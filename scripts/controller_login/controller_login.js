@@ -26,6 +26,7 @@ async function registrarUsu(){
         correo :$("#correo").val().trim(),
         contraseña : $("#contraseña").val().trim(),
         edad : $("#edad").val().trim(),
+        telefono : $("#telefono").val().trim(),
         fecha_nac : $("#fechaNac").val().trim(),
 
     }
@@ -48,4 +49,8 @@ async function validarIngreso() {
     }else {
         alert("Usuario y/o contraseña incorrectos")
     }
+}
+
+async function loginRegister() {
+    
 }

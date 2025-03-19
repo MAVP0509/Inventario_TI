@@ -25,15 +25,15 @@ print(json_encode($respuesta_servidor));
 function insertarUsuario(){
     include("../coneccion.php");
     $registro =date("Y-m-d H:i:s");
-    $sql="INSERT INTO usuario(nombre,correo,contraseña,edad,fecha_nac,fecha_reg,habilitado) VALUES ('$valores->nombre',
-    '$valores->correo','$valores->contraseña','$valores->edad','$valores->fecha_nac,'$registro',1)";
+    $sql="INSERT INTO usuario(nombre,correo,contraseña,edad,telefono,fecha_nac,fecha_reg,habilitado) VALUES ('$valores->nombre',
+    '$valores->correo','$valores->contraseña','$valores->edad','$valores->telefono','$valores->fecha_nac,'$registro',1)";
     return mysqli_query($con,$sql);
 }
 
 function editar_usuario($valores){
     include("../conexion.php");
     $sql = "UPDATE usuario SET nombre='$valores->nombre', correo='$valores->correo', contraseña='$valores->contraseña', 
-    edad='$valores->edad', fecha_nac='$valores->fecha_nac' WHERE id='$valores->id';";
+    edad='$valores->edad', telefono='$valores->telefono',fecha_nac='$valores->fecha_nac' WHERE id='$valores->id';";
     return mysqli_query($con,$sql);
 }
 
