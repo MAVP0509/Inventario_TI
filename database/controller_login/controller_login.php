@@ -7,7 +7,11 @@
 
     $respuesta_servidor = new stdClass();
 
-
+    if($clientejson->accion==0){
+        $respuesta_servidor->resultado=ConsultarDatos($clientejson);
+    }elseif($clientejson->accion==1){
+        $respuesta_servidor->resultado=insertarUsuario($clientejson);
+    }
 
 
     function consultarDatos(){
@@ -19,4 +23,12 @@
             array_push($array,$fila);
         }
         return $array;
+    }
+
+    function insertarUsuario(){
+        include("../coneccion.php");
+        $registro =date("Y-m-d H:i:s");
+        $sql="INSERT INTO usuario(nombre,correo,contraseña,edad,fecha_nac,fecha_reg,habilitado) VALUES ('$valores->nombre',
+        '$valores->correo','$valores->contraseña','$valores->edad','$valores->fecha_nac,'$registro',1)";
+        return mysqli_query($con,$sql);
     }

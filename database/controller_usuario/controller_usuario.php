@@ -26,7 +26,7 @@ function insertarUsuario(){
     include("../coneccion.php");
     $registro =date("Y-m-d H:i:s");
     $sql="INSERT INTO usuario(nombre,correo,contraseña,edad,fecha_nac,fecha_reg,habilitado) VALUES ('$valores->nombre',
-    '$valores->correo','$valores->contraseña','$valores->edad','$valores->fecha_nac,'$registro','$valores->habilitado')";
+    '$valores->correo','$valores->contraseña','$valores->edad','$valores->fecha_nac,'$registro',1)";
     return mysqli_query($con,$sql);
 }
 
