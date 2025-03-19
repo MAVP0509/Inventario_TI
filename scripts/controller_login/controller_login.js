@@ -37,7 +37,6 @@ async function insertar_usuario(){
 
 async function validarIngreso() {
     let model = {
-        accion : 0,
         correo :$("#correo").val().trim(),
         edad : $("#edad").val().trim(),
 
