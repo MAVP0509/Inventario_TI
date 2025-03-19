@@ -15,6 +15,9 @@ if($clientejson->accion==0){
     $respuesta_servidor->resultado=consultar_usuario($clientejson);
 }elseif($clientejson->accion==3){
     $respuesta_servidor->resultado=desactivar_usuario($clientejson);
+}elseif($clientejson->accion==4){
+    $respuesta_servidor->resultado==eliminar_usuario($clientejson);
+    
 }
 
 print(json_encode($respuesta_servidor));
