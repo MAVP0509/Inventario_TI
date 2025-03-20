@@ -48,3 +48,7 @@ async function validarIngreso() {
     }
     server.resultado;
 }
+
+const container = document.querySelector("container");
+const btnIni = document.getElementById("btn-ini");
+const btn
