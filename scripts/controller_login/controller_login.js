@@ -17,7 +17,7 @@ function server_usuario(model){
     })
 }
 
-async function insertar_usuario(){
+async function registrarUsu(){
     
 
     let model = {
@@ -26,7 +26,7 @@ async function insertar_usuario(){
         correo :$("#correo").val().trim(),
         contraseña : $("#contraseña").val().trim(),
         edad : $("#edad").val().trim(),
-        fecha_nac : $("#fecha_nac").val().trim(),
+        fecha_nac : $("#fechaNac").val().trim(),
 
     }
 
@@ -43,12 +43,10 @@ async function validarIngreso() {
     }
 
     let server = await server_usuario({Accion : 0});
-    if(server.resultado[0] === model.correo ){
-
+    if(server.resultado[0] === model.correo && server.resultado[1] === model.contraseña){
+        alert("Felicidades")
+    }else {
+        alert("Usuario y/o contraseña incorrectos")
     }
-    server.resultado;
 }
 
-const container = document.querySelector("container");
-const btnIni = document.getElementById("btn-ini");
-const btn
