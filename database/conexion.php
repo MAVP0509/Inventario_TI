@@ -1,7 +1,7 @@
 <?php 
     $user="root";
     $pass="root";
-    $sever="localhost";
+    $server="localhost";
     $db="inventario_ti";
     $con= mysqli_connect($server,$user,$pass) or die("Error al conectar");
     mysqli_select_db($con,$db);
