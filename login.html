@@ -31,7 +31,7 @@
         </div>
 
         <!--Col de registro de usuario-->
-        <div class="col" style="display: none;" id="colnone">
+        <div class="col" style="display: none;" id="colnone" onload="validar_contraseña()">
             <div class="card text-center" style="width: 50vh;">
                 <div class="card-body">
                     <h5>Crear una cuenta</h5>
@@ -52,20 +52,24 @@
                             <input type="date" class="form-control" id="fechanac" placeholder="Fecha de nacimiento" name="inputReg">
                         </div>
                     </div>
-                    <div class="form-group">
-                        <input type="password" class="form-control" id="regcontraseña" 
+                    <div class="form-group" name="formcotra">
+                        <input type="password" class="form-control" id="reg-contraseña" data-html="true"
                         data-toggle="popover" 
                         title="Crea una contraseña segura" 
-                        data-content="Que tenga al menos 8 caracteres;
-                                    Que incluya letras mayúsculas y minúsculas;
-                                    Que incluya números;
-                                    Que incluya caracteres especiales como * () # @, etc.;" 
-                        placeholder="Crea tu contraseña">
+                        data-content="<ul class='list-group'>
+                                        <li class='list-group-item'>Que tenga al menos 8 caracteres.</li>
+                                        <li class='list-group-item'>Que incluya letras mayúsculas y minúsculas.</li>
+                                        <li class='list-group-item'>Que incluya números.</li>
+                                        <li class='list-group-item'>Que incluya caracteres especiales como * () # @, etc.</li>
+                                    </ul>"
+                                     
+                        placeholder="Crea tu contraseña" required>
                     </div>
-                    <div class="form-group">
-                        <input type="password" class="form-control" id="confcontraseña" placeholder="Confirma tu contraseña">
+                    <div class="form-group" name="formcontra">
+                        <input type="password" class="form-control" id="conf-contraseña" placeholder="Confirma tu contraseña" required>
                     </div>
-                    <button class="btn btn-primary" id="btn-reg" onclick="registrarUsu()">Registrate</button>
+                    <span id="errorcontra" style="color: red; display: none;">La contraseña no coincide</span>
+                    <button class="btn btn-primary" type="submit" id="btn-reg" onclick="registrarUsu()" disabled>Registrate</button>
                     <br>
                     <a href="#" onclick="toggleForms(false)">¿Ya tienes cuenta?</a>   
                 </div>
