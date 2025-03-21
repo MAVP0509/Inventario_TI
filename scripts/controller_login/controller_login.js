@@ -30,8 +30,8 @@ async function registrarUsu(){
         edad : $("#edad").val().trim(),
         telefono : $("#telefono").val().trim(),
         fecha_nac : $("#fechanac").val().trim(),
-
     }
+
 
     //console.log(JSON.stringify(model));
     let server =await server_usuario(model);
@@ -77,7 +77,7 @@ $(document).ready(function () {
     
   });
 
-async function validar_contraseña() {
+/* async function validar_contraseña() {
     let contraseña = document.getElementById("reg-contraseña");
     let vcontraseña = document.getElementById("conf-contraseña");
 
@@ -85,6 +85,14 @@ async function validar_contraseña() {
         document.getElementById("btn-reg").disabled = true;
     } else if (contraseña === vcontraseña) {
         document.getElementById("btn-reg").disabled = false;
+    }
+} */
+
+function validar(a,b){
+    if (a === b) {
+        return true;
+    }else{  
+        return false;
     }
 }
 
