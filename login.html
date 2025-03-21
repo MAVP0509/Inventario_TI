@@ -19,10 +19,10 @@
                 <div class="card-body">
                     <h5>Iniciar sesión</h5>
                     <div class="form-group">
-                        <input type="email" class="form-control" id="logcorreo" placeholder="Correo eléctronico">
+                        <input type="email" class="form-control" id="logcorreo" placeholder="Correo eléctronico" name="inputInit">
                     </div>
                     <div class="form-group">
-                        <input type="password" class="form-control" id="logcontraseña" placeholder="Contraseña">
+                        <input type="password" class="form-control" id="logcontraseña" placeholder="Contraseña" name="inputInit">
                         <a clas="form-sublink" href="#" onclick="toggleForms(false, true)">¿Olvidaste tu contraseña?</a>
                     </div>
                     <button class="btn btn-primary" id="btn-ini" onclick="validarIngreso()">Iniciar sesión</button>
@@ -37,24 +37,24 @@
                 <div class="card-body">
                     <h5>Crear una cuenta</h5>
                     <div class="form-group">
-                        <input type="text" class="form-control" id="nombre" placeholder="Nombre completo">
+                        <input type="text" class="form-control" id="nombre" placeholder="Nombre completo" name="inputReg">
                     </div>
                     <div class="form-group">
-                        <input type="email" class="form-control" id="regcorreo" placeholder="Correo eléctronico">
+                        <input type="email" class="form-control" id="regcorreo" placeholder="Correo eléctronico" name="inputReg">
                     </div>
                     <div class="form-group">
-                        <input type="tel" class="form-control" id="telefono" placeholder="Número de teléfono">
+                        <input type="tel" class="form-control" id="telefono" placeholder="Número de teléfono" name="inputReg">
                     </div>
                     <div class="form-row form-group">
                         <div class="col">
-                            <input type="number" class="form-control" id="edad" placeholder="Edad">
+                            <input type="number" class="form-control" id="edad" placeholder="Edad" name="inputReg">
                         </div>
                         <div class="col">
-                            <input type="date" class="form-control" id="fechanac" placeholder="Fecha de nacimiento">
+                            <input type="date" class="form-control" id="fechanac" placeholder="Fecha de nacimiento" name="inputReg">
                         </div>
                     </div>
                     <div class="form-group">
-                        <input type="password" class="form-control" id="regcontraseña" placeholder="Crea tu contraseña">
+                        <input type="password" class="form-control" id="regcontraseña" placeholder="Crea tu contraseña" name="inputReg">
                     </div>
 
                     <button class="btn btn-primary" id="btn-reg" onclick="registrarUsu()">Registrate</button>
@@ -71,7 +71,7 @@
                 <div class="card-body">
                     <h5>Recupera tu cuenta</h5>
                     <div class="form-group">
-                        <input type="email" class="form-control" id="repcorreo" onke placeholder="Correo eléctronico">
+                        <input type="email" class="form-control" id="repcorreo" onke placeholder="Correo eléctronico" name="inputRecov">
                     </div>
                     <div class="form-group">
                         <button type="button" class="btn btn-light" onclick="toggleForms(false)">Cancelar</button>
