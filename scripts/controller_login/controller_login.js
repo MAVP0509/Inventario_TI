@@ -51,6 +51,18 @@ async function validarIngreso() {
     }
 }
 
-async function loginRegister() {
-    
+async function toggleForms(showRegister = false, showRecovery = false){
+    if(showRecovery){
+        $("#colrep").show(); //Muetsra el formulario de recuperación
+        $("#colnone").hide(); //Oculta el formulario de inicio de sesión
+        $("#colblock").hide(); //Oculta el formulario de registro
+    } else if(showRegister) {
+        $("#colnone").show(); //Muestra la sección de registro
+        $("#colblock").hide(); //Oculta la sección de inicio de sesión
+        $("#colrep").hide(); //Oculta la seccion de recuperación
+    } else {
+        $("#colnone").hide(); //Oculta la sección de registro
+        $("#colblock").show(); //Muestra el formulario de inicio de sesión
+        $("#colrep").hide(); //Oculta la sección de recuperación
+    }
 }

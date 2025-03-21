@@ -12,50 +12,72 @@
 </head>
 <body class="container-fluid d-flex justify-content-center align-items-center vh-100">
     <div class="row">
-        <div class="col" style="display: block;">
+
+        <!--Col de Iniciar sesión-->
+        <div class="col" style="display: block;" id="colblock">
             <div class="card text-center" style="width: 50vh;">
                 <div class="card-body">
                     <h5>Iniciar sesión</h5>
                     <div class="form-group">
-                        <!--<label for="label-email">Correo</label>-->
-                        <input type="text" class="form-control" id="inp_correo" placeholder="Correo eléctronico">
+                        <input type="email" class="form-control" id="logcorreo" placeholder="Correo eléctronico">
                     </div>
-    
                     <div class="form-group">
-                        <!--label for="contraseña">Contraseña</label-->
-                        <input type="password" class="form-control" id="inp_contraseña" placeholder="Contraseña">
-                        <a clas="form-sublink" href="">¿Olvidaste tu contraseña?</a>
+                        <input type="password" class="form-control" id="logcontraseña" placeholder="Contraseña">
+                        <a clas="form-sublink" href="#" onclick="toggleForms(true, false)">¿Olvidaste tu contraseña?</a>
                     </div>
-                    <script>
-                        
-                    </script>
-                    <button class="btn btn-primary" id="btn_inisec" onclick="">Iniciar sesión</button>
-                    <p class="small text-center text-gray-soft">¿No te has registrado?<a href="#" onclick=""> Registrate</a></p>
+                    <button class="btn btn-primary" id="btn-ini" onclick="">Iniciar sesión</button>
+                    <p class="small text-center text-gray-soft">¿No te has registrado?<a href="#" id="link-registro" onclick="toggleForms(true)"> Registrate</a></p>
                 </div>
             </div>
         </div>
 
-        <div class="col" style="display: none;">
-            <div class="card" style="width: 50vh;">
+        <!--Col de registro de usuario-->
+        <div class="col" style="display: none;" id="colnone">
+            <div class="card text-center" style="width: 50vh;">
                 <div class="card-body">
-                    <h5>Registrate</h5>
+                    <h5>Crear una cuenta</h5>
                     <div class="form-group">
-                        <!--<label for="label-email">Correo</label>-->
-                        <input type="text" class="form-control" id="inp_correo" placeholder="Correo eléctronico">
+                        <input type="text" class="form-control" id="nombre" placeholder="Nombre completo">
                     </div>
-    
                     <div class="form-group">
-                        <!--label for="contraseña">Contraseña</label-->
-                        <input type="password" class="form-control" id="inp_contraseña" placeholder="Contraseña">
-                        <a clas="form-sublink" href="">¿Olvidaste tu contraseña?</a>
+                        <input type="email" class="form-control" id="regcorreo" placeholder="Correo eléctronico">
                     </div>
-                    <script>
-                        
-                    </script>
-                    <button class="btn btn-primary" id="btn_inisec" onclick="">Iniciar sesión</button>
-                    <p class="small text-center text-gray-soft">¿No te has registrado?<a href="#" onclick=""> Registrate</a></p>
+                    <div class="form-group">
+                        <input type="tel" class="form-control" id="telefono" placeholder="Número de teléfono">
+                    </div>
+                    <div class="form-row form-group">
+                        <div class="col">
+                            <input type="number" class="form-control" id="edad" placeholder="Edad">
+                        </div>
+                        <div class="col">
+                            <input type="date" class="form-control" id="fechanac" placeholder="Fecha de nacimiento">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" id="regcontraseña" placeholder="Crea tu contraseña">
+                    </div>
+
+                    <button class="btn btn-primary" id="btn-reg" onclick="">Registrate</button>
+                    <br>
+                    <a href="#" id="link-login" onclick="toggleForms(false)">¿Ya tienes cuenta?</a>   
                 </div>
     
+            </div>
+        </div>
+
+        <!--Col de recuperación de contraseña-->
+        <div class="col" style="display: none;" id="colrep">
+            <div class="card text-center" style="width: 50vh;">
+                <div class="card-body">
+                    <h5>Recupera tu cuenta</h5>
+                    <div class="form-group">
+                        <input type="email" class="form-control" id="repcorreo" onke placeholder="Correo eléctronico">
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-light" onclick="toggleForms(false)">Cancelar</button>
+                        <button type="button" class="btn btn-primary">Buscar</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -67,5 +89,5 @@
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="scripts/controller_usuario/controller_usuario.js"></script>
-
+    <script src="scripts/controller_login/controller_login.js"></script>
 </html>
