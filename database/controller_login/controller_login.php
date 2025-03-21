@@ -19,7 +19,7 @@
     //print($clientejson->nombre);
 
     if($clientejson->accion==0){
-        $respuesta_servidor->resultado = ConsultarDatos($clientejson);
+        $respuesta_servidor->resultado = consultarDatos($clientejson);
     }elseif($clientejson->accion==1){
         $respuesta_servidor->resultado = insertarUsuario($clientejson);
     } 
