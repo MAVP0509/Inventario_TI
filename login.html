@@ -23,16 +23,16 @@
                     </div>
                     <div class="form-group">
                         <input type="password" class="form-control" id="logcontraseña" placeholder="Contraseña">
-                        <a clas="form-sublink" href="">¿Olvidaste tu contraseña?</a>
+                        <a clas="form-sublink" href="#" onclick="toggleForms(true, false)">¿Olvidaste tu contraseña?</a>
                     </div>
-                    <button class="btn btn-primary" id="btn_inisec" onclick="">Iniciar sesión</button>
-                    <p class="small text-center text-gray-soft">¿No te has registrado?<a href="#" onclick=""> Registrate</a></p>
+                    <button class="btn btn-primary" id="btn-ini" onclick="">Iniciar sesión</button>
+                    <p class="small text-center text-gray-soft">¿No te has registrado?<a href="#" id="link-registro" onclick="toggleForms(true)"> Registrate</a></p>
                 </div>
             </div>
         </div>
 
         <!--Col de registro de usuario-->
-        <div class="col" style="display: block;" id="colnone">
+        <div class="col" style="display: none;" id="colnone">
             <div class="card text-center" style="width: 50vh;">
                 <div class="card-body">
                     <h5>Crear una cuenta</h5>
@@ -57,16 +57,16 @@
                         <input type="password" class="form-control" id="regcontraseña" placeholder="Crea tu contraseña">
                     </div>
 
-                    <button class="btn btn-primary" id="btn_inisec" onclick="">Registrate</button>
+                    <button class="btn btn-primary" id="btn-reg" onclick="">Registrate</button>
                     <br>
-                    <a href="#" onclick="">¿Ya tienes cuenta?</a>   
+                    <a href="#" id="link-login" onclick="toggleForms(false)">¿Ya tienes cuenta?</a>   
                 </div>
     
             </div>
         </div>
 
         <!--Col de recuperación de contraseña-->
-        <div class="col" style="display: block;" id="colrep">
+        <div class="col" style="display: none;" id="colrep">
             <div class="card text-center" style="width: 50vh;">
                 <div class="card-body">
                     <h5>Recupera tu cuenta</h5>
@@ -74,7 +74,7 @@
                         <input type="email" class="form-control" id="repcorreo" onke placeholder="Correo eléctronico">
                     </div>
                     <div class="form-group">
-                        <button type="button" class="btn btn-light">Cancelar</button>
+                        <button type="button" class="btn btn-light" onclick="toggleForms(false)">Cancelar</button>
                         <button type="button" class="btn btn-primary">Buscar</button>
                     </div>
                 </div>
@@ -89,5 +89,5 @@
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="scripts/controller_usuario/controller_usuario.js"></script>
-
+    <script src="scripts/controller_login/controller_login.js"></script>
 </html>
