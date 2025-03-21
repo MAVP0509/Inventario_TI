@@ -79,17 +79,6 @@ $(document).ready(function () {
     
   });
 
-/* async function validar_contraseña() {
-    let contraseña = document.getElementById("reg-contraseña");
-    let vcontraseña = document.getElementById("conf-contraseña");
-
-    if (contraseña !== vcontraseña) {
-        document.getElementById("btn-reg").disabled = true;
-    } else if (contraseña === vcontraseña) {
-        document.getElementById("btn-reg").disabled = false;
-    }
-} */
-
 function validar_contraseña(){
     let contraseña = document.getElementById("reg-contraseña");
     let vcontraseña = document.getElementById("conf-contraseña");
