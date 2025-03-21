@@ -1,3 +1,4 @@
+let respuesta
 function server_usuario(model){
     return new Promise ((resolve,reject)=>{
         $.ajax({
@@ -7,12 +8,12 @@ function server_usuario(model){
                 trama:JSON.stringify(model)
             },
             success: function(response){
+                respuesta = response
+                console.log(respuesta)
                 try {
                     resolve(JSON.parse(response))
-                    alert("Registro exitoso")
                 } catch (error) {
                     reject(error)
-                    alert("Registro fallido")
                 }
             }
         })
@@ -21,8 +22,6 @@ function server_usuario(model){
 
 
 async function registrarUsu(){
-    
-
     let model = {
         accion : 1,
         nombre: $("#nombre").val().trim(),
@@ -36,6 +35,10 @@ async function registrarUsu(){
 
     //console.log(JSON.stringify(model));
     let server =await server_usuario(model);
+    let inputs = document.getElementsByName("inputReg");
+    for (let i = 0; i < inputs.length; i++) {
+        const element = inputs[i].value = "";
+    }
 }
 
 async function validarIngreso() {
