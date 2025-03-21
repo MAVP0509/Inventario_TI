@@ -9,13 +9,16 @@ function server_usuario(model){
             success: function(response){
                 try {
                     resolve(JSON.parse(response))
+                    alert("Registro exitoso")
                 } catch (error) {
                     reject(error)
+                    alert("Registro fallido")
                 }
             }
         })
     })
 }
+
 
 async function registrarUsu(){
     
@@ -33,7 +36,6 @@ async function registrarUsu(){
 
     //console.log(JSON.stringify(model));
     let server =await server_usuario(model);
-    //console.log(server);
 }
 
 async function validarIngreso() {
