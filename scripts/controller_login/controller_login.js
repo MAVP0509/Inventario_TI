@@ -39,6 +39,8 @@ async function registrarUsu(){
     for (let i = 0; i < inputs.length; i++) {
         const element = inputs[i].value = "";
     }
+
+    validar_contraseña();
 }
 
 async function validarIngreso() {
@@ -88,10 +90,12 @@ $(document).ready(function () {
     }
 } */
 
-function validar(a,b){
-    if (a === b) {
+function validar_contraseña(){
+    let contraseña = document.getElementById("reg-contraseña");
+    let vcontraseña = document.getElementById("conf-contraseña");
+    if (contraseña === vcontraseña) {
         return true;
-    }else{  
+    } else {  
         return false;
     }
 }
