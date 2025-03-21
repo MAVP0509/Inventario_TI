@@ -1,4 +1,4 @@
-let respuesta
+let respuesta = "";
 function server_usuario(model){
     return new Promise ((resolve,reject)=>{
         $.ajax({
@@ -9,7 +9,6 @@ function server_usuario(model){
             },
             success: function(response){
                 respuesta = response
-                console.log(respuesta)
                 try {
                     resolve(JSON.parse(response))
                 } catch (error) {
@@ -26,7 +25,7 @@ async function registrarUsu(){
         accion : 1,
         nombre: $("#nombre").val().trim(),
         correo :$("#regcorreo").val().trim(),
-        contraseña : $("#regcontraseña").val().trim(),
+        contraseña : $("#reg-contraseña").val().trim(),
         edad : $("#edad").val().trim(),
         telefono : $("#telefono").val().trim(),
         fecha_nac : $("#fechanac").val().trim(),
@@ -34,13 +33,15 @@ async function registrarUsu(){
 
 
     //console.log(JSON.stringify(model));
+    console.log(JSON.stringify(model));
     let server =await server_usuario(model);
-    let inputs = document.getElementsByName("inputReg");
+    console.log(server)
+    /*let inputs = document.getElementsByName("inputReg");
     for (let i = 0; i < inputs.length; i++) {
         const element = inputs[i].value = "";
     }
-
-    validar_contraseña();
+  */
+    
 }
 
 async function validarIngreso() {
