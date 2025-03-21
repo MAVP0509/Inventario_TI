@@ -25,9 +25,7 @@
                         <a clas="form-sublink" href="#" onclick="toggleForms(false, true)">¿Olvidaste tu contraseña?</a>
                     </div>
                     <button class="btn btn-primary" id="btn-ini" onclick="">Iniciar sesión</button>
-                    <p class="small text-center text-gray-soft">¿No te has registrado?  <a href="#" onclick="toggleForms(true)">Registrate</a></p>
-                    <button class="btn btn-primary" id="btn-ini" onclick="validarIngreso()">Iniciar sesión</button>
-                    <p class="small text-center text-gray-soft">¿No te has registrado?<a href="#" id="link-registro" onclick="toggleForms(true)"> Registrate</a></p>
+                    <p class="small text-center text-gray-soft">¿No te has registrado?  <a href="#" id="link-registro" onclick="toggleForms(true)">Registrate</a></p>
                 </div>
             </div>
         </div>
@@ -64,7 +62,9 @@
                                     Que incluya caracteres especiales como * () # @, etc.;" 
                         placeholder="Crea tu contraseña">
                     </div>
-
+                    <div class="form-control">
+                        <input type="password" class="form-control" id="confcontraseña" placeholder="Confirma tu contraseña">
+                    </div>
                     <button class="btn btn-primary" id="btn-reg" onclick="registrarUsu()">Registrate</button>
                     <br>
                     <a href="#" onclick="toggleForms(false)">¿Ya tienes cuenta?</a>   
