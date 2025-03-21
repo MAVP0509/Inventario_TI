@@ -16,7 +16,7 @@ function server_usuario(model){
                 }
             }
         })
-    })
+    })  
 }
 
 
