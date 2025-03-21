@@ -2,9 +2,9 @@ function server_usuario(model){
     return new Promise ((resolve,reject)=>{
         $.ajax({
             type: "POST",
-            url: "database/controller_usuario/controller_usuario.php",
+            url: "database/controller_login/controller_login.php",
             data: {
-                Trama:JSON.stringify(model)
+                trama:JSON.stringify(model)
             },
             success: function(response){
                 try {
@@ -23,23 +23,23 @@ async function registrarUsu(){
     let model = {
         accion : 1,
         nombre: $("#nombre").val().trim(),
-        correo :$("#correo").val().trim(),
-        contraseña : $("#contraseña").val().trim(),
+        correo :$("#regcorreo").val().trim(),
+        contraseña : $("#regcontraseña").val().trim(),
         edad : $("#edad").val().trim(),
         telefono : $("#telefono").val().trim(),
-        fecha_nac : $("#fechaNac").val().trim(),
+        fecha_nac : $("#fechanac").val().trim(),
 
     }
 
-    console.log(JSON.stringify(model));
+    //console.log(JSON.stringify(model));
     let server =await server_usuario(model);
-    console.log(server);
+    //console.log(server);
 }
 
 async function validarIngreso() {
     let model = {
-        correo :$("#correo").val().trim(),
-        edad : $("#edad").val().trim(),
+        correo :$("#logcorreo").val().trim(),
+        contraseña : $("#logcontraseña").val().trim(),
 
     }
 
@@ -66,3 +66,24 @@ async function toggleForms(showRegister = false, showRecovery = false){
         $("#colrep").hide(); //Oculta la sección de recuperación
     }
 }
+
+/*async function prueba(params) {
+    let persona = {
+        nombre : "Miguel",
+        fecha : Date()
+    }
+
+
+}
+let a = 0;
+let b = 1;
+let res = suma(a,b);
+
+let parametrosparasua ={
+    a:0,
+    b:1
+}
+
+function suma(params){
+    return params.a + params.b;
+} */

@@ -1,7 +1,7 @@
 <?php
 
 header('Content-Type: text/html; charset=UTF-8');
-date_default_timezone_set('America/Mrexico_City');
+date_default_timezone_set('America/Mexico_City');
 
 $clientejson = json_decode($_POST['trama']);
 
@@ -23,7 +23,7 @@ if($clientejson->accion==0){
 print(json_encode($respuesta_servidor));
 
 function insertarUsuario(){
-    include("../coneccion.php");
+    include("../conexion.php");
     $registro =date("Y-m-d H:i:s");
     $sql="INSERT INTO usuario(nombre,correo,contraseña,edad,telefono,fecha_nac,fecha_reg,habilitado) VALUES ('$valores->nombre',
     '$valores->correo','$valores->contraseña','$valores->edad','$valores->telefono','$valores->fecha_nac,'$registro',1)";

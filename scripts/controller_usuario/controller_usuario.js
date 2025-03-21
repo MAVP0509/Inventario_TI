@@ -4,7 +4,7 @@ function server_usuario(model){
             type: "POST",
             url: "database/controller_usuario/controller_usuario.php",
             data: {
-                Trama:JSON.stringify(model)
+                trama:JSON.stringify(model) 
             },
             success: function(response){
                 try {
