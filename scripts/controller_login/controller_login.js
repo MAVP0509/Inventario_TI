@@ -65,3 +65,8 @@ async function toggleForms(showRegister = false, showRecovery = false){
         $("#colrep").hide(); //Oculta la sección de recuperación
     }
 }
+
+$(document).ready(function () {
+    $('[data-toggle="popover"]').popover()
+    
+  });
