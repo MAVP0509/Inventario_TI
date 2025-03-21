@@ -9,7 +9,6 @@ function server_usuario(model){
             },
             success: function(response){
                 respuesta = response
-                console.log(respuesta)
                 try {
                     resolve(JSON.parse(response))
                 } catch (error) {
@@ -76,23 +75,3 @@ $(document).ready(function () {
     $('[data-toggle="popover"]').popover()
     
   });
-/*async function prueba(params) {
-    let persona = {
-        nombre : "Miguel",
-        fecha : Date()
-    }
-
-
-}
-let a = 0;
-let b = 1;
-let res = suma(a,b);
-
-let parametrosparasua ={
-    a:0,
-    b:1
-}
-
-function suma(params){
-    return params.a + params.b;
-} */
