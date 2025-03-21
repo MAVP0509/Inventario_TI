@@ -110,3 +110,7 @@ let parametrosparasua ={
 function suma(params){
     return params.a + params.b;
 } */
+
+    function hola(){
+        console.log("Hola")
+    }
