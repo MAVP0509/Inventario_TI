@@ -62,7 +62,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
                         </div>
-                        <input type="tel" class="form-control" id="telefono" placeholder="Número de teléfono" name="inputReg">
+                        <input type="tel" class="form-control" id="telefono" maxlength="10" oninput="this.value.replace(/[^0-9]/g, '');" required placeholder="Número de teléfono" name="inputReg">
                     </div>
                     <div class="form-row form-group">
                         <div class="col">
