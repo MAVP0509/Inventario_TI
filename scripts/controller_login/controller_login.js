@@ -112,21 +112,23 @@ function enter_enviar(event){
 }
 
 
-/* async function validar_email(){
-        inputCorreo = document.getElementsByName("inputInit")[1]
+async function validar_email(){
+        regCorreo = document.getElementById("regcorreo").value()
 
-        inputCorreo.addEventListener("invalid", ()=> {
-            alert("Ingrese un correo electrónico válido")
-        })
+        regCorreo.addEventListener("input", function(event){
+            var regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 
-        inputCorreo.addEventListener("input", () => {
-            inputCorreo.reportValidity();
-            alert("Correo válido")
-            if (!reportVal) {
-              alert("Correo no válido")
+            if (!correo) {
+              alert("El correo no puede estar vacío.");
+              event.preventDefault();
+            } else if (!regex.test(correo)) {
+              alert("Por favor ingresa un correo electrónico válido.");
+              event.preventDefault();
+            } else {
+              alert("Correo válido.");
             }
           });
-} */
+} 
 
 async function validar_telefono(){
     telefonoInput = document.getElementById('telefono');
