@@ -88,12 +88,27 @@ $(document).ready(function () {
   });
 
 function validar_contraseña(){
-    let contraseña = document.getElementById("reg-contraseña");
-    let vcontraseña = document.getElementById("conf-contraseña");
-    if (contraseña === vcontraseña) {
-        return true;
-    } else {  
-        return false;
+    let contraseña = document.getElementById("reg-contraseña").value;
+    let vcontraseña = document.getElementById("conf-contraseña").value;
+
+    if (contraseña !== vcontraseña) {
+        mensaje += 'Las contraseñas no coinciden.<br>';
+    }
+
+    var popoverContent = document.querySelector('#reg-contraseña').getAttribute('data-content');
+    if (mensaje) {
+        document.querySelector('#reg-contraseña').setAttribute('data-content', mensaje);
+        $('#reg-contraseña').popover('show');
+    } else {
+        $('#reg-contraseña').popover('hide');
+    }
+    document.getElementById('reg-contraseña').addEventListener('input', validar_contraseña);
+    document.getElementById('conf-contraseña').addEventListener('input', validar_contraseña);
+}
+
+function enter_enviar(event){
+    if (event.keyCode == 13){
+        validar_contraseña()
     }
 }
 
