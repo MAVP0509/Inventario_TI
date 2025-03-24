@@ -66,6 +66,9 @@
                     </div>
                     <div class="form-row form-group">
                         <div class="col">
+                            <input type="date" class="form-control" id="fechanac" placeholder="Fecha de nacimiento" name="inputReg">
+                        </div>
+                        <div class="col">
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa-solid fa-image-portrait"></i></span>
@@ -73,20 +76,17 @@
                                 <input type="number" class="form-control" id="edad" placeholder="Edad" name="inputReg">
                             </div>
                         </div>
-                        <div class="col">
-                            <input type="date" class="form-control" id="fechanac" placeholder="Fecha de nacimiento" name="inputReg">
-                        </div>
                     </div>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
                         </div>
-                        <input type="password" class="form-control" id="reg-contraseña" data-html="true" data-toggle="popover" title="Crea una contraseña segura" 
+                        <input type="password" class="form-control" id="reg-contraseña" data-html="true" data-toggle="popover" data-trigger="hover" title="Crea una contraseña segura" 
                         data-content="<ul class='list-group'>
-                                        <li class='list-group-item'>Que tenga al menos 8 caracteres.</li>
-                                        <li class='list-group-item'>Que incluya letras mayúsculas y minúsculas.</li>
-                                        <li class='list-group-item'>Que incluya números.</li>
-                                        <li class='list-group-item'>Que incluya caracteres especiales como * () # @, etc.</li>
+                                        <li class='list-group-item' id='minlongitud'>Que tenga al menos 8 caracteres.</li>
+                                        <li class='list-group-item' id='lestrasmm'>Que incluya letras mayúsculas y minúsculas.</li>
+                                        <li class='list-group-item' id='numeros'>Que incluya números.</li>
+                                        <li class='list-group-item' id='caracteresp'>Que incluya caracteres especiales como * () # @, etc.</li>
                                     </ul>"
                                      
                         placeholder="Crea tu contraseña" required name="inputReg">

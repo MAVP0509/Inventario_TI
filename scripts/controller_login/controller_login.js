@@ -48,7 +48,6 @@ async function registrarUsu(){
         alert("Usuario no ingresado")
     }
     
-    
 }
 
 async function validarIngreso() {
@@ -87,6 +86,8 @@ $(document).ready(function () {
     
     // Añadimos el evento input al campo de confirmación de contraseña
     document.getElementById('conf-contraseña').addEventListener('input', validar_contraseña);
+    document.getElementById('reg-contraseña').addEventListener('input', validar_contraseña);
+    document.getElementById('fechanac').addEventListener('input',calcularEdad);
 });
 
 function validar_contraseña(){
@@ -94,21 +95,56 @@ function validar_contraseña(){
     let confcontraseña = document.getElementById('conf-contraseña').value;
     let errorMessage = document.getElementById('error-mensaje');
 
-    if (regcontraseña !== confcontraseña){
+    if (event.target.id === 'conf-contraseña') {
+        if (regcontraseña !== confcontraseña){
+            errorMessage.style.display = 'block';
+            errorMessage.textContent = 'Las contraseñas no coinciden';
+        } else {
+            errorMessage.style.display = 'none';
+        }
+    }
+
+    /* if (regcontraseña !== confcontraseña){
         errorMessage.style.display = 'block';
         errorMessage.textContent = 'Las contraseñas no coinciden';
     } else {
         errorMessage.style.display = 'none';
-    }
+    } */
+
+    let minlongitud = regcontraseña.length >= 8;
+    let letrasmay = /[A-Z]/.test(regcontraseña);
+    let letrasmin = /[a-z]/.test(regcontraseña);
+    let numeros = /\d/.test(regcontraseña);
+    let especialesc = /[()*#@]/.test(regcontraseña);
+
+    document.getElementById('minlongitud').style.color = minlongitud ? 'green' : 'red';
+    document.getElementById('lestrasmm').style.color = (letrasmay && letrasmin) ? 'green' : 'red';
+    document.getElementById('numeros').style.color = numeros ? 'green' : 'red';
+    document.getElementById('caracteresp').style.color = especialesc ? 'green' : 'red';
+    
 }
 
-document.getElementById('conf-contraseña').addEventListener('input', validar_contraseña);
+document.getElementById('conf-contraseña').addEventListener('input', validar_contraseña); //Manda a llamar el input donde se registra la contraseña para usar la función
 
-function enter_enviar(event){
+function calcularEdad(){
+    let fechaNacimiento = new Date(document.getElementById('fechanac').value);
+    let hoy = new Date();
+    let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+    
+    let mes = hoy.getMonth() - fechaNacimiento.getMonth();
+
+    if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
+        edad--;
+    }
+
+    document.getElementById('edad').value = edad;
+}
+
+/* function enter_enviar(event){
     if (event.keyCode == 13){
         validar_contraseña()
     }
-}
+} */
 
 
 async function validar_email(){
