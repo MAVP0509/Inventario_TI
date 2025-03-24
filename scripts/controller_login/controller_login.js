@@ -41,7 +41,7 @@ async function registrarUsu(){
         const element = inputs[i].value = "";
     }
     if(respuesta.resultado = true){
-        let toast = $('#miToast');
+        let toast = $('#liveToast');
         // Mostramos el toast usando el método de Bootstrap
         toast.toast('show');
     }else if(respuesta.resultado = false){
@@ -84,7 +84,6 @@ async function toggleForms(showRegister = false, showRecovery = false){
 
 $(document).ready(function () {
     $('[data-toggle="popover"]').popover()
-    
   });
 
 function validar_contraseña(){
@@ -113,7 +112,6 @@ function enter_enviar(event){
 }
 
 
-
 /* async function validar_email(){
         inputCorreo = document.getElementsByName("inputInit")[1]
 
@@ -129,3 +127,11 @@ function enter_enviar(event){
             }
           });
 } */
+
+async function validar_telefono(){
+    telefonoInput = document.getElementById('telefono');
+
+  telefonoInput.addEventListener('input', function() {
+    this.value = this.value.replace(/[^0-9]/g, ''); // Reemplaza cualquier cosa que no sea un número
+  });
+}

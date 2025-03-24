@@ -56,13 +56,13 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
                         </div>
-                        <input type="email" class="form-control" id="regcorreo" placeholder="Correo eléctronico" name="inputReg">
+                        <input type="email" class="form-control" id="regcorreo" placeholder="Correo eléctronico" name="inputReg" inputmode="email">
                     </div>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
                         </div>
-                        <input type="tel" class="form-control" id="telefono" maxlength="10" required placeholder="Número de teléfono" name="inputReg">
+                        <input type="tel" class="form-control" id="telefono" maxlength="10" required placeholder="Número de teléfono" name="inputReg" oninput="validar_telefono()">
                     </div>
                     <div class="form-row form-group">
                         <div class="col">
@@ -95,7 +95,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
                         </div>
-                        <input type="password" class="form-control" id="conf-contraseña" placeholder="Confirma tu contraseña" required>
+                        <input type="password" class="form-control" id="conf-contraseña" placeholder="Confirma tu contraseña" name ="inputReg" required>
                     </div><!--  -->
                     <button class="btn btn-primary" id="btn-reg" onclick="registrarUsu()">Registrate</button>
                     <br>
@@ -127,21 +127,23 @@
         </div>
 
     </div>
-    <!-- Codigo del toast-->
-    <div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
-        <div id="miToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="2000" style="position: absolute; top: 0; right: 0;">
-            <div class="toast-header">
-              <strong class="mr-auto">Notificación</strong>
-              <small>Ahora</small>
-              <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="toast-body">
-              Este es un mensaje de prueba para el toast.
-            </div>
+<!-- Codigo del toast-->
+<div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
+    <div class="position-fixed bottom-0 right-0 p-3" style="position: absolute; top: 0; right: 0;">
+        <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="2000">
+          <div class="toast-header">
+            <strong class="mr-auto">Inventario_ti</strong>
+            <small class="text-muted">Ahora</small>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="toast-body">
+            Usuario Registrado
+          </div>
         </div>
     </div>
+</div>
         
 
     
