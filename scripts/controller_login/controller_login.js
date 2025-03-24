@@ -102,6 +102,8 @@ function validar_contraseña(){
     }
 }
 
+document.getElementById('conf-contraseña').addEventListener('input', validar_contraseña);
+
 function enter_enviar(event){
     if (event.keyCode == 13){
         validar_contraseña()
