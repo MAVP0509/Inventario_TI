@@ -83,26 +83,23 @@ async function toggleForms(showRegister = false, showRecovery = false){
 }
 
 $(document).ready(function () {
-    $('[data-toggle="popover"]').popover()
-  });
+    $('[data-toggle="popover"]').popover(); 
+    
+    // Añadimos el evento input al campo de confirmación de contraseña
+    document.getElementById('conf-contraseña').addEventListener('input', validar_contraseña);
+});
 
 function validar_contraseña(){
-    let contraseña = document.getElementById("reg-contraseña").value;
-    let vcontraseña = document.getElementById("conf-contraseña").value;
+    let regcontraseña = document.getElementById('reg-contraseña').value;
+    let confcontraseña = document.getElementById('conf-contraseña').value;
+    let errorMessage = document.getElementById('error-mensaje');
 
-    if (contraseña !== vcontraseña) {
-        mensaje += 'Las contraseñas no coinciden.<br>';
-    }
-
-    var popoverContent = document.querySelector('#reg-contraseña').getAttribute('data-content');
-    if (mensaje) {
-        document.querySelector('#reg-contraseña').setAttribute('data-content', mensaje);
-        $('#reg-contraseña').popover('show');
+    if (regcontraseña !== confcontraseña){
+        errorMessage.style.display = 'block';
+        errorMessage.textContent = 'Las contraseñas no coinciden';
     } else {
-        $('#reg-contraseña').popover('hide');
+        errorMessage.style.display = 'none';
     }
-    document.getElementById('reg-contraseña').addEventListener('input', validar_contraseña);
-    document.getElementById('conf-contraseña').addEventListener('input', validar_contraseña);
 }
 
 function enter_enviar(event){
@@ -135,5 +132,5 @@ async function validar_telefono(){
 
   telefonoInput.addEventListener('input', function() {
     this.value = this.value.replace(/[^0-9]/g, ''); // Reemplaza cualquier cosa que no sea un número
-  });
+          });
 }
