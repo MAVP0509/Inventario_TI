@@ -1,4 +1,4 @@
-let respuesta = "";
+let respuesta 
 function server_usuario(model){
     return new Promise ((resolve,reject)=>{
         $.ajax({
@@ -36,11 +36,18 @@ async function registrarUsu(){
     console.log(JSON.stringify(model));
     let server =await server_usuario(model);
     console.log(server)
-    /*let inputs = document.getElementsByName("inputReg");
+    let inputs = document.getElementsByName("inputReg");
     for (let i = 0; i < inputs.length; i++) {
         const element = inputs[i].value = "";
     }
-  */
+    if(respuesta.resultado = true){
+        let toast = $('#miToast');
+        // Mostramos el toast usando el método de Bootstrap
+        toast.toast('show');
+    }else if(respuesta.resultado = false){
+        alert("Usuario no ingresado")
+    }
+    
     
 }
 
@@ -90,27 +97,20 @@ function validar_contraseña(){
     }
 }
 
-/*async function prueba(params) {
-    let persona = {
-        nombre : "Miguel",
-        fecha : Date()
-    }
 
 
-}
-let a = 0;
-let b = 1;
-let res = suma(a,b);
+/* async function validar_email(){
+        inputCorreo = document.getElementsByName("inputInit")[1]
 
-let parametrosparasua ={
-    a:0,
-    b:1
-}
+        inputCorreo.addEventListener("invalid", ()=> {
+            alert("Ingrese un correo electrónico válido")
+        })
 
-function suma(params){
-    return params.a + params.b;
+        inputCorreo.addEventListener("input", () => {
+            inputCorreo.reportValidity();
+            alert("Correo válido")
+            if (!reportVal) {
+              alert("Correo no válido")
+            }
+          });
 } */
-
-    function hola(){
-        console.log("Hola")
-    }
