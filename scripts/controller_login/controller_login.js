@@ -90,7 +90,7 @@ $(document).ready(function () {
     document.getElementById('fechanac').addEventListener('input',calcularEdad);
 });
 
-function validar_contraseña(){
+function validar_contraseña(event){
     let regcontraseña = document.getElementById('reg-contraseña').value;
     let confcontraseña = document.getElementById('conf-contraseña').value;
     let errorMessage = document.getElementById('error-mensaje');
