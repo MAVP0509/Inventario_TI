@@ -45,7 +45,8 @@ async function registrarUsu(){
         toast.toast('show');
     }else if(resp.resultado === false){
         alert("Usuario no ingresado")
-    }
+    } 
+
     let inputs = document.getElementsByName("inputReg");
     for (let i = 0; i < inputs.length; i++) {
         const element = inputs[i].value = "";
@@ -68,6 +69,10 @@ async function validar_ingreso() {
         window.location.href = "index.html";
     }else{
         alert("Usuario no existente")
+        let inputs = document.getElementsByName("inputInit");
+        for (let i = 0; i < inputs.length; i++) {
+        const element = inputs[i].value = "";
+        }
     }
     
 }
@@ -180,3 +185,12 @@ async function validar_telefono(){
     this.value = this.value.replace(/[^0-9]/g, ''); // Reemplaza cualquier cosa que no sea un número
           });
 }
+
+let models ={
+    nombre : "Miguel",
+    edad : 23
+}
+
+sessionStorage.setItem("nombre", models)
+//sessionStorage.getItem
+console.log(sessionStorage.getItem("nombre"))
