@@ -74,7 +74,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa-solid fa-image-portrait"></i></span>
                                 </div>
-                                <input type="number" class="form-control" id="edad" placeholder="Edad" name="inputReg">
+                                <input type="number" class="form-control" id="edad" placeholder="Edad" name="inputReg" disabled>
                             </div>
                         </div>
                     </div>
@@ -97,8 +97,13 @@
                         </div>
                         <input type="password" class="form-control" id="conf-contraseña" placeholder="Confirma tu contraseña" name ="inputReg" required>
                     </div>
-                    <span id="error-mensaje" style="display: none; color:red;"></span>
-                    <button class="btn btn-primary" id="btn-reg" onclick="registrarUsu()/* ; window.location.href='index.html' */">Registrate</button>
+                    <div>
+                        <label>
+                            <input type="checkbox" id="toggle-passwords"> Mostrar contraseñas
+                        </label>
+                    </div>
+                    <div id="error-mensaje" style="display: none; color:red;"></div>
+                    <button class="btn btn-primary" id="btn-reg" onclick="registrarUsu()">Registrate</button>
                     <br>
                     <a href="#" onclick="toggleForms(false)">¿Ya tienes cuenta?</a>
                      

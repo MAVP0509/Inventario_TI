@@ -22,15 +22,20 @@ function server_usuario(model){
 
 
 async function registrarUsu(){
+
+    if (!validar_contraseña({ target: { id: 'reg-contraseña' } })) {
+        return;
+    }
+
     let model = {
         accion : 1,
         nombre: $("#nombre").val().trim(),
         correo :$("#regcorreo").val().trim(),
-        contraseña : $("#reg-contraseña").val().trim(),
+        contraseña :$("#reg-contraseña").val().trim(),
         edad : $("#edad").val().trim(),
         telefono : $("#telefono").val().trim(),
         fecha_nac : $("#fechanac").val().trim(),
-    }
+    };
 
 
     //console.log(JSON.stringify(model));
@@ -86,44 +91,72 @@ $(document).ready(function () {
     document.getElementById('conf-contraseña').addEventListener('input', validar_contraseña);
     document.getElementById('reg-contraseña').addEventListener('input', validar_contraseña);
     document.getElementById('fechanac').addEventListener('input',calcularEdad);
+    document.getElementById('toggle-passwords').addEventListener('change', togglePasswords);
     
 });
 
-function validar_contraseña(event){
+function validar_contraseña(){
     let regcontraseña = document.getElementById('reg-contraseña').value;
     let confcontraseña = document.getElementById('conf-contraseña').value;
     let errorMessage = document.getElementById('error-mensaje');
-
-    if (event.target.id === 'conf-contraseña') {
-        if (regcontraseña !== confcontraseña){
-            errorMessage.style.display = 'block';
-            errorMessage.textContent = 'Las contraseñas no coinciden';
-        } else {
-            errorMessage.style.display = 'none';
-        }
-    }
-
-    /* if (regcontraseña !== confcontraseña){
-        errorMessage.style.display = 'block';
-        errorMessage.textContent = 'Las contraseñas no coinciden';
-    } else {
-        errorMessage.style.display = 'none';
-    } */
 
     let minlongitud = regcontraseña.length >= 8;
     let letrasmay = /[A-Z]/.test(regcontraseña);
     let letrasmin = /[a-z]/.test(regcontraseña);
     let numeros = /\d/.test(regcontraseña);
     let especialesc = /[()*#@]/.test(regcontraseña);
-
-    document.getElementById('minlongitud').style.color = minlongitud ? 'green' : 'red';
-    document.getElementById('lestrasmm').style.color = (letrasmay && letrasmin) ? 'green' : 'red';
-    document.getElementById('numeros').style.color = numeros ? 'green' : 'red';
-    document.getElementById('caracteresp').style.color = especialesc ? 'green' : 'red';
     
-}
+    try {
+        document.getElementById('minlongitud').style.color = minlongitud ? 'green' : 'red';  
+        document.getElementById('lestrasmm').style.color = (letrasmay && letrasmin) ? 'green' : 'red';
+        document.getElementById('numeros').style.color = numeros ? 'green' : 'red';
+        document.getElementById('caracteresp').style.color = especialesc ? 'green' : 'red';
+    } catch (error) {
+        
+    }
+                 
+        
+      
+    let cumpleRequisitos = minlongitud && letrasmay && letrasmin && numeros && especialesc;
 
-document.getElementById('conf-contraseña').addEventListener('input', validar_contraseña); //Manda a llamar el input donde se registra la contraseña para usar la función
+    if (!cumpleRequisitos) {
+        errorMessage.style.display = 'block';
+        errorMessage.textContent = 'La contraseña no cumple con los requisitos de seguridad';
+        document.getElementById('reg-contraseña').style.borderColor = 'red';
+        return false;
+    } else {
+        errorMessage.style.display = 'none';
+        document.getElementById('reg-contraseña').style.borderColor = 'green';
+    }
+
+    if (event.target.id === 'conf-contraseña' || event.target.id === 'reg-contraseña') {
+        if (regcontraseña !== confcontraseña){
+            errorMessage.style.display = 'block';
+            errorMessage.textContent = 'Las contraseñas no coinciden';
+            document.getElementById('conf-contraseña').style.borderColor = 'red';
+        } else {
+            errorMessage.style.display = 'none';    
+            document.getElementById('conf-contraseña').style.borderColor = 'green';
+        }
+    }
+
+    return true;
+    }
+
+    function togglePasswords() {
+        let regPasswordInput = document.getElementById('reg-contraseña');
+        let confPasswordInput = document.getElementById('conf-contraseña');
+        let toggle = document.getElementById('toggle-passwords');
+    
+        if (toggle.checked) {
+            regPasswordInput.type = 'text';
+            confPasswordInput.type = 'text';
+        } else {
+            regPasswordInput.type = 'password';
+            confPasswordInput.type = 'password';
+        }
+    }
+/* document.getElementById('conf-contraseña').addEventListener('input', validar_contraseña); */ //Manda a llamar el input donde se registra la contraseña para usar la función
 
 function calcularEdad(){
     let fechaNacimiento = new Date(document.getElementById('fechanac').value);
