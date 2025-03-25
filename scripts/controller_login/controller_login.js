@@ -129,7 +129,6 @@ function validar_contraseña(){
         document.getElementById('reg-contraseña').style.borderColor = 'green';
     }
 
-<<<<<<< Updated upstream
     if (event.target.id === 'conf-contraseña' || event.target.id === 'reg-contraseña') {
         if (regcontraseña !== confcontraseña){
             errorMessage.style.display = 'block';
@@ -171,19 +170,6 @@ function calcularEdad(){
     }
 
     document.getElementById('edad').value = edad;
-=======
-    /* let minLength = regcontraseña.length >= 8;
-    let myletras = /[A-z]/.test(regcontraseña);
-    let mnletras= /[a-z]/.test(regcontraseña);
-    let numeros= /\d/.test(regcontraseña);
-    let ctrespeciales= /[()*#@]/.test(regcontraseña);
-    document.getElementById
-    document.getElementById
-    document.getElementById
-    document.getElementById
-    document.getElementById */
-
->>>>>>> Stashed changes
 }
 
 /* function enter_enviar(event){
