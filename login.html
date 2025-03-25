@@ -34,9 +34,10 @@
                     </div>
 
                         <a clas="form-sublink" href="#" onclick="toggleForms(false, true)">¿Olvidaste tu contraseña?</a><br>
-                        <br><button class="btn btn-primary" id="btn-ini" onclick="">Iniciar sesión</button><br>
+                        <br><button class="btn btn-primary" id="btn-ini" onclick="window.location.href='index.html'">Iniciar sesión</button><br>
                         <br><p class="small text-center text-gray-soft">¿No te has registrado?  <a href="#" id="link-registro" onclick="toggleForms(true)">Registrate</a></p>
-                </div>
+                        <a href="index.html">prueba</a>
+                    </div>
             </div>
         </div>
 
@@ -88,7 +89,6 @@
                                         <li class='list-group-item' id='numeros'>Que incluya números.</li>
                                         <li class='list-group-item' id='caracteresp'>Que incluya caracteres especiales como * () # @, etc.</li>
                                     </ul>"
-                                     
                         placeholder="Crea tu contraseña" required name="inputReg">
                     </div>
                     <div class="input-group mb-3">
@@ -98,7 +98,7 @@
                         <input type="password" class="form-control" id="conf-contraseña" placeholder="Confirma tu contraseña" name ="inputReg" required>
                     </div>
                     <span id="error-mensaje" style="display: none; color:red;"></span>
-                    <button class="btn btn-primary" id="btn-reg" onclick="registrarUsu()">Registrate</button>
+                    <button class="btn btn-primary" id="btn-reg" onclick="registrarUsu(); window.location.href='index.html'">Registrate</button>
                     <br>
                     <a href="#" onclick="toggleForms(false)">¿Ya tienes cuenta?</a>
                      
