@@ -1,3 +1,4 @@
+//inv toastr
 let respuesta 
 function server_usuario(model){
     return new Promise ((resolve,reject)=>{
@@ -36,17 +37,18 @@ async function registrarUsu(){
     //console.log(JSON.stringify(model));
     //console.log(JSON.stringify(model));
     let server =await server_usuario(model);
-    console.log(server)
-    let inputs = document.getElementsByName("inputReg");
-    for (let i = 0; i < inputs.length; i++) {
-        const element = inputs[i].value = "";
-    }
-    if(respuesta.resultado = true){
+
+    let resp=JSON.parse(respuesta)
+    if(resp.resultado === true){
         let toast = $('#liveToast');
         // Mostramos el toast usando el método de Bootstrap
         toast.toast('show');
-    }else if(respuesta.resultado = false){
+    }else if(resp.resultado === false){
         alert("Usuario no ingresado")
+    }
+    let inputs = document.getElementsByName("inputReg");
+    for (let i = 0; i < inputs.length; i++) {
+        const element = inputs[i].value = "";
     }
     
 }
@@ -93,6 +95,7 @@ $(document).ready(function () {
     document.getElementById('conf-contraseña').addEventListener('input', validar_contraseña);
     document.getElementById('reg-contraseña').addEventListener('input', validar_contraseña);
     document.getElementById('fechanac').addEventListener('input',calcularEdad);
+    document.getElementById('regcorreo').addEventListener('input', validar_email);
     
 });
 
@@ -153,23 +156,22 @@ function calcularEdad(){
 } */
 
 
-async function validar_email(){
-        regCorreo = document.getElementById("regcorreo").value()
-
-        regCorreo.addEventListener("input", function(event){
-            var regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-
-            if (!correo) {
-              alert("El correo no puede estar vacío.");
-              event.preventDefault();
-            } else if (!regex.test(correo)) {
-              alert("Por favor ingresa un correo electrónico válido.");
-              event.preventDefault();
-            } else {
-              alert("Correo válido.");
-            }
-          });
-} 
+async function validar_email(event){
+    inputEmail = document.getElementById('regcorreo').value
+    errorMessageEmail = document.getElementById("error-mensaje-email")
+    const email = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(inputEmail)
+    
+    if (event.target.id === 'regcorreo') {
+        if(email === false){
+            errorMessageEmail.style.display = 'block';
+            errorMessageEmail.textContent = 'Ingresa un correo válido';
+            document.getElementById('btn-reg').disabled= true
+        } else {
+            errorMessageEmail.style.display = 'none';
+            document.getElementById('btn-reg').disabled= false
+        }
+    }
+}
 
 async function validar_telefono(){
     telefonoInput = document.getElementById('telefono');
