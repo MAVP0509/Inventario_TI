@@ -9,6 +9,7 @@ function server_usuario(model){
             },
             success: function(response){
                 respuesta = response
+                window.location.href = "index.html";
                 try {
                     resolve(JSON.parse(response))
                 } catch (error) {
@@ -50,19 +51,16 @@ async function registrarUsu(){
     
 }
 
-async function validarIngreso() {
+async function validar_ingreso() {
     let model = {
+        accion: 0,
         correo :$("#logcorreo").val().trim(),
         contraseña : $("#logcontraseña").val().trim(),
 
     }
 
-    let server = await server_usuario({Accion : 0});
-    if(server.resultado[0] === model.correo && server.resultado[1] === model.contraseña){
-        alert("Felicidades")
-    }else {
-        alert("Usuario y/o contraseña incorrectos")
-    }
+    let server = await server_usuario(model);
+    
 }
 
 async function toggleForms(showRegister = false, showRecovery = false){
@@ -88,6 +86,7 @@ $(document).ready(function () {
     document.getElementById('conf-contraseña').addEventListener('input', validar_contraseña);
     document.getElementById('reg-contraseña').addEventListener('input', validar_contraseña);
     document.getElementById('fechanac').addEventListener('input',calcularEdad);
+    
 });
 
 function validar_contraseña(event){
