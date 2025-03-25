@@ -28,15 +28,16 @@
 
     function consultarDatos($valores){
         include("../conexion.php");
-        //$user =$POST['correo'];
-        //$pass=$POST['contraseña'];
         $sql="SELECT * FROM usuario WHERE correo= '$valores->correo' AND contraseña='$valores->contraseña'";
         $query = mysqli_query($con,$sql);
-        if($query->num_rows>0){
-            echo "success";
-        }else{
-            echo "error";
+        
+        if($query->num_rows > 0){
+            return true;
         }
+        
+        else{
+            return false;
+        } 
     }
 
     function insertarUsuario($valores){
@@ -45,5 +46,13 @@
         $sql="INSERT INTO usuario(nombre,correo,contraseña,edad,telefono,fecha_nac,fecha_reg,habilitado) VALUES ('$valores->nombre',
         '$valores->correo','$valores->contraseña','$valores->edad', '$valores->telefono','$valores->fecha_nac','$registro',1)";
         //var_dump($sql);
-        return mysqli_query($con,$sql);
+        $sql_val_mail="SELECT * FROM usuario WHERE correo= '$valores->correo'";
+        //$query_mail=mysqli_query($con,$sql_val_mail);
+
+        if(mysqli_query($con,$sql_val_mail)-> num_rows > 0){
+            return false;
+        }else{
+            return mysqli_query($con,$sql);
+        }
+
     }

@@ -9,9 +9,9 @@ function server_usuario(model){
             },
             success: function(response){
                 respuesta = response
-                window.location.href = "index.html";
                 try {
                     resolve(JSON.parse(response))
+                    console.log(JSON.parse(response))
                 } catch (error) {
                     reject(error)
                 }
@@ -34,7 +34,7 @@ async function registrarUsu(){
 
 
     //console.log(JSON.stringify(model));
-    console.log(JSON.stringify(model));
+    //console.log(JSON.stringify(model));
     let server =await server_usuario(model);
     console.log(server)
     let inputs = document.getElementsByName("inputReg");
@@ -60,6 +60,13 @@ async function validar_ingreso() {
     }
 
     let server = await server_usuario(model);
+
+    let resp=JSON.parse(respuesta)
+    if (resp.resultado === true){
+        window.location.href = "index.html";
+    }else{
+        alert("Usuario no existente")
+    }
     
 }
 
