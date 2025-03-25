@@ -28,13 +28,15 @@
 
     function consultarDatos($valores){
         include("../conexion.php");
-        $sql="SELECT correo, contraseña FROM usuario WHERE id='$valores->id'";
+        //$user =$POST['correo'];
+        //$pass=$POST['contraseña'];
+        $sql="SELECT * FROM usuario WHERE correo= '$valores->correo' AND contraseña='$valores->contraseña'";
         $query = mysqli_query($con,$sql);
-        $array = array();
-        while ($fila = mysqli_fetch_object($query)){
-            array_push($array,$fila);
+        if($query->num_rows>0){
+            echo "success";
+        }else{
+            echo "error";
         }
-        return $array;
     }
 
     function insertarUsuario($valores){
