@@ -51,7 +51,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                         </div>
-                        <input type="text" class="form-control" id="nombre" placeholder="Nombre completo" name="inputReg">
+                        <input type="text" class="form-control" id="nombre" placeholder="Nombre completo" name="inputReg" required>
                     </div>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
@@ -59,11 +59,12 @@
                         </div>
                         <input type="email" class="form-control" id="regcorreo" placeholder="Correo eléctronico" name="inputReg" focus="validar_correo()" required>
                     </div>
+                    <span id="error-mensaje-email" style="display: none; color:red;"></span>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
                         </div>
-                        <input type="tel" class="form-control" id="telefono" maxlength="10" required placeholder="Número de teléfono" name="inputReg" oninput="validar_telefono()">
+                        <input type="tel" class="form-control" id="telefono" maxlength="10" required placeholder="Número de teléfono" name="inputReg" oninput="validar_telefono()" required>
                     </div>
                     <div class="form-row form-group">
                         <div class="col">
@@ -134,7 +135,7 @@
 
     </div>
 <!-- Codigo del toast-->
-<div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
+<div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px; ">
     <div class="position-fixed bottom-0 right-0 p-3" style="position: absolute; top: 0; right: 0;">
         <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="2000">
           <div class="toast-header">
@@ -150,6 +151,7 @@
         </div>
     </div>
 </div>
+
         
 
     
