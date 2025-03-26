@@ -21,12 +21,12 @@ use PHPMailer\PHPMailer\PHPMailer;
     //print($clientejson->nombre);
 
     if($clientejson->accion==0){
-        $respuesta_servidor->resultado = enviar_email();
+        $respuesta_servidor->resultado = enviar_email($clientejson);
     } 
     print(json_encode($respuesta_servidor));
 
 
-    function enviar_email(){
+    function enviar_email($destino){
         include("../email/Exception.php");
         include("../email/PHPMailer.php");
         include("../email/SMTP.php");
@@ -45,7 +45,7 @@ use PHPMailer\PHPMailer\PHPMailer;
         
             // Configuración del remitente y destinatario
             $mail->setFrom('janny.garcia703@gmail.com', 'Inventario_TI');
-            $mail->addAddress('miguelvera3094@gmail.com', 'Destinatario');
+            $mail->addAddress($destino->correo, 'Destinatario');
             // $mail->addReplyTo('otra-direccion@dominio.com', 'Responder a'); // Opcional: dirección de respuesta
         
             // Contenido del correo
@@ -56,11 +56,11 @@ use PHPMailer\PHPMailer\PHPMailer;
         
             // Enviar el correo
             $mail->send();
-            if ($mail->send()){
+            /* if ($mail->send()){
                 return true;
             }else{
                 return $mail;
-            }
+            } */
         } catch (Exception $e) {
             
         }

@@ -9,7 +9,7 @@
 
     <title>Inventario_TI</title>
 </head>
-<body class="container-fluid d-flex justify-content-center align-items-center vh-100" onload="enviar_correo()">
+<body class="container-fluid d-flex justify-content-center align-items-center vh-100">
     <div class="row">
 
         <!--Col de Iniciar sesión-->
@@ -25,6 +25,7 @@
                         </div>
                         <input type="email" class="form-control" id="logcorreo" placeholder="Correo eléctronico" name="inputInit" input="validar_email()" required>
                     </div>
+                    <span name="error-mensaje-email" style="display: none; color:red;">Ingresa un correo válido</span>
 
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
@@ -59,7 +60,7 @@
                         </div>
                         <input type="email" class="form-control" id="regcorreo" placeholder="Correo eléctronico" name="inputReg" focus="validar_correo()" required>
                     </div>
-                    <span id="error-mensaje-email" style="display: none; color:red;"></span>
+                    <span name="error-mensaje-email" style="display: none; color:red;">Ingresa un correo válido</span>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
@@ -122,12 +123,13 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
                         </div>
-                        <input type="email" class="form-control" id="repcorreo" onke placeholder="Correo eléctronico" name="inputRecov">
+                        <input type="email" class="form-control" id="rep-correo" onke placeholder="Correo eléctronico" name="inputRecov">
                     </div>
+                    <span name="error-mensaje-email" style="display: none; color:red;">Ingresa un correo válido</span>
 
                     <div class="form-group">
                         <button type="button" class="btn btn-danger" onclick="toggleForms(false)">Cancelar</button>
-                        <button type="button" class="btn btn-primary">Buscar</button>
+                        <button type="button" class="btn btn-primary" onclick="recuperar_contraseña()">Buscar</button>
                     </div>
                 </div>
             </div>
