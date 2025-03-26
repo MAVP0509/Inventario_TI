@@ -227,3 +227,29 @@ let models ={
 sessionStorage.setItem("nombre", models)
 //sessionStorage.getItem
 console.log(sessionStorage.getItem("nombre"))
+
+
+async function enviar_correo() {
+
+    let model ={
+        accion : 0
+    }
+    return new Promise ((resolve,reject)=>{
+        $.ajax({
+            type: "POST",
+            url: "database/controller_email/controller_email.php",
+            data: {
+                trama:JSON.stringify(model)
+            },
+            success: function(response){
+                respuesta = response
+                try {
+                    resolve(JSON.parse(response))
+                    console.log(JSON.parse(response))
+                } catch (error) {
+                    reject(error)
+                }
+            }
+        })
+    })  
+}
