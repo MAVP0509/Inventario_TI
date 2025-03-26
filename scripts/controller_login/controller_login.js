@@ -82,6 +82,24 @@ async function validar_ingreso() {
     
 }
 
+async function repcuperar_contraseña() {
+    let model = {
+        accion: 0,
+        correo: $("#logcorreo").val().trim(),
+    }
+
+    let server = await server_usuario(model);
+    let menssage = document.getElementById('mensaje-correo');
+
+    if (resp.resultado === true) {
+        menssage.style.display = 'block';
+        menssage.textContent = "Te hemos enviado un correo para restablecer tu contraseña.";
+    } else {
+        menssage.style.display = 'none';
+    }
+    
+}
+
 async function toggleForms(showRegister = false, showRecovery = false){
     if(showRecovery){
         $("#colrep").show(); //Muetsra el formulario de recuperación

@@ -19,71 +19,6 @@
                             <h5>Iniciar sesión</h5><br>
                             <i class="fa-solid fa-circle-user fa-5x"></i><br><br>
                             
-    <title>Inventario_TI</title>
-</head>
-<body class="container-fluid d-flex justify-content-center align-items-center vh-100">
-    <div class="row">
-
-        <!--Col de Iniciar sesión-->
-        <div class="col" style="display: block;" id="colblock">
-            <div class="card text-center" style="width: 50vh;">
-                <div class="card-body">
-                    <h5>Iniciar sesión</h5><br>
-                    <i class="fa-solid fa-circle-user fa-5x"></i><br><br>
-                    
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
-                        </div>
-                        <input type="email" class="form-control" id="logcorreo" placeholder="Correo eléctronico" name="inputInit" input="validar_email()" required>
-                    </div>
-                    <span name="error-mensaje-email" style="display: none; color:red;">Ingresa un correo válido</span>
-
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                        </div>
-                        <input type="password" class="form-control" id="logcontraseña" placeholder="Contraseña" name="inputInit">
-                    </div>
-
-                        <a clas="form-sublink" href="#" onclick="toggleForms(false, true)">¿Olvidaste tu contraseña?</a><br>
-                        <br><button class="btn btn-primary" id="btn-ini" onclick="validar_ingreso()">Iniciar sesión</button><br>
-                        <br><p class="small text-center text-gray-soft">¿No te has registrado?  <a href="#" id="link-registro" onclick="toggleForms(true)">Registrate</a></p>
-                        <a href="index.html">prueba</a>
-                    </div>
-            </div>
-        </div>
-
-        <!--Col de registro de usuario-->
-        <div class="col" style="display: none;" id="colnone">
-            <div class="card text-center" style="width: 50vh;">
-                <div class="card-body">
-                    <h5>Crear una cuenta</h5>
-                    <i class="fa-solid fa-circle-user fa-5x"></i><br><br>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="nombre" placeholder="Nombre completo" name="inputReg" required>
-                    </div>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
-                        </div>
-                        <input type="email" class="form-control" id="regcorreo" placeholder="Correo eléctronico" name="inputReg" focus="validar_correo()" required>
-                    </div>
-                    <span name="error-mensaje-email" style="display: none; color:red;">Ingresa un correo válido</span>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
-                        </div>
-                        <input type="tel" class="form-control" id="telefono" maxlength="10" required placeholder="Número de teléfono" name="inputReg" oninput="validar_telefono()" required>
-                    </div>
-                    <div class="form-row form-group">
-                        <div class="col">
-                            <input type="date" class="form-control" id="fechanac" placeholder="Fecha de nacimiento" name="inputReg">
-                        </div>
-                        <div class="col">
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
@@ -194,6 +129,9 @@
                                 <button type="button" class="btn btn-danger" onclick="toggleForms(false)">Cancelar</button>
                                 <button type="button" class="btn btn-primary">Buscar</button>
                             </div>
+                            <div class="alert alert-info" role="alert" id="mensaje-correo" style="display: none;">
+                                
+                            </div>                              
                         </div>
                     </div>
                 </div>
@@ -218,51 +156,6 @@
         </div>
 
     </body>
-        <!--Col de recuperación de contraseña-->
-        <div class="col" style="display: none;" id="colrep">
-            <div class="card text-center" style="width: 50vh;">
-                <div class="card-body">
-                    <h5>Recupera tu cuenta</h5>
-                    <i class="fa-solid fa-circle-user fa-5x"></i><br><br>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
-                        </div>
-                        <input type="email" class="form-control" id="rep-correo" onke placeholder="Correo eléctronico" name="inputRecov">
-                    </div>
-                    <span name="error-mensaje-email" style="display: none; color:red;">Ingresa un correo válido</span>
-
-                    <div class="form-group">
-                        <button type="button" class="btn btn-danger" onclick="toggleForms(false)">Cancelar</button>
-                        <button type="button" class="btn btn-primary" onclick="recuperar_contraseña()">Buscar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-<!-- Codigo del toast-->
-<div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px; ">
-    <div class="position-fixed bottom-0 right-0 p-3" style="position: absolute; top: 0; right: 0;">
-        <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="2000">
-          <div class="toast-header">
-            <strong class="mr-auto">Inventario_ti</strong>
-            <small class="text-muted">Ahora</small>
-            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="toast-body">
-            Usuario Registrado
-          </div>
-        </div>
-    </div>
-</div>
-
-        
-
-    
-</body>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
