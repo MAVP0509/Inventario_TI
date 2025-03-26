@@ -108,9 +108,11 @@ $(document).ready(function () {
     /* document.getElementById('toggle-passwords').addEventListener('change', togglePasswords); */
     document.getElementById('regcorreo').addEventListener('input', validar_email);
     document.getElementById('toggle-password-icon').addEventListener('click', togglePasswords);
+    document.getElementById('logcorreo').addEventListener('input', validar_email);
+    document.getElementById('rep-correo').addEventListener('input', validar_email);
     
 });
-
+//console.log(r=document.getElementById('rep-correo').addEventListener('input', validar_email))
 function validar_contraseña(){
     let regcontraseña = document.getElementById('reg-contraseña').value;
     let confcontraseña = document.getElementById('conf-contraseña').value;
@@ -196,21 +198,81 @@ function calcularEdad(){
     }
 } */
 
-async function validar_email(event){
-    inputEmail = document.getElementById('regcorreo').value
-    errorMessageEmail = document.getElementById("error-mensaje-email")
-    const email = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(inputEmail)
-    
-    if (event.target.id === 'regcorreo') {
-        if(email === false){
-            errorMessageEmail.style.display = 'block';
-            errorMessageEmail.textContent = 'Ingresa un correo válido';
-            document.getElementById('btn-reg').disabled= true
-        } else {
-            errorMessageEmail.style.display = 'none';
-            document.getElementById('btn-reg').disabled= false
+
+async function validar_email(node){
+    inputEmail = document.querySelectorAll('input[type="email"]')
+    errorMessageEmail = document.getElementsByName("error-mensaje-email")
+    const email = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    //nodeValue: "display: none; color:red;"
+    //console.log(inputEmail[0].value)
+    /* let correoLogin = [ document.getElementById('regcorreo'),
+        document.getElementById('logcorreo'),
+        document.getElementById('rep-correo')] */
+    node= document.querySelector('input[type="email"]')
+    //idNode=[node[0].id,node[3].id,node[2].id]
+    switch (node) {
+        case node.id ==="logcorreo":
+            if(!email.test(inputEmail[0].value)){
+                errorMessageEmail[0].attributes.style.nodeValue = 'display: block; color:red;';
+                //errorMessageEmail[0].textContent = 'Ingresa un correo válido';
+            }else{
+                errorMessageEmail[0].attributes.style.nodeValue = 'display: none; color:red;';
+                /* errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
+                errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;' */
+                
+            }
+          break;
+      
+        case node.id ==="regcorreo":
+            if(!email.test(inputEmail[1].value)){
+                errorMessageEmail[1].attributes.style.nodeValue = 'display: block; color:red;';
+                //errorMessageEmail[1].textContent = 'Ingresa un correo válido';
+            }else{
+                errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;';
+                /* errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
+                errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;' */
+            }
+          break;
+          case node.id ==="rep-correo":
+            if(!email.test(inputEmail[2].value)){
+                errorMessageEmail[2].attributes.style.nodeValue = 'display: block; color:red;';
+                //errorMessageEmail[1].textContent = 'Ingresa un correo válido';
+            }else{
+                errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;';
+                /* errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
+                errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;' */
+            }
+          break;
+      
+        //default:
+      }
+        /* if(!email.test(inputEmail[0].value)){
+            errorMessageEmail[0].attributes.style.nodeValue = 'display: block; color:red;';
+            //errorMessageEmail[0].textContent = 'Ingresa un correo válido';
+        }else{
+            errorMessageEmail[0].attributes.style.nodeValue = 'display: none; color:red;';
+            errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
+            errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;'
+            
         }
-    }
+        if(!email.test(inputEmail[1].value)){
+            errorMessageEmail[1].attributes.style.nodeValue = 'display: block; color:red;';
+            //errorMessageEmail[1].textContent = 'Ingresa un correo válido';
+        }else{
+            errorMessageEmail[0].attributes.style.nodeValue = 'display: none; color:red;';
+            errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
+            errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;'
+        }
+        if(!email.test(inputEmail[2].value)){
+            errorMessageEmail[2].attributes.style.nodeValue = 'display: block; color:red;';
+            //errorMessageEmail[2].textContent = 'Ingresa un correo válido';
+        }else{
+            errorMessageEmail[0].attributes.style.nodeValue = 'display: none; color:red;';
+            errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
+            errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;'
+        } */
+    
+        
 }
 
 async function validar_telefono(){
@@ -221,7 +283,7 @@ async function validar_telefono(){
           });
 }
 
-let models ={
+/* let models ={
     nombre : "Miguel",
     edad : 23
 }
@@ -229,12 +291,12 @@ let models ={
 sessionStorage.setItem("nombre", models)
 //sessionStorage.getItem
 console.log(sessionStorage.getItem("nombre"))
+ */
 
-
-async function enviar_correo() {
-
+async function recuperar_contraseña() {
     let model ={
-        accion : 0
+        accion : 0,
+        correo : $("#rep-correo").val().trim()
     }
     return new Promise ((resolve,reject)=>{
         $.ajax({
@@ -244,14 +306,15 @@ async function enviar_correo() {
                 trama:JSON.stringify(model)
             },
             success: function(response){
-                respuesta = response
                 try {
                     resolve(JSON.parse(response))
-                    console.log(JSON.parse(response))
+                    //console.log(JSON.parse(response))
                 } catch (error) {
                     reject(error)
                 }
             }
         })
-    })  
+    })
+
+
 }

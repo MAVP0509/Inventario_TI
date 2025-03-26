@@ -57,15 +57,3 @@ function consultarDatos($valores){
 
     }
 
-
-    function enviar_correo(){
-        /*Clase para tratar con excepciones y errores*/
-        require 'C:/PHPMailer/src/Exception.php';
-        /*Clase PHPMailer*/
-        require 'C:/PHPMailer/src/PHPMailer.php';
-        /*Clase SMTP necesaria para la conexión con un servidor SMTP*/
-        require 'C:/PHPMailer/src/SMTP.php';
-        /*Al crear un objeto PHPMailer, pasa el parámetro "true" para activar las excepciones (mensajes en caso de error)*/
-        $email = new PHPMailer(true);
-    }
-   
