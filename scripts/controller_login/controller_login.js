@@ -205,17 +205,29 @@ function calcularEdad(){
 
 
 async function validar_email(node){
-    inputEmail = document.querySelectorAll('input[type="email"]')
+    //inputEmail = document.querySelectorAll('input[type="email"]')
     errorMessageEmail = document.getElementsByName("error-mensaje-email")
     const email = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
     //nodeValue: "display: none; color:red;"
     //console.log(inputEmail[0].value)
-    /* let correoLogin = [ document.getElementById('regcorreo'),
-        document.getElementById('logcorreo'),
-        document.getElementById('rep-correo')] */
+    let col = document.querySelectorAll('.col')
+    let seleccionado = Array.from(col).filter(col =>{
+        let activo = window.getComputedStyle(col)
+        return activo.display =='block'
+    })
+
+    seleccionado.forEach(col => {
+        // Dentro de la columna visible, seleccionar el primer input de tipo "email"
+        let inputEmail = col.querySelector('input[type="email"]');
+        
+        if (inputEmail) {
+            console.log(inputEmail.value);  // Aquí puedes hacer lo que necesites con el input
+        }
+    });
+    console.log(inputEmail)
     node= document.querySelector('input[type="email"]')
     //idNode=[node[0].id,node[3].id,node[2].id]
-    switch (node) {
+    switch (col) {
         case node.id ==="logcorreo":
             if(!email.test(inputEmail[0].value)){
                 errorMessageEmail[0].attributes.style.nodeValue = 'display: block; color:red;';
@@ -250,34 +262,7 @@ async function validar_email(node){
           break;
       
         //default:
-      }
-        /* if(!email.test(inputEmail[0].value)){
-            errorMessageEmail[0].attributes.style.nodeValue = 'display: block; color:red;';
-            //errorMessageEmail[0].textContent = 'Ingresa un correo válido';
-        }else{
-            errorMessageEmail[0].attributes.style.nodeValue = 'display: none; color:red;';
-            errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
-            errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;'
-            
-        }
-        if(!email.test(inputEmail[1].value)){
-            errorMessageEmail[1].attributes.style.nodeValue = 'display: block; color:red;';
-            //errorMessageEmail[1].textContent = 'Ingresa un correo válido';
-        }else{
-            errorMessageEmail[0].attributes.style.nodeValue = 'display: none; color:red;';
-            errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
-            errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;'
-        }
-        if(!email.test(inputEmail[2].value)){
-            errorMessageEmail[2].attributes.style.nodeValue = 'display: block; color:red;';
-            //errorMessageEmail[2].textContent = 'Ingresa un correo válido';
-        }else{
-            errorMessageEmail[0].attributes.style.nodeValue = 'display: none; color:red;';
-            errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
-            errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;'
-        } */
-    
-        
+      } 
 }
 
 async function validar_telefono(){
