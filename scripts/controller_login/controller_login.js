@@ -254,34 +254,7 @@ async function validar_email(node){
           break;
       
         //default:
-      }
-        /* if(!email.test(inputEmail[0].value)){
-            errorMessageEmail[0].attributes.style.nodeValue = 'display: block; color:red;';
-            //errorMessageEmail[0].textContent = 'Ingresa un correo válido';
-        }else{
-            errorMessageEmail[0].attributes.style.nodeValue = 'display: none; color:red;';
-            errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
-            errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;'
-            
-        }
-        if(!email.test(inputEmail[1].value)){
-            errorMessageEmail[1].attributes.style.nodeValue = 'display: block; color:red;';
-            //errorMessageEmail[1].textContent = 'Ingresa un correo válido';
-        }else{
-            errorMessageEmail[0].attributes.style.nodeValue = 'display: none; color:red;';
-            errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
-            errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;'
-        }
-        if(!email.test(inputEmail[2].value)){
-            errorMessageEmail[2].attributes.style.nodeValue = 'display: block; color:red;';
-            //errorMessageEmail[2].textContent = 'Ingresa un correo válido';
-        }else{
-            errorMessageEmail[0].attributes.style.nodeValue = 'display: none; color:red;';
-            errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
-            errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;'
-        } */
-    
-        
+      } 
 }
 
 async function validar_telefono(){
