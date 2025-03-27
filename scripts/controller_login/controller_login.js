@@ -79,6 +79,7 @@ async function registrarUsu(){
     
 }
 
+
 async function validar_ingreso() {
     let model = {
         accion: 0,
@@ -102,6 +103,7 @@ async function validar_ingreso() {
     
 }
 
+
 async function toggleForms(showRegister = false, showRecovery = false){
     if(showRecovery){
         $("#colrep").show(); //Muetsra el formulario de recuperación
@@ -118,6 +120,7 @@ async function toggleForms(showRegister = false, showRecovery = false){
     }
 }
 
+
 $(document).ready(function () {
     $('[data-toggle="popover"]').popover(); 
     
@@ -132,6 +135,7 @@ $(document).ready(function () {
     
 });
 //console.log(r=document.getElementById('rep-correo').addEventListener('input', validar_email))
+
 function validar_contraseña(){
     let regcontraseña = document.getElementById('reg-contraseña').value;
     let confcontraseña = document.getElementById('conf-contraseña').value;
@@ -148,11 +152,9 @@ function validar_contraseña(){
         document.getElementById('lestrasmm').style.color = (letrasmay && letrasmin) ? 'green' : 'red';
         document.getElementById('numeros').style.color = numeros ? 'green' : 'red';
         document.getElementById('caracteresp').style.color = especialesc ? 'green' : 'red';
-    } catch (error) {
+        } catch (error) {
         
     }
-                 
-        
       
     let cumpleRequisitos = minlongitud && letrasmay && letrasmin && numeros && especialesc;
 
@@ -178,22 +180,27 @@ function validar_contraseña(){
     }
 
     return true;
+
     }
 
-    function togglePasswords() {
+
+function togglePasswords() {
         let regPasswordInput = document.getElementById('reg-contraseña');
         let confPasswordInput = document.getElementById('conf-contraseña');
-        let toggle = document.getElementById('toggle-passwords');
+        let toggleIcon = document.getElementById('toggle-password-icon');   
     
-        if (toggle.checked) {
+        if (regPasswordInput.type === 'password') {
             regPasswordInput.type = 'text';
             confPasswordInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye-slash');  
+            toggleIcon.classList.add('fa-eye');
         } else {
             regPasswordInput.type = 'password';
             confPasswordInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
         }
     }
-/* document.getElementById('conf-contraseña').addEventListener('input', validar_contraseña); */ //Manda a llamar el input donde se registra la contraseña para usar la función
 
 function calcularEdad(){
     let fechaNacimiento = new Date(document.getElementById('fechanac').value);
@@ -290,7 +297,7 @@ console.log(sessionStorage.getItem("nombre"))
 async function recuperar_contraseña() {
     let model ={
         accion : 0,
-        correo : $("#rep-correo").val().trim()
+        correo : $("#repcorreo").val().trim()
     }
 
     let server = await server_email(model);
