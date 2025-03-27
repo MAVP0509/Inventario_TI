@@ -23,9 +23,9 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
                                 </div>
-                                <input type="email" class="form-control" id="logcorreo" placeholder="Correo eléctronico" name="inputInit" input="validar_email()" required>
+                                <input type="email" class="form-control Comprobarmail" id="logcorreo" placeholder="Correo eléctronico" name="inputInit" input="validar_email()" required>
                             </div>
-
+                            <span id="error-mensajeEmail-log" style="display: none; color:red;">Ingresa un correo válido</span>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
@@ -57,15 +57,16 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
                                 </div>
-                                <input type="email" class="form-control" id="regcorreo" placeholder="Correo eléctronico" name="inputReg" focus="validar_correo()" required>
+                                <input type="email" class="form-control Comprobarmail" id="regcorreo" placeholder="Correo eléctronico" name="inputReg" focus="validar_correo()" required>
                             </div>
-                            <span id="error-mensaje-email" style="display: none; color:red;"></span>
+                            <span id="error-mensajeEmail-reg" style="display: none; color:red;">Ingresa un correo válido</span>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
                                 </div>
-                                <input type="tel" class="form-control" id="telefono" maxlength="10" required placeholder="Número de teléfono" name="inputReg" oninput="validar_telefono()" required>
+                                <input type="tel" class="form-control" id="telefono" maxlength="10" required placeholder="Número de teléfono" name="inputReg" required>
                             </div>
+                            <span id="error-mensageTel" style="display: none; color:red;">Ingresa un número válido</span>
                             <div class="form-row form-group">
                                 <div class="col">
                                     <input type="date" class="form-control" id="fechanac" placeholder="Fecha de nacimiento" name="inputReg">
@@ -104,7 +105,7 @@
                                 </label>
                             </div>
                             <div id="error-mensaje" style="display: none; color:red;"></div>
-                            <button class="btn btn-primary" id="btn-reg" onclick="registrarUsu()">Registrate</button>
+                            <button class="btn btn-primary" id="btn-reg" onclick="registrarUsu()" disabled>Registrate</button>
                             <br>
                             <a href="#" onclick="toggleForms(false)">¿Ya tienes cuenta?</a>
                             
@@ -122,9 +123,9 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
                                 </div>
-                                <input type="email" class="form-control" id="repcorreo" placeholder="Correo eléctronico" required>
+                                <input type="email" class="form-control Comprobarmail" id="repcorreo" placeholder="Correo eléctronico" required>
                             </div>
-
+                            <span id="error-mensajeEmail-rep" style="display: none; color:red;">Ingresa un correo válido</span>
                             <div class="form-group">
                                 <button type="button" class="btn btn-danger" onclick="toggleForms(false)">Cancelar</button>
                                 <button type="button" class="btn btn-primary" onclick="recuperar_contraseña()">Buscar</button>

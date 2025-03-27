@@ -27,17 +27,17 @@ use PHPMailer\PHPMailer\PHPMailer;
 
 
     function recuperar_email($destino) {
-        include("../conexion.php");
+        //include("../conexion.php");
         include("../email/Exception.php");
         include("../email/PHPMailer.php");
         include("../email/SMTP.php");
 
-        $sql="SELECT * FROM usuario WHERE correo= '$destino->correo'";
+       /*  $sql="SELECT * FROM usuario WHERE correo= '$destino->correo'";
         $query = mysqli_query($con,$sql);
 
         if ($query->num_rows > 0){
             return true;
-        }
+        } */
 
         $mail = new PHPMailer();
 
@@ -142,10 +142,11 @@ use PHPMailer\PHPMailer\PHPMailer;
                 return "Error al enviar el correo";
             } */
 
-            // return $mail;
+            return true;
 
         } catch (Exception $e) {
             /* return "Error al enviar el correo: {$mail->ErrorInfo}"; */
+            return false;
         }
     }
 
