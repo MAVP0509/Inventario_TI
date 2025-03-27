@@ -59,6 +59,7 @@ async function registrarUsu(){
     
 }
 
+
 async function validar_ingreso() {
     let model = {
         accion: 0,
@@ -82,23 +83,6 @@ async function validar_ingreso() {
     
 }
 
-async function repcuperar_contraseña() {
-    let model = {
-        accion: 0,
-        correo: $("#logcorreo").val().trim(),
-    }
-
-    let server = await server_usuario(model);
-    let menssage = document.getElementById('mensaje-correo');
-
-    if (resp.resultado === true) {
-        menssage.style.display = 'block';
-        menssage.textContent = "Te hemos enviado un correo para restablecer tu contraseña.";
-    } else {
-        menssage.style.display = 'none';
-    }
-    
-}
 
 async function toggleForms(showRegister = false, showRecovery = false){
     if(showRecovery){
@@ -116,6 +100,7 @@ async function toggleForms(showRegister = false, showRecovery = false){
     }
 }
 
+
 $(document).ready(function () {
     $('[data-toggle="popover"]').popover(); 
     
@@ -127,10 +112,11 @@ $(document).ready(function () {
     document.getElementById('regcorreo').addEventListener('input', validar_email);
     document.getElementById('toggle-password-icon').addEventListener('click', togglePasswords);
     document.getElementById('logcorreo').addEventListener('input', validar_email);
-    document.getElementById('rep-correo').addEventListener('input', validar_email);
+    document.getElementById('repcorreo').addEventListener('input', validar_email);
     
 });
 //console.log(r=document.getElementById('rep-correo').addEventListener('input', validar_email))
+
 function validar_contraseña(){
     let regcontraseña = document.getElementById('reg-contraseña').value;
     let confcontraseña = document.getElementById('conf-contraseña').value;
@@ -177,6 +163,7 @@ function validar_contraseña(){
     return true;
 
     }
+
 
 function togglePasswords() {
         let regPasswordInput = document.getElementById('reg-contraseña');
@@ -314,7 +301,7 @@ console.log(sessionStorage.getItem("nombre"))
 async function recuperar_contraseña() {
     let model ={
         accion : 0,
-        correo : $("#rep-correo").val().trim()
+        correo : $("#repcorreo").val().trim()
     }
     return new Promise ((resolve,reject)=>{
         $.ajax({

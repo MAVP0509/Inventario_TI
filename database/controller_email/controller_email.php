@@ -20,16 +20,24 @@ use PHPMailer\PHPMailer\PHPMailer;
     //var_dump($persona);
     //print($clientejson->nombre);
 
-    if($clientejson->accion==0){
-        $respuesta_servidor->resultado = enviar_email($clientejson);
+    if ($clientejson->accion==0) {
+        $respuesta_servidor->resultado = recuperar_email($clientejson);
     } 
     print(json_encode($respuesta_servidor));
 
 
-    function enviar_email($destino){
+    function recuperar_email($destino) {
+        include("../conexion.php");
         include("../email/Exception.php");
         include("../email/PHPMailer.php");
         include("../email/SMTP.php");
+
+        $sql="SELECT * FROM usuario WHERE correo= '$destino->correo'";
+        $query = mysqli_query($con,$sql);
+
+        if ($query->num_rows > 0){
+            return true;
+        }
 
         $mail = new PHPMailer();
 
@@ -92,19 +100,6 @@ use PHPMailer\PHPMailer\PHPMailer;
                             line-height: 1.5;
                             color: #555;
                         }
-                        .button {
-                            display: inline-block;
-                            margin-top: 20px;
-                            padding: 10px 20px;
-                            background-color: #007bff;
-                            color: white;
-                            text-decoration: none;
-                            border-radius: 5px;
-                            font-size: 16px;
-                        }
-                        .button:hover {
-                            background-color: #0056b3;
-                        }
                         .footer {
                             background-color: #f4f4f9;
                             color: #666;
@@ -122,10 +117,10 @@ use PHPMailer\PHPMailer\PHPMailer;
                         </div>
 
                         <div class="card">
-                            <h2>Registro</h2>
+                            <h2>Recuperación de contraseña</h2>
                             <p>Este es un correo de prueba con contenido en <b>HTML</b>. Gracias por usar nuestro sistema.</p>
                             <p>Si necesitas más información, haz clic en el botón de abajo:</p>
-                            <a href="#" class="button">Ir al sistema</a>
+                            <button></button>
                         </div>
 
                         <div class="footer">
@@ -140,14 +135,18 @@ use PHPMailer\PHPMailer\PHPMailer;
         
             // Enviar el correo
             $mail->send();
-            /* if ($mail->send()){
-                return true;
-            }else{
+
+            /* if ($mail->send()) {
+                return "correo enviado correctamente.";
+            } else {
+                return "Error al enviar el correo";
             } */
+
             // return $mail;
 
         } catch (Exception $e) {
-            
+            /* return "Error al enviar el correo: {$mail->ErrorInfo}"; */
         }
     }
+
 
