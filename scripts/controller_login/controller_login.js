@@ -21,6 +21,26 @@ function server_usuario(model){
     })  
 }
 
+function server_email(model){
+    return new Promise ((resolve,reject)=>{
+        $.ajax({
+            type: "POST",
+            url: "database/controller_email/controller_email.php",
+            data: {
+                trama:JSON.stringify(model)
+            },
+            success: function(response){
+                try {
+                    resolve(JSON.parse(response))
+                    //console.log(JSON.parse(response))
+                } catch (error) {
+                    reject(error)
+                }
+            }
+        })
+    })
+}
+
 
 async function registrarUsu(){
 
@@ -109,10 +129,10 @@ $(document).ready(function () {
     document.getElementById('reg-contraseña').addEventListener('input', validar_contraseña);
     document.getElementById('fechanac').addEventListener('input',calcularEdad);
     /* document.getElementById('toggle-passwords').addEventListener('change', togglePasswords); */
-    document.getElementById('regcorreo').addEventListener('input', validar_email);
+    //document.getElementById('regcorreo').addEventListener('input', validar_email);
     document.getElementById('toggle-password-icon').addEventListener('click', togglePasswords);
-    document.getElementById('logcorreo').addEventListener('input', validar_email);
-    document.getElementById('repcorreo').addEventListener('input', validar_email);
+    //document.getElementById('logcorreo').addEventListener('input', validar_email);
+    //document.getElementById('repcorreo').addEventListener('input', validar_email);
     
 });
 //console.log(r=document.getElementById('rep-correo').addEventListener('input', validar_email))
@@ -204,7 +224,7 @@ function calcularEdad(){
 } */
 
 
-async function validar_email(node){
+/* async function validar_email(node){
     //inputEmail = document.querySelectorAll('input[type="email"]')
     errorMessageEmail = document.getElementsByName("error-mensaje-email")
     const email = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
@@ -234,8 +254,8 @@ async function validar_email(node){
                 //errorMessageEmail[0].textContent = 'Ingresa un correo válido';
             }else{
                 errorMessageEmail[0].attributes.style.nodeValue = 'display: none; color:red;';
-                /* errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
-                errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;' */
+                //errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
+                //errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;'
                 
             }
           break;
@@ -246,8 +266,8 @@ async function validar_email(node){
                 //errorMessageEmail[1].textContent = 'Ingresa un correo válido';
             }else{
                 errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;';
-                /* errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
-                errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;' */
+                //errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
+                //errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;'
             }
           break;
           case node.id ==="rep-correo":
@@ -256,14 +276,14 @@ async function validar_email(node){
                 //errorMessageEmail[1].textContent = 'Ingresa un correo válido';
             }else{
                 errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;';
-                /* errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
-                errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;' */
+                //errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
+                //errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;'
             }
           break;
       
         //default:
       } 
-}
+} */
 
 async function validar_telefono(){
     telefonoInput = document.getElementById('telefono');
@@ -288,23 +308,24 @@ async function recuperar_contraseña() {
         accion : 0,
         correo : $("#repcorreo").val().trim()
     }
-    return new Promise ((resolve,reject)=>{
-        $.ajax({
-            type: "POST",
-            url: "database/controller_email/controller_email.php",
-            data: {
-                trama:JSON.stringify(model)
-            },
-            success: function(response){
-                try {
-                    resolve(JSON.parse(response))
-                    //console.log(JSON.parse(response))
-                } catch (error) {
-                    reject(error)
-                }
-            }
-        })
-    })
+    
+    let server = await server_email(model);
 
+    let emailmessages = document.getElementById('mensaje-correo-success');
+    //let emailmessaged = document.getElementById('mensaje-correo-danger');
+
+    if(server.resultado === true) {
+        emailmessages.style.display = 'block';
+        emailmessages.textContent = 'Te hemos enviado un correo para recuperar tu contraseña.';
+
+        //emailmessages.classList.remove('alert-danger'); // Eliminar clase de error (si existe)
+        //emailmessages.classList.add('alert-success');   // Asegurarse de que tenga clase de éxito (verde)
+    } else {
+        //emailmessaged.style.display = 'block';
+        //emailmessaged.textContent = 'El correo ingresado no está registrado. Por favor, inténtelo nuevamente.';
+
+        //emailmessaged.classList.remove('alert-success'); // Eliminar clase de éxito (si existe)
+        //emailmessaged.classList.add('alert-danger');   // Asegurarse de que tenga clase de error (rojo)
+    }
 
 }
