@@ -21,6 +21,26 @@ function server_usuario(model){
     })  
 }
 
+function server_email(model){
+    return new Promise ((resolve,reject)=>{
+        $.ajax({
+            type: "POST",
+            url: "database/controller_email/controller_email.php",
+            data: {
+                trama:JSON.stringify(model)
+            },
+            success: function(response){
+                respuesta=response
+                try {
+                    resolve(JSON.parse(response))
+                    //console.log(JSON.parse(response))
+                } catch (error) {
+                    reject(error)
+                }
+            }
+        })
+    })
+}
 
 async function registrarUsu(){
 
@@ -106,9 +126,9 @@ $(document).ready(function () {
     document.getElementById('reg-contraseña').addEventListener('input', validar_contraseña);
     document.getElementById('fechanac').addEventListener('input',calcularEdad);
     document.getElementById('toggle-passwords').addEventListener('change', togglePasswords);
-    document.getElementById('regcorreo').addEventListener('input', validar_email);
-    document.getElementById('logcorreo').addEventListener('input', validar_email);
-    document.getElementById('rep-correo').addEventListener('input', validar_email);
+    //document.getElementById('regcorreo').addEventListener('input', validar_email);
+    //document.getElementById('logcorreo').addEventListener('input', validar_email);
+    //document.getElementById('rep-correo').addEventListener('input', validar_email);
     
 });
 //console.log(r=document.getElementById('rep-correo').addEventListener('input', validar_email))
@@ -196,7 +216,7 @@ function calcularEdad(){
 } */
 
 
-async function validar_email(node){
+/* async function validar_email(node){
     //inputEmail = document.querySelectorAll('input[type="email"]')
     errorMessageEmail = document.getElementsByName("error-mensaje-email")
     const email = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
@@ -205,9 +225,9 @@ async function validar_email(node){
     let col = document.querySelectorAll('.col')
     let seleccionado = Array.from(col).filter(col =>{
         let activo = window.getComputedStyle(col)
-        return activo.display =='block'
+        return  activo.display =='block'
     })
-
+    console.log (seleccionado)
     seleccionado.forEach(col => {
         // Dentro de la columna visible, seleccionar el primer input de tipo "email"
         let inputEmail = col.querySelector('input[type="email"]');
@@ -226,8 +246,6 @@ async function validar_email(node){
                 //errorMessageEmail[0].textContent = 'Ingresa un correo válido';
             }else{
                 errorMessageEmail[0].attributes.style.nodeValue = 'display: none; color:red;';
-                /* errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
-                errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;' */
                 
             }
           break;
@@ -238,8 +256,6 @@ async function validar_email(node){
                 //errorMessageEmail[1].textContent = 'Ingresa un correo válido';
             }else{
                 errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;';
-                /* errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
-                errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;' */
             }
           break;
           case node.id ==="rep-correo":
@@ -248,14 +264,10 @@ async function validar_email(node){
                 //errorMessageEmail[1].textContent = 'Ingresa un correo válido';
             }else{
                 errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;';
-                /* errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
-                errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;' */
             }
           break;
-      
-        //default:
       } 
-}
+} */
 
 async function validar_telefono(){
     telefonoInput = document.getElementById('telefono');
@@ -280,23 +292,15 @@ async function recuperar_contraseña() {
         accion : 0,
         correo : $("#rep-correo").val().trim()
     }
-    return new Promise ((resolve,reject)=>{
-        $.ajax({
-            type: "POST",
-            url: "database/controller_email/controller_email.php",
-            data: {
-                trama:JSON.stringify(model)
-            },
-            success: function(response){
-                try {
-                    resolve(JSON.parse(response))
-                    //console.log(JSON.parse(response))
-                } catch (error) {
-                    reject(error)
-                }
-            }
-        })
-    })
 
+    let server = await server_email(model);
 
+    let resp=JSON.parse(respuesta)
+
+    if(resp.resultado===false){
+        alert("El correo ingresado no está registrado")
+    }else{
+        document.getElementById("colrep").style.display = 'none'
+        document.getElementById("col-reset").style.display = 'block'
+    }
 }

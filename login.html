@@ -123,7 +123,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
                         </div>
-                        <input type="email" class="form-control" id="rep-correo" onke placeholder="Correo eléctronico" name="inputRecov">
+                        <input type="email" class="form-control" id="rep-correo"  placeholder="Correo eléctronico" name="inputRecov">
                     </div>
                     <span name="error-mensaje-email" style="display: none; color:red;">Ingresa un correo válido</span>
 
@@ -135,6 +135,45 @@
             </div>
         </div>
 
+        <!--Col de reseteo de contraseña-->
+        <div class="col" style="display: none;" id="col-reset">
+            <div class="card text-center" style="width: 50vh; display:block" id="form-token">
+                <div class="card-body" >
+                    <h5>Verifica el token de autenticación</h5>
+                    <i class="fa-solid fa-user-secret fa-5x"></i><br><br>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa-solid fa-shield"></i></span>
+                        </div>
+                        <input type="text" class="form-control" id="valtoken" placeholder="Token de autenticación" >
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-primary" onclick="">Confirmar</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card text-center" style="width: 50vh; display:none;" id="form-resetPass" >
+                <div class="card-body">
+                    <h5>Resestablece tu contraseña</h5>
+                    <i class="fa-solid fa-user-secret fa-5x"></i><br><br>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                        </div>
+                        <input type="password" class="form-control" id="respass" placeholder="Nueva contraseña" name="inputReset">
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
+                        </div>
+                        <input type="password" class="form-control" id="conf-respass" placeholder="Confirmar contraseña" name="inputReset">
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-primary" onclick="">Confirmar</button>
+                    </div>
+                </div>
+            </div>        
+        </div>
     </div>
 <!-- Codigo del toast-->
 <div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px; ">
