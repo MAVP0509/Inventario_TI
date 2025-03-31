@@ -41,10 +41,11 @@ function server_email(model){
     })
 }
 
-
 async function registrarUsu(){
-
+    let toast = $('#liveToast');
     if (!validar_contraseña({ target: { id: 'reg-contraseña' } })) {
+        toast.body("¡El toast ha sido actualizado!")
+        toast.toast('show')
         return;
     }
 
@@ -61,11 +62,10 @@ async function registrarUsu(){
 
     //console.log(JSON.stringify(model));
     //console.log(JSON.stringify(model));
-    let server =await server_usuario(model);
+    let server = await server_usuario(model);
 
     let resp=JSON.parse(respuesta)
     if(resp.resultado === true){
-        let toast = $('#liveToast');
         // Mostramos el toast usando el método de Bootstrap
         toast.toast('show');
     }else if(resp.resultado === false){
@@ -128,11 +128,7 @@ $(document).ready(function () {
     document.getElementById('conf-contraseña').addEventListener('input', validar_contraseña);
     document.getElementById('reg-contraseña').addEventListener('input', validar_contraseña);
     document.getElementById('fechanac').addEventListener('input',calcularEdad);
-    /* document.getElementById('toggle-passwords').addEventListener('change', togglePasswords); */
-    //document.getElementById('regcorreo').addEventListener('input', validar_email);
-    document.getElementById('toggle-password-icon').addEventListener('click', togglePasswords);
-    //document.getElementById('logcorreo').addEventListener('input', validar_email);
-    //document.getElementById('repcorreo').addEventListener('input', validar_email);
+    document.getElementById('toggle-passwords').addEventListener('change', togglePasswords);
     
 });
 //console.log(r=document.getElementById('rep-correo').addEventListener('input', validar_email))
@@ -224,74 +220,59 @@ function calcularEdad(){
 } */
 
 
-/* async function validar_email(node){
-    //inputEmail = document.querySelectorAll('input[type="email"]')
-    errorMessageEmail = document.getElementsByName("error-mensaje-email")
-    const email = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-    //nodeValue: "display: none; color:red;"
-    //console.log(inputEmail[0].value)
-    let col = document.querySelectorAll('.col')
-    let seleccionado = Array.from(col).filter(col =>{
-        let activo = window.getComputedStyle(col)
-        return activo.display =='block'
-    })
-
-    seleccionado.forEach(col => {
-        // Dentro de la columna visible, seleccionar el primer input de tipo "email"
-        let inputEmail = col.querySelector('input[type="email"]');
-        
-        if (inputEmail) {
-            console.log(inputEmail.value);  // Aquí puedes hacer lo que necesites con el input
-        }
-    });
-    console.log(inputEmail)
-    node= document.querySelector('input[type="email"]')
-    //idNode=[node[0].id,node[3].id,node[2].id]
-    switch (col) {
-        case node.id ==="logcorreo":
-            if(!email.test(inputEmail[0].value)){
-                errorMessageEmail[0].attributes.style.nodeValue = 'display: block; color:red;';
-                //errorMessageEmail[0].textContent = 'Ingresa un correo válido';
-            }else{
-                errorMessageEmail[0].attributes.style.nodeValue = 'display: none; color:red;';
-                //errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
-                //errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;'
-                
-            }
-          break;
-      
-        case node.id ==="regcorreo":
-            if(!email.test(inputEmail[1].value)){
-                errorMessageEmail[1].attributes.style.nodeValue = 'display: block; color:red;';
-                //errorMessageEmail[1].textContent = 'Ingresa un correo válido';
-            }else{
-                errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;';
-                //errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
-                //errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;'
-            }
-          break;
-          case node.id ==="rep-correo":
-            if(!email.test(inputEmail[2].value)){
-                errorMessageEmail[2].attributes.style.nodeValue = 'display: block; color:red;';
-                //errorMessageEmail[1].textContent = 'Ingresa un correo válido';
-            }else{
-                errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;';
-                //errorMessageEmail[1].attributes.style.nodeValue = 'display: none; color:red;'
-                //errorMessageEmail[2].attributes.style.nodeValue = 'display: none; color:red;'
-            }
-          break;
-      
-        //default:
-      } 
-} */
-
-async function validar_telefono(){
-    telefonoInput = document.getElementById('telefono');
-
-  telefonoInput.addEventListener('input', function() {
-    this.value = this.value.replace(/[^0-9]/g, ''); // Reemplaza cualquier cosa que no sea un número
-          });
+//Comprueba en tiempo real el contenido de los inputs tipo email
+let inputEmail
+$('.Comprobarmail').on('input',function(e){
+    //console.log(e.currentTarget.value)
+    inputEmail =e.currentTarget.value
+    idInput = e.currentTarget.id
+    validar_email(e.currentTarget.value)
 }
+)
+
+ async function validar_email(){
+    const email = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+
+    //console.log(inputEmail)
+
+    if(idInput === "logcorreo"){
+        if(!email.test(inputEmail)){
+            document.getElementById('error-mensajeEmail-log').style = 'display : block; color:red;'
+        }else{
+            document.getElementById('error-mensajeEmail-log').style = ' display : none;'
+        }
+    }else if(idInput === "regcorreo"){
+        if(!email.test(inputEmail) || inputEmail === ""){
+            document.getElementById('error-mensajeEmail-reg').style = 'display : block; color:red;'
+            document.getElementById('btn-reg').disabled= true;
+        }else{
+            document.getElementById('error-mensajeEmail-reg').style = ' display : none;'
+            document.getElementById('btn-reg').disabled= false;
+        }
+    }else if(idInput === "repcorreo"){
+        if(!email.test(inputEmail)){
+            document.getElementById('error-mensajeEmail-rep').style = 'display : block; color:red;'
+        }else{
+            document.getElementById('error-mensajeEmail-rep').style = ' display : none;'
+        }
+    }
+} 
+
+
+//Función para comprobar que el telefono sea uno válido
+$('#telefono').on('input', function() {
+    this.value= this.value.replace(/[^0-9]/g, '')
+    valTel = $(this).val();
+    if (valTel.length < 10 ||valTel.length === 0) {
+        document.getElementById('error-mensageTel').style = "display : block; color:red;"
+        document.getElementById('btn-reg').disabled= true;
+    } else {
+        document.getElementById('error-mensageTel').style = "display : none;"
+        document.getElementById('btn-reg').disabled= false;
+    }
+}); 
+
+
 
 /* let models ={
     nombre : "Miguel",
@@ -328,4 +309,12 @@ async function recuperar_contraseña() {
         //emailmessaged.classList.add('alert-danger');   // Asegurarse de que tenga clase de error (rojo)
     }
 
+    let resp=JSON.parse(respuesta)
+
+    if(resp.resultado===false){
+        alert("El correo ingresado no está registrado")
+    }else{
+        document.getElementById("colrep").style.display = 'none'
+        document.getElementById("col-reset").style.display = 'block'
+    }
 }
