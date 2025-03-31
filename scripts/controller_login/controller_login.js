@@ -1,5 +1,6 @@
 //inv toastr
 let respuesta 
+
 function server_usuario(model){
     return new Promise ((resolve,reject)=>{
         $.ajax({
@@ -42,7 +43,53 @@ function server_email(model){
     })
 }
 
+async function load(){
+
+    let url = window.location.href;
+    let params = new URLSearchParams(url);
+    let token = params.get("isReset")
+
+    if (token) {
+        validar_token(token);
+    }
+}
+
+async function generarhashtoken(token) {
+
+    const esconder = new TextEncoder();
+    const encoder = new TextEncoder();
+    const data = encoder.encode(token);  // Convierte el token en un array de bytes
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);  // Genera el hash
+    const hashArray = Array.from(new Uint8Array(hashBuffer));  // Convierte el buffer en un array de bytes
+    const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');  // Convierte a hexadecimal
+    return hashHex;  // Devuelve el hash en formato hexadecimal
+    
+}
+
+async function validar_token(hashtoken) {
+
+    let model = {
+        accion : 2,
+        token : token
+    };
+
+    let server = await server_usuario(model);
+    let resp = JSON.parse(respuesta);
+
+    if (resp.resultado === true){
+        document.getElementById('col-reset').style.display = 'block';
+        document.getElementById('colrep').style.display = 'none';
+        document.getElementById('colnine').style.display = 'none';
+    } else {
+        alert("El token no es válido, vuelva a intentarlo");
+    }
+    
+}
+
+window.onload = load;
+
 async function registrarUsu(){
+
     let toast = $('#liveToast');
     if (!validar_contraseña({ target: { id: 'reg-contraseña' } })) {
         toast.body("¡El toast ha sido actualizado!")
@@ -129,7 +176,7 @@ $(document).ready(function () {
     document.getElementById('conf-contraseña').addEventListener('input', validar_contraseña);
     document.getElementById('reg-contraseña').addEventListener('input', validar_contraseña);
     document.getElementById('fechanac').addEventListener('input',calcularEdad);
-    document.getElementById('toggle-passwords').addEventListener('change', togglePasswords);
+    document.getElementById('toggle-password-icon').addEventListener('click', togglePasswords);
     
 });
 //console.log(r=document.getElementById('rep-correo').addEventListener('input', validar_email))

@@ -18,16 +18,20 @@
     //var_dump($persona);
     //print($clientejson->nombre);
 
-    if ($clientejson->accion==0) {
+
+    if ($clientejson->accion == 0) {
         $respuesta_servidor->resultado = consultarDatos($clientejson);
-    } else if ($clientejson->accion==1) {
+    } else if ($clientejson->accion == 1) {
         $respuesta_servidor->resultado = insertarUsuario($clientejson);
-    } 
+    } else if ($clientejson->accion == 2) {
+        $respuesta_servidor->resultado = validarToken($clientejson->token);
+    }
     print(json_encode($respuesta_servidor)); //si lo quitas truena la app
 
 
 function consultarDatos($valores) {
         include("../conexion.php");
+
         $sql="SELECT * FROM usuario WHERE correo= '$valores->correo'";
         $query = mysqli_query($con,$sql);
         
@@ -58,3 +62,14 @@ function consultarDatos($valores) {
 
     }
 
+function validarToken($token){
+    include("../conexion.php");
+    $sql ="SELECT * FROM usuario WHERE token = '$token' AND token_expiracion > NOW()";
+    $query = mysqli_query($con,$sql);
+
+    if ($query->num_rows > 0) {
+        return true;
+    } else {
+        return false;
+    }
+}

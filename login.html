@@ -9,7 +9,7 @@
 
         <title>Inventario_TI</title>
     </head>
-    <body class="container-fluid d-flex justify-content-center align-items-center vh-100">
+    <body class="container-fluid d-flex justify-content-center align-items-center vh-100" onload="load()">
             <div class="row">
 
                 <!--Col de Iniciar sesión-->
@@ -99,11 +99,6 @@
                                 </div>
                                 <input type="password" class="form-control" id="conf-contraseña" placeholder="Confirma tu contraseña" name ="inputReg" required>
                             </div>
-                            <div>
-                                <label>
-                                    <input type="checkbox" id="toggle-passwords"> Mostrar contraseñas
-                                </label>
-                            </div>
                             <div id="error-mensaje" style="display: none; color:red;"></div>
                             <button class="btn btn-primary" id="btn-reg" onclick="registrarUsu()" disabled>Registrate</button>
                             <br>
@@ -138,21 +133,6 @@
 
                 <!--Col de reseteo de contraseña-->
                 <div class="col" style="display: none;" id="col-reset">
-                    <div class="card text-center" style="width: 50vh; display:block" id="form-token">
-                        <div class="card-body" >
-                            <h5>Verifica el token de autenticación</h5>
-                            <i class="fa-solid fa-user-secret fa-5x"></i><br><br>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fa-solid fa-shield"></i></span>
-                                </div>
-                                <input type="text" class="form-control" id="valtoken" placeholder="Token de autenticación" >
-                            </div>
-                            <div class="form-group">
-                                <button type="button" class="btn btn-primary" onclick="">Confirmar</button>
-                            </div>
-                        </div>
-                    </div>
                     <div class="card text-center" style="width: 50vh; display:none;" id="form-resetPass" >
                         <div class="card-body">
                             <h5>Resestablece tu contraseña</h5>

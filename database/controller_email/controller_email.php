@@ -1,7 +1,5 @@
 <?php
 
-session_start();
-
 use PHPMailer\PHPMailer\PHPMailer;
 
     header('Content-Type: text/html; charset=UTF-8');
@@ -36,9 +34,9 @@ use PHPMailer\PHPMailer\PHPMailer;
         if ($query->num_rows > 0) {
             $usuario =mysqli_fetch_assoc($query);
             $token = bin2hex(random_bytes(4));
-            $token_expiracion = time() + 300;
-
-            $update_token_sql = "UPDATE usuario SET token = 'token', token_expiracion = '$token_expiracion' WHERE correo = '$correo'";
+            $token_expiracion = date("Y-m-d H:i:s", time() + 300);
+            token_expirados();
+            $update_token_sql = "UPDATE usuario SET token = '$token', token_expiracion = '$token_expiracion' WHERE correo = '$correo'";
             if (mysqli_query($con, $update_token_sql)) {
                 return email_recuperacion($correo, $token);
             }
@@ -50,6 +48,13 @@ use PHPMailer\PHPMailer\PHPMailer;
         }
     }
 
+    function token_expirados() {
+        include("../conexion.php");
+
+        $sql = "UPDATE usuario SET token = NULL, token_expiracion = NULL WHERE token_expiracion < NOW() AND correo='$correo'";
+        mysqli_query($con, $sql);
+
+    }
 
     function email_recuperacion($destino, $token) {
         
@@ -68,10 +73,12 @@ use PHPMailer\PHPMailer\PHPMailer;
             $mail->Username = 'janny.garcia703@gmail.com'; // Tu dirección de correo electrónico
             $mail->Password = 'cgwrbvbjzgmjuyws'; // Tu contraseña de correo electrónico
             $mail->Port = 465; // Puerto SMTP
+            
             $Year =  date("Y");
             // Configuración del remitente y destinatario
             $mail->setFrom('janny.garcia703@gmail.com', 'Inventario_TI');
             $mail->addAddress($destino, 'Destinatario');
+            $reset_link = "";
             // $mail->addReplyTo('otra-direccion@dominio.com', 'Responder a'); // Opcional: dirección de respuesta
         
             // Contenido del correo
@@ -137,8 +144,8 @@ use PHPMailer\PHPMailer\PHPMailer;
                         <div class="card">
                             <h2>Recuperación de contraseña</h2>
                             <p>Hemos recibido una solicitud para recuperar tu contraseña.</p>
-                            <p><Tu token de recuperación es:/p>
-                            <h3>'.$token.'</h3>
+                            <p>Haz clic en el enlace para restablecer su contraseña:</p>
+                            <h3>href:</h3>
                             <p>Este token es valido por 5 minutos.</p>
                             <p>Si no solicitaste este cambio ignore este correo.</p>
                         </div>
@@ -162,10 +169,7 @@ use PHPMailer\PHPMailer\PHPMailer;
             } */
             return true;
 
-        } catch (Exception $e) {
+            } catch (Exception $e) {
             return false;
         }
     }
-
-
-
