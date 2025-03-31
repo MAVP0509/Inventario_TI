@@ -30,6 +30,7 @@ function server_email(model){
                 trama:JSON.stringify(model)
             },
             success: function(response){
+                respuesta = response
                 try {
                     resolve(JSON.parse(response))
                     //console.log(JSON.parse(response))
@@ -300,7 +301,7 @@ async function recuperar_contraseña() {
     let server = await server_email(model);
 
     let emailmessages = document.getElementById('mensaje-correo-success');
-    //let emailmessaged = document.getElementById('mensaje-correo-danger');
+    let emailmessaged = document.getElementById('mensaje-correo-danger');
 
     if(server.resultado === true) {
         emailmessages.style.display = 'block';
@@ -309,8 +310,8 @@ async function recuperar_contraseña() {
         //emailmessages.classList.remove('alert-danger'); // Eliminar clase de error (si existe)
         //emailmessages.classList.add('alert-success');   // Asegurarse de que tenga clase de éxito (verde)
     } else {
-        //emailmessaged.style.display = 'block';
-        //emailmessaged.textContent = 'El correo ingresado no está registrado. Por favor, inténtelo nuevamente.';
+        emailmessaged.style.display = 'block';
+        emailmessaged.textContent = 'El correo ingresado no está registrado. Por favor, inténtelo nuevamente.';
 
         //emailmessaged.classList.remove('alert-success'); // Eliminar clase de éxito (si existe)
         //emailmessaged.classList.add('alert-danger');   // Asegurarse de que tenga clase de error (rojo)
