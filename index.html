@@ -7,5 +7,12 @@
 </head>
 <body>
     <h1>FFF</h1>
+    <script>
+        // Verificamos si el usuario está autenticado
+        if (sessionStorage.getItem('log') !== 'true') {
+            // Si no está autenticado, redirigimos a login.html
+            window.location.href = 'login.html';
+        }
+    </script>
 </body>
 </html>
