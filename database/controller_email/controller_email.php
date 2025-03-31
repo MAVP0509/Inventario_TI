@@ -36,7 +36,7 @@ use PHPMailer\PHPMailer\PHPMailer;
         if ($query->num_rows > 0) {
 
             $token = bin2hex(random_bytes(4));
-            $_SESSION['token'] = $token;
+            $_SESSION['clientejson'] = $token;
             $_SESSION['token_expiracion'] = time() + 300;
 
             return email_recuperacion($correo, $token);
