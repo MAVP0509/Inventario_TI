@@ -34,12 +34,17 @@ use PHPMailer\PHPMailer\PHPMailer;
         $query = mysqli_query($con,$sql);
 
         if ($query->num_rows > 0) {
-
+            $usuario =mysqli_fetch_assoc($query);
             $token = bin2hex(random_bytes(4));
-            $_SESSION['clientejson'] = $token;
-            $_SESSION['token_expiracion'] = time() + 300;
+            $token_expiracion = time() + 300;
 
-            return email_recuperacion($correo, $token);
+            $update_token_sql = "UPDATE usuario SET token = 'token', token_expiracion = '$token_expiracion' WHERE correo = '$correo'";
+            if (mysqli_query($con, $update_token_sql)) {
+                return email_recuperacion($correo, $token);
+            }
+            else {
+                return false;
+            }
         } else {
             return false;
         }
@@ -159,8 +164,8 @@ use PHPMailer\PHPMailer\PHPMailer;
 
         } catch (Exception $e) {
             return false;
-            /* return "Error al enviar el correo: {$mail->ErrorInfo}"; */
         }
     }
+
 
 
