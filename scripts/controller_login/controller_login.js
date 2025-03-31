@@ -43,10 +43,11 @@ function server_email(model){
 
 async function registrarUsu(){
     let toast = $('#liveToast');
-    if (!validar_contraseña({ target: { id: 'reg-contraseña' } })) {
-        toast.body("¡El toast ha sido actualizado!")
+    if (!validar_contraseña({ target: { id: 'reg-contraseña' } }) || email ===false || !tel===false  ) {
+        toast.find('.toast-body').text('¡Rellena todos los campos para continuar!')
+        //toast.body("¡El toast ha sido actualizado!")
         toast.toast('show')
-        return;
+        return false;
     }
 
     let model = {
@@ -222,6 +223,7 @@ function calcularEdad(){
 
 //Comprueba en tiempo real el contenido de los inputs tipo email
 let inputEmail
+let email=false
 $('.Comprobarmail').on('input',function(e){
     //console.log(e.currentTarget.value)
     inputEmail =e.currentTarget.value
@@ -231,26 +233,28 @@ $('.Comprobarmail').on('input',function(e){
 )
 
  async function validar_email(){
-    const email = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    const estructuraEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
     //console.log(inputEmail)
 
     if(idInput === "logcorreo"){
-        if(!email.test(inputEmail)){
+        if(!estructuraEmail.test(inputEmail)){
             document.getElementById('error-mensajeEmail-log').style = 'display : block; color:red;'
         }else{
             document.getElementById('error-mensajeEmail-log').style = ' display : none;'
         }
     }else if(idInput === "regcorreo"){
-        if(!email.test(inputEmail) || inputEmail === ""){
+        if(!estructuraEmail.test(inputEmail) || inputEmail === ""){
             document.getElementById('error-mensajeEmail-reg').style = 'display : block; color:red;'
-            document.getElementById('btn-reg').disabled= true;
+            email=false
+            //document.getElementById('btn-reg').disabled= true;
         }else{
             document.getElementById('error-mensajeEmail-reg').style = ' display : none;'
-            document.getElementById('btn-reg').disabled= false;
+            email=true
+            //document.getElementById('btn-reg').disabled= false;
         }
     }else if(idInput === "repcorreo"){
-        if(!email.test(inputEmail)){
+        if(!estructuraEmail.test(inputEmail)){
             document.getElementById('error-mensajeEmail-rep').style = 'display : block; color:red;'
         }else{
             document.getElementById('error-mensajeEmail-rep').style = ' display : none;'
@@ -260,15 +264,18 @@ $('.Comprobarmail').on('input',function(e){
 
 
 //Función para comprobar que el telefono sea uno válido
+let tel= false
 $('#telefono').on('input', function() {
     this.value= this.value.replace(/[^0-9]/g, '')
     valTel = $(this).val();
     if (valTel.length < 10 ||valTel.length === 0) {
         document.getElementById('error-mensageTel').style = "display : block; color:red;"
-        document.getElementById('btn-reg').disabled= true;
+        tel=false
+        //document.getElementById('btn-reg').disabled= true;
     } else {
         document.getElementById('error-mensageTel').style = "display : none;"
-        document.getElementById('btn-reg').disabled= false;
+        tel=true
+        //document.getElementById('btn-reg').disabled= false;
     }
 }); 
 
