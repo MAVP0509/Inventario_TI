@@ -484,11 +484,11 @@ async function validar_token(token) {
 }
 
 async function enlaceconParametros(token) {
-
+    
     let baseUrl = "http://localhost/Inventario/recuperacion.html";
     
     let params = new URLSearchParams();
-    params.append("token", token);
+    params.append("tfgf", token);
 
     let urlConParametros = `${baseUrl}?${params.toString()}`;
 

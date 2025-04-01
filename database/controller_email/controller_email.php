@@ -25,6 +25,8 @@ use PHPMailer\PHPMailer\PHPMailer;
     } 
     print(json_encode($respuesta_servidor));
 
+    // Recibir los datos de la solicitud POST (que son la URL con el token)
+
     function verificar_email($correo){
         include("../conexion.php");
 
@@ -79,7 +81,7 @@ use PHPMailer\PHPMailer\PHPMailer;
             // Configuración del remitente y destinatario
             $mail->setFrom('janny.garcia703@gmail.com', 'Inventario_TI');
             $mail->addAddress($destino, 'Destinatario');
-            $reset_link = "http://localhost/Inventario_TI/recuperacion.html?token=$token";
+            $reset_link = "http://localhost/Inventario_TI/recuperacion.html?ftygui=$token";
             // $mail->addReplyTo('otra-direccion@dominio.com', 'Responder a'); // Opcional: dirección de respuesta
         
             // Contenido del correo
@@ -108,6 +110,7 @@ use PHPMailer\PHPMailer\PHPMailer;
                             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
                             overflow: hidden;
                             border: 1px solid #e0e0e0;
+                            text-align: center;
                         }
                         .header {
                             background-color: #007bff;
@@ -156,7 +159,7 @@ use PHPMailer\PHPMailer\PHPMailer;
                         }
                     </style>
                 </head>
-                <body class="container-centrer">
+                <body>
                     <div class="email-container">
                         <div class="header">
                             Notificación de Inventario_TI
@@ -166,7 +169,7 @@ use PHPMailer\PHPMailer\PHPMailer;
                             <p>Hemos recibido una solicitud para recuperar tu contraseña.</p>
                             <p>Haz clic en el botón de abajo para restablecer tu contraseña:</p>
                             <a href="'.$reset_link.'">Restablecer Contraseña</a>
-                            <p>Este token es válido por 5 minutos.</p>
+                            <p>Este mensaje es válido por 5 minutos.</p>
                             <p>Si no solicitaste este cambio, ignora este correo.</p>
                         </div>
                         <div class="footer">
