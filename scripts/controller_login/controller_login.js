@@ -42,73 +42,109 @@ function server_email(model){
     })
 }
 
-
+//Función para el formulario de registro
 let toast = $('#liveToast')
 async function registrarUsu(){
-    if (pass, email, tel, nombre, fecha, vEdad ===false ) {
-        toast.find('.toast-body').text('¡Rellena todos los campos correctamente para continuar!')
-        //toast.body("¡El toast ha sido actualizado!")
+    try{
+        if (pass, email, tel, nombre, fecha, vEdad ===false ) {
+            toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
+            toast.addClass('bg-danger');
+            toast.find('.toast-body').text('¡Rellena todos los campos correctamente para continuar!').css('color','white')
+            toast.toast('show')
+            //console.log(pass, email, tel, nombre, fecha, edad)
+            return false;
+    
+        }else {
+            let model = {
+                accion : 1,
+                nombre: $("#nombre").val().trim(),
+                correo :$("#regcorreo").val().trim(),
+                contraseña :$("#reg-contraseña").val().trim(),
+                edad : $("#edad").val().trim(),
+                telefono : $("#telefono").val().trim(),
+                fecha_nac : $("#fechanac").val().trim(),
+            };
+        
+            let server = await server_usuario(model);
+        
+            let resp=JSON.parse(respuesta)
+            if(resp.resultado === true){
+                localStorage.setItem('registroExitoso', '¡Usuario Registrado!');
+                window.location.href = "login.html"
+            }else if(resp.resultado === false){
+                toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
+                toast.addClass('bg-danger');
+                toast.find('.toast-body').text('Usuario ya existente').css('color','white')
+                toast.toast('show')
+            } 
+            
+            /* let inputs = document.getElementsByName("inputReg");
+            for (let i = 0; i < inputs.length; i++) {
+                const element = inputs[i].value = "";
+            } */
+        }    
+    }catch (error){
+        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
+        toast.addClass('bg-danger');
+        toast.find('.toast-body').text('No se puede conectar al servidor').css('color','white')
         toast.toast('show')
-        console.log(pass, email, tel, nombre, fecha, edad)
-        return false;
-    }else {
+    }
+    
+}
+//Función para el mensaje de "Usuario Registrado en el formulario de ingreso"
+window.addEventListener('load', function () {
+    // Leemos el mensaje del registro desde sessionStorage
+    const mensajeRegistro = localStorage.getItem('registroExitoso');
+    
+    if (mensajeRegistro) {
+        // Si el mensaje existe, mostramos el toast
+        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
+        toast.addClass('bg-success');
+        toast.find('.toast-body').text(mensajeRegistro).css('color','white');
+        toast.toast('show');
+        
+
+        // Eliminamos el mensaje para evitar que aparezca nuevamente
+        localStorage.removeItem('registroExitoso');
+    }
+})
+
+//Función para el formulario de ingreso
+async function validar_ingreso() {
+    try{
         let model = {
-            accion : 1,
-            nombre: $("#nombre").val().trim(),
-            correo :$("#regcorreo").val().trim(),
-            contraseña :$("#reg-contraseña").val().trim(),
-            edad : $("#edad").val().trim(),
-            telefono : $("#telefono").val().trim(),
-            fecha_nac : $("#fechanac").val().trim(),
-        };
+            accion: 0,
+            correo :$("#logcorreo").val().trim(),
+            contraseña : $("#logcontraseña").val().trim(),
+    
+        }
     
         let server = await server_usuario(model);
     
         let resp=JSON.parse(respuesta)
-        if(resp.resultado === true){
-            // Mostramos el toast usando el método de Bootstrap
-            toast.find('.toast-body').text('¡Usuario Registrado!')
-            toast.toast('show');
-            window.location.href = "index.html"
-        }else if(resp.resultado === false){
-            alert("Usuario no ingresado")
-        } 
-        
-        /* let inputs = document.getElementsByName("inputReg");
-        for (let i = 0; i < inputs.length; i++) {
+        if (resp.resultado === false){
+            toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
+            toast.addClass('bg-danger');
+            toast.find('.toast-body').text("Usuario/contraseña no válidos").css('color','white')
+            toast.toast('show')
+            let inputs = document.getElementsByName("inputInit");
+            for (let i = 0; i < inputs.length; i++) {
             const element = inputs[i].value = "";
-        } */
-    }    
-}
-
-
-async function validar_ingreso() {
-    let model = {
-        accion: 0,
-        correo :$("#logcorreo").val().trim(),
-        contraseña : $("#logcontraseña").val().trim(),
-
-    }
-
-    let server = await server_usuario(model);
-
-    let resp=JSON.parse(respuesta)
-    if (resp.resultado === false){
+            }
+        }else{
+            sessionStorage.setItem("user", respuesta)
+            sessionStorage.setItem("log", 'true')
+            sessionStorage.setItem("bienvenido", "Bienvenido " + resp.resultado[0])
+            //console.log(sessionStorage.getItem("nombre"))
+            window.location.href = "index.html";
+            }
+    }catch (error){
         toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-danger'); 
-        toast.find('.toast-body').text('Usuario no encontrado').css('color', 'white');
-        toast.find('.mr-auto') 
-        toast.toast('show');
-        let inputs = document.getElementsByName("inputInit");
-        for (let i = 0; i < inputs.length; i++) {
-        const element = inputs[i].value = "";
-        }
-    }else{
-        sessionStorage.setItem("user", respuesta)
-        sessionStorage.setItem("log", 'true')
-        //console.log(sessionStorage.getItem("nombre"))
-        window.location.href = "index.html";
-        }
+        toast.addClass('bg-danger');
+        toast.find('.toast-body').text('No se puede conectar al servidor').css('color','white')
+        toast.toast('show')
+    }
+    
 }
 
 
