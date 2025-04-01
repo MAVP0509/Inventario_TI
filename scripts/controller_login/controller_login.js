@@ -33,7 +33,7 @@ function server_email(model){
             success: function(response){
                 try {
                     resolve(JSON.parse(response))
-                    //console.log(JSON.parse(response))   
+                    console.log(JSON.parse(response))   
                 } catch (error) {
                     reject(error)
                 }
@@ -396,10 +396,12 @@ async function recuperar_contraseña() {
         let enlace = await enlaceconParametros(token); // Obtener el enlace con el token
         emailmessages.style.display = 'block';
         emailmessages.textContent = 'Te hemos enviado un correo para recuperar tu contraseña.';
+        emailmessaged.style.display = 'none';
         
     } else {
         emailmessaged.style.display = 'block';
         emailmessaged.textContent = 'El correo ingresado no está registrado. Por favor, inténtelo nuevamente.';
+        emailmessages.style.display = 'none';
     }
 
     if(response.resultado===false){
