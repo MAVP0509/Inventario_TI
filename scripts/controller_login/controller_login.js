@@ -42,84 +42,6 @@ function server_email(model){
     })
 }
 
-async function load() {
-    let urlParams = new URLSearchParams(window.location.search);
-    let token = urlParams.get("token");
-
-    if (token) {
-        // Validar el token con el servidor
-        let isValid = await validar_token(token);
-
-        if (isValid) {
-            // Mostrar la sección de reseteo de contraseña
-            document.getElementById('col-reset').style.display = 'block';
-
-            // Ocultar las demás secciones
-            document.getElementById('colblock').style.display = 'none';
-            document.getElementById('colnone').style.display = 'none';
-            document.getElementById('colrep').style.display = 'none';
-
-            // Guardar el token en una variable global para usarlo al confirmar el reseteo
-            window.resetToken = token;
-        } else {
-            return false;;
-        }
-    }
-}
-
-window.onload = load;
-
-async function validar_token(token) {
-    let model = {
-        accion: 2, // Acción para validar el token
-        token: token
-    };
-
-    try {
-        let response = await server_usuario(model);
-        return response.resultado === true;
-    } catch (error) {
-        return false;
-    }
-}
-
-    async function confirmarReset() {
-    let nuevaContraseña = document.getElementById('respass').value;
-    let confirmarContraseña = document.getElementById('conf-respass').value;
-
-    if (nuevaContraseña !== confirmarContraseña) {
-        alert('Las contraseñas no coinciden.');
-        return;
-    }
-
-    let token = sessionStorage.getItem('resetToken');
-    if (!token) {
-        alert('Token no válido o expirado.');
-        return;
-    }
-
-    let model = {
-        accion: 3, // Acción para restablecer la contraseña
-        token: token, // Usa el token global
-        nueva_contraseña: nuevaContraseña
-    };
-
-    try {
-        let response = await server_usuario(model);
-
-        if (response.resultado === true) {
-            alert('Contraseña restablecida correctamente.');
-            sessionStorage.removeItem('resetToken'); // Limpiar el token
-            window.location.href = 'login.html'; // Redirigir al login
-        } else {
-            alert('Error al restablecer la contraseña: ' + response.mensaje);
-        }
-    } catch (error) {
-        return false;
-    }
-}
-
-
 async function registrarUsu(){
 
     let toast = $('#liveToast');
@@ -376,6 +298,9 @@ async function recuperar_contraseña() {
     let emailmessaged = document.getElementById('mensaje-correo-danger');
 
     if(response.resultado === true) {
+
+        let token = response.token; // Suponiendo que el servidor devuelve un token
+        let enlace = await enlaceconParametros(token); // Obtener el enlace con el token
         emailmessages.style.display = 'block';
         emailmessages.textContent = 'Te hemos enviado un correo para recuperar tu contraseña.';
         //emailmessaged.style.display = 'none';
@@ -403,4 +328,95 @@ async function recuperar_contraseña() {
         document.getElementById("colrep").style.display = 'none'
         document.getElementById("col-reset").style.display = 'block'
     }
+}
+
+async function load() {
+    let urlParams = new URLSearchParams(window.location.search);
+    let token = urlParams.get("token");
+
+    if (token) {
+        // Validar el token con el servidor
+        let isValid = await validar_token(token);
+
+        if (isValid) {
+            // Mostrar la sección de reseteo de contraseña
+            document.getElementById('col-reset').style.display = 'block';
+
+            // Ocultar las demás secciones
+            document.getElementById('colblock').style.display = 'none';
+            document.getElementById('colnone').style.display = 'none';
+            document.getElementById('colrep').style.display = 'none';
+
+            // Guardar el token en una variable global para usarlo al confirmar el reseteo
+            window.resetToken = token;
+        } else {
+            return false;;
+        }
+    } else {
+        return false;
+    }
+}
+
+window.onload = load;
+
+async function validar_token(token) {
+    let model = {
+        accion: 2, // Acción para validar el token
+        token: token
+    };
+
+    try {
+        let response = await server_usuario(model);
+        return response.resultado === true;
+    } catch (error) {
+        return false;
+    }
+}
+
+    async function confirmarReset() {
+    let nuevaContraseña = document.getElementById('respass').value;
+    let confirmarContraseña = document.getElementById('conf-respass').value;
+
+    if (nuevaContraseña !== confirmarContraseña) {
+        alert('Las contraseñas no coinciden.');
+        return;
+    }
+
+    let token = sessionStorage.getItem('resetToken');
+    if (!token) {
+        alert('Token no válido o expirado.');
+        return;
+    }
+
+    let model = {
+        accion: 3, // Acción para restablecer la contraseña
+        token: token, // Usa el token global
+        nueva_contraseña: nuevaContraseña
+    };
+
+    try {
+        let response = await server_usuario(model);
+
+        if (response.resultado === true) {
+            alert('Contraseña restablecida correctamente.');
+            sessionStorage.removeItem('resetToken'); // Limpiar el token
+            window.location.href = 'login.html'; // Redirigir al login
+        } else {
+            alert('Error al restablecer la contraseña: ' + response.mensaje);
+        }
+    } catch (error) {
+        return false;
+    }
+}
+
+async function enlaceconParametros(token) {
+
+    let baseUrl = "http://localhost/Inventario/index.html";
+    
+    let params = new URLSearchParams();
+    params.append("token", token);
+
+    let urlConParametros = `${baseUrl}?${params.toString()}`;
+
+    return urlConParametros;
 }

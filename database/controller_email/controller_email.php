@@ -78,7 +78,7 @@ use PHPMailer\PHPMailer\PHPMailer;
             // Configuración del remitente y destinatario
             $mail->setFrom('janny.garcia703@gmail.com', 'Inventario_TI');
             $mail->addAddress($destino, 'Destinatario');
-            $reset_link = "http://localhost/Inventario_TI/login.html?token=$token"; // Enlace de restablecimiento de contraseña
+            $reset_link = "http://localhost/Inventario_TI/login.html"; // Enlace de restablecimiento de contraseña 
             // $mail->addReplyTo('otra-direccion@dominio.com', 'Responder a'); // Opcional: dirección de respuesta
         
             // Contenido del correo
