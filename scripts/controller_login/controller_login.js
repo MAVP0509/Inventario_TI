@@ -360,31 +360,17 @@ async function recuperar_contraseña() {
         let enlace = await enlaceconParametros(token); // Obtener el enlace con el token
         emailmessages.style.display = 'block';
         emailmessages.textContent = 'Te hemos enviado un correo para recuperar tu contraseña.';
-        //emailmessaged.style.display = 'none';
-        /* setTimeout(() => {
-            document.getElementById('colrep').style.display = 'none';
-            document.getElementById('colblock').style.display = 'block';
-        }, 10000); // Ocultar el mensaje después de 5 segundos */
         
-
-        //emailmessages.classList.remove('alert-danger'); // Eliminar clase de error (si existe)
-        //emailmessages.classList.add('alert-success');   // Asegurarse de que tenga clase de éxito (verde)
     } else {
         emailmessaged.style.display = 'block';
         emailmessaged.textContent = 'El correo ingresado no está registrado. Por favor, inténtelo nuevamente.';
-        /* document.getElementById('colrep').style.display = 'block'; */
-        //emailmessages.style.display = 'none';
-        //emailmessaged.classList.remove('alert-success'); // Eliminar clase de éxito (si existe)
-        //emailmessaged.classList.add('alert-danger');   // Asegurarse de que tenga clase de error (rojo)
-        //document.getElementById('colrep').style.display = 'block';
     }
 
     if(response.resultado===false){
         alert("El correo ingresado no está registrado")
-    }else{
+    }/* else{
         document.getElementById("colrep").style.display = 'none'
-        //document.getElementById("col-reset").style.display = 'block'
-    }
+    } */
 }
 let token = ''
 async function load() {

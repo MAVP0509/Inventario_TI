@@ -78,85 +78,101 @@ use PHPMailer\PHPMailer\PHPMailer;
             // Configuración del remitente y destinatario
             $mail->setFrom('janny.garcia703@gmail.com', 'Inventario_TI');
             $mail->addAddress($destino, 'Destinatario');
-            $reset_link = "http://localhost/Inventario_TI/login.html?token=$token";
+            $reset_link = "http://localhost/Inventario_TI/recuperacion.html?token=$token";
             // $mail->addReplyTo('otra-direccion@dominio.com', 'Responder a'); // Opcional: dirección de respuesta
         
             // Contenido del correo
             $mail->isHTML(true); // Usar HTML en el correo
             $mail->Subject = 'Recuperación de contraseña';
             $mail->Body = 
+            $mail->Body = 
             '<html>
                 <head>
                     <style>
                         body {
                             font-family: Arial, sans-serif;
-                            background-color: #f4f4f9;
+                            background-color: #f9fafc;
                             color: #333;
                             margin: 0;
                             padding: 0;
                             display: flex;
-                            flex-direction: column;
+                            justify-content: center;
+                            align-items: center;
                             min-height: 100vh;
+                        }
+                        .email-container {
+                            max-width: 400px;
+                            background-color: #ffffff;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                            overflow: hidden;
+                            border: 1px solid #e0e0e0;
                         }
                         .header {
                             background-color: #007bff;
-                            color: white;
+                            color: #ffffff;
                             padding: 20px;
                             text-align: center;
-                            font-size: 24px;
+                            font-size: 20px;
                             font-weight: bold;
                         }
-                        .card {
-                            border: 1px solid #ddd;
-                            border-radius: 10px;
-                            width: 350px;
-                            margin: 20px auto;
-                            background-color: #fff;
-                            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                            text-align: center;
+                        .content {
                             padding: 20px;
+                            text-align: center;
                         }
-                        .card h2 {
+                        .content h2 {
                             color: #007bff;
                             margin-bottom: 15px;
+                            font-size: 22px;
                         }
-                        .card p {
+                        .content p {
                             font-size: 16px;
-                            line-height: 1.5;
+                            line-height: 1.6;
                             color: #555;
+                            margin-bottom: 20px;
+                        }
+                        .content a {
+                            display: inline-block;
+                            background-color: #007bff;
+                            color: #ffffff;
+                            text-decoration: none;
+                            padding: 10px 20px;
+                            border-radius: 5px;
+                            font-size: 16px;
+                            font-weight: bold;
+                            margin-top: 10px;
+                        }
+                        .content a:hover {
+                            background-color: #0056b3;
                         }
                         .footer {
-                            background-color: #f4f4f9;
-                            color: #666;
+                            background-color: #f9fafc;
+                            color: #888;
                             text-align: center;
-                            padding: 10px;
+                            padding: 15px;
                             font-size: 12px;
-                            margin-top: auto;
+                            border-top: 1px solid #e0e0e0;
                         }
                     </style>
                 </head>
-
-                    <body>
+                <body>
+                    <div class="email-container">
                         <div class="header">
                             Notificación de Inventario_TI
                         </div>
-
-                        <div class="card">
+                        <div class="content">
                             <h2>Recuperación de contraseña</h2>
                             <p>Hemos recibido una solicitud para recuperar tu contraseña.</p>
-                            <p>Haz clic en el enlace para restablecer su contraseña:</p>
+                            <p>Haz clic en el botón de abajo para restablecer tu contraseña:</p>
                             <a href="'.$reset_link.'">Restablecer Contraseña</a>
-                            <p>Este token es valido por 5 minutos.</p>
-                            <p>Si no solicitaste este cambio ignore este correo.</p>
+                            <p>Este token es válido por 5 minutos.</p>
+                            <p>Si no solicitaste este cambio, ignora este correo.</p>
                         </div>
-
                         <div class="footer">
-                            <p>&copy; <span id="año"> '.$Year.'</span> Inventario_TI. Todos los derechos reservados.</p>
+                            &copy; '.$Year.' Inventario_TI. Todos los derechos reservados.
                         </div>
-
-                        
-                    </body>
-                    
+                    </div>
+                </body>
             </html>';
             $mail->AltBody = 'Recuperación de contraseña.';
         
