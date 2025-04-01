@@ -41,20 +41,6 @@ function server_email(model){
     })
 }
 
-async function validar_token(token) {
-    let model = {
-        accion: 2, // Acción para validar el token
-        token: token
-    };
-
-    try {
-        let response = await server_usuario(model);
-        return response.resultado === true;
-    } catch (error) {
-        return false;
-    }
-}
-
 
 let token
 
@@ -88,7 +74,7 @@ async function validar_token(token) {
     }
 } 
 
-    async function confirmarReset() {
+async function confirmarReset() {
     let nuevaContraseña = document.getElementById('respass').value;
     let confirmarContraseña = document.getElementById('conf-respass').value;
 
@@ -124,3 +110,30 @@ async function validar_token(token) {
     }
 }
 
+$(document).ready(function () {
+    $('[data-toggle="popover"]').popover(); 
+    
+    // Añadimos el evento input al campo de confirmación de contraseña
+    document.getElementById('respass').addEventListener('input', validar_contraseña);
+    document.getElementById('conf-respass').addEventListener('input', validar_contraseña);
+    document.getElementById('mostrar-pass').addEventListener('click', togglePasswords);
+    
+});
+
+function togglePasswords() {
+    let regPasswordInput = document.getElementById('respass');
+    let confPasswordInput = document.getElementById('conf-respass');
+    let toggleIcon = document.getElementById('mostrar-pass');   
+
+    if (regPasswordInput.type === 'password') {
+        regPasswordInput.type = 'text';
+        confPasswordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye-slash');  
+        toggleIcon.classList.add('fa-eye');
+    } else {
+        regPasswordInput.type = 'password';
+        confPasswordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    }
+}
