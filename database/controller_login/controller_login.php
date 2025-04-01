@@ -67,7 +67,7 @@ function consultarDatos($valores) {
  function validarToken($token){
     include("../conexion.php");
     $sql ="SELECT * FROM usuario WHERE token = '$token' AND token_expiracion > NOW()";
-    echo $sql;
+
     $query = mysqli_query($con,$sql);
 
     if ($query->num_rows > 0) {
@@ -79,6 +79,10 @@ function consultarDatos($valores) {
 
 function restablecer_contraseña($valores){
     include("../conexion.php");
+
+    if (!isset($valores->token) || !isset($valores->contraseña)) {
+        return false;
+    }
     $token = $valores->token;
     $nueva_contraseña = password_hash($valores->contraseña, PASSWORD_BCRYPT);
     $sql="SELECT * FROM usuario WHERE token = '$token' AND token_expiracion > NOW()";
@@ -87,11 +91,11 @@ function restablecer_contraseña($valores){
     if ($query->num_rows > 0) {
         $update_sql = "UPDATE usuario SET contraseña = '$nueva_contraseña', token = NULL, token_expiracion = NULL WHERE token = '$token'";
         if (mysqli_query($con, $update_sql)) {
-            return true;
+            return true; //Contraseña restablecida
         } else {
-            return false;
+            return false; //Error al actualizar contraseña
         }
     } else {
-        return false;
+        return false; //Token inválido o expirado
     }
 }

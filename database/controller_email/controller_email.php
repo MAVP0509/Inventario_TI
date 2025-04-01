@@ -33,7 +33,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 
         if ($query->num_rows > 0) {
             $usuario =mysqli_fetch_assoc($query);
-            $token = bin2hex(random_bytes(4));
+            $token = bin2hex(random_bytes(4)); //Creación del token
             $token_expiracion = date("Y-m-d H:i:s", time() + 300);
             token_expirados($correo);
             $update_token_sql = "UPDATE usuario SET token = '$token', token_expiracion = '$token_expiracion' WHERE correo = '$correo'";
@@ -78,7 +78,7 @@ use PHPMailer\PHPMailer\PHPMailer;
             // Configuración del remitente y destinatario
             $mail->setFrom('janny.garcia703@gmail.com', 'Inventario_TI');
             $mail->addAddress($destino, 'Destinatario');
-            $reset_link = "http://localhost/Inventario_TI/login.html"; // Enlace de restablecimiento de contraseña 
+            $reset_link = "http://localhost/Inventario_TI/login.html?token=$token";
             // $mail->addReplyTo('otra-direccion@dominio.com', 'Responder a'); // Opcional: dirección de respuesta
         
             // Contenido del correo

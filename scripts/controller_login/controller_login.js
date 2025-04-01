@@ -304,10 +304,10 @@ async function recuperar_contraseña() {
         emailmessages.style.display = 'block';
         emailmessages.textContent = 'Te hemos enviado un correo para recuperar tu contraseña.';
         //emailmessaged.style.display = 'none';
-        setTimeout(() => {
+        /* setTimeout(() => {
             document.getElementById('colrep').style.display = 'none';
             document.getElementById('colblock').style.display = 'block';
-        }, 10000); // Ocultar el mensaje después de 5 segundos
+        }, 10000); // Ocultar el mensaje después de 5 segundos */
         
 
         //emailmessages.classList.remove('alert-danger'); // Eliminar clase de error (si existe)
@@ -315,7 +315,7 @@ async function recuperar_contraseña() {
     } else {
         emailmessaged.style.display = 'block';
         emailmessaged.textContent = 'El correo ingresado no está registrado. Por favor, inténtelo nuevamente.';
-        document.getElementById('colrep').style.display = 'block';
+        /* document.getElementById('colrep').style.display = 'block'; */
         //emailmessages.style.display = 'none';
         //emailmessaged.classList.remove('alert-success'); // Eliminar clase de éxito (si existe)
         //emailmessaged.classList.add('alert-danger');   // Asegurarse de que tenga clase de error (rojo)
@@ -326,13 +326,13 @@ async function recuperar_contraseña() {
         alert("El correo ingresado no está registrado")
     }else{
         document.getElementById("colrep").style.display = 'none'
-        document.getElementById("col-reset").style.display = 'block'
+        //document.getElementById("col-reset").style.display = 'block'
     }
 }
-
+let token = ''
 async function load() {
     let urlParams = new URLSearchParams(window.location.search);
-    let token = urlParams.get("token");
+     token = urlParams.get("token");
 
     if (token) {
         // Validar el token con el servidor
@@ -340,7 +340,7 @@ async function load() {
 
         if (isValid) {
             // Mostrar la sección de reseteo de contraseña
-            document.getElementById('col-reset').style.display = 'block';
+            document.getElementById("col-reset").style.display = 'block';
 
             // Ocultar las demás secciones
             document.getElementById('colblock').style.display = 'none';
@@ -356,8 +356,6 @@ async function load() {
         return false;
     }
 }
-
-window.onload = load;
 
 async function validar_token(token) {
     let model = {
@@ -382,16 +380,18 @@ async function validar_token(token) {
         return;
     }
 
-    let token = sessionStorage.getItem('resetToken');
     if (!token) {
-        alert('Token no válido o expirado.');
-        return;
+        return false;
+    }
+    else{
+    sessionStorage.setItem('resetToken',token);
+
     }
 
     let model = {
         accion: 3, // Acción para restablecer la contraseña
         token: token, // Usa el token global
-        nueva_contraseña: nuevaContraseña
+        contraseña: nuevaContraseña
     };
 
     try {
@@ -411,7 +411,7 @@ async function validar_token(token) {
 
 async function enlaceconParametros(token) {
 
-    let baseUrl = "http://localhost/Inventario/index.html";
+    let baseUrl = "http://localhost/Inventario/recuperacion.html";
     
     let params = new URLSearchParams();
     params.append("token", token);
