@@ -75,6 +75,7 @@ use PHPMailer\PHPMailer\PHPMailer;
             $mail->Port = 465; // Puerto SMTP
             
             $Year =  date("Y");
+            $mail->CharSet = 'UTF-8';
             // Configuración del remitente y destinatario
             $mail->setFrom('janny.garcia703@gmail.com', 'Inventario_TI');
             $mail->addAddress($destino, 'Destinatario');
@@ -155,7 +156,7 @@ use PHPMailer\PHPMailer\PHPMailer;
                         }
                     </style>
                 </head>
-                <body>
+                <body class="container-centrer">
                     <div class="email-container">
                         <div class="header">
                             Notificación de Inventario_TI
