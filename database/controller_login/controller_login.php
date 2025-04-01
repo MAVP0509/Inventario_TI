@@ -31,7 +31,7 @@
     print(json_encode($respuesta_servidor)); //si lo quitas truena la app
 
 
-function consultarDatos($valores) {
+    function consultarDatos($valores) {
         include("../conexion.php");
 
         $sql="SELECT * FROM usuario WHERE correo= '$valores->correo'";
@@ -40,10 +40,14 @@ function consultarDatos($valores) {
         if ($query->num_rows > 0) {
             $user = mysqli_fetch_assoc($query);
             if (password_verify($valores->contraseña, $user['contraseña'])) {
-                return true;
+                $result =[$user['nombre'] , $user['correo'], $user['edad'],$user['telefono'],$user['fecha_reg']];
+                return $result;
+            }else{
+                return false;
             }
-        }
+        }else{
             return false;
+        }
     }
 
     function insertarUsuario($valores){
@@ -61,7 +65,6 @@ function consultarDatos($valores) {
         }else{
             return mysqli_query($con,$sql);
         }
-
     }
 
  function validarToken($token){

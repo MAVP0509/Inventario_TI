@@ -1,6 +1,6 @@
 //inv toastr
-let respuesta 
-
+//Variable que utilizo para las consultas, dependiendo si es un true/false 
+let respuesta
 function server_usuario(model){
     return new Promise ((resolve,reject)=>{
         $.ajax({
@@ -42,43 +42,43 @@ function server_email(model){
     })
 }
 
+
+let toast = $('#liveToast')
 async function registrarUsu(){
-
-    let toast = $('#liveToast');
-    if (!validar_contraseña({ target: { id: 'reg-contraseña' } })) {
-        toast.body("¡El toast ha sido actualizado!")
+    if (pass, email, tel, nombre, fecha, vEdad ===false ) {
+        toast.find('.toast-body').text('¡Rellena todos los campos correctamente para continuar!')
+        //toast.body("¡El toast ha sido actualizado!")
         toast.toast('show')
-        return;
-    }
-
-    let model = {
-        accion : 1,
-        nombre: $("#nombre").val().trim(),
-        correo :$("#regcorreo").val().trim(),
-        contraseña :$("#reg-contraseña").val().trim(),
-        edad : $("#edad").val().trim(),
-        telefono : $("#telefono").val().trim(),
-        fecha_nac : $("#fechanac").val().trim(),
-    };
-
-
-    //console.log(JSON.stringify(model));
-    //console.log(JSON.stringify(model));
-    let server = await server_usuario(model);
-
-    let resp=JSON.parse(respuesta)
-    if(resp.resultado === true){
-        // Mostramos el toast usando el método de Bootstrap
-        toast.toast('show');
-    }else if(resp.resultado === false){
-        alert("Usuario no ingresado")
-    } 
-
-    let inputs = document.getElementsByName("inputReg");
-    for (let i = 0; i < inputs.length; i++) {
-        const element = inputs[i].value = "";
-    }
+        console.log(pass, email, tel, nombre, fecha, edad)
+        return false;
+    }else {
+        let model = {
+            accion : 1,
+            nombre: $("#nombre").val().trim(),
+            correo :$("#regcorreo").val().trim(),
+            contraseña :$("#reg-contraseña").val().trim(),
+            edad : $("#edad").val().trim(),
+            telefono : $("#telefono").val().trim(),
+            fecha_nac : $("#fechanac").val().trim(),
+        };
     
+        let server = await server_usuario(model);
+    
+        let resp=JSON.parse(respuesta)
+        if(resp.resultado === true){
+            // Mostramos el toast usando el método de Bootstrap
+            toast.find('.toast-body').text('¡Usuario Registrado!')
+            toast.toast('show');
+            window.location.href = "index.html"
+        }else if(resp.resultado === false){
+            alert("Usuario no ingresado")
+        } 
+        
+        /* let inputs = document.getElementsByName("inputReg");
+        for (let i = 0; i < inputs.length; i++) {
+            const element = inputs[i].value = "";
+        } */
+    }    
 }
 
 
@@ -93,16 +93,22 @@ async function validar_ingreso() {
     let server = await server_usuario(model);
 
     let resp=JSON.parse(respuesta)
-    if (resp.resultado === true){
-        window.location.href = "index.html";
-    }else{
-        alert("Usuario no existente")
+    if (resp.resultado === false){
+        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
+        toast.addClass('bg-danger'); 
+        toast.find('.toast-body').text('Usuario no encontrado').css('color', 'white');
+        toast.find('.mr-auto') 
+        toast.toast('show');
         let inputs = document.getElementsByName("inputInit");
         for (let i = 0; i < inputs.length; i++) {
         const element = inputs[i].value = "";
         }
-    }
-    
+    }else{
+        sessionStorage.setItem("user", respuesta)
+        sessionStorage.setItem("log", 'true')
+        //console.log(sessionStorage.getItem("nombre"))
+        window.location.href = "index.html";
+        }
 }
 
 
@@ -133,7 +139,15 @@ $(document).ready(function () {
     document.getElementById('toggle-password-icon').addEventListener('click', togglePasswords);
     
 });
-//console.log(r=document.getElementById('rep-correo').addEventListener('input', validar_email))
+
+
+//Comprueba en tiempo real las contraseñas
+let pass=false
+$('.ComprobarContraseña').on('input',function(e){
+    //console.log(e.currentTarget.value)
+    
+    validar_contraseña()
+})
 
 function validar_contraseña(){
     let regcontraseña = document.getElementById('reg-contraseña').value;
@@ -182,7 +196,6 @@ function validar_contraseña(){
 
     }
 
-
 function togglePasswords() {
         let regPasswordInput = document.getElementById('reg-contraseña');
         let confPasswordInput = document.getElementById('conf-contraseña');
@@ -201,6 +214,7 @@ function togglePasswords() {
         }
     }
 
+let vEdad=false
 function calcularEdad(){
     let fechaNacimiento = new Date(document.getElementById('fechanac').value);
     let hoy = new Date();
@@ -213,6 +227,12 @@ function calcularEdad(){
     }
 
     document.getElementById('edad').value = edad;
+
+    if (edad<18){
+        vEdad=false
+    }else{
+        vEdad=true
+    }
 }
 
 /* function enter_enviar(event){
@@ -224,6 +244,8 @@ function calcularEdad(){
 
 //Comprueba en tiempo real el contenido de los inputs tipo email
 let inputEmail
+let email=false
+let idInput
 $('.Comprobarmail').on('input',function(e){
     //console.log(e.currentTarget.value)
     inputEmail =e.currentTarget.value
@@ -233,26 +255,28 @@ $('.Comprobarmail').on('input',function(e){
 )
 
  async function validar_email(){
-    const email = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
     //console.log(inputEmail)
 
     if(idInput === "logcorreo"){
-        if(!email.test(inputEmail)){
+        if(!regexEmail.test(inputEmail)){
             document.getElementById('error-mensajeEmail-log').style = 'display : block; color:red;'
         }else{
             document.getElementById('error-mensajeEmail-log').style = ' display : none;'
         }
     }else if(idInput === "regcorreo"){
-        if(!email.test(inputEmail) || inputEmail === ""){
+        if(!regexEmail.test(inputEmail) || inputEmail === ""){
             document.getElementById('error-mensajeEmail-reg').style = 'display : block; color:red;'
-            document.getElementById('btn-reg').disabled= true;
+            email=false
+            //document.getElementById('btn-reg').disabled= true;
         }else{
             document.getElementById('error-mensajeEmail-reg').style = ' display : none;'
-            document.getElementById('btn-reg').disabled= false;
+            email=true
+            //document.getElementById('btn-reg').disabled= false;
         }
     }else if(idInput === "repcorreo"){
-        if(!email.test(inputEmail)){
+        if(!regexEmail.test(inputEmail)){
             document.getElementById('error-mensajeEmail-rep').style = 'display : block; color:red;'
         }else{
             document.getElementById('error-mensajeEmail-rep').style = ' display : none;'
@@ -262,18 +286,51 @@ $('.Comprobarmail').on('input',function(e){
 
 
 //Función para comprobar que el telefono sea uno válido
+let tel= false
 $('#telefono').on('input', function() {
     this.value= this.value.replace(/[^0-9]/g, '')
     valTel = $(this).val();
     if (valTel.length < 10 ||valTel.length === 0) {
         document.getElementById('error-mensageTel').style = "display : block; color:red;"
-        document.getElementById('btn-reg').disabled= true;
+        tel=false
+        //document.getElementById('btn-reg').disabled= true;
     } else {
         document.getElementById('error-mensageTel').style = "display : none;"
-        document.getElementById('btn-reg').disabled= false;
+        tel=true
+        //document.getElementById('btn-reg').disabled= false;
     }
+});
+
+//Función para comprobar que el nombre del registro sea uno válido
+let nombre= false
+$('#nombre').on('input', function(e) {
+    //validar_nombre(e.currentTarget.value)
+    const regexNombre = /^([A-ZÁ-Ú][a-zá-ÿñÑ]{2,})(?: ([A-Za-zÁ-Úá-úñÑ][a-zá-ÿñÑ]{2,})){0,5}$/
+    if(!regexNombre.test(e.currentTarget.value)){
+        document.getElementById('error-mensajeNombre').style = 'display : block; color:red;'
+        nombre=false
+    }else{
+        document.getElementById('error-mensajeNombre').style = ' display : none;'
+        nombre=true
+    }
+    
 }); 
 
+
+//Función para comprobar que se ingresó una fecha
+let fecha= false
+$('#fechanac').on('input', function(e) {
+    //validar_nombre(e.currentTarget.value)
+    const regexFecha = /^\d{4}-\d{2}-\d{2}$/
+    if(!regexFecha.test(e.currentTarget.value)){
+        document.getElementById('error-mensageFecha').style = 'display : block; color:red;'
+        fecha=false
+    }else{
+        document.getElementById('error-mensageFecha').style = ' display : none;'
+        fecha=true
+    }
+    
+});
 
 
 /* let models ={
