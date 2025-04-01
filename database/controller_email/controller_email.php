@@ -35,7 +35,7 @@ use PHPMailer\PHPMailer\PHPMailer;
             $usuario =mysqli_fetch_assoc($query);
             $token = bin2hex(random_bytes(4));
             $token_expiracion = date("Y-m-d H:i:s", time() + 300);
-            token_expirados();
+            token_expirados($correo);
             $update_token_sql = "UPDATE usuario SET token = '$token', token_expiracion = '$token_expiracion' WHERE correo = '$correo'";
             if (mysqli_query($con, $update_token_sql)) {
                 return email_recuperacion($correo, $token);
@@ -48,7 +48,7 @@ use PHPMailer\PHPMailer\PHPMailer;
         }
     }
 
-    function token_expirados() {
+    function token_expirados($correo) {
         include("../conexion.php");
 
         $sql = "UPDATE usuario SET token = NULL, token_expiracion = NULL WHERE token_expiracion < NOW() AND correo='$correo'";
@@ -78,7 +78,7 @@ use PHPMailer\PHPMailer\PHPMailer;
             // Configuración del remitente y destinatario
             $mail->setFrom('janny.garcia703@gmail.com', 'Inventario_TI');
             $mail->addAddress($destino, 'Destinatario');
-            $reset_link = "";
+            $reset_link = "http://localhost/Inventario_TI/login.html?token=$token"; // Enlace de restablecimiento de contraseña
             // $mail->addReplyTo('otra-direccion@dominio.com', 'Responder a'); // Opcional: dirección de respuesta
         
             // Contenido del correo
@@ -145,7 +145,7 @@ use PHPMailer\PHPMailer\PHPMailer;
                             <h2>Recuperación de contraseña</h2>
                             <p>Hemos recibido una solicitud para recuperar tu contraseña.</p>
                             <p>Haz clic en el enlace para restablecer su contraseña:</p>
-                            <h3>href:</h3>
+                            <a href="'.$reset_link.'">Restablecer Contraseña</a>
                             <p>Este token es valido por 5 minutos.</p>
                             <p>Si no solicitaste este cambio ignore este correo.</p>
                         </div>
@@ -158,7 +158,7 @@ use PHPMailer\PHPMailer\PHPMailer;
                     </body>
                     
             </html>';
-            $mail->AltBody = 'Tu token de recuperación es: ' . $token . '. Este token es válido por 5 minutos.';
+            $mail->AltBody = 'Recuperación de contraseña.';
         
             // Enviar el correo
             $mail->send();

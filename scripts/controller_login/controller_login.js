@@ -13,7 +13,7 @@ function server_usuario(model){
                 respuesta = response
                 try {
                     resolve(JSON.parse(response))
-                    console.log(JSON.parse(response))
+                    //console.log(JSON.parse(response))
                 } catch (error) {
                     reject(error)
                 }
@@ -31,10 +31,9 @@ function server_email(model){
                 trama:JSON.stringify(model)
             },
             success: function(response){
-                respuesta = response
                 try {
                     resolve(JSON.parse(response))
-                    //console.log(JSON.parse(response))
+                    //console.log(JSON.parse(response))   
                 } catch (error) {
                     reject(error)
                 }
@@ -43,50 +42,83 @@ function server_email(model){
     })
 }
 
-async function load(){
-
-    let url = window.location.href;
-    let params = new URLSearchParams(url);
-    let token = params.get("isReset")
+async function load() {
+    let urlParams = new URLSearchParams(window.location.search);
+    let token = urlParams.get("token");
 
     if (token) {
-        validar_token(token);
+        // Validar el token con el servidor
+        let isValid = await validar_token(token);
+
+        if (isValid) {
+            // Mostrar la sección de reseteo de contraseña
+            document.getElementById('col-reset').style.display = 'block';
+
+            // Ocultar las demás secciones
+            document.getElementById('colblock').style.display = 'none';
+            document.getElementById('colnone').style.display = 'none';
+            document.getElementById('colrep').style.display = 'none';
+
+            // Guardar el token en una variable global para usarlo al confirmar el reseteo
+            window.resetToken = token;
+        } else {
+            return false;;
+        }
     }
-}
-
-async function generarhashtoken(token) {
-
-    const esconder = new TextEncoder();
-    const encoder = new TextEncoder();
-    const data = encoder.encode(token);  // Convierte el token en un array de bytes
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);  // Genera el hash
-    const hashArray = Array.from(new Uint8Array(hashBuffer));  // Convierte el buffer en un array de bytes
-    const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');  // Convierte a hexadecimal
-    return hashHex;  // Devuelve el hash en formato hexadecimal
-    
-}
-
-async function validar_token(hashtoken) {
-
-    let model = {
-        accion : 2,
-        token : token
-    };
-
-    let server = await server_usuario(model);
-    let resp = JSON.parse(respuesta);
-
-    if (resp.resultado === true){
-        document.getElementById('col-reset').style.display = 'block';
-        document.getElementById('colrep').style.display = 'none';
-        document.getElementById('colnine').style.display = 'none';
-    } else {
-        alert("El token no es válido, vuelva a intentarlo");
-    }
-    
 }
 
 window.onload = load;
+
+async function validar_token(token) {
+    let model = {
+        accion: 2, // Acción para validar el token
+        token: token
+    };
+
+    try {
+        let response = await server_usuario(model);
+        return response.resultado === true;
+    } catch (error) {
+        return false;
+    }
+}
+
+    async function confirmarReset() {
+    let nuevaContraseña = document.getElementById('respass').value;
+    let confirmarContraseña = document.getElementById('conf-respass').value;
+
+    if (nuevaContraseña !== confirmarContraseña) {
+        alert('Las contraseñas no coinciden.');
+        return;
+    }
+
+    let token = sessionStorage.getItem('resetToken');
+    if (!token) {
+        alert('Token no válido o expirado.');
+        return;
+    }
+
+    let model = {
+        accion: 3, // Acción para restablecer la contraseña
+        token: token, // Usa el token global
+        nueva_contraseña: nuevaContraseña
+    };
+
+    try {
+        let response = await server_usuario(model);
+
+        if (response.resultado === true) {
+            alert('Contraseña restablecida correctamente.');
+            sessionStorage.removeItem('resetToken'); // Limpiar el token
+            window.location.href = 'login.html'; // Redirigir al login
+        } else {
+            alert('Error al restablecer la contraseña: ' + response.mensaje);
+        }
+    } catch (error) {
+        return false;
+    }
+}
+
 
 async function registrarUsu(){
 
@@ -338,28 +370,34 @@ async function recuperar_contraseña() {
         correo : $("#repcorreo").val().trim()
     }
     
-    let server = await server_email(model);
+    let response = await server_email(model);
 
     let emailmessages = document.getElementById('mensaje-correo-success');
     let emailmessaged = document.getElementById('mensaje-correo-danger');
 
-    if(server.resultado === true) {
+    if(response.resultado === true) {
         emailmessages.style.display = 'block';
         emailmessages.textContent = 'Te hemos enviado un correo para recuperar tu contraseña.';
+        //emailmessaged.style.display = 'none';
+        setTimeout(() => {
+            document.getElementById('colrep').style.display = 'none';
+            document.getElementById('colblock').style.display = 'block';
+        }, 10000); // Ocultar el mensaje después de 5 segundos
+        
 
         //emailmessages.classList.remove('alert-danger'); // Eliminar clase de error (si existe)
         //emailmessages.classList.add('alert-success');   // Asegurarse de que tenga clase de éxito (verde)
     } else {
         emailmessaged.style.display = 'block';
         emailmessaged.textContent = 'El correo ingresado no está registrado. Por favor, inténtelo nuevamente.';
-
+        document.getElementById('colrep').style.display = 'block';
+        //emailmessages.style.display = 'none';
         //emailmessaged.classList.remove('alert-success'); // Eliminar clase de éxito (si existe)
         //emailmessaged.classList.add('alert-danger');   // Asegurarse de que tenga clase de error (rojo)
+        //document.getElementById('colrep').style.display = 'block';
     }
 
-    let resp=JSON.parse(respuesta)
-
-    if(resp.resultado===false){
+    if(response.resultado===false){
         alert("El correo ingresado no está registrado")
     }else{
         document.getElementById("colrep").style.display = 'none'

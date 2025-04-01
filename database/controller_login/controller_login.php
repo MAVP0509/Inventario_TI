@@ -25,6 +25,8 @@
         $respuesta_servidor->resultado = insertarUsuario($clientejson);
     } else if ($clientejson->accion == 2) {
         $respuesta_servidor->resultado = validarToken($clientejson->token);
+    } elseif ($clientejson->accion == 3) {
+        $respuesta_servidor->resultado = restablecer_contraseña($clientejson);
     }
     print(json_encode($respuesta_servidor)); //si lo quitas truena la app
 
@@ -62,13 +64,33 @@ function consultarDatos($valores) {
 
     }
 
-function validarToken($token){
+ function validarToken($token){
     include("../conexion.php");
     $sql ="SELECT * FROM usuario WHERE token = '$token' AND token_expiracion > NOW()";
+    echo $sql;
     $query = mysqli_query($con,$sql);
 
     if ($query->num_rows > 0) {
         return true;
+    } else {
+        return false;
+    }
+}
+
+function restablecer_contraseña($valores){
+    include("../conexion.php");
+    $token = $valores->token;
+    $nueva_contraseña = password_hash($valores->contraseña, PASSWORD_BCRYPT);
+    $sql="SELECT * FROM usuario WHERE token = '$token' AND token_expiracion > NOW()";
+    $query = mysqli_query($con,$sql);
+    
+    if ($query->num_rows > 0) {
+        $update_sql = "UPDATE usuario SET contraseña = '$nueva_contraseña', token = NULL, token_expiracion = NULL WHERE token = '$token'";
+        if (mysqli_query($con, $update_sql)) {
+            return true;
+        } else {
+            return false;
+        }
     } else {
         return false;
     }
