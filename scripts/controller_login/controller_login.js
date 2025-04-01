@@ -11,7 +11,7 @@ function server_usuario(model){
                 respuesta = response
                 try {
                     resolve(JSON.parse(response))
-                    //console.log(JSON.parse(response))
+                    console.log(JSON.parse(response))
                 } catch (error) {
                     reject(error)
                 }
