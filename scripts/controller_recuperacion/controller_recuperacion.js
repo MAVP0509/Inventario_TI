@@ -124,14 +124,3 @@ async function validar_token(token) {
     }
 }
 
-async function enlaceconParametros(token) {
-
-    let baseUrl = "http://localhost/Inventario/recuperacion.html";
-    
-    let params = new URLSearchParams();
-    params.append("token", token);
-
-    let urlConParametros = `${baseUrl}?${params.toString()}`;
-
-    return urlConParametros;
-}
