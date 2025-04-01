@@ -12,24 +12,26 @@
     </head>
     <body class="container-fluid d-flex justify-content-center align-items-center vh-100">
             <div class="row">
-
                 <!--Col de Iniciar sesión-->
                 <div class="col" style="display: block;" id="colblock">
                     <div class="card text-center" style="width: 50vh;">
                         <div class="card-body">
                             <h5>Iniciar sesión</h5><br>
+                            <!--Logotipo del usuario-->
                             <i class="fa-solid fa-circle-user fa-5x"></i><br><br>
-                            
+                            <!--Input del correo-->
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
+                                    <!--icono del input-->
                                     <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
                                 </div>
-                                <input type="email" class="form-control Comprobarmail" id="logcorreo" placeholder="Correo eléctronico" name="inputInit" input="validar_email()" required>
+                                <input type="email" class="form-control Comprobarmail" id="logcorreo" placeholder="Correo eléctronico" name="inputInit" input="validar_email()">
                             </div>
                             <span id="error-mensajeEmail-log" style="display: none; color:red;">Ingresa un correo válido</span>
+                            <!--input de la contraseña-->
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                                    <span class="input-group-text verContraseña"><i id="toggle-password-icon-log" class="fa-solid fa-eye-slash" style="cursor: pointer;"></i></span>
                                 </div>
                                 <input type="password" class="form-control" id="logcontraseña" placeholder="Contraseña" name="inputInit">
                             </div>
@@ -38,7 +40,6 @@
                                 <br><button class="btn btn-primary" id="btn-ini" onclick="validar_ingreso()">Iniciar sesión</button><br>
                                 <br><p class="small text-center text-gray-soft">¿No te has registrado?  <a href="#" id="link-registro" onclick="toggleForms(true)">Registrate</a></p>
                             </div>
-                            <button onclick="enviar_correo()">ennviar correo</button>
                     </div>
                 </div>
 
@@ -179,23 +180,23 @@
                     </div>        
 
                 </div>
-            </div>
+            </div><!--Termina la "row"-->
         
 
             <!-- Codigo del toast-->
             <div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px; ">
                 <div class="position-fixed bottom-0 right-0 p-3" style="position: absolute; top: 0; right: 0;">
                     <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="2000" style="width: 200px;">
-                    <div class="toast-header">
-                        <strong class="mr-auto">Inventario_ti</strong>
-                        <small class="text-muted">Ahora</small>
-                        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="toast-body">
-                        Usuario Registrado
-                    </div>
+                        <div class="toast-header">
+                            <strong class="mr-auto">Inventario_ti</strong>
+                            <small class="text-muted">Ahora</small>
+                            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="toast-body">
+                            Usuario Registrado
+                        </div>
                     </div>
                 </div>
             </div>

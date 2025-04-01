@@ -1,5 +1,6 @@
 //inv toastr
-let respuesta 
+//Variable que utilizo para las consultas, dependiendo si es un true/false 
+let respuesta
 function server_usuario(model){
     return new Promise ((resolve,reject)=>{
         $.ajax({
@@ -41,6 +42,8 @@ function server_email(model){
         })
     })
 }
+
+
 let toast = $('#liveToast')
 async function registrarUsu(){
     if (pass, email, tel, nombre, fecha, vEdad ===false ) {
@@ -91,13 +94,7 @@ async function validar_ingreso() {
     let server = await server_usuario(model);
 
     let resp=JSON.parse(respuesta)
-    let user =JSON.stringify(model)
-    if (resp.resultado === true){
-        sessionStorage.setItem("user", user)
-        sessionStorage.setItem("log", 'true')
-        //console.log(sessionStorage.getItem("nombre"))
-        window.location.href = "index.html";
-    }else{
+    if (resp.resultado === false){
         toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
         toast.addClass('bg-danger'); 
         toast.find('.toast-body').text('Usuario no encontrado').css('color', 'white');
@@ -107,8 +104,12 @@ async function validar_ingreso() {
         for (let i = 0; i < inputs.length; i++) {
         const element = inputs[i].value = "";
         }
-    }
-    
+    }else{
+        sessionStorage.setItem("user", respuesta)
+        sessionStorage.setItem("log", 'true')
+        //console.log(sessionStorage.getItem("nombre"))
+        window.location.href = "index.html";
+        }
 }
 
 
@@ -195,7 +196,6 @@ function validar_contraseña(){
     return true;
 
     }
-
 
 function togglePasswords() {
         let regPasswordInput = document.getElementById('reg-contraseña');
