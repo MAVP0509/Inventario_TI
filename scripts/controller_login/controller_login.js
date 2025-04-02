@@ -391,8 +391,8 @@ async function recuperar_contraseña() {
 
     if(response.resultado === true) {
 
-        let token = response.token; // Suponiendo que el servidor devuelve un token
-        let enlace = await enlaceconParametros(token); // Obtener el enlace con el token
+        // let token = response.token; // Suponiendo que el servidor devuelve un token
+        // let enlace = await enlaceconParametros(token); // Obtener el enlace con el token
         emailmessages.style.display = 'block';
         emailmessages.textContent = 'Te hemos enviado un correo para recuperar tu contraseña.';
         emailmessaged.style.display = 'none';
@@ -410,7 +410,7 @@ async function enlaceconParametros(token) {
     let baseUrl = "http://localhost/Inventario/recuperacion.html";
     
     let params = new URLSearchParams();
-    params.append("tfgf", token);
+    params.append("ftygui", token);
 
     let urlConParametros = `${baseUrl}?${params.toString()}`;
 

@@ -6,7 +6,7 @@ function server_usuario(model){
             url: "database/controller_recuperacion/controller_recuperacion.php",
             data: {
                 trama:JSON.stringify(model)
-            },
+            },  
             success: function(response){
                 respuesta = response
                 try {
@@ -46,7 +46,7 @@ let token
 
 async function load() {
     let urlParams = new URLSearchParams(window.location.search);
-     token = urlParams.get("token");
+     token = urlParams.get("ftygui"); // *Este es el token de la URL 
 
     if (token) {
         // Validar el token con el servidor
@@ -114,9 +114,9 @@ $(document).ready(function () {
     $('[data-toggle="popover"]').popover(); 
     
     // Añadimos el evento input al campo de confirmación de contraseña
-    document.getElementById('respass').addEventListener('input', validar_contraseña);
-    document.getElementById('conf-respass').addEventListener('input', validar_contraseña);
-    document.getElementById('mostrar-pass').addEventListener('click', togglePasswords);
+    // document.getElementById('respass').addEventListener('input', validar_contraseña);
+    // document.getElementById('conf-respass').addEventListener('input', validar_contraseña);
+    // document.getElementById('mostrar-pass').addEventListener('click', togglePasswords);
     
 });
 

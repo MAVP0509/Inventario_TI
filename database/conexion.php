@@ -1,9 +1,9 @@
 <?php 
-    $user="root";
+    $user="janny";
     //$user="root";
-    $pass="root";
+    $pass="janny789";
     //$pass="78910";
-    $server="localhost";
+    $server="10.11.134.194";
     //$server="localhost";
     $db="inventario_ti";
     $con= mysqli_connect($server,$user,$pass) or die("Error al conectar");
