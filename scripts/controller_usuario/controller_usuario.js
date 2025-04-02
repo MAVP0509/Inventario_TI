@@ -43,3 +43,4 @@ window.addEventListener('beforeunload',()=>{
    sessionStorage.setItem('log', 'false') */
    sessionStorage.clear()
 })
+

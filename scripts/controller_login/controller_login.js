@@ -139,7 +139,7 @@ async function validar_ingreso() {
             sessionStorage.setItem("user", respuesta)
             sessionStorage.setItem("log", 'true')
             sessionStorage.setItem("bienvenido", "Bienvenido " + resp.resultado[0])
-            window.location.href = "index.html";
+            window.location.href = "prueba.html";
             }
     }catch (error){
         toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
