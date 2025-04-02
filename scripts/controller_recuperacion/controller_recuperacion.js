@@ -6,7 +6,7 @@ function server_usuario(model){
             url: "database/controller_recuperacion/controller_recuperacion.php",
             data: {
                 trama:JSON.stringify(model)
-            },
+            },  
             success: function(response){
                 respuesta = response
                 try {

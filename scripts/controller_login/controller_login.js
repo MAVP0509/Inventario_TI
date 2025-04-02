@@ -410,7 +410,7 @@ async function enlaceconParametros(token) {
     let baseUrl = "http://localhost/Inventario/recuperacion.html";
     
     let params = new URLSearchParams();
-    params.append("tfgf", token);
+    params.append("ftygui", token);
 
     let urlConParametros = `${baseUrl}?${params.toString()}`;
 
