@@ -38,7 +38,25 @@
                     <button type="button" class="btn btn-primary" onclick="confirmarReset()">Confirmar</button>
                 </div>
             </div>
-        </div>        
+        </div>    
+        
+        <!--Código del toast-->
+        <div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px; ">
+            <div class="position-fixed bottom-0 right-0 p-3" style="position: absolute; top: 0; right: 0;">
+                <div id="toast-rec" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="3000" style="width: 300px;">
+                    <div class="toast-header">
+                        <strong class="mr-auto">Inventario_ti</strong>
+                        <small class="text-muted">Ahora</small>
+                        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="toast-body">
+                        Usuario Registrado
+                    </div>
+                </div>
+            </div>
+        </div>
 
 </body>
 

@@ -90,10 +90,12 @@ async function registrarUsu(){
     }
     
 }
+
 //Función para el mensaje de "Usuario Registrado en el formulario de ingreso"
 window.addEventListener('load', function () {
     // Leemos el mensaje del registro desde sessionStorage
     const mensajeRegistro = localStorage.getItem('registroExitoso');
+    const mensajeContraseña = sessionStorage.getItem('reseteoContraseña')
     
     if (mensajeRegistro) {
         // Si el mensaje existe, mostramos el toast
@@ -101,11 +103,14 @@ window.addEventListener('load', function () {
         toast.addClass('bg-success');
         toast.find('.toast-body').text(mensajeRegistro).css('color','white');
         toast.toast('show');
-        
-
-        // Eliminamos el mensaje para evitar que aparezca nuevamente
-        localStorage.removeItem('registroExitoso');
+    }else if(mensajeContraseña){
+        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
+        toast.addClass('bg-success');
+        toast.find('.toast-body').text(mensajeContraseña).css('color','white');
+        toast.toast('show');
     }
+
+    localStorage.clear()
 })
 
 //Función para el formulario de ingreso
@@ -377,6 +382,7 @@ sessionStorage.setItem("nombre", models)
 //sessionStorage.getItem
 console.log(sessionStorage.getItem("nombre"))
  */
+
 
 async function recuperar_contraseña() {
     let model ={
