@@ -40,7 +40,7 @@ function server_email(model){
     })
 }
 
-
+let toast = $('#toast-rec')
 let token
 
 async function load() {
@@ -132,11 +132,14 @@ async function confirmarReset() {
         let response = await server_usuario(model);
 
         if (response.resultado === true) {
-            alert('Contraseña restablecida correctamente.');
-            sessionStorage.removeItem('resetToken'); // Limpiar el token
+            localStorage.setItem('reseteoContraseña', '¡Contraseña restablecida exitosamente!')
+            localStorage.removeItem('resetToken'); // Limpiar el token
             window.location.href = 'login.html'; // Redirigir al login
         } else {
-            alert('Error al restablecer la contraseña: ' + response.mensaje);
+            toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
+            toast.addClass('bg-danger');
+            toast.find('.toast-body').text("El tiempo ha vencido, solicita otro correo").css('color','white');
+            toast.toast('show')
         }
     } catch (error) {
         return false;
