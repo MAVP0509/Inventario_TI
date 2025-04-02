@@ -34,7 +34,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 
         if ($query->num_rows > 0) { //verifica email
             $usuario =mysqli_fetch_assoc($query);
-            $token = bin2hex(random_bytes(4)); //Creación del token
+            $token = bin2hex(random_bytes(16)); //Creación del token
             $token_expiracion = date("Y-m-d H:i:s", time() + 300); //fecha del token
             token_expirados($correo);
             $update_token_sql = "UPDATE usuario SET token = '$token', token_expiracion = '$token_expiracion' WHERE correo = '$correo'";
