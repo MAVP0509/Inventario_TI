@@ -39,7 +39,7 @@ window.addEventListener('load', function () {
 })
 
 window.addEventListener('beforeunload',()=>{
-    if(sessionStorage.getItem('user') && sessionStorage.getItem('log')){
-        sessionStorage.clear()
-    }
+  /*  sessionStorage.removeItem('user')
+   sessionStorage.setItem('log', 'false') */
+   sessionStorage.clear()
 })

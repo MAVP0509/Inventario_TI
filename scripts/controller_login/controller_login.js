@@ -91,11 +91,11 @@ async function registrarUsu(){
     
 }
 
-//Función para el mensaje de "Usuario Registrado en el formulario de ingreso"
+//Función para el mensaje de "Usuario Registrado en el formulario de ingreso" y del reseteo de contraseña exitoso
 window.addEventListener('load', function () {
     // Leemos el mensaje del registro desde sessionStorage
     const mensajeRegistro = localStorage.getItem('registroExitoso');
-    const mensajeContraseña = sessionStorage.getItem('reseteoContraseña')
+    const mensajeContraseña = localStorage.getItem('reseteoContraseña')
     
     if (mensajeRegistro) {
         // Si el mensaje existe, mostramos el toast
@@ -139,7 +139,6 @@ async function validar_ingreso() {
             sessionStorage.setItem("user", respuesta)
             sessionStorage.setItem("log", 'true')
             sessionStorage.setItem("bienvenido", "Bienvenido " + resp.resultado[0])
-            //console.log(sessionStorage.getItem("nombre"))
             window.location.href = "index.html";
             }
     }catch (error){
