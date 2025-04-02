@@ -193,7 +193,7 @@ function validar_contraseña(){
     let letrasmay = /[A-Z]/.test(regcontraseña);
     let letrasmin = /[a-z]/.test(regcontraseña);
     let numeros = /\d/.test(regcontraseña);
-    let especialesc = /[()*#@]/.test(regcontraseña);
+    let especialesc = /[()*#@.]/.test(regcontraseña);
     
     try {
         document.getElementById('minlongitud').style.color = minlongitud ? 'green' : 'red';  

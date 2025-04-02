@@ -4,7 +4,6 @@
     date_default_timezone_set('America/Mexico_City');
 
     $clientejson = json_decode($_POST['trama']);
-
     $respuesta_servidor = new stdClass();
 
     if ($clientejson->accion == 0) {
@@ -19,7 +18,6 @@
     function validarToken($token){
         include("../conexion.php");
         $sql ="SELECT * FROM usuario WHERE token = '$token' AND token_expiracion > NOW()";
-    
         $query = mysqli_query($con,$sql);
     
         if ($query->num_rows > 0) {
