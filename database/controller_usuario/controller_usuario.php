@@ -21,7 +21,7 @@ if($clientejson->accion==0){
 
 print(json_encode($respuesta_servidor));
 
-function insertarUsuario(){
+function insertarUsuario($valores){
     include("../conexion.php");
     $registro =date("Y-m-d H:i:s");
     $sql="INSERT INTO usuario(nombre,correo,contraseña,edad,telefono,fecha_nac,fecha_reg,habilitado) VALUES ('$valores->nombre',
@@ -31,8 +31,8 @@ function insertarUsuario(){
 
 function editar_usuario($valores){
     include("../conexion.php");
-    $sql = "UPDATE usuario SET nombre='$valores->nombre', correo='$valores->correo', contraseña='$valores->contraseña', 
-    edad='$valores->edad', telefono='$valores->telefono',fecha_nac='$valores->fecha_nac' WHERE id='$valores->id';";
+    $sql = "UPDATE usuario SET nombre='$valores->nombre', correo='$valores->correo', contraseña='$valores->contraseña',
+    edad='$valores->edad', telefono='$valores->telefono',fecha_nac='$valores->fecha_nac', fecha_reg = '$valores->fecha_reg' WHERE id='$valores->id';";
     return mysqli_query($con,$sql);
 }
 
