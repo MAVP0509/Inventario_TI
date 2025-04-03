@@ -7,36 +7,36 @@ $clientejson = json_decode($_POST['trama']);
 
 $respuesta_servidor = new stdClass();
 
-if($clientejson->accion==0){
-    $respuesta_servidor->resultado=insertarUsuario($clientejson);
-}elseif($clientejson->accion==1){
-    $respuesta_servidor->resultado=editar_usuario($clientejson);
-}elseif($clientejson->accion==2){
-    $respuesta_servidor->resultado=consultar_usuario($clientejson);
-}elseif($clientejson->accion==3){
-    $respuesta_servidor->resultado=desactivar_usuario($clientejson);
-}elseif($clientejson->accion==4){
-    $respuesta_servidor->resultado==eliminar_usuario($clientejson);
+if ($clientejson->accion == 0) {
+    $respuesta_servidor->resultado = insertarUsuario($clientejson);
+} elseif($clientejson->accion == 1) {
+    $respuesta_servidor->resultado = editar_usuario($clientejson);
+} elseif ($clientejson->accion == 2) {
+    $respuesta_servidor->resultado = consultar_usuario($clientejson);
+} elseif ($clientejson->accion == 3) {
+    $respuesta_servidor->resultado = desactivar_usuario($clientejson);
+ }elseif ($clientejson->accion == 4) {
+    $respuesta_servidor->resultado = eliminar_usuario($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
 
-function insertarUsuario(){
+function insertarUsuario() {
     include("../conexion.php");
-    $registro =date("Y-m-d H:i:s");
-    $sql="INSERT INTO usuario(nombre,correo,contraseña,edad,telefono,fecha_nac,fecha_reg,habilitado) VALUES ('$valores->nombre',
+    $registro = date("Y-m-d H:i:s");
+    $sql = "INSERT INTO usuario(nombre,correo,contraseña,edad,telefono,fecha_nac,fecha_reg,habilitado) VALUES ('$valores->nombre',
     '$valores->correo','$valores->contraseña','$valores->edad','$valores->telefono','$valores->fecha_nac,'$registro',1)";
     return mysqli_query($con,$sql);
 }
 
-function editar_usuario($valores){
+function editar_usuario($valores) {
     include("../conexion.php");
-    $sql = "UPDATE usuario SET nombre='$valores->nombre', correo='$valores->correo', contraseña='$valores->contraseña', 
-    edad='$valores->edad', telefono='$valores->telefono',fecha_nac='$valores->fecha_nac' WHERE id='$valores->id';";
+    $sql = "UPDATE usuario SET nombre = '$valores->nombre', correo = '$valores->correo', contraseña = '$valores->contraseña', 
+    edad ='$valores->edad', telefono = '$valores->telefono',fecha_nac = '$valores->fecha_nac' WHERE id = '$valores->id';";
     return mysqli_query($con,$sql);
 }
 
-function consultar_usuario(){
+function consultar_usuario() {
     include("../conexion.php");
     $sql = "SELECT * FROM  usuario WHERE habilitado = 1 ";
     $query = mysqli_query($con, $sql);
@@ -51,7 +51,7 @@ function consultar_usuario(){
 function desactivar_usuario($valores){
     include("../conexion.php");
     // $sql = "DELETE FROM usuario WHERE id = '$valores->id'";
-    $sql= "UPDATE usuario SET habilitado = 0 WHERE id= '$valores->id'; ";
+    $sql = "UPDATE usuario SET habilitado = 0 WHERE id = '$valores->id'; ";
     return mysqli_query($con, $sql);
 }
 
