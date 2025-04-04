@@ -3,7 +3,7 @@ function server_usuario(model) {
     return new Promise ((resolve,reject)=>{
         $.ajax({
             type: "POST",
-            url: "database/controller_usuario/controller_usuario.php",
+            url: "database/controller_usuario2/controller_usuario2.php",
             data: {
                 trama:JSON.stringify(model) 
             },
