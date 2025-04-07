@@ -57,6 +57,14 @@ function desactivar_usuario($valores){
 
 function eliminar_usuario($valores){
     include("../conexion.php");
-    $sql="DELETE FROM usuario where id='$valores->id';";
-    return mysqli_query($con,$sql);
+
+    if (is_array($valores->id)) { // Verifica si $valores->id es un array
+        $ids = implode(",", array_map('intval', $valores->id)); // Convierte el array de IDs en una lista separada por comas
+        $sql = "DELETE FROM usuario WHERE id IN ($ids);"; // Consulta sql usando IN para eliminar múltiples registros
+        return mysqli_query($con, $sql);
+    } else {
+        $sql="DELETE FROM usuario where id='$valores->id';";
+        return mysqli_query($con,$sql);
+    }
+    
 }

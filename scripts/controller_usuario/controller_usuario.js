@@ -36,7 +36,7 @@ async function consultar_informacion() {
 
     let response = await server_usuario(model);
     console.log(response);
-    let usuario = response.resultado;
+    usuario = response.resultado;
 
     let tblBody = $("#tbl-body-info");
     tblBody.empty();
@@ -46,7 +46,9 @@ async function consultar_informacion() {
         row += `<tr>
                     <td>
                         <div class="form-group form-check">
-                            <input type="checkbox" class="form-check-input check-change" onclick="eliminar_usuario(${usuario[i].id})" value="${usuario[i].id}" id="Check${usuario[i].id}">
+                            <input type="checkbox" class="form-check-input check-change" 
+                            onclick="seleccionar_usuario(${usuario[i].id})" 
+                            value="${usuario[i].id}" id="Check${usuario[i].id}">
                         </div>
                     </td>
                     <td >${i + 1}</td>
@@ -67,6 +69,7 @@ async function consultar_informacion() {
     //</td>
     tblBody.append(row); //function consultar informacion
 }
+
 async function editar_usuario(params) {
     let model = {
         accion: 1,
@@ -80,79 +83,45 @@ async function editar_usuario(params) {
     let response = await server_usuario(model);
 }
 
-let usuSelect = ""
-async function selecionar_usuario(params) {
+let usuSeleccionado = [];
 
-    for (let i = 0; i < usuario.length; i++) {
-        const element = usuario[i];
-        if (element.id == params.value) {
-            usuSelect = element;
-            break;
-            
-        }
-        
+async function seleccionar_usuario(params) {
+
+    let index = usuSeleccionado.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
+    if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
+        usuSeleccionado.push(params); // Añade uno o más elementos al final de un array
+    } else {
+        usuSeleccionado.splice(index, 1); 
     }
 
-    document.getElementById("nombre").value = usuSelect.nombre;
-    document.getElementById("correo").value = usuSelect.correo;    
-    document.getElementById("edad").value = usuSelect.edad;    
-    document.getElementById("telefono").value = usuSelect.telefono;
-    document.getElementById("fecha-n").value = usuSelect.fecha_nac;
-    document.getElementById("fecha-r").value = usuSelect.fecha_reg;    
 }
 
-let selectedUsers = [];
 
-async function eliminar_usuario(id) {
+async function eliminar_usuario() {
 
-    /* let selectusu =
-
-        let model = {
-            accion : 4,
-            id : id
-        }
-
-        let response = await server_usuario(model);
-        
-        if (condition) {
-            alert("usuario eliminado exitosamente");
-            consultar_informacion();
-        } else {
-            alert("Hubo un error al eliminar el usuario");
-        } */
-
-    if (selectedUsers.length === 0) {
+    if (usuSeleccionado.length === 0) {
         alert("Por favor, selecciona al menos un usuario para eliminar.");
         return;
     }
 
-    const modal = new bootstrap.Modal(document.getElementById('mdl-eu'))
-    const modalMessage = document.getElementById('modal-message');
-    
-    modalMessage.textContent = `¿Estás seguro de que deseas eliminar ${selectedUsers.length} usuario(s)?`;
-    modal.show();
+    if (!confirm(`¿¿Estás seguro de que deseas eliminar ${usuSeleccionado.length} usuario(s)?`)) {
+        return;
+    }
 
-    document.getElementById("mdl-btn-conf").onclick = async function() {
         let model = {
-            accion: 4,
-            ids: selectedUsers
-        };
-    
-        let response = await server_usuario(model);
-
-        if (response.success) {
-            alert('Usuarios eliminados con éxito.');
-            consultar_informacion();
-        } else {
-            alert('Hubo un error al eliminar los usuarios.');
+            accion : 4,
+            id : usuSeleccionado
         }
 
-        modal.hide();
-    };
-
-    document.getElementById("mdl-btn-can").onclick = function() {
-        modal.hide();  
-    };
+        let response = await server_usuario(model);
+        
+        if (response.resultado) {
+            alert("usuario eliminado exitosamente");
+            usuSeleccionado = [];
+            consultar_informacion();
+        } else {
+            alert("Hubo un error al eliminar el usuario");
+        }
         
     }
 
