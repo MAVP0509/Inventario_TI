@@ -146,7 +146,12 @@ async function consultar_informacion(params) {
                         return control;
                     }
                 },
-            ]
+            ],
+            dom: `             
+            "<'row' <'col-sm-2 text-left'f><'col-sm-10 text-right'B>>"
+            +"<'row'<'col-sm-12'tr>>"+
+            "<'row' <'col-sm-4 text-left'i><'col-sm-4 pt-3 text-center'l><'col-sm-4 text-right'p>>" + 
+            `,
         })
     } catch (error) {
         console.log(error)
