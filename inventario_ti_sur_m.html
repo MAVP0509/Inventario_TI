@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="libraries/fontawesome-free-6.7.2-web/css/all.min.css">
     <link rel= "stylesheet" href="libraries/bootstrap-4.6.2-dist/css/bootstrap.min.css">
-    
+    <link rel="stylesheet" href="libraries/DataTables/datatables.min.css"> <!--?Esta es la hoja de estilos de datatables -->
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
     
-    <title>Document</title>
+    <title>Inventario_TI</title>
 </head>
-<body class="hold-transition sidebar-mini layout-fixed" onload="consultar_usuarios()">
+<body class="hold-transition sidebar-mini layout-fixed" onload="">
     <div clas="wrapper">
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
             <!-- Left navbar links -->
@@ -82,7 +82,7 @@
               <div class="container-fluid">
                 <div class="row mb-2">
                   <div class="col-sm-6">
-                    <h1 class="m-0">Tabla</h1>
+                    <h1 class="m-0">Inventario</h1>
                   </div><!-- /.col -->
                 </div><!-- /.row -->
               </div><!-- /.container-fluid -->
@@ -104,7 +104,7 @@
                             </div><!-- /.card-header -->
                             <div class="card-body">
                                 <div class="row">
-                                  <button type="button" class="btn btn-info" >Nuevo Usuario</button>
+                                  <button type="button" class="btn btn-info" >Nuevo equipo</button>
                                 </div>
                                 <div id="tbl" class="dataTables_wrapper dt-bootstrap4">
                                       <div class="row">
@@ -113,61 +113,14 @@
                                       </div>
                                       <div class="row">
                                           <div class="col-sm-12">
-                                              <table id="tbl-usuario" class="table table-bordered table-hover dataTable dtr-inline" aria-describedby="tbl-usuario_info">
+                                              <table id="tbl-inventario" class="table table-bordered table-hover dataTable dtr-inline" aria-describedby="tbl-usuario_info">
                                                   <thead>
-                                                      <tr>
-                                                          <th>Nombre</th>
-                                                          <th>Correo</th>
-                                                          <th>Edad</th>
-                                                          <th>Teléfono</th>
-                                                          <th>Fecha_nac</th>
-                                                          <th>Fecha_reg</th>
-                                                          <th>Detalle</th>
-                                                          <th>Eliminar</th>
-
-                                                      </tr>
                                                   </thead>
-                                                  <tbody id="tbl-usuario-body">
-
-                                      
+                                                  <tbody id="tbl-inventario-body">                                      
                                                   </tbody>
                                                   <tfoot>
-                                                      <tr>
-                                                          <th>Nombre</th>
-                                                          <th>Correo</th>
-                                                          <th>Edad</th>
-                                                          <th>Teléfono</th>
-                                                          <th>Fecha_nac</th>
-                                                          <th>Fecha_reg</th>
-                                                          <th>Detalle</th>
-                                                          <th>Eliminar</th>
-
-                                                      </tr>
                                                   </tfoot>
                                               </table>
-                                          </div>
-                                      </div>
-                                      <div class="row">
-                                          <div class="col-sm-12 col-md-5">
-                                              <div class="dataTables_info" role="status">Mostrando 1 a 10 de 10 registros</div>
-                                          </div>
-                                          <div class="col-sm-12 col-md-7">
-                                              <div class="dataTables_paginate paging_simple_numbers">
-                                                  <ul class="pagination justify-content-end">
-                                                      <li class="paginate_button page-item previous disabled">
-                                                          <a href="#" data-dt-idx="0"  tabindex="0" class="page-link">Previo</a>
-                                                      </li>
-                                                      <li class="paginate_button page_item active">
-                                                          <a href="#" data-dt-idx="1"  tabindex="0" class="page-link">1</a>
-                                                      </li>
-                                                      <li class="paginate_button page_item active">
-                                                          <a href="#" data-dt-idx="2" tabindex="0" class="page-link">2</a>
-                                                      </li>
-                                                      <li class="paginate_button page_item next">
-                                                          <a href="#" data-dt-idx="3" tabindex="0" class="page-link">Siguiente</a>
-                                                      </li>
-                                                  </ul>
-                                              </div>
                                           </div>
                                       </div>
                                   
@@ -268,9 +221,11 @@
 </body>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="scripts/controller_usuario2/controller_usuario2.js"></script>
+    <script src="scripts/controller_inventario_ti_sur_m/controller_inventario_ti_sur_m.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="libraries/DataTables/datatables.js"></script>
+    <script src="libraries/DataTables/datatables.min.js"></script>
     <script src="dist/js/adminlte.js"></script>
     
     

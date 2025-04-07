@@ -50,13 +50,18 @@ async function consultar_usuarios() {
 }
 
 let usuSelect=""
-let modal
+let modalEdit 
 async function seleccionar_usuario(params) {
 
     for (let i = 0; i < usuarios.length; i++) {
         const element = usuarios[i];
 
         if(element.id===params.value){
+
+            let model ={
+                contraseña : element.contraseña
+            }
+            console.log(model)
             usuSelect = element;
             break;
         }
@@ -72,8 +77,8 @@ async function seleccionar_usuario(params) {
     document.getElementById('fecha_reg').value=usuSelect.fecha_reg
     document.getElementById('contraseña').value=usuSelect.contraseña
     
-    modal = new bootstrap.Modal(document.getElementById('modalEditar'))
-    modal.show()
+    modalEdit = new bootstrap.Modal(document.getElementById('modalEditar'))
+    modalEdit.show()
 }
 
 async function editar_usuario(params) {
@@ -93,5 +98,5 @@ async function editar_usuario(params) {
     usuSelect = ""
 
     consultar_usuarios()
-    modal.hide()
+    modalEdit.hide()
 }
