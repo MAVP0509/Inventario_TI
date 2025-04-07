@@ -31,8 +31,8 @@ async function consultar_usuarios() {
     let r = await server_usuario({accion : 2})
 
     usuarios = r.resultado
-    document.getElementById('tbl-usuario-body').innerHTML=``
-    for (let i = 0; i < usuarios.length; i++) {
+    
+    /* for (let i = 0; i < usuarios.length; i++) {
         const element = usuarios[i]
         document.getElementById('tbl-usuario-body').innerHTML+=`
         <tr>
@@ -46,7 +46,83 @@ async function consultar_usuarios() {
             <td><button type="button" class="btn btn-danger" id="idEditar${element.id}"  value="${element.id}" onclick="">Eliminar</button></td>
         </tr>
         `
-    }   
+    }    */
+
+        
+            $("#tbl-usuario").DataTable({
+                data: usuarios, //? Este es el array de objetos que trae el ajax, en este caso es el array de usuarios.
+    
+                columns: [ //? Aqui se definen las columnas de la tabla, el primer elemento es el id de la columna, el segundo es el nombre de la columna y el tercero es el render, que es lo que se va a mostrar en la tabla.
+                    {
+                        data: 'nombre',
+                        render: function (data, type, row) {
+                            let control = `<label style="text-align: center">${data}</label>`
+                            return control;
+                        }
+                    },
+                    {
+                        data: "correo",
+                        render: function (data, type, row) {
+                            let control = `<label style="text-align: center">${data}</label>`
+                            return control;
+                        }
+    
+                    },
+                    {
+                        data: 'edad',
+                        render: function (data, type, row) {
+                            let control = `<label style="text-align: center">${data}</label>`
+                            return control;
+                        }
+                    },
+                    {
+                        data: "telefono",
+                        render: function (data, type, row) {
+                            let control = `<label style="text-align: center">${data}</label>`
+                            return control;
+                        }
+    
+                    },
+                    {
+                        data: 'fecha_nac',
+                        render: function (data, type, row) {
+                            let control = `<label style="text-align: center">${data}</label>`
+                            return control;
+                        }
+                    },
+                    {
+                        data: "fecha_reg",
+                        render: function (data, type, row) {
+                            let control = `<label style="text-align: center">${data}</label>`
+                            return control;
+                        }
+    
+                    },
+                    {
+                        data: 'id',
+                        render: function (data, type, row) {
+                            let control = `<button type="button" class="btn btn-warning" id="${data}"  value="${data}" onclick="seleccionar_usuario(this)">Editar</button>`
+                            return control;
+                        }
+                    },
+                    {
+                        data: "id",
+                        render: function (data, type, row) {
+                            let control = `<label style="text-align: center">${data}</label>`
+                            return control;
+                        }
+    
+                    },
+               
+                    
+                ], stateSave: true,
+                //!Esta parte del codigo (DOM) es para que los botones, paginacion y filtros de busqueda se acomoden a sus necesidades, si quieren pueden buscar mas info en la documentacion de datatables, pero en este caso no es necesario.
+    
+    
+            }
+            )
+       
+    
 }
 
 let usuSelect=""

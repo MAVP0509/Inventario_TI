@@ -3,7 +3,7 @@ function server_inventario(model) {
     return new Promise ((resolve,reject)=>{
         $.ajax({
             type: "POST",
-            url: "database/controller_inventario_ti_sur_m/inventario_ti_sur_m.php",
+            url: "database/controller_inventario_ti_sur/controller_inventario_ti_sur_m.php",
             data: {
                 trama:JSON.stringify(model) 
             },
@@ -28,13 +28,14 @@ async function consultar_inventario() {
     let Task = new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "database/controller_inventario_ti_sur_m/inventario_ti_sur_m.php",
+            url: "database/controller_inventario_ti_sur/controller_inventario_ti_sur_m.php",
             data: {
                 trama: JSON.stringify(model)
             },
             success: function (response) {
                 try {
                     resolve(JSON.parse(response))
+                    console.log(resolve)
                 } catch (error) {
                     reject(error)
                 }
@@ -66,14 +67,14 @@ async function dibujar_tabla(params) {
 
             columns: [ //? Aqui se definen las columnas de la tabla, el primer elemento es el id de la columna, el segundo es el nombre de la columna y el tercero es el render, que es lo que se va a mostrar en la tabla.
                 {
-                    data: 'id_user_diavaz_all',
+                    data: 'zona',
                     render: function (data, type, row) {
-                        let control = `<label style="text-align: center">${row.Nombre + " " + row.Apellido_P + " " + row.Apellido_M}</label>`
+                        let control = `<label style="text-align: center">${data}</label>`
                         return control;
                     }
                 },
                 {
-                    data: "Correo_Diavaz",
+                    data: "rubro",
                     render: function (data, type, row) {
                         let control = `<label style="text-align: center">${data}</label>`
                         return control;
@@ -81,33 +82,93 @@ async function dibujar_tabla(params) {
 
                 },
                 {
-                    data: "Rol",
+                    data: "af",
                     render: function (data, type, row) {
                         let control = `<label style="text-align: center">${data}</label>`
                         return control;
                     }
                 },
                 {
-                    data: "id_user_diavaz_all",
+                    data: "tipo",
                     render: function (data, type, row) {
-                        let control = `<button class="btn btn-primary btn-sm" value = '${JSON.stringify(row)}' onClick='EditarUsuario(this)' ><i class="fa fa-edit"></i></button>`;
+                        let control = `<label style="text-align: center">${data}</label>`
                         return control;
                     }
                 },
                 {
-                    data: "Activo",
+                    data: "marca",
                     render: function (data, type, row) {
-                        let enabled = ''
-                        if (data == 1) {
-                            enabled = "checked"
-                        }
-                        else {
-                            enabled = ""
-                        }
-                        let control = `<div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
-                        <input type="checkbox" class="custom-control-input" id="customSwitch_${row.id_user_diavaz_all}"  ${enabled}>
-                        <label class="custom-control-label" for="customSwitch_${row.id_user_diavaz_all}"></label>
-                        </div>`
+                        let control = `<label style="text-align: center">${data}</label>`
+                        return control;
+                    }
+                },
+                {
+                    data: "modelo",
+                    render: function (data, type, row) {
+                        let control = `<label style="text-align: center">${data}</label>`
+                        return control;
+                    }
+                },
+                {
+                    data: "num_serie",
+                    render: function (data, type, row) {
+                        let control = `<label style="text-align: center">${data}</label>`
+                        return control;
+                    }
+                    
+                },
+                {
+                    data: "mac_adress",
+                    render: function (data, type, row) {
+                        let control = `<label style="text-align: center">${data}</label>`
+                        return control;
+                    }
+                    
+                },
+                {
+                    data: "ubicacion",
+                    render: function (data, type, row) {
+                        let control = `<label style="text-align: center">${data}</label>`
+                        return control;
+                    }
+                    
+                },
+                {
+                    data: "tag",
+                    render: function (data, type, row) {
+                        let control = `<label style="text-align: center">${data}</label>`
+                        return control;
+                    }
+                    
+                },
+                {
+                    data: "usuario",
+                    render: function (data, type, row) {
+                        let control = `<label style="text-align: center">${data}</label>`
+                        return control;
+                    }
+                    
+                },
+                {
+                    data: "posicion",
+                    render: function (data, type, row) {
+                        let control = `<label style="text-align: center">${data}</label>`
+                        return control;
+                    }
+                    
+                },
+                {
+                    data: "fecha_entrega",
+                    render: function (data, type, row) {
+                        let control = `<label style="text-align: center">${data}</label>`
+                        return control;
+                    }
+                    
+                },
+                {
+                    data :"id",
+                    render: function(data,type,row){
+                        let control =`<button type="button" class="btn btn-warning" id=${data} >Editar</button>`
                         return control;
                     }
                 },
@@ -125,7 +186,7 @@ async function dibujar_tabla(params) {
                     text: 'Agregar Usuario <span class="fa fa-plus"></span> ',
                     className: 'btn btn-sm btn-primary',
                     action: function (e, dt, node, config) {
-                        InsertarUsuario()
+                        //InsertarUsuario()
                     },
                 },
 
@@ -176,4 +237,8 @@ async function dibujar_tabla(params) {
         console.log(error)
     }
 
+}
+
+async function alert(params) {
+    alert("Hola")
 }
