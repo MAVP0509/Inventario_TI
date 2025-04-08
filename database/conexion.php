@@ -1,10 +1,10 @@
 <?php 
-    $user="root";
+    $user="janny";
     //$user="root";
-    $pass="root";
-    //$pass="78910";
-    $server="localhost";
+    //$pass="root";
+    $pass="janny789";
     //$server="localhost";
+    $server="10.11.134.194";
     $db="inventario_ti";
     $con= mysqli_connect($server,$user,$pass) or die("Error al conectar");
     mysqli_select_db($con,$db);
