@@ -12,78 +12,65 @@
     <title>Document</title>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed" onload="consultar_usuarios()">
-    <div clas="wrapper">
-        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-            <!-- Left navbar links -->
-            <ul class="navbar-nav">
-              <li class="nav-item">
-                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-              </li>
-             
-            </ul>
-        
-           
-          </nav>
-        <aside class="main-sidebar sidebar-dark-primary elevation-4">
-             <!-- Sidebar -->
-    <div class="sidebar">
-        <!-- Sidebar user panel (optional) -->
-        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-          <div class="image">
-            <img src="dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
-          </div>
-          <div class="info">
-            <a href="#" class="d-block">Alexander Pierce</a>
-          </div>
-        </div>
   
-        <!-- Sidebar Menu -->
-        <nav class="mt-2">
-          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-            <!-- Add icons to the links using the .nav-icon class
-                 with font-awesome or any other icon font library -->
-            <li class="nav-item menu-open">
-              <a href="#" class="nav-link active">
-                <i class="nav-icon fas fa-tachometer-alt"></i>
-                <p>
-                  Dashboard
-                  <i class="right fas fa-angle-left"></i>
-                </p>
-              </a>
-              <ul class="nav nav-treeview">
-                <li class="nav-item">
-                  <a href="./index.html" class="nav-link active">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Dashboard v1</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="./index2.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Dashboard v2</p>
-                  </a>
-                </li>
-                <li class="nav-item">
-                  <a href="./index3.html" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Dashboard v3</p>
-                  </a>
-                </li>
-              </ul>
+  <div clas="wrapper">
+      <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+          <!-- Left navbar links -->
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
             </li>
-          </ul>
-        </nav>
-        <!-- /.sidebar-menu -->
-      </div>
-        </aside>
+          </ul>   
 
-        <div class="content-wrapper">
+
+      </nav>
+    
+      <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        <a href="#" class="brand-link">
+          <img src="" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+          <span class="brand-text font-weight-light">Inventario TI</span>
+        </a>
+      
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <!-- Sidebar user panel (optional) -->
+          <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+              <img src="#" class="img-circle elevation-2" alt="User Image">
+            </div>
+
+            <div class="info">
+              <a href="#" class="d-block">Name user</a>
+            </div>
+
+          </div>
+    
+          <!-- Sidebar Menu -->
+          <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+              <!-- Add icons to the links using the .nav-icon class
+                  with font-awesome or any other icon font library -->
+              <li class="nav-time">
+                  <a href="#" class="nav-link active">
+                      <i class="nav-icon fa-solid fa-user-group"></i>
+                      <p>
+                        Usuarios
+                      </p>
+                  </a>
+              </li>
+            </ul>
+          </nav>
+          <!-- /.sidebar-menu -->
+        </div>
+      </aside>
+
+      <div class="content-wrapper">
             <!-- Content Header (Page header) -->
             <div class="content-header">
               <div class="container-fluid">
                 <div class="row mb-2">
                   <div class="col-sm-6">
-                    <h1 class="m-0">Tabla</h1>
+                    <h1 class="m-0">Inventario TI</h1>
                   </div><!-- /.col -->
                 </div><!-- /.row -->
               </div><!-- /.container-fluid -->
@@ -95,18 +82,20 @@
               <div class="container-fluid">
                 <!-- Small boxes (Stat box) -->
                 <div class="row">
-                    <div class="col-lg">
+                    <div class="col-12">
                         <div class="card">
                             <div class="card-header">
                               <h3 class="card-title">
-                                <i class="fas fa-chart-pie mr-1"></i>
-                                Datos
+                                <i class="fa-solid fa-table"></i>
+                                Usuarios
                               </h3>
+                              <div class="d-flex justify-content-end mb-3">
+                                <button type="button" onclick="nuevo_usuario()" class="btn btn-info"><i class="fa-solid fa-plus icon"></i>Nuevo</button>
+                                <button type="button" onclick="mensaje_eliminar()" class="btn btn-danger" style="margin-left: 10px;">Eliminar</button>
+                              </div>
                             </div><!-- /.card-header -->
+
                             <div class="card-body">
-                                <div class="row">
-                                  <button type="button" class="btn btn-info" >Nuevo Usuario</button>
-                                </div>
                                 <div id="tbl" class="dataTables_wrapper dt-bootstrap4">
                                       <div class="row">
                                           <div class="col-sm-12 col-md-6"></div>
@@ -114,9 +103,11 @@
                                       </div>
                                       <div class="row">
                                           <div class="col-sm-12">
-                                              <table id="tbl-usuario" class="table table-bordered table-hover dataTable dtr-inline" aria-describedby="tbl-usuario_info">
+                                              <table id="tbl-usuario" class="table table-bordered table-hover dataTable dtr-inline table-responsive" aria-describedby="Tabla de usuarios">
                                                   <thead>
                                                       <tr>
+                                                          <th></th>
+                                                          <th>Id</th>
                                                           <th>Nombre</th>
                                                           <th>Correo</th>
                                                           <th>Edad</th>
@@ -134,6 +125,8 @@
                                                   </tbody>
                                                   <tfoot>
                                                       <tr>
+                                                          <th></th>
+                                                          <th>Id</th>
                                                           <th>Nombre</th>
                                                           <th>Correo</th>
                                                           <th>Edad</th>
@@ -163,13 +156,11 @@
               </div><!-- /.container-fluid -->
             </section>
             <!-- /.content -->
-          </div>
-
-        
-    </div>
+      </div>
+  </div>
 
     <!-- Modal Editar-->
-    <div class="modal fade" id="modalEditar" style="display : none;" aria-hidden="true" >
+  <div class="modal fade" id="modalEditar" style="display : none;" aria-hidden="true" >
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -185,7 +176,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                             </div>
-                            <input type="text" class="form-control" id="nombre">
+                            <input type="text" class="form-control" id="nombre" name="">
                         </div>
                         <label for="correo">Correo</label>
                         <div class="input-group mb-3">
@@ -227,7 +218,7 @@
                         <label for="contraseña" class="form-label">Contraseña</label>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <span class="input-group-text"><i id="iconOjo" class="fa-solid fa-eye-slash" style="cursor: pointer;"></i></span>
+                                <span class="input-group-text"><i id="ver-passEdit" class="fa-solid fa-eye-slash" style="cursor: pointer;"></i></span>
                             </div>
                             
                             <input type="password" class="form-control" id="contraseña" disabled>
@@ -239,10 +230,10 @@
                 </div>
             </div>
         </div>
-    </div>
+  </div>
 
     <!-- Modal Insertar usuario-->
-    <div class="modal fade" id="modalInsertar" style="display : none;" aria-hidden="true" >
+  <div class="modal fade" id="modalInsertar" style="display : none;" aria-hidden="true" >
       <div class="modal-dialog">
           <div class="modal-content">
               <div class="modal-header">
@@ -252,7 +243,6 @@
                   </button>
               </div>
               <div class="modal-body">
-                <span id="usuReg"></span><br><br>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
@@ -271,6 +261,7 @@
                     </div>
                     <input type="tel" class="form-control" id="telefonoReg" maxlength="10" placeholder="Número de teléfono" >
                 </div>
+                <label for="fechanacReg">Fecha de nacimiento</label>
                 <div class="input-group mb-3">
                         <input type="date" class="form-control" id="fechanacReg" placeholder="Fecha de nacimiento">
                 </div>
@@ -282,22 +273,58 @@
                 </div>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text"><i id="toggle-password-icon" class="fa-solid fa-eye-slash" style="cursor: pointer;"></i></span>
+                        <span class="input-group-text"><i id="ver-passReg" class="fa-solid fa-eye-slash" style="cursor: pointer;"></i></span>
                     </div>
-                    <input type="password" class="form-control" id="contraseñaReg" placeholder="Crea tu contraseña" required name="inputReg">
+                    <input type="password" class="form-control" id="contraseñaReg" placeholder="Contraseña" >
                 </div>
-                <button class="btn btn-primary" id="btn-reg" onclick="registrarUsu()" >Registrate</button>
-                <br>
               </div>
               <div class="modal-footer">
                   <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
-                  <button type="button" class="btn btn-primary" onclick="editar_usuario()">Guardar</button>
+                  <button type="button" class="btn btn-primary" onclick="insertar_usuario()">Guardar</button>
               </div>
           </div>
       </div>
   </div>
 
-    
+  <!--Modal eliminación de usuario-->
+  <div class="modal fade" id="modalElim" style="display : none;" aria-hidden="true" >
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Eliminar usuario(s)</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message">¿Estás seguro de que deseas eliminar estos usuarios?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="mdl-btn-can">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="">Confirmar</button>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- Codigo del toast-->
+  <div class="toasts-bottom-right fixed" aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px; ">
+    <div class="position-fixed bottom-0 right-0 p-3" style="position: absolute; top: 0; right: 0;">
+        <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="3000" style="width: 300px;">
+            <div class="toast-header">
+                <strong class="mr-auto">Inventario_ti</strong>
+                <small>Ahora</small>
+                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="toast-body">
+                Usuario Registrado
+            </div>
+        </div>
+    </div>
+  </div>
+
     
 </body>
 

@@ -20,39 +20,52 @@ function server_usuario(model) {
     })
 }
 
-$('#modalEditar').on('shown.bs.modal', function () {
-    $('#myInput').trigger('focus')
-  })
 
-/* let modalEditar = $("#modalEditar") */
-  
+$(document).ready(function (){
+    document.getElementById('fechanacReg').addEventListener('input',calcularEdad);
+    document.getElementById('ver-passReg').addEventListener('click', ver_contraseña);
+})
+let toast = $('#liveToast')
+
+$(".icon").on('mouseover', function(e){
+    let icono = e.currentTarget.find('i')
+    icono.addClass("fa-beat")
+    console.log(icono)
+})
+$(".icon").on('mouseout', function(e){
+    let icono = e.currentTarget.find('i')
+    icono.removeClass("fa-beat")
+    console.log(icono)
+})
+
 let usuarios = []
 async function consultar_usuarios() {
     let r = await server_usuario({accion : 2})
 
     usuarios = r.resultado
-    
-    /* for (let i = 0; i < usuarios.length; i++) {
-        const element = usuarios[i]
-        document.getElementById('tbl-usuario-body').innerHTML+=`
-        <tr>
-            <td>${element.nombre}</td>
-            <td>${element.correo}</td>
-            <td>${element.edad}</td>
-            <td>${element.telefono}</td>
-            <td>${element.fecha_nac}</td>
-            <td>${element.fecha_reg}</td>
-            <td><button type="button" class="btn btn-warning" id="idEditar${element.id}"  value="${element.id}" onclick="seleccionar_usuario(this)">Editar</button></td>
-            <td><button type="button" class="btn btn-danger" id="idEditar${element.id}"  value="${element.id}" onclick="">Eliminar</button></td>
-        </tr>
-        `
-    }    */
-
         
-            $("#tbl-usuario").DataTable({
+    let table = $("#tbl-usuario").DataTable()
+    table.destroy()
+
+    $("#tbl-usuario").DataTable({
                 data: usuarios, //? Este es el array de objetos que trae el ajax, en este caso es el array de usuarios.
     
                 columns: [ //? Aqui se definen las columnas de la tabla, el primer elemento es el id de la columna, el segundo es el nombre de la columna y el tercero es el render, que es lo que se va a mostrar en la tabla.
+                    {
+                        data: 'id',
+                        render: function (data, type, row) {
+                            let control = `<div class="form-check" ><input type="checkbox" class="form-check-input check-change" 
+                            onclick="seleccionar_usuarios(${data})" value="${data}"></div>`
+                            return control;
+                        }
+                    },
+                    {
+                        data: 'id',
+                        render: function (data, type, row) {
+                            let control = `<label style="text-align: center">${data}</label>`
+                            return control;
+                        }
+                    },
                     {
                         data: 'nombre',
                         render: function (data, type, row) {
@@ -120,12 +133,10 @@ async function consultar_usuarios() {
     
     
             }
-            )
-       
-    
+    )   
 }
 
-let usuSelect=""
+let usuSelect = ""
 let modalEdit 
 async function seleccionar_usuario(params) {
 
@@ -171,8 +182,151 @@ async function editar_usuario(params) {
     }
 
     let r = await server_usuario(model)
-    usuSelect = ""
 
+    let resp=JSON.parse(respuesta)
+    if(resp.resultado === true){
+        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
+        toast.addClass('bg-success');
+        toast.find('.toast-body').text('Usuario editado').css('color','white')
+        toast.toast('show')
+    }else if(resp.resultado === false){
+        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
+        toast.addClass('bg-danger');
+        toast.find('.toast-body').text('Error al editar usuario').css('color','white')
+        toast.toast('show')
+    } 
+    usuSelect = ""
     consultar_usuarios()
     modalEdit.hide()
 }
+
+let usuSeleccionado = []
+async function seleccionar_usuarios(params) {
+
+    let index = usuSeleccionado.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
+    if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
+        usuSeleccionado.push(params); // Añade uno o más elementos al final de un array
+    } else {
+        usuSeleccionado.splice(index, 1); 
+    }
+}
+
+let modalElim
+async function mensaje_eliminar() {
+
+    if (usuSeleccionado.length === 0) {
+        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
+        toast.addClass('bg-warning');
+        toast.find('.toast-body').text('Por favor, selecciona al menos un usuario para continuar').css('color','white')
+        toast.toast('show')
+        return;
+    }else{
+        modalElim = new bootstrap.Modal(document.getElementById('modalElim'))
+        modalElim.show()
+    }
+}
+
+async function eliminar_usuario(params) {
+        let model = {
+            accion : 3,
+            id : usuSeleccionado
+        }
+
+        let response = await server_usuario(model);
+        
+        if (response.resultado) {
+            toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
+            toast.addClass('bg-success');
+            toast.find('.toast-body').text('Usuario(s) eliminado(s)').css('color','white')
+            toast.toast('show')
+            usuSeleccionado = [];
+            let table = $("#tbl-usuario").DataTable()
+            table.destroy()
+            consultar_usuarios()
+            modalReg.hide()
+        } else {
+            toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
+            toast.addClass('bg-danger');
+            toast.find('.toast-body').text('Error en la consulta').css('color','white')
+            toast.toast('show')
+            modalReg.hide()
+        }
+        
+}
+
+let modalReg
+async function nuevo_usuario(params) {
+    modalReg = new bootstrap.Modal(document.getElementById('modalInsertar'))
+    modalReg.show()
+}
+
+async function insertar_usuario(params) {
+    let model = {
+        accion : 0,
+        nombre : $('#nombreReg').val().trim(),
+        correo : $('#correoReg').val().trim(),
+        telefono : $('#telefonoReg').val().trim(),
+        fecha_nac : $('#fechanacReg').val().trim(),
+        edad : $('#edadReg').val().trim(),
+        contraseña : $('#contraseña').val().trim()
+    }
+
+    let server = await server_usuario(model)
+
+    let resp=JSON.parse(respuesta)
+    if(resp.resultado === true){
+        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
+        toast.addClass('bg-success');
+        toast.find('.toast-body').text('Usuario registrado').css('color','white')
+        toast.toast('show')
+    }else if(resp.resultado === false){
+        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
+        toast.addClass('bg-danger');
+        toast.find('.toast-body').text('Usuario ya existente').css('color','white')
+        toast.toast('show')
+    } 
+
+    let table = $("#tbl-usuario").DataTable()
+    table.destroy()
+    consultar_usuarios()
+    modalReg.hide()
+}
+
+let vEdad=false
+function calcularEdad(){
+    let fechaNacimiento = new Date(document.getElementById('fechanacReg').value);
+    let hoy = new Date();
+    let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+    
+    let mes = hoy.getMonth() - fechaNacimiento.getMonth();
+
+    if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
+        edad--;
+    }
+
+    document.getElementById('edadReg').value = edad;
+
+    if (edad<18){
+        vEdad=false
+    }else{
+        vEdad=true
+    }
+}
+
+function ver_contraseña(){
+    let regPasswordInput = document.getElementById('contraseñaReg')
+    let iconReg = document.getElementById('ver-passReg')   
+    let editPasswordInput = document.getElementById('contraseña')
+    let iconEdit = document.getElementById('ver-passEdit');  
+
+    if (regPasswordInput.type === 'password') {
+        regPasswordInput.type = 'text';
+        iconReg.classList.remove('fa-eye-slash');  
+        iconReg.classList.add('fa-eye');
+    } else if(regPasswordInput.type === 'text'){
+        regPasswordInput.type = 'password';
+        iconReg.classList.remove('fa-eye');
+        iconReg.classList.add('fa-eye-slash');
+    }
+}
+
