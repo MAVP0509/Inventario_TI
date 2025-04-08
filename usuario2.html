@@ -90,8 +90,8 @@
                                 Usuarios
                               </h3>
                               <div class="d-flex justify-content-end mb-3">
-                                <button type="button" onclick="nuevo_usuario()" class="btn btn-info"><i class="fa-solid fa-plus icon"></i>Nuevo</button>
-                                <button type="button" onclick="mensaje_eliminar()" class="btn btn-danger" style="margin-left: 10px;">Eliminar</button>
+                                <button type="button" onclick="nuevo_usuario()" class="btn btn-info icon"><i class="fa-solid fa-plus fa-lg"></i></button>
+                                <button type="button" onclick="mensaje_eliminar()" class="btn btn-danger icon" style="margin-left: 10px;"><i class="fa-solid fa-trash fa-lg"></i></button>
                               </div>
                             </div><!-- /.card-header -->
 
@@ -103,7 +103,7 @@
                                       </div>
                                       <div class="row">
                                           <div class="col-sm-12">
-                                              <table id="tbl-usuario" class="table table-bordered table-hover dataTable dtr-inline table-responsive" aria-describedby="Tabla de usuarios">
+                                              <table id="tbl-usuario" class="table table-bordered table-hover dataTable dtr-inline " aria-describedby="Tabla de usuarios">
                                                   <thead>
                                                       <tr>
                                                           <th></th>
@@ -114,7 +114,7 @@
                                                           <th>Teléfono</th>
                                                           <th>Fecha_nac</th>
                                                           <th>Fecha_reg</th>
-                                                          <th>Detalle</th>
+                                                          <th>Editar</th>
                                                           <th>Eliminar</th>
 
                                                       </tr>
@@ -133,7 +133,7 @@
                                                           <th>Teléfono</th>
                                                           <th>Fecha_nac</th>
                                                           <th>Fecha_reg</th>
-                                                          <th>Detalle</th>
+                                                          <th>Editar</th>
                                                           <th>Eliminar</th>
 
                                                       </tr>
@@ -233,8 +233,8 @@
   </div>
 
     <!-- Modal Insertar usuario-->
-  <div class="modal fade" id="modalInsertar" style="display : none;" aria-hidden="true" >
-      <div class="modal-dialog">
+  <div class="modal fade " id="modalInsertar" aria-modal="true" >
+      <div class="modal-dialog ">
           <div class="modal-content">
               <div class="modal-header">
                   <h4 class="modal-title">Nuevo Usuario</h4>
@@ -289,7 +289,7 @@
   <!--Modal eliminación de usuario-->
   <div class="modal fade" id="modalElim" style="display : none;" aria-hidden="true" >
     <div class="modal-dialog" role="document">
-        <div class="modal-content">
+        <div class="modal-content bg-danger">
             <div class="modal-header">
                 <h5 class="modal-title">Eliminar usuario(s)</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -301,7 +301,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal" id="mdl-btn-can">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="">Confirmar</button>
+                <button type="button" class="btn btn-primary" onclick="eliminar_usuario()">Confirmar</button>
             </div>
         </div>
     </div>

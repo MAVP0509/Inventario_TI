@@ -24,19 +24,22 @@ function server_usuario(model) {
 $(document).ready(function (){
     document.getElementById('fechanacReg').addEventListener('input',calcularEdad);
     document.getElementById('ver-passReg').addEventListener('click', ver_contraseña);
+
+    $('#tbl-usuario').on('mouseover', '.icon', function() {
+        $(this).find('i').addClass('fa-bounce');  // Agregar una clase extra si lo deseas
+    }).on('mouseout', '.icon', function() {
+        $(this).find('i').removeClass('fa-bounce');
+    });
+})
+$(".icon").on('mouseover', function(){
+    $(this).find('i').addClass("fa-bounce");
+})
+$(".icon").on('mouseout', function(e){
+    $(this).find('i').removeClass("fa-bounce");
 })
 let toast = $('#liveToast')
 
-$(".icon").on('mouseover', function(e){
-    let icono = e.currentTarget.find('i')
-    icono.addClass("fa-beat")
-    console.log(icono)
-})
-$(".icon").on('mouseout', function(e){
-    let icono = e.currentTarget.find('i')
-    icono.removeClass("fa-beat")
-    console.log(icono)
-})
+
 
 let usuarios = []
 async function consultar_usuarios() {
@@ -54,7 +57,7 @@ async function consultar_usuarios() {
                     {
                         data: 'id',
                         render: function (data, type, row) {
-                            let control = `<div class="form-check" ><input type="checkbox" class="form-check-input check-change" 
+                            let control = `<div class="form-check d-flex justify-content-center align-middle" ><input type="checkbox" class="form-check-input check-change" 
                             onclick="seleccionar_usuarios(${data})" value="${data}"></div>`
                             return control;
                         }
@@ -114,7 +117,7 @@ async function consultar_usuarios() {
                     {
                         data: 'id',
                         render: function (data, type, row) {
-                            let control = `<button type="button" class="btn btn-warning" id="${data}"  value="${data}" onclick="seleccionar_usuario(this)">Editar</button>`
+                            let control = `<div class="d-flex justify-content-center align-items-center"><button type="button" style="text-align: center" class="btn btn-warning icon" id="${data}"  value="${data}" onclick="seleccionar_usuario(this)"><i class="fa-solid fa-pen-to-square fa-lg"></i></button></div>`
                             return control;
                         }
                     },
@@ -135,6 +138,9 @@ async function consultar_usuarios() {
             }
     )   
 }
+
+
+
 
 let usuSelect = ""
 let modalEdit 
@@ -200,6 +206,7 @@ async function editar_usuario(params) {
     modalEdit.hide()
 }
 
+
 let usuSeleccionado = []
 async function seleccionar_usuarios(params) {
 
@@ -236,20 +243,20 @@ async function eliminar_usuario(params) {
         
         if (response.resultado) {
             toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-            toast.addClass('bg-success');
+            toast.addClass('bg-warning');
             toast.find('.toast-body').text('Usuario(s) eliminado(s)').css('color','white')
             toast.toast('show')
             usuSeleccionado = [];
             let table = $("#tbl-usuario").DataTable()
             table.destroy()
             consultar_usuarios()
-            modalReg.hide()
+            modalElim.hide()
         } else {
             toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
             toast.addClass('bg-danger');
             toast.find('.toast-body').text('Error en la consulta').css('color','white')
             toast.toast('show')
-            modalReg.hide()
+            modalElim.hide()
         }
         
 }
