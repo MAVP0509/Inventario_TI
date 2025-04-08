@@ -1,5 +1,6 @@
 <?php
- header('Content_Type: text/html; charset=UTF-8');
+
+header('Content_Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
 
 $clientejson = json_decode($_POST['trama']);
@@ -14,7 +15,7 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_datos($clientejson);
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = desactivar_datos($clientejson);
- }elseif ($clientejson->accion == 4) {
+}elseif ($clientejson->accion == 4) {
     $respuesta_servidor->resultado = eliminar_datos($clientejson);
 }
 

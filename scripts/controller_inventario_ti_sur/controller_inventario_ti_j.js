@@ -22,7 +22,7 @@ function server_inventario(model) {
 
 }
 
-let usuario = [];
+let datos = [];
 
 async function consultar_informacion(params) {
 
@@ -33,17 +33,18 @@ async function consultar_informacion(params) {
 
     let response = await server_inventario(model);
     //console.log(response);
-    usuario = response.resultado;
+    dato = response.resultado;
 
     try {
         $("#tabla1").DataTable({
-            data: usuario,
+            data: dato,
             columns: [
                 {
                     data: "id",
                     render: function(data, type, row) {
                         let control = `<div class="form-group form-check">
-                            <input type="checkbox" class="form-check-input check-change">
+                            <input type="checkbox" class="form-check-input check-change"
+                            onclick="selecionar_datos(${dato[i].id})" value="${dato[i].id}" id="check${dato[i].id}">
                         </div>`
                         return control;
                     }
@@ -176,7 +177,9 @@ async function consultar_informacion(params) {
                         title: 'Haz clic para agregar un usuario'
                     },
                     action: function (e, dt, node, config) {
-                        crear_registro();
+                        let modal = new bootstrap.Modal(document.getElementById('modal-registro'));
+                        modal.show();
+                        //selecionar_datos()
                     }
                 },
                 {
@@ -187,7 +190,7 @@ async function consultar_informacion(params) {
                         title: 'Haz clic para agregar un usuario'
                     },
                     action: function (e, dt, node, config) {
-                        $('#modal-registro').modal('show');
+                        
                     }
                 }
             ],
@@ -203,24 +206,14 @@ async function consultar_informacion(params) {
 
 }
 
-let ususelect = "";
+let ususelect = [];
 async function selecionar_datos(params) {
-    for (let i = 0; i < usuarios.length; i++) {
-        const element = usuarios[i];
-        
-        if (element.id === params.value) {
-            ususelect = element;
-            break;
-            
-        }
-        modal
+    let index = ususelect.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
+    if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
+        ususelect.push(params); // Añade uno o más elementos al final de un array
+    } else {
+        ususelect.splice(index, 1); 
     }
-
-    document.getElementById("inp-zona").value = ususelect.zona;
-    document.getElementById("inp-fecha-entraga").value = ususelect.fecha_entrega;
-
-    modal = new bootstrap.Modal(document.getElementById('modal-registro'));
-    modal.show();
 }
 
 let modal = ""
@@ -228,6 +221,7 @@ let modal = ""
 async function crear_registro(params) {
     let model = {
         accion: 0,
+        zona: $("#inp-zona"),
         rubro: $("#inp-rubro").val().trim(),
         af: $("#inp-af").val().trim(),
         tipo: $("#inp-tipo").val().trim(),
@@ -238,40 +232,75 @@ async function crear_registro(params) {
         ubicacion: $("#inp-ubicacion").val().trim(),
         tag: $("#inp-tag").val().trim(),
         usuario: $("#inp-usuario").val().trim(),
-        posicion: $("#inp-posicion").val().trim()
-        
+        posicion: $("#inp-posicion").val().trim(),
+        fecha_entrega: $("inp-fecha-entrega")
     }
 
     let server = await server_inventario(model);
     let response = JSON.parse(respuesta);
 
-    try {
+    
         if (response.resultado === true) {
-            //mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
+            mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
+            
         } else {
             mostrarAlerta('error', 'Error', 'No se pudo crear el registro. Inténtalo nuevamente.');
         }
-    } catch (error) {
-        
-    }
-    modal = new bootstrap.Modal(document.getElementById('modal-registro'));
-    modal.show();
+    /* modal = new bootstrap.Modal(document.getElementById('modal-registro'));
+    modal.show(); */
     
+    let table = $('#tabla1').DataTable();
+    table.destroy();
+    consultar_informacion();
+    modal.hide();
 }
 
 async function editar_registro(params) {
+    let model = {
+        accion: 1,
+        rubro: $("#inp-rubro").val().trim(),
+        af: $("#inp-af").val().trim(),
+        tipo: $("#inp-tipo").val().trim(),
+        marca: $("#inp-marca").val().trim(),
+        modelo: $("#inp-modelo").val().trim(),
+        num_serie: $("#inp-num-serie").val().trim(),
+        mac_adress: $("#inp-mac-adress").val().trim(),
+        ubicacion: $("#inp-ubicacion").val().trim(),
+        tag: $("#inp-tag").val().trim(),
+        usuario: $("#inp-usuario").val().trim(),
+        posicion: $("#inp-posicion").val().trim(),
+    }
+
+    let serve = await server_inventario(model);
+    let response = JSON.parse(respuesta);
+
+    if (response.respuesta === true) {
+        mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
+        
+    } else {
+        mostrar_alerta('error', 'Error', 'No se pudo editar el registro. Inténtalo nuevamente.');
+    }
+
+    consultar_informacion();
     
 }
 
-async function eliminar_registro(params) {
+async function desactivar_registro(params) {
+    let model = {
+        accion: 3,
+    }
+}
+
+/* async function eliminar_registro(params) {
     let response = await server_inventario({ accion: 4, id: id });
         if (response.resultado === true) {
             mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
             $('#tabla1').DataTable().ajax.reload(); // Recargar la tabla
+            $('#modal-registro').modal('hide');
         } else {
             mostrarAlerta('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
         }
-}
+} */
 
 function mostrar_alerta(tipo, titulo, mensaje) {
     Swal.fire({
