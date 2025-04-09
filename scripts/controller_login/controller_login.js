@@ -46,10 +46,8 @@ let toast = $('#liveToast')
 async function registrarUsu(){
     try{
         if (pass, email, tel, nombre, fecha, vEdad ===false ) {
-            toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-            toast.addClass('bg-danger');
-            toast.find('.toast-body').text('¡Rellena todos los campos correctamente para continuar!').css('color','white')
-            toast.toast('show')
+            mostrar_alerta('warning', 'Inventario TI', '¡Rellena todos los campos correctamente para continuar!');
+
             //console.log(pass, email, tel, nombre, fecha, edad)
             return false;
     
@@ -71,10 +69,8 @@ async function registrarUsu(){
                 localStorage.setItem('registroExitoso', '¡Usuario Registrado!');
                 window.location.href = "login.html"
             }else if(resp.resultado === false){
-                toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-                toast.addClass('bg-danger');
-                toast.find('.toast-body').text('Usuario ya existente').css('color','white')
-                toast.toast('show')
+                mostrar_alerta('warning', 'Inventario TI', 'Usuario ya existente');
+
             } 
             
             /* let inputs = document.getElementsByName("inputReg");
@@ -83,10 +79,7 @@ async function registrarUsu(){
             } */
         }    
     }catch (error){
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-danger');
-        toast.find('.toast-body').text('No se puede conectar al servidor').css('color','white')
-        toast.toast('show')
+        mostrar_alerta('error', 'Inventario TI', 'No se puedo conectar al servidor');
     }
     
 }
@@ -99,15 +92,9 @@ window.addEventListener('load', function () {
     
     if (mensajeRegistro) {
         // Si el mensaje existe, mostramos el toast
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-success');
-        toast.find('.toast-body').text(mensajeRegistro).css('color','white');
-        toast.toast('show');
+        mostrar_alerta('success', 'Inventario TI', mensajeRegistro);
     }else if(mensajeContraseña){
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-success');
-        toast.find('.toast-body').text(mensajeContraseña).css('color','white');
-        toast.toast('show');
+        mostrar_alerta('success', 'Inventario TI', mensajeContraseña);
     }
 
     localStorage.clear()
@@ -127,10 +114,7 @@ async function validar_ingreso() {
     
         let resp=JSON.parse(respuesta)
         if (resp.resultado === false){
-            toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-            toast.addClass('bg-danger');
-            toast.find('.toast-body').text("Usuario/contraseña no válidos").css('color','white')
-            toast.toast('show')
+            mostrar_alerta('error', 'Inventario TI', "Usuario/contraseña no válidos");
             let inputs = document.getElementsByName("inputInit");
             for (let i = 0; i < inputs.length; i++) {
             const element = inputs[i].value = "";
@@ -142,10 +126,7 @@ async function validar_ingreso() {
             window.location.href = "usuario.html";
             }
     }catch (error){
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-danger');
-        toast.find('.toast-body').text('No se puede conectar al servidor').css('color','white')
-        toast.toast('show')
+        mostrar_alerta('error', 'Inventario TI', "No se pudo conectar al servidor");
     }
     
 }
@@ -420,4 +401,18 @@ async function enlaceconParametros(token) {
     let urlConParametros = `${baseUrl}?${params.toString()}`;
 
     return urlConParametros;
+}
+
+function mostrar_alerta(tipo, titulo, mensaje) {
+    Swal.fire({
+        icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
+        title: titulo,
+        text: mensaje,
+        timer: 2000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end',
+        heighAuto : true
+    });
 }

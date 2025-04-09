@@ -45,11 +45,8 @@ window.addEventListener('load', function () {
     
     if (mensajeRegistro) {
         // Si el mensaje existe, mostramos el toast
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-success');
-        toast.find('.toast-body').text(mensajeRegistro).css('color','white');
-        toast.toast('show');
-        
+        mostrar_alerta('success', 'Bienvenido', mensajeRegistro)
+
 
         // Eliminamos el mensaje para evitar que aparezca nuevamente
         sessionStorage.removeItem('bienvenido');
@@ -172,10 +169,10 @@ async function seleccionar_usuario(params) {
 
         if(element.id===params.value){
 
-            let model ={
+            /* let model ={
                 contraseña : element.contraseña
             }
-            console.log(model)
+            console.log(model) */
             usuSelect = element;
             break;
         }
@@ -212,15 +209,9 @@ async function editar_usuario(params) {
 
     let resp=JSON.parse(respuesta)
     if(resp.resultado === true){
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-success');
-        toast.find('.toast-body').text('Usuario editado').css('color','white')
-        toast.toast('show')
+        mostrar_alerta('success', 'Inventario TI', 'Usuario editado')
     }else if(resp.resultado === false){
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-danger');
-        toast.find('.toast-body').text('Error al editar usuario').css('color','white')
-        toast.toast('show')
+        mostrar_alerta('error', 'Inventario TI', 'Error en la consulta')
     } 
     usuSelect = ""
     consultar_usuarios()
@@ -243,10 +234,7 @@ let modalElim
 async function mensaje_eliminar() {
 
     if (usuSeleccionado.length === 0) {
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-warning');
-        toast.find('.toast-body').text('Por favor, selecciona al menos un usuario para continuar').css('color','white')
-        toast.toast('show')
+        mostrar_alerta('warning', 'Inventario TI', 'Por favor, selecciona al menos un usuario para continuar')
         return;
     }else{
         modalElim = new bootstrap.Modal(document.getElementById('modalElim'))
@@ -263,20 +251,15 @@ async function eliminar_usuario(params) {
         let response = await server_usuario(model);
         
         if (response.resultado) {
-            toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-            toast.addClass('bg-warning');
-            toast.find('.toast-body').text('Usuario(s) eliminado(s)').css('color','white')
-            toast.toast('show')
+            mostrar_alerta('success', 'Inventario TI', 'Usuario(s) eliminado(s) correctamente')
+
             usuSeleccionado = [];
             let table = $("#tbl-usuario").DataTable()
             table.destroy()
             consultar_usuarios()
             modalElim.hide()
         } else {
-            toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-            toast.addClass('bg-danger');
-            toast.find('.toast-body').text('Error en la consulta').css('color','white')
-            toast.toast('show')
+            mostrar_alerta('error', 'Inventario TI', 'Error en la consulta');
             modalElim.hide()
         }
         
@@ -308,15 +291,9 @@ async function insertar_usuario(params) {
     
         let resp=JSON.parse(respuesta)
         if(resp.resultado === true){
-            toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-            toast.addClass('bg-success');
-            toast.find('.toast-body').text('Usuario registrado').css('color','white')
-            toast.toast('show')
+            mostrar_alerta('success', 'Inventario TI', 'Usuario registrado correctamente')
         }else if(resp.resultado === false){
-            toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-            toast.addClass('bg-danger');
-            toast.find('.toast-body').text('Usuario ya existente').css('color','white')
-            toast.toast('show')
+            mostrar_alerta('warning', 'Inventario TI', 'Usuario Usuario ya existente')
         } 
     
         let table = $("#tbl-usuario").DataTable()
@@ -324,10 +301,7 @@ async function insertar_usuario(params) {
         consultar_usuarios()
         modalReg.hide()
     } catch (error) {
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-danger');
-        toast.find('.toast-body').text('Rellene correctamente los campos').css('color','white')
-        toast.toast('show')
+        mostrar_alerta('warning', 'Inventario TI', 'Rellene correctamente los campos')
     }
     
 }
@@ -396,19 +370,13 @@ async function desactivar_usuario(params) {
 
     if (r.resultado) {
         modalDes.hide()
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-warning');
-        toast.find('.toast-body').text('Usuario eliminado').css('color','white')
-        toast.toast('show')
+        mostrar_alerta('success', 'Inventario TI', 'Usuario eliminado')
         let table = $("#tbl-usuario").DataTable()
         table.destroy()
         consultar_usuarios()
         
     } else {
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-danger');
-        toast.find('.toast-body').text('Error en la consulta').css('color','white')
-        toast.toast('show')
+        mostrar_alerta('error', 'Inventario TI', 'Error en la consulta')
     }
 }
 
@@ -421,4 +389,18 @@ $("#log-out").on('mouseout', function(){
 async function cerrar_sesion() {
     sessionStorage.setItem('log','false')
     window.location.reload()
+}
+
+function mostrar_alerta(tipo, titulo, mensaje) {
+    Swal.fire({
+        icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
+        title: titulo,
+        text: mensaje,
+        timer: 2000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end',
+        heighAuto : true
+    });
 }
