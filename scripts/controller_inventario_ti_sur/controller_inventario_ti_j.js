@@ -35,6 +35,9 @@ async function consultar_informacion(params) {
     //console.log(response);
     datos = response.resultado;
 
+    let table = $('#tabla1').DataTable();
+    table.destroy();
+        
     try {
         $("#tabla1").DataTable({
             data: datos,
@@ -141,10 +144,19 @@ async function consultar_informacion(params) {
                     }
                 },
                 {
-                    data: "id",
+                    data: "fecha_entrega",
                     render: function(data, type, row) {
                         let control = `<label style="text-align: center">${data}</label>`
                         return control;
+                    }
+                },
+                {
+                    data: "id",
+                    render: function(data, type, row) {
+                        let control = `<div class="d-flex justify-content-center align-items-center">
+                                        <button type="button" style="text-align: center" class="btn btn-warning icon" id="${data}" value="${data}" onclick="mostrar_registro(this)">
+                                        <i class="fa-solid fa-pen-to-square fa-lg"></i></button></div>`
+                                        return control;
                     }
                 }
             ],
@@ -174,7 +186,7 @@ async function consultar_informacion(params) {
                     className: 'btn btn-sm btn-primary',
                     attr: {
                         style: 'background-color: green; color: white; border-radius: 8px; padding: 10px 20px;', // Estilos inline
-                        title: 'Haz clic para agregar un usuario'
+                        title: 'Haz clic para agregar un registros'
                     },
                     action: function (e, dt, node, config) {
                         let modal = new bootstrap.Modal(document.getElementById('modal-registro'));
@@ -183,20 +195,16 @@ async function consultar_informacion(params) {
                     }
                 },
                 {
-                    text: 'Editar registro',
+                    text: 'Eliminar registro',
                     className: 'btn btn-sm btn-primary',
                     attr: {
-                        style: 'background-color: blue; color: white; border-radius: 8px; padding: 10px 20px;', // Estilos inline
-                        title: 'Haz clic para agregar un usuario'
+                        style: 'background-color: red; color: white; border-radius: 8px; padding: 10px 20px;', // Estilos inline
+                        title: 'Haz clic para eliminar un registro'
                     },
                     action: function (e, dt, node, config) {
-                        /* let modal = new bootstrap.Modal(document.getElementById('modal-editar'));
-                        modal.show(); */
-                        //mostrar_registro()
-                        
-
+                        desactivar_registro();
                     }
-                }
+                },
             ],
             stateSave: true,
             resposive: true,
@@ -223,29 +231,35 @@ async function mostrar_datos(params) {
     modal.show();
 }
 
-registroSeleccionado ="";
+let selecreg ="";
+let modalE
 
-/* async function mostrar_registro(params) {
-    let zona = "Base operativa región Sur";
-    let registro = dayjs().format('YYYY-MM-DD HH:mm:ss');//new Date().toISOString().slice(0, 19).replace('T', ' ');
+async function mostrar_registro(params) {
+    for (let i = 0; i < datos.length; i++) {
+        const element = datos[i];
 
-    $("#inp-zona").val(zona);
-    $("#inp-rubro").val(registroSeleccionado.rubro);
-    $("#inp-af").val(registroSeleccionado.af);
-    $("#inp-tipo").val(registroSeleccionado.tipo);
-    $("#inp-marca").val(registroSeleccionado.marca);
-    $("#inp-modelo").val(registroSeleccionado.modelo);
-    $("#inp-num-serie").val(registroSeleccionado.num_serie);
-    $("#inp-mac-adress").val(registroSeleccionado.mac_adress);
-    $("#inp-ubicacion").val(registroSeleccionado.ubicacion);
-    $("#inp-tag").val(registroSeleccionado.tag);
-    $("#inp-usuario").val(registroSeleccionado.usuario);
-    $("#inp-posicion").val(registroSeleccionado.posicion);
-    $("#inp-fecha-entrega").val(registro);
+        if(element.id===params.value){
+            selecreg = element;
+            break;
+        }
+    }
+        document.getElementById("edi-zona").value = selecreg.zona;
+        document.getElementById("edi-rubro").value = selecreg.rubro;
+        document.getElementById("edi-af").value = selecreg.af;
+        document.getElementById("edi-tipo").value = selecreg.tipo;
+        document.getElementById("edi-marca").value = selecreg.marca;
+        document.getElementById("edi-modelo").value = selecreg.modelo;
+        document.getElementById("edi-num-serie").value = selecreg.num_serie;
+        document.getElementById("edi-mac-adress").value = selecreg.mac_adress;
+        document.getElementById("edi-ubicacion").value = selecreg.ubicacion;
+        document.getElementById("edi-tag").value = selecreg.tag;
+        document.getElementById("edi-usuario").value = selecreg.usuario;
+        document.getElementById("edi-posicion").value = selecreg.posicion;
+        document.getElementById("edi-fecha-entrega").value = selecreg.fecha_entrega;
 
-    let modal = new bootstrap.Modal(document.getElementById('modal-editar'));
-    modal.show();
-} */
+        modalE = new bootstrap.Modal(document.getElementById('modal-editar'));
+        modalE.show();
+}
 
 selecreg = [];
 
@@ -304,45 +318,51 @@ async function crear_registro(params) {
 async function editar_registro(params) {
     let model = {
         accion: 1,
-        rubro: $("#inp-rubro").val().trim(),
-        af: $("#inp-af").val().trim(),
-        tipo: $("#inp-tipo").val().trim(),
-        marca: $("#inp-marca").val().trim(),
-        modelo: $("#inp-modelo").val().trim(),
-        num_serie: $("#inp-num-serie").val().trim(),
-        mac_adress: $("#inp-mac-adress").val().trim(),
-        ubicacion: $("#inp-ubicacion").val().trim(),
-        tag: $("#inp-tag").val().trim(),
-        usuario: $("#inp-usuario").val().trim(),
-        posicion: $("#inp-posicion").val().trim(),
+        id: selecreg.id,
+        rubro: $("#edi-rubro").val().trim(),
+        af: $("#edi-af").val().trim(),
+        tipo: $("#edi-tipo").val().trim(),
+        marca: $("#edi-marca").val().trim(),
+        modelo: $("#edi-modelo").val().trim(),
+        num_serie: $("#edi-num-serie").val().trim(),
+        mac_adress: $("#edi-mac-adress").val().trim(),
+        ubicacion: $("#edi-ubicacion").val().trim(),
+        tag: $("#edi-tag").val().trim(),
+        usuario: $("#edi-usuario").val().trim(),
+        posicion: $("#edi-posicion").val().trim(),
     }
 
     let server = await server_inventario(model);
     let response = JSON.parse(respuesta);
 
-    if (response.respuesta === true) {
+    if (response.resultado === true) {
         mostrar_alerta('success', '¡Edición exitosa!', 'El registro se ha actualizado correctamente.');
-
-        let table = $('#tabla1').DataTable();
-        table.destroy();
-        consultar_informacion();
-        let modal = new bootstrap.getInstance(document.getElementById('modal-editar'));
-        modal.hide();
         
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo editar el registro. Inténtalo nuevamente.');
     }
 
-    consultar_informacion();
+        consultar_informacion();
+        modalE.hide();
+
+    /* consultar_informacion();
     model = new bootstrap.Modal(document.getElementById('modal-editar'));
-    model.hide();
+    model.hide(); */
     
 }
 
 async function desactivar_registro(params) {
-    let model = {
-        accion: 3,
-    }
+    let response = await server_inventario({ accion: 3, id: selecreg });
+        if (response.resultado === true) {
+            mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
+
+            let table = $('#tabla1').DataTable();
+            table.destroy();
+            consultar_informacion();
+            
+        } else {
+            mostrarAlerta('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
+        }
 }
 
 /* async function eliminar_registro(params) {

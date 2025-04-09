@@ -21,28 +21,31 @@ if ($clientejson->accion == 0) {
 
 print(json_encode($respuesta_servidor));
 
-$zona = 'Base Operativa Región Sur';
+
 
 function insertar_datos($valores) {
     include("../conexion.php");
     $registro = date("Y-m-d H:i:s");
+    $zona = 'Base Operativa Región Sur';
     $sql = "INSERT INTO inventario_ti_sur(zona, rubro, af, tipo, marca, modelo, num_serie, mac_adress, ubicacion, tag, usuario, posicion, fecha_entrega, habilitado) 
     VALUES ('$zona', '$valores->rubro','$valores->af','$valores->tipo','$valores->marca','$valores->modelo', '$valores->num_serie', '$valores->mac_adress', 
-    '$valores->ubicacion', '$valores->tag', '$valores->usuario', '$valores->posicion', '$registro',1)";
+    '$valores->ubicacion', '$valores->tag', '$valores->usuario', '$valores->posicion', '$registro',1);";
     return mysqli_query($con,$sql);
 }
 
 function editar_datos($valores) {
-    include("../conexion.php"); 
+    include("../conexion.php");
+    $zona = 'Base Operativa Región Sur';
     $sql = "UPDATE inventario_ti_sur SET zona = '$zona', rubro = '$valores->rubro', af = '$valores->af', tipo ='$valores->tipo', marca = '$valores->marca', 
-    num_serie = '$valores->num_serie', mac_adress'$valores->mac_adress', ubicacion = '$valores->ubicacion', tag = '$valores->tag', usuario = '$valores->usuario', 
+    num_serie = '$valores->num_serie', mac_adress = '$valores->mac_adress', ubicacion = '$valores->ubicacion', tag = '$valores->tag', usuario = '$valores->usuario', 
     posicion = '$valores->posicion' WHERE id = '$valores->id';";
+    //var_dump($sql);
     return mysqli_query($con,$sql);
 }
 
 function consultar_datos() {
     include("../conexion.php");
-    $sql = "SELECT * FROM  inventario_ti_sur";
+    $sql = "SELECT * FROM  inventario_ti_sur WHERE habilitado = 1";
     $query = mysqli_query($con, $sql);
     $array = array();
     while ($fila = mysqli_fetch_object($query)){
@@ -54,9 +57,15 @@ function consultar_datos() {
 
 function desactivar_datos($valores){
     include("../conexion.php");
-    // $sql = "DELETE FROM usuario WHERE id = '$valores->id'";
-    $sql = "UPDATE inventario_ti_sur SET habilitado = 0 WHERE id = '$valores->id'; ";
-    return mysqli_query($con, $sql);
+    if (is_array($valores->id)) { // Verifica si $valores->id es un array
+        $ids = implode(",", array_map('intval', $valores->id)); // Convierte el array de IDs en una lista separada por comas
+        $sql = "UPDATE inventario_ti_sur SET habilitado = 0 WHERE id IN ($ids);"; // Consulta sql usando IN para eliminar múltiples registros
+        //var_dump($sql);
+        return mysqli_query($con, $sql);
+    } else {
+        $sql="UPDATE inventario_ti_sur SET habilitado = 0 where id='$valores->id';";
+        return mysqli_query($con,$sql);
+    }
 }
 
 function eliminar_datos($valores){
