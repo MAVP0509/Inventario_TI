@@ -411,3 +411,14 @@ async function desactivar_usuario(params) {
         toast.toast('show')
     }
 }
+
+$("#log-out").on('mouseover', function(){
+    $(this).find('i').removeClass('fa-solid fa-door-closed fa-lg').addClass('fa-solid fa-door-open fa-xl');
+})
+$("#log-out").on('mouseout', function(){
+    $(this).find('i').removeClass('fa-solid fa-door-open fa-lg').addClass('fa-solid fa-door-closed fa-xl')
+})
+async function cerrar_sesion() {
+    sessionStorage.setItem('log','false')
+    window.location.reload()
+}
