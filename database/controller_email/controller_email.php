@@ -25,18 +25,17 @@ use PHPMailer\PHPMailer\PHPMailer;
     } 
     print(json_encode($respuesta_servidor));
 
-    // Recibir los datos de la solicitud POST (que son la URL con el token)
 
-    function verificar_email($correo){
+    function verificar_email($correo){ //Verifica que el correo existe y genera el token
         include("../conexion.php");
 
         $sql="SELECT * FROM usuario WHERE correo= '$correo'";
         $query = mysqli_query($con,$sql);
 
-        if ($query->num_rows > 0) {
+        if ($query->num_rows > 0) { //verifica email
             $usuario =mysqli_fetch_assoc($query);
-            $token = bin2hex(random_bytes(6)); //Creación del token
-            $token_expiracion = date("Y-m-d H:i:s", time() + 300);
+            $token = bin2hex(random_bytes(16)); //Creación del token
+            $token_expiracion = date("Y-m-d H:i:s", time() + 300); //fecha del token
             token_expirados($correo);
             $update_token_sql = "UPDATE usuario SET token = '$token', token_expiracion = '$token_expiracion' WHERE correo = '$correo'";
             if (mysqli_query($con, $update_token_sql)) {

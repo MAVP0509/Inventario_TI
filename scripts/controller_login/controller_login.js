@@ -90,10 +90,12 @@ async function registrarUsu(){
     }
     
 }
-//Función para el mensaje de "Usuario Registrado en el formulario de ingreso"
+
+//Función para el mensaje de "Usuario Registrado en el formulario de ingreso" y del reseteo de contraseña exitoso
 window.addEventListener('load', function () {
     // Leemos el mensaje del registro desde sessionStorage
     const mensajeRegistro = localStorage.getItem('registroExitoso');
+    const mensajeContraseña = localStorage.getItem('reseteoContraseña')
     
     if (mensajeRegistro) {
         // Si el mensaje existe, mostramos el toast
@@ -101,11 +103,14 @@ window.addEventListener('load', function () {
         toast.addClass('bg-success');
         toast.find('.toast-body').text(mensajeRegistro).css('color','white');
         toast.toast('show');
-        
-
-        // Eliminamos el mensaje para evitar que aparezca nuevamente
-        localStorage.removeItem('registroExitoso');
+    }else if(mensajeContraseña){
+        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
+        toast.addClass('bg-success');
+        toast.find('.toast-body').text(mensajeContraseña).css('color','white');
+        toast.toast('show');
     }
+
+    localStorage.clear()
 })
 
 //Función para el formulario de ingreso
@@ -134,7 +139,6 @@ async function validar_ingreso() {
             sessionStorage.setItem("user", respuesta)
             sessionStorage.setItem("log", 'true')
             sessionStorage.setItem("bienvenido", "Bienvenido " + resp.resultado[0])
-            //console.log(sessionStorage.getItem("nombre"))
             window.location.href = "index.html";
             }
     }catch (error){
@@ -193,7 +197,7 @@ function validar_contraseña(){
     let letrasmay = /[A-Z]/.test(regcontraseña);
     let letrasmin = /[a-z]/.test(regcontraseña);
     let numeros = /\d/.test(regcontraseña);
-    let especialesc = /[()*#@]/.test(regcontraseña);
+    let especialesc = /[()*#@.]/.test(regcontraseña);
     
     try {
         document.getElementById('minlongitud').style.color = minlongitud ? 'green' : 'red';  
@@ -378,6 +382,7 @@ sessionStorage.setItem("nombre", models)
 console.log(sessionStorage.getItem("nombre"))
  */
 
+
 async function recuperar_contraseña() {
     let model ={
         accion : 0,
@@ -410,7 +415,7 @@ async function enlaceconParametros(token) {
     let baseUrl = "http://localhost/Inventario/recuperacion.html";
     
     let params = new URLSearchParams();
-    params.append("tfgf", token);
+    params.append("ftygui", token);
 
     let urlConParametros = `${baseUrl}?${params.toString()}`;
 

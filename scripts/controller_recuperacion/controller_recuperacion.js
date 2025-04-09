@@ -5,15 +5,14 @@ function server_usuario(model){
             type: "POST",
             url: "database/controller_recuperacion/controller_recuperacion.php",
             data: {
-                trama:JSON.stringify(model)
-            },
+                trama:JSON.stringify(model)},  
             success: function(response){
-                respuesta = response
+                respuesta = response;
                 try {
-                    resolve(JSON.parse(response))
-                    console.log(JSON.parse(response))
+                    resolve(JSON.parse(response));
+                    console.log(JSON.parse(response));
                 } catch (error) {
-                    reject(error)
+                    reject(error);
                 }
             }
         })
@@ -41,7 +40,7 @@ function server_email(model){
     })
 }
 
-
+let toast = $('#toast-rec')
 let token
 
 async function load() {
@@ -52,8 +51,6 @@ async function load() {
         // Validar el token con el servidor
         let isValid = await validar_token(token);
         let resp =JSON.parse(respuesta)
-
-            // Guardar el token en una variable global para usarlo al confirmar el reseteo
         window.resetToken = token;
     } else {
             return false;;
@@ -77,11 +74,47 @@ async function validar_token(token) {
 async function confirmarReset() {
     let nuevaContraseña = document.getElementById('respass').value;
     let confirmarContraseña = document.getElementById('conf-respass').value;
+    let messageError = document.getElementById('mensaje-error');
 
-    if (nuevaContraseña !== confirmarContraseña) {
-        alert('Las contraseñas no coinciden.');
-        return;
+    let mnlong = nuevaContraseña.length >=8;
+    let mylet = /[A-Z]/.test(nuevaContraseña);
+    let mnlet = /[a-z]/.test(nuevaContraseña);
+    let mn = /\d/.test(nuevaContraseña);
+    let mincrc = /[()*#@.]/.test(nuevaContraseña);
+
+    try {
+        document.getElementById('mnlong').style.color = mnlong ? 'green' : 'red';  
+        document.getElementById('mymlet').style.color = (mylet && mnlet) ? 'green' : 'red';
+        document.getElementById('mnlet').style.color = mn ? 'green' : 'red';
+        document.getElementById('mincrc').style.color = mincrc ? 'green' : 'red';
+        } catch (error) {
+        
     }
+
+    let cumpleReq = mnlong && mylet &&  mnlet && mn && mincrc;
+
+    if(!cumpleReq){
+        messageError.style.display = 'block';
+        messageError.textContent = "La contraseña no cumple con los requisitos de seguridad";
+        document.getElementById('respass').style.borderColor = 'red';
+        return false;
+    } else {
+        messageError.style.display = 'none';
+        document.getElementById('respass').style.borderColor = 'green';
+    }
+    if(event.target.id === 'conf-respass' || event.target.id === 'respass'){
+        if (nuevaContraseña !== confirmarContraseña) {
+            messageError.style.display = 'block';
+            messageError.textContent = "La contraseña no coinciden";
+            document.getElementById('conf-respass').style.borderColor = 'red';
+            return false;
+        } else {
+            messageError.style.display = 'none';
+            document.getElementById('conf-respass').style.borderColor = 'green';
+        }
+        return true;
+    } 
+    
 
     if (!token) {
         return false;
@@ -99,11 +132,14 @@ async function confirmarReset() {
         let response = await server_usuario(model);
 
         if (response.resultado === true) {
-            alert('Contraseña restablecida correctamente.');
-            sessionStorage.removeItem('resetToken'); // Limpiar el token
+            localStorage.setItem('reseteoContraseña', '¡Contraseña restablecida exitosamente!')
+            localStorage.removeItem('resetToken'); // Limpiar el token
             window.location.href = 'login.html'; // Redirigir al login
         } else {
-            alert('Error al restablecer la contraseña: ' + response.mensaje);
+            toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
+            toast.addClass('bg-danger');
+            toast.find('.toast-body').text("El tiempo ha vencido, solicita otro correo").css('color','white');
+            toast.toast('show')
         }
     } catch (error) {
         return false;
@@ -114,9 +150,9 @@ $(document).ready(function () {
     $('[data-toggle="popover"]').popover(); 
     
     // Añadimos el evento input al campo de confirmación de contraseña
-    // document.getElementById('respass').addEventListener('input', validar_contraseña);
-    // document.getElementById('conf-respass').addEventListener('input', validar_contraseña);
-    // document.getElementById('mostrar-pass').addEventListener('click', togglePasswords);
+    document.getElementById('conf-respass').addEventListener('input', confirmarReset);
+    document.getElementById('respass').addEventListener('input', confirmarReset);
+    document.getElementById('mostrar-pass').addEventListener('click', togglePasswords);
     
 });
 
@@ -137,4 +173,3 @@ function togglePasswords() {
         toggleIcon.classList.add('fa-eye-slash');
     }
 }
-
