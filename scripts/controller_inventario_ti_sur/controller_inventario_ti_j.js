@@ -33,11 +33,11 @@ async function consultar_informacion(params) {
 
     let response = await server_inventario(model);
     //console.log(response);
-    dato = response.resultado;
+    datos = response.resultado;
 
     try {
         $("#tabla1").DataTable({
-            data: dato,
+            data: datos,
             columns: [
                 {
                     data: "id",
@@ -192,8 +192,8 @@ async function consultar_informacion(params) {
                     action: function (e, dt, node, config) {
                         /* let modal = new bootstrap.Modal(document.getElementById('modal-editar'));
                         modal.show(); */
-                        mostrar_datos()
-                        selecionar_registro()
+                        //mostrar_registro()
+                        
 
                     }
                 }
@@ -223,55 +223,40 @@ async function mostrar_datos(params) {
     modal.show();
 }
 
-selecreg = "";
+registroSeleccionado ="";
+
+/* async function mostrar_registro(params) {
+    let zona = "Base operativa región Sur";
+    let registro = dayjs().format('YYYY-MM-DD HH:mm:ss');//new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+    $("#inp-zona").val(zona);
+    $("#inp-rubro").val(registroSeleccionado.rubro);
+    $("#inp-af").val(registroSeleccionado.af);
+    $("#inp-tipo").val(registroSeleccionado.tipo);
+    $("#inp-marca").val(registroSeleccionado.marca);
+    $("#inp-modelo").val(registroSeleccionado.modelo);
+    $("#inp-num-serie").val(registroSeleccionado.num_serie);
+    $("#inp-mac-adress").val(registroSeleccionado.mac_adress);
+    $("#inp-ubicacion").val(registroSeleccionado.ubicacion);
+    $("#inp-tag").val(registroSeleccionado.tag);
+    $("#inp-usuario").val(registroSeleccionado.usuario);
+    $("#inp-posicion").val(registroSeleccionado.posicion);
+    $("#inp-fecha-entrega").val(registro);
+
+    let modal = new bootstrap.Modal(document.getElementById('modal-editar'));
+    modal.show();
+} */
+
+selecreg = [];
 
 async function selecionar_registro(params) {
 
-    for (let i = 0; i < dato.length; i++) {
-        const element = dato[i];
-
-        if(element.id===params.value){
-            break;
-        }
-        
-        document.getElementById("inp-rubro").value = selecreg.rubro;
-        document.getElementById("inp-af").value = selecreg.af;
-        document.getElementById("inp-tipo").value = selecreg.tipo;
-        document.getElementById("inp-marca").value = selecreg.marca;
-        document.getElementById("inp-modelo").value = selecreg.modelo;
-        document.getElementById("inp-num-serie").value = selecreg.num_serie;
-        document.getElementById("inp-mac-adress").value = selecreg.mac_adress;
-        document.getElementById("inp-ubicacion").value = selecreg.ubicacion;
-        document.getElementById("inp-tag").value = selecreg.tag;
-        document.getElementById("inp-usuario").value = selecreg.usuario;
-        document.getElementById("inp-posicion").value = selecreg.posicion;
-
-        let modal = new bootstrap.Modal(document.getElementById('modal-editar'));
-        modal.show();
-    }
-    /* let registroSeleccionado = dato.find(item => item.id === id);
-    dato = response.resultado;
-
-    if (registroSeleccionado) {
-        // Llenar los campos del modal-editar con los datos del registro seleccionado
-        $("#inp-rubro").val(registroSeleccionado.rubro);
-        $("#inp-af").val(registroSeleccionado.af);
-        $("#inp-tipo").val(registroSeleccionado.tipo);
-        $("#inp-marca").val(registroSeleccionado.marca);
-        $("#inp-modelo").val(registroSeleccionado.modelo);
-        $("#inp-num-serie").val(registroSeleccionado.num_serie);
-        $("#inp-mac-adress").val(registroSeleccionado.mac_adress);
-        $("#inp-ubicacion").val(registroSeleccionado.ubicacion);
-        $("#inp-tag").val(registroSeleccionado.tag);
-        $("#inp-usuario").val(registroSeleccionado.usuario);
-        $("#inp-posicion").val(registroSeleccionado.posicion);
-
-        // Mostrar el modal de edición
-        let modal = new bootstrap.Modal(document.getElementById('modal-editar'));
-        modal.show();
+    let index = selecreg.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
+    if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
+        selecreg.push(params); // Añade uno o más elementos al final de un array
     } else {
-        mostrar_alerta('error', 'Error', 'No se pudo encontrar el registro seleccionado.');
-    } */
+        selecreg.splice(index, 1); 
+    } 
     
 }
 
@@ -332,7 +317,7 @@ async function editar_registro(params) {
         posicion: $("#inp-posicion").val().trim(),
     }
 
-    let serve = await server_inventario(model);
+    let server = await server_inventario(model);
     let response = JSON.parse(respuesta);
 
     if (response.respuesta === true) {
