@@ -4,7 +4,7 @@ function server_inventario(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "database/controller_inventario_ti_sur/controller_inventario_ti_j.php",
+            url: "database/controller_inventario/controller_inventario.php",
             data: {
                 trama: JSON.stringify(model)
             },
@@ -21,6 +21,22 @@ function server_inventario(model) {
 
 
 }
+
+$(document).ready(function (){
+
+    $('#tabla1').on('mouseover', '.icon', function() {
+        $(this).find('i').addClass('fa-bounce');  // Agregar una clase extra si lo deseas
+    }).on('mouseout', '.icon', function() {
+        $(this).find('i').removeClass('fa-bounce');
+    });
+})
+$(".icon").on('mouseover', function(){
+    $(this).find('i').addClass("fa-bounce");
+})
+$(".icon").on('mouseout', function(e){
+    $(this).find('i').removeClass("fa-bounce");
+})
+let toast = $('#liveToast')
 
 let datos = [];
 
@@ -54,9 +70,9 @@ async function consultar_informacion(params) {
                 },
                 {
                     data: "id",
-                    render: function(data, type, row) {
+                    render: function(data, type, row, meta) {
                         let control = `<label style="text-align: center">${data}</label>`
-                        return control;
+                        return meta.row + 1;
                     }
                 },
                 {
@@ -182,10 +198,19 @@ async function consultar_informacion(params) {
                     className: 'btn btn-sm btn-primary'
                 }, */
                 {
-                    text: 'Crear registro',
-                    className: 'btn btn-sm btn-primary',
+                    text: '<i class="fa-solid fa-pen-to-square fa-lg"></i> Crear registro',
+                    className: 'btn btn-sm btn-success icon',
                     attr: {
-                        style: 'background-color: green; color: white; border-radius: 8px; padding: 10px 20px;', // Estilos inline
+                        style: `
+                            background-color: #28a745; 
+                            color: white; 
+                            border-radius: 50px; 
+                            padding: 10px 20px; 
+                            font-size: 16px; 
+                            font-weight: bold; 
+                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+                            transition: all 0.3s ease;
+                        `, // Estilos inline
                         title: 'Haz clic para agregar un registros'
                     },
                     action: function (e, dt, node, config) {
@@ -195,14 +220,23 @@ async function consultar_informacion(params) {
                     }
                 },
                 {
-                    text: 'Eliminar registro',
-                    className: 'btn btn-sm btn-primary',
+                    text: '<i class="fa-solid fa-trash fa-lg"></i> Eliminar registro',
+                    className: 'btn btn-sm btn-primary ',
                     attr: {
-                        style: 'background-color: red; color: white; border-radius: 8px; padding: 10px 20px;', // Estilos inline
+                        style: `
+                            background-color:rgb(211, 38, 38); 
+                            color: white; 
+                            border-radius: 50px; 
+                            padding: 10px 20px; 
+                            font-size: 16px; 
+                            font-weight: bold; 
+                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+                            transition: all 0.3s ease;
+                        `, // Estilos inline
                         title: 'Haz clic para eliminar un registro'
                     },
                     action: function (e, dt, node, config) {
-                        desactivar_registro();
+                        confirmar_eliminacion();
                     }
                 },
             ],
@@ -359,7 +393,7 @@ async function desactivar_registro(params) {
             let table = $('#tabla1').DataTable();
             table.destroy();
             consultar_informacion();
-            
+
         } else {
             mostrarAlerta('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
         }
@@ -387,4 +421,25 @@ function mostrar_alerta(tipo, titulo, mensaje) {
         toast: true,
         position: 'top-end'
     });
+}
+
+async function confirmar_eliminacion() {
+    if (selecreg.length === 0) {
+        mostrar_alerta('error', 'Error', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
+    } else {
+        Swal.fire({
+            title: '¿Está seguro de eliminarlo?',
+            text: "Esta acción no se puede deshacer.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                desactivar_registro(); // Llama a la función para eliminar el registro
+            }
+        });
+    }
 }
