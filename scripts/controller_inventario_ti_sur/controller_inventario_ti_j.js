@@ -44,7 +44,7 @@ async function consultar_informacion(params) {
                     render: function(data, type, row) {
                         let control = `<div class="form-group form-check">
                             <input type="checkbox" class="form-check-input check-change"
-                            onclick="selecionar_datos(${dato[i].id})" value="${dato[i].id}" id="check${dato[i].id}">
+                            onclick="selecionar_registro(${data})" value="${data}" id="check${data}">
                         </div>`
                         return control;
                     }
@@ -179,7 +179,7 @@ async function consultar_informacion(params) {
                     action: function (e, dt, node, config) {
                         let modal = new bootstrap.Modal(document.getElementById('modal-registro'));
                         modal.show();
-                        //selecionar_datos()
+                        mostrar_datos()
                     }
                 },
                 {
@@ -190,7 +190,11 @@ async function consultar_informacion(params) {
                         title: 'Haz clic para agregar un usuario'
                     },
                     action: function (e, dt, node, config) {
-                        
+                        /* let modal = new bootstrap.Modal(document.getElementById('modal-editar'));
+                        modal.show(); */
+                        mostrar_datos()
+                        selecionar_registro()
+
                     }
                 }
             ],
@@ -207,18 +211,74 @@ async function consultar_informacion(params) {
 }
 
 let ususelect = [];
-async function selecionar_datos(params) {
-    let index = ususelect.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
-    if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
-        ususelect.push(params); // Añade uno o más elementos al final de un array
-    } else {
-        ususelect.splice(index, 1); 
+async function mostrar_datos(params) {
+
+    let zona = "Base operativa región Sur";
+    let registro = dayjs().format('YYYY-MM-DD HH:mm:ss');//new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+    $("#inp-zona").val(zona);
+    $("#inp-fecha-entrega").val(registro);
+
+    let modal = new bootstrap.Modal(document.getElementById('modal-registro'));
+    modal.show();
+}
+
+selecreg = "";
+
+async function selecionar_registro(params) {
+
+    for (let i = 0; i < dato.length; i++) {
+        const element = dato[i];
+
+        if(element.id===params.value){
+            break;
+        }
+        
+        document.getElementById("inp-rubro").value = selecreg.rubro;
+        document.getElementById("inp-af").value = selecreg.af;
+        document.getElementById("inp-tipo").value = selecreg.tipo;
+        document.getElementById("inp-marca").value = selecreg.marca;
+        document.getElementById("inp-modelo").value = selecreg.modelo;
+        document.getElementById("inp-num-serie").value = selecreg.num_serie;
+        document.getElementById("inp-mac-adress").value = selecreg.mac_adress;
+        document.getElementById("inp-ubicacion").value = selecreg.ubicacion;
+        document.getElementById("inp-tag").value = selecreg.tag;
+        document.getElementById("inp-usuario").value = selecreg.usuario;
+        document.getElementById("inp-posicion").value = selecreg.posicion;
+
+        let modal = new bootstrap.Modal(document.getElementById('modal-editar'));
+        modal.show();
     }
+    /* let registroSeleccionado = dato.find(item => item.id === id);
+    dato = response.resultado;
+
+    if (registroSeleccionado) {
+        // Llenar los campos del modal-editar con los datos del registro seleccionado
+        $("#inp-rubro").val(registroSeleccionado.rubro);
+        $("#inp-af").val(registroSeleccionado.af);
+        $("#inp-tipo").val(registroSeleccionado.tipo);
+        $("#inp-marca").val(registroSeleccionado.marca);
+        $("#inp-modelo").val(registroSeleccionado.modelo);
+        $("#inp-num-serie").val(registroSeleccionado.num_serie);
+        $("#inp-mac-adress").val(registroSeleccionado.mac_adress);
+        $("#inp-ubicacion").val(registroSeleccionado.ubicacion);
+        $("#inp-tag").val(registroSeleccionado.tag);
+        $("#inp-usuario").val(registroSeleccionado.usuario);
+        $("#inp-posicion").val(registroSeleccionado.posicion);
+
+        // Mostrar el modal de edición
+        let modal = new bootstrap.Modal(document.getElementById('modal-editar'));
+        modal.show();
+    } else {
+        mostrar_alerta('error', 'Error', 'No se pudo encontrar el registro seleccionado.');
+    } */
+    
 }
 
 let modal = ""
 
 async function crear_registro(params) {
+    
     let model = {
         accion: 0,
         zona: $("#inp-zona"),
@@ -252,6 +312,7 @@ async function crear_registro(params) {
     let table = $('#tabla1').DataTable();
     table.destroy();
     consultar_informacion();
+    let modal = new bootstrap.getInstance(document.getElementById('modal-registro'));
     modal.hide();
 }
 
@@ -275,13 +336,21 @@ async function editar_registro(params) {
     let response = JSON.parse(respuesta);
 
     if (response.respuesta === true) {
-        mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
+        mostrar_alerta('success', '¡Edición exitosa!', 'El registro se ha actualizado correctamente.');
+
+        let table = $('#tabla1').DataTable();
+        table.destroy();
+        consultar_informacion();
+        let modal = new bootstrap.getInstance(document.getElementById('modal-editar'));
+        modal.hide();
         
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo editar el registro. Inténtalo nuevamente.');
     }
 
     consultar_informacion();
+    model = new bootstrap.Modal(document.getElementById('modal-editar'));
+    model.hide();
     
 }
 
