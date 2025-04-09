@@ -314,7 +314,7 @@ async function crear_registro(params) {
     
     let model = {
         accion: 0,
-        zona: $("#inp-zona"),
+        zona: $("#inp-zona").val().trim(),
         rubro: $("#inp-rubro").val().trim(),
         af: $("#inp-af").val().trim(),
         tipo: $("#inp-tipo").val().trim(),
@@ -326,7 +326,7 @@ async function crear_registro(params) {
         tag: $("#inp-tag").val().trim(),
         usuario: $("#inp-usuario").val().trim(),
         posicion: $("#inp-posicion").val().trim(),
-        fecha_entrega: $("inp-fecha-entrega")
+        fecha_entrega: $("inp-fecha-entrega").val()
     }
 
     let server = await server_inventario(model);
