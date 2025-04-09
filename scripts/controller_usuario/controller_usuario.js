@@ -39,10 +39,29 @@ $(".icon").on('mouseout', function(e){
 })
 let toast = $('#liveToast')
 
+window.addEventListener('load', function () {
+    // Leemos el mensaje del registro desde localStorage
+    const mensajeRegistro = sessionStorage.getItem('bienvenido');
+    
+    if (mensajeRegistro) {
+        // Si el mensaje existe, mostramos el toast
+        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
+        toast.addClass('bg-success');
+        toast.find('.toast-body').text(mensajeRegistro).css('color','white');
+        toast.toast('show');
+        
+
+        // Eliminamos el mensaje para evitar que aparezca nuevamente
+        sessionStorage.removeItem('bienvenido');
+    }
+})
+
+
 
 
 let usuarios = []
 async function consultar_usuarios() {
+
     let r = await server_usuario({accion : 2})
 
     usuarios = r.resultado
@@ -124,7 +143,7 @@ async function consultar_usuarios() {
                     {
                         data: "id",
                         render: function (data, type, row) {
-                            let control = `<div class="d-flex justify-content-center align-items-center" ><button type="button" tyle="text-align: center" class="btn btn-danger icon"  value="${data}" onclick="desactivar_usuario(this)" value="${data}"><i class="fa-solid fa-trash fa-lg"></i></button></div>`
+                            let control = `<div class="d-flex justify-content-center align-items-center" ><button type="button" tyle="text-align: center" class="btn btn-danger icon"  value="${data}" onclick="desactivar_usuariomsg(this)" value="${data}"><i class="fa-solid fa-trash fa-lg"></i></button></div>`
                             return control;
                         }
     
@@ -349,15 +368,32 @@ function ver_contraseña(){
     }
 }
 
+let modalDes
+let usuDes
+async function desactivar_usuariomsg(params) {
+    for (let i = 0; i < usuarios.length; i++) {
+        const element = usuarios[i];
+
+        if(element.id===params.value){
+            usuDes = element;
+            break;
+        }
+        
+    }
+    modalDes = new bootstrap.Modal(document.getElementById('modalDes'))
+    modalDes.show()
+}
+
 async function desactivar_usuario(params) {
     let model ={
         accion : 3,
-        id : params.value,
+        id : usuDes.id
     }
     
     let r = await server_usuario(model)
 
     if (r.resultado) {
+        modalDes.hide()
         toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
         toast.addClass('bg-warning');
         toast.find('.toast-body').text('Usuario eliminado').css('color','white')
@@ -365,6 +401,7 @@ async function desactivar_usuario(params) {
         let table = $("#tbl-usuario").DataTable()
         table.destroy()
         consultar_usuarios()
+        
     } else {
         toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
         toast.addClass('bg-danger');

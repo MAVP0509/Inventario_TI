@@ -27,7 +27,7 @@
     
       <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <a href="#" class="brand-link">
-          <img src="" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+          <img src="diavaz.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
           <span class="brand-text font-weight-light">Inventario TI</span>
         </a>
       
@@ -36,13 +36,13 @@
           <!-- Sidebar user panel (optional) -->
           <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
-              <img src="#" class="img-circle elevation-2" alt="User Image">
+              <img src="user2.png" class="img-circle elevation-2" alt="User Image">
             </div>
 
             <div class="info">
-              <a href="#" class="d-block">Name user</a>
+              <a href="#" class="d-block" id="user"></i>Name user</a>
             </div>
-
+        
           </div>
     
           <!-- Sidebar Menu -->
@@ -50,14 +50,22 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
               <!-- Add icons to the links using the .nav-icon class
                   with font-awesome or any other icon font library -->
-              <li class="nav-time">
-                  <a href="#" class="nav-link active">
-                      <i class="nav-icon fa-solid fa-user-group"></i>
+                <li class="nav-item">
+                  <a href="usuario.html" class="nav-link active">
+                      <i class="nav-icon fa-solid fa-users"></i>
                       <p>
                         Usuarios
                       </p>
                   </a>
-              </li>
+                </li>
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link active">
+                        <i class="nav-icon fa-solid fa-users"></i>
+                        <p>
+                            Inventario
+                        </p>
+                    </a>
+                </li>
             </ul>
           </nav>
           <!-- /.sidebar-menu -->
@@ -286,7 +294,7 @@
       </div>
   </div>
 
-  <!--Modal eliminación de usuario-->
+  <!--Modal eliminación de usuarios-->
   <div class="modal fade" id="modalElim" style="display : none;" aria-hidden="true" >
     <div class="modal-dialog" role="document">
         <div class="modal-content bg-danger">
@@ -325,7 +333,47 @@
     </div>
   </div>
 
+  <!--Modal eliminación de usuario-->
+  <div class="modal fade" id="modalDes"  aria-hidden="true" >
+    <div class="modal-dialog" role="document">
+        <div class="modal-content bg-danger">
+            <div class="modal-header">
+                <h5 class="modal-title">Eliminar usuario</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message">¿Estás seguro de que deseas eliminar este usuario?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="mdl-btn-can">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="desactivar_usuario()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+  </div>
     
+  <script>
+    // Verificamos si el usuario está autenticado
+    if (sessionStorage.getItem('log') !== 'true') {
+        // Si no está autenticado, redirigimos a login.html
+        window.location.href = 'login.html';
+    }
+    let sesion = sessionStorage.getItem('user')
+    while (sesion === 'true') {
+        if(sesion === 'true'){
+            window.location.href = 'usuario.html'
+            let usuarioLog = JSON.parse(sessionStorage.getItem('user'))
+            let user = document.getElementById('user')
+            user.textContent = usuarioLog.resultado[0] 
+        }else{
+             window.location.href = 'login.html'
+        }
+       
+    }
+    
+    </script>
 </body>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
