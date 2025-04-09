@@ -25,20 +25,19 @@ print(json_encode($respuesta_servidor));
 
 function insertar_datos($valores) {
     include("../conexion.php");
-    $registro = date("Y-m-d H:i:s");
-    $zona = 'Base Operativa Región Sur';
+    //$registro = date("Y-m-d H:i:s");
     $sql = "INSERT INTO inventario_ti_sur(zona, rubro, af, tipo, marca, modelo, num_serie, mac_adress, ubicacion, tag, usuario, posicion, fecha_entrega, habilitado) 
-    VALUES ('$zona', '$valores->rubro','$valores->af','$valores->tipo','$valores->marca','$valores->modelo', '$valores->num_serie', '$valores->mac_adress', 
-    '$valores->ubicacion', '$valores->tag', '$valores->usuario', '$valores->posicion', '$registro',1);";
+    VALUES ('$valores->zona', '$valores->rubro','$valores->af','$valores->tipo','$valores->marca','$valores->modelo', '$valores->num_serie', '$valores->mac_adress', 
+    '$valores->ubicacion', '$valores->tag', '$valores->usuario', '$valores->posicion', '$valores->fecha_entrega',1);";
     return mysqli_query($con,$sql);
 }
 
 function editar_datos($valores) {
     include("../conexion.php");
-    $zona = 'Base Operativa Región Sur';
-    $sql = "UPDATE inventario_ti_sur SET zona = '$zona', rubro = '$valores->rubro', af = '$valores->af', tipo ='$valores->tipo', marca = '$valores->marca', 
+    //$zona = 'Base Operativa Región Sur';
+    $sql = "UPDATE inventario_ti_sur SET zona = '$valores->zona', rubro = '$valores->rubro', af = '$valores->af', tipo ='$valores->tipo', marca = '$valores->marca', 
     num_serie = '$valores->num_serie', mac_adress = '$valores->mac_adress', ubicacion = '$valores->ubicacion', tag = '$valores->tag', usuario = '$valores->usuario', 
-    posicion = '$valores->posicion' WHERE id = '$valores->id';";
+    posicion = '$valores->posicion', fecha_entrega = '$valores->fecha_entrega' WHERE id = '$valores->id';";
     //var_dump($sql);
     return mysqli_query($con,$sql);
 }

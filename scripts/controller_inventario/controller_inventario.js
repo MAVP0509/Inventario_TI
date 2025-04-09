@@ -216,7 +216,7 @@ async function consultar_informacion(params) {
                     action: function (e, dt, node, config) {
                         let modal = new bootstrap.Modal(document.getElementById('modal-registro'));
                         modal.show();
-                        mostrar_datos()
+                        //mostrar_datos()
                     }
                 },
                 {
@@ -253,7 +253,7 @@ async function consultar_informacion(params) {
 }
 
 let ususelect = [];
-async function mostrar_datos(params) {
+/* async function mostrar_datos(params) {
 
     let zona = "Base operativa región Sur";
     let registro = dayjs().format('YYYY-MM-DD HH:mm:ss');//new Date().toISOString().slice(0, 19).replace('T', ' ');
@@ -263,7 +263,7 @@ async function mostrar_datos(params) {
 
     let modal = new bootstrap.Modal(document.getElementById('modal-registro'));
     modal.show();
-}
+} */
 
 let selecreg ="";
 let modalE
