@@ -137,3 +137,4 @@ function togglePasswords() {
         toggleIcon.classList.add('fa-eye-slash');
     }
 }
+
