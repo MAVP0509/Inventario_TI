@@ -179,7 +179,6 @@ async function seleccionar_usuario(params) {
         
     }
 
-    document.getElementById('usu').innerText=usuSelect.nombre
     document.getElementById('nombre').value=usuSelect.nombre
     document.getElementById('correo').value=usuSelect.correo
     document.getElementById('telefono').value=usuSelect.telefono

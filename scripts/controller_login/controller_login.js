@@ -46,7 +46,7 @@ let toast = $('#liveToast')
 async function registrarUsu(){
     try{
         if (pass, email, tel, nombre, fecha, vEdad ===false ) {
-            mostrar_alerta('warning', 'Inventario TI', '¡Rellena todos los campos correctamente para continuar!');
+            mostrar_toast('warning', 'Inventario TI', '¡Rellena todos los campos correctamente para continuar!');
 
             //console.log(pass, email, tel, nombre, fecha, edad)
             return false;
@@ -69,7 +69,7 @@ async function registrarUsu(){
                 localStorage.setItem('registroExitoso', '¡Usuario Registrado!');
                 window.location.href = "login.html"
             }else if(resp.resultado === false){
-                mostrar_alerta('warning', 'Inventario TI', 'Usuario ya existente');
+                mostrar_toast('warning', 'Inventario TI', 'Usuario ya existente');
 
             } 
             
@@ -79,7 +79,7 @@ async function registrarUsu(){
             } */
         }    
     }catch (error){
-        mostrar_alerta('error', 'Inventario TI', 'No se puedo conectar al servidor');
+        mostrar_toast('error', 'Inventario TI', 'No se puedo conectar al servidor');
     }
     
 }
@@ -92,9 +92,9 @@ window.addEventListener('load', function () {
     
     if (mensajeRegistro) {
         // Si el mensaje existe, mostramos el toast
-        mostrar_alerta('success', 'Inventario TI', mensajeRegistro);
+        mostrar_toast('success', 'Inventario TI', mensajeRegistro);
     }else if(mensajeContraseña){
-        mostrar_alerta('success', 'Inventario TI', mensajeContraseña);
+        mostrar_toast('success', 'Inventario TI', mensajeContraseña);
     }
 
     localStorage.clear()
@@ -114,7 +114,7 @@ async function validar_ingreso() {
     
         let resp=JSON.parse(respuesta)
         if (resp.resultado === false){
-            mostrar_alerta('error', 'Inventario TI', "Usuario/contraseña no válidos");
+            mostrar_toast('error', 'Inventario TI', "Usuario/contraseña no válidos");
             let inputs = document.getElementsByName("inputInit");
             for (let i = 0; i < inputs.length; i++) {
             const element = inputs[i].value = "";
@@ -126,7 +126,7 @@ async function validar_ingreso() {
             window.location.href = "usuario.html";
             }
     }catch (error){
-        mostrar_alerta('error', 'Inventario TI', "No se pudo conectar al servidor");
+        mostrar_toast('error', 'Inventario TI', "No se pudo conectar al servidor");
     }
     
 }
@@ -403,7 +403,7 @@ async function enlaceconParametros(token) {
     return urlConParametros;
 }
 
-function mostrar_alerta(tipo, titulo, mensaje) {
+function mostrar_toast(tipo, titulo, mensaje) {
     Swal.fire({
         icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
         title: titulo,
