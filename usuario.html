@@ -14,7 +14,11 @@
 <body class="hold-transition sidebar-mini layout-fixed" onload="consultar_usuarios()">
   
   <div clas="wrapper">
-      <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+      <!-- Preloader -->
+      <div class="preloader flex-column justify-content-center align-items-center">
+        <img src="diavaz.png" alt="DiavazLogo" height="60" width="60">
+      </div>
+      <nav class="main-header navbar navbar-expand navbar-white navbar-light fixed-top">
             <!-- Left navbar links -->
             <ul class="navbar-nav">
               <li class="nav-item">
@@ -23,7 +27,7 @@
             </ul>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#" role="button" onclick="cerrar_sesion()" id="log-out"><i class="fa-solid fa-door-closed fa-xl"></i></a>
+                    <a class="nav-link" href="#" role="button" onclick="cerrar_sesionmsg()" id="log-out"><i class="fa-solid fa-door-closed fa-xl"></i></a>
                 </li>
 
             </ul>   
@@ -219,7 +223,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa-solid fa-image-portrait"></i></span>         
                             </div>       
-                            <input type="number" class="form-control" id="edad" >
+                            <input type="number" class="form-control" id="edad" disabled>
                         </div>
                         <label for="fecha_reg" class="form-label">Fecha de registro</label>
                         <div class="input-group mb-3">
@@ -238,8 +242,8 @@
                         </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="editar_usuario()">Guardar</button>
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal">Cancelar <i class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+                    <button type="button" class="btn btn-primary icon" onclick="editar_usuario()">Guardar <i class="fa-solid fa-floppy-disk fa-lg"></i></button>
                 </div>
             </div>
         </div>
@@ -256,18 +260,21 @@
                   </button>
               </div>
               <div class="modal-body">
+                <span id="error-mensajeNombre" style="display: none; color:red;">Ingresa un nombre válido</span>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                     </div>
                     <input type="text" class="form-control" id="nombreReg" placeholder="Nombre completo" name="insertMdl">
                 </div>
+                <span id="error-mensajeEmail" style="display: none; color:red;">Ingresa un correo válido</span>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
                     </div>
                     <input type="email" class="form-control" id="correoReg" placeholder="Correo eléctronico" name="insertMdl">
                 </div>
+                <span id="error-mensageTel" style="display: none; color:red;">Ingresa un número válido</span>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
@@ -275,6 +282,7 @@
                     <input type="tel" class="form-control" id="telefonoReg" maxlength="10" placeholder="Número de teléfono" name="insertMdl">
                 </div>
                 <label for="fechanacReg">Fecha de nacimiento</label>
+                <span id="error-mensageFecha" style="display: none; color:red;">Ingresa una fecha válida</span>
                 <div class="input-group mb-3">
                         <input type="date" class="form-control" id="fechanacReg" placeholder="Fecha de nacimiento" name="insertMdl">
                 </div>
@@ -284,6 +292,7 @@
                   </div>
                   <input type="number" class="form-control" id="edadReg" placeholder="Edad" disabled name="insertMdl">
                 </div>
+                <span id="error-mensagePass" style="display: none; color:red;">Ingresa una contraseña</span>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
                         <span class="input-group-text"><i id="ver-passReg" class="fa-solid fa-eye-slash" style="cursor: pointer;"></i></span>
@@ -292,74 +301,14 @@
                 </div>
               </div>
               <div class="modal-footer">
-                  <button type="button" class="btn btn-danger" data-dismiss="modal">Cancelar</button>
-                  <button type="button" class="btn btn-primary" onclick="insertar_usuario()">Guardar</button>
+                  <button type="button" class="btn btn-danger icon" data-dismiss="modal">Cancelar <i class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+                  <button type="button" class="btn btn-primary icon" onclick="insertar_usuario()">Guardar <i class="fa-solid fa-floppy-disk fa-lg"></i></button>
               </div>
           </div>
       </div>
   </div>
-
-  <!--Modal eliminación de usuarios-->
-  <div class="modal fade" id="modalElim" style="display : none;" aria-hidden="true" >
-    <div class="modal-dialog" role="document">
-        <div class="modal-content bg-danger">
-            <div class="modal-header">
-                <h5 class="modal-title">Eliminar usuario(s)</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p id="modal-message">¿Estás seguro de que deseas eliminar estos usuarios?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="mdl-btn-can">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="eliminar_usuario()">Confirmar</button>
-            </div>
-        </div>
-    </div>
-  </div>
-
-  <!-- Codigo del toast-->
-  <div class="toasts-bottom-right fixed" aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px; ">
-    <div class="position-fixed bottom-0 right-0 p-3" style="position: absolute; top: 0; right: 0;">
-        <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-delay="3000" style="width: 300px;">
-            <div class="toast-header">
-                <strong class="mr-auto">Inventario_ti</strong>
-                <small>Ahora</small>
-                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="toast-body">
-                Usuario Registrado
-            </div>
-        </div>
-    </div>
-  </div>
-
-  <!--Modal eliminación de usuario-->
-  <div class="modal fade" id="modalDes"  aria-hidden="true" >
-    <div class="modal-dialog" role="document">
-        <div class="modal-content bg-danger">
-            <div class="modal-header">
-                <h5 class="modal-title">Eliminar usuario</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p id="modal-message">¿Estás seguro de que deseas eliminar este usuario?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal" id="mdl-btn-can">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="desactivar_usuario()">Confirmar</button>
-            </div>
-        </div>
-    </div>
-  </div>
     
-  <script>
+    <script>
     // Verificamos si el usuario está autenticado
     if (sessionStorage.getItem('log') !== 'true') {
         // Si no está autenticado, redirigimos a login.html
