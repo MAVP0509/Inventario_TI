@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
     <link rel="stylesheet" href="libraries/fontawesome-free-6.7.2-web/css/all.min.css">
     <link rel="stylesheet" href="libraries/DataTables/datatables.min.css">
+    <link rel="stylesheet" href="libraries/select2/css/select2.min.css">
 
 </head>
 <body class="hold-transition sidebar-mini layout-fixed" onload="consultar_informacion()">
@@ -306,17 +307,17 @@
                         <input type="text" class="form-control" id="edi-zona" disabled>
                     </div>
                     <div class="input-group mb-3">
-                        <div class="input-group-prepend">
+                        <!-- <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
-                        </div>
-                        <select class="custom-select" id="edi-rubro">
-                            <option selected>Selecciona un opción</option>
-                            <option value="Pc/Laptop">Pc/Lapto</option>
-                            <option value="Teléfono">Teléfono</option>
-                            <option value="Cámara">Cámara</option>
-                            <option value="Site">Site</option>
-                            <option value="Impresora">Impresora</option>
-                            <option value="Salud Ocupacional">Salud Ocupacional</option>
+                        </div> -->
+                        <select class="form-control" id="edi-rubro">
+                            <option selected="selected">Selecciona un rubro</option>
+                            <option>Pc/Lapto</option>
+                            <option>Teléfono</option>
+                            <option>Cámara</option>
+                            <option>Site</option>
+                            <option>Impresora</option>
+                            <option>Salud Ocupacional</option>
                         </select>
                     </div>
                     <div class="input-group mb-3">
@@ -404,6 +405,6 @@
     <script src="libraries/DataTables/datatables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.13/dayjs.min.js"></script>
-
+    <script src="libraries/select2/js/select2.min.js"></script>
 
 </html>

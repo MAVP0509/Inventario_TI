@@ -443,3 +443,7 @@ async function confirmar_eliminacion() {
         });
     }
 }
+
+$(".js-example-tags").select2({
+    tags: true
+})
