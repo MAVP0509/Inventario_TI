@@ -30,6 +30,7 @@ function server_email(model){
             },
             success: function(response){
                 respuesta = response
+                Swal.close()
                 try {
                     resolve(JSON.parse(response))
                     console.log(JSON.parse(response))   
@@ -40,12 +41,19 @@ function server_email(model){
         })
     })
 }
+$(".icon").on('mouseover', function(){
+    $(this).find('i').addClass("fa-bounce");
+})
+$(".icon").on('mouseout', function(e){
+    $(this).find('i').removeClass("fa-bounce");
+})
+
+
 
 //Función para el formulario de registro
-let toast = $('#liveToast')
 async function registrarUsu(){
     try{
-        if (pass, email, tel, nombre, fecha, vEdad ===false ) {
+        if (!pass || !email || !tel || !nombre || !fecha || !vEdad  ) {
             mostrar_toast('warning', 'Inventario TI', '¡Rellena todos los campos correctamente para continuar!');
 
             //console.log(pass, email, tel, nombre, fecha, edad)
@@ -102,14 +110,15 @@ window.addEventListener('load', function () {
 
 //Función para el formulario de ingreso
 async function validar_ingreso() {
+ 
     try{
         let model = {
             accion: 0,
-            correo :$("#logcorreo").val().trim(),
+            correo : $("#logcorreo").val().trim(),
             contraseña : $("#logcontraseña").val().trim(),
     
         }
-    
+        
         let server = await server_usuario(model);
     
         let resp=JSON.parse(respuesta)
@@ -157,6 +166,7 @@ $(document).ready(function () {
     document.getElementById('reg-contraseña').addEventListener('input', validar_contraseña);
     document.getElementById('fechanac').addEventListener('input',calcularEdad);
     document.getElementById('toggle-password-icon').addEventListener('click', togglePasswords);
+    document.getElementById('toggle-password-icon-log').addEventListener('click', ver_contraseña);
     
 });
 
@@ -206,12 +216,13 @@ function validar_contraseña(){
             errorMessage.style.display = 'block';
             errorMessage.textContent = 'Las contraseñas no coinciden';
             document.getElementById('conf-contraseña').style.borderColor = 'red';
+            pass = false
         } else {
             errorMessage.style.display = 'none';    
             document.getElementById('conf-contraseña').style.borderColor = 'green';
+            pass = true
         }
     }
-
     return true;
 
     }
@@ -353,15 +364,20 @@ $('#fechanac').on('input', function(e) {
 });
 
 
-/* let models ={
-    nombre : "Miguel",
-    edad : 23
-}
+function ver_contraseña(){
+    let logPasswordInput = document.getElementById('logcontraseña')
+    let iconLog = document.getElementById('toggle-password-icon-log')    
 
-sessionStorage.setItem("nombre", models)
-//sessionStorage.getItem
-console.log(sessionStorage.getItem("nombre"))
- */
+    if (logPasswordInput.type === 'password') {
+        logPasswordInput.type = 'text';
+        iconLog.classList.remove('fa-eye-slash');  
+        iconLog.classList.add('fa-eye');
+    } else if(logPasswordInput.type === 'text'){
+        logPasswordInput.type = 'password';
+        iconLog.classList.remove('fa-eye');
+        iconLog.classList.add('fa-eye-slash');
+    }
+}
 
 
 async function recuperar_contraseña() {
@@ -403,16 +419,39 @@ async function enlaceconParametros(token) {
     return urlConParametros;
 }
 
+
 function mostrar_toast(tipo, titulo, mensaje) {
     Swal.fire({
         icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
         title: titulo,
         text: mensaje,
-        timer: 2000,
+        timer: 2500,
         timerProgressBar: true,
         showConfirmButton: false,
         toast: true,
         position: 'top-end',
-        heighAuto : true
+        heighAuto : true,
+        theme : 'dark'
     });
+}
+
+function cargando(){
+    Swal.fire({
+        title: 'Cargando...',
+        text: 'Por favor espere un momento',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        heightAuto: false,
+        color: "#716add",
+        backdrop: `
+        rgba(0,0,123,0.4)` ,
+        imageUrl: "diavaz.png",
+        imageWidth: 200,
+        imageHeight: 200,
+        imageAlt: "Custom image",
+        didOpen: () => {
+          Swal.showLoading();
+        }
+        
+      });
 }
