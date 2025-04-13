@@ -1,4 +1,5 @@
 <?php 
+    //*Archivo de conección a la base de datos
     //$user="janny";
     $user="root";
     //$pass="janny789";

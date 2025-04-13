@@ -1,4 +1,5 @@
 <?php
+//* Consultas a la bd realizadas en la pestaña de usuarios
 
 header('Content-Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
@@ -17,23 +18,25 @@ if($clientejson->accion==0){
     $respuesta_servidor->resultado=desactivar_usuario($clientejson);
 }
 
-print(json_encode($respuesta_servidor));
+print(json_encode($respuesta_servidor));//? envía la respuesta de la base de datos a javascript
 
+//* Creación de un nuevo usuario
 function insertar_usuario($valores){
     include("../conexion.php");
-    $registro =date("Y-m-d H:i:s");
-    $hashed_contraseña = password_hash($valores->contraseña, PASSWORD_BCRYPT);
+    $registro =date("Y-m-d H:i:s");//*Guarda la fecha y hora en la que se hace el registro
+    $hashed_contraseña = password_hash($valores->contraseña, PASSWORD_BCRYPT); //*Encripta la contraseña ingresada
     $sql = "INSERT INTO usuario(nombre,correo,contraseña,edad,telefono,fecha_nac,fecha_reg,habilitado) VALUES ('$valores->nombre',
     '$valores->correo','$hashed_contraseña','$valores->edad','$valores->telefono','$valores->fecha_nac','$registro',1)";
 
-    $sql_val_mail="SELECT * FROM usuario WHERE correo= '$valores->correo'";
+    $sql_val_mail="SELECT * FROM usuario WHERE correo= '$valores->correo'"; //* Confirma si el correo ya existe en la base de datos
     if(mysqli_query($con,$sql_val_mail)-> num_rows > 0){
         return false;
     }else{
-        return mysqli_query($con,$sql);
+        return mysqli_query($con,$sql); //* No encontró el correo así que si registró el usuario
     }
 }
 
+//* Edita un usuario ya existente
 function editar_usuario($valores){
     include("../conexion.php");
     $sql = "UPDATE usuario SET nombre='$valores->nombre', correo='$valores->correo', contraseña='$valores->contraseña',
@@ -41,22 +44,25 @@ function editar_usuario($valores){
     return mysqli_query($con,$sql);
 }
 
+//* Consulta los registros de la tabla usuarios para mostrarlos en el programa
 function consultar_usuario(){
     include("../conexion.php");
     $sql = "SELECT * FROM  usuario WHERE habilitado = 1 ";
     $query = mysqli_query($con, $sql);
     $array = array();
     while ($fila = mysqli_fetch_object($query)){
-        array_push($array, $fila);
+        array_push($array, $fila);  //* Se guardan los registros en un array
     }
     return $array;
 }
 
+
+//* "Elimina" uno o varios usuarios a la vez (los desactiva, siguen en la bd, pero no se mostrarán en el programa)
 function desactivar_usuario($valores){
     include("../conexion.php");
-    if (is_array($valores->id)) { // Verifica si $valores->id es un array
-        $ids = implode(",", array_map('intval', $valores->id)); // Convierte el array de IDs en una lista separada por comas
-        $sql = "UPDATE usuario SET habilitado = 0 WHERE id IN ($ids);"; // Consulta sql usando IN para eliminar múltiples registros
+    if (is_array($valores->id)) { //* Verifica si $valores->id es un array
+        $ids = implode(",", array_map('intval', $valores->id)); //* Convierte el array de IDs en una lista separada por comas
+        $sql = "UPDATE usuario SET habilitado = 0 WHERE id IN ($ids);"; //* Consulta sql usando IN para eliminar múltiples registros
         return mysqli_query($con, $sql);
     } else {
         $sql="UPDATE usuario SET habilitado = 0 where id='$valores->id';";
