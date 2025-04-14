@@ -171,7 +171,7 @@ async function consultar_informacion(params) {
                 }
             ],
             dom: `
-                <'row mb-2'<'col-sm-6 text-center'f><'col-sm-6 text-right'B>>
+                <'row mb-2'<'col-sm-6 text-left'f><'col-sm-6 text-right'B>>
                 <'row'<'col-sm-12'tr>>
                 <'row mt-2'<'col-sm-3'l><'col-sm-5 text-center'i><'col-sm-4 text-right'p>>
             `,

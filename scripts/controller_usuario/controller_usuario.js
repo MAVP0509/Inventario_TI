@@ -146,16 +146,49 @@ async function consultar_usuarios() {
                             let control = `<div class="d-flex justify-content-center align-items-center" ><button type="button" tyle="text-align: center" class="btn btn-danger icon"  value="${data}" onclick="desactivar_usuariomsg(this)" value="${data}"><i class="fa-solid fa-trash fa-lg"></i></button></div>`
                             return control;
                         }
-    
+                    }
+                ], 
+                dom: `
+                    <'row mb-2'<'col-sm-6 text-left'f><'col-sm-6 text-right'B>>
+                    <'row'<'col-sm-12'tr>>
+                    <'row mt-2'<'col-sm-3'l><'col-sm-5 text-center'i><'col-sm-4 text-right'p>>
+                `,
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json',
+                    paginate: {
+                        first: '<i class="fas fa-angle-double-left"></i>',
+                        previous: '<i class="fas fa-angle-left"></i>',
+                        next: '<i class="fas fa-angle-right"></i>',
+                        last: '<i class="fas fa-angle-double-right"></i>'
                     },
-               
-                    
-                ], stateSave: true,
+                },
+                buttons:[
+                    {   text : 'word',
+                        action: function (e, dt, node, config) {
+                            crear_word()
+                        }
+                    },
+                    /* {
+                        extend: 'excelHtml5',
+                        text: 'Exportar a Excel',
+                        className: 'btn btn-sm btn-success'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: 'Exportar a PDF',
+                        className: 'btn btn-sm btn-danger'
+                    },
+                    {
+                        extend: 'print',
+                        text: 'Imprimir',
+                        className: 'btn btn-sm btn-primary'
+                    }, */
+                ],
+                stateSave: true,
+                resposive: true,
                 //!Esta parte del codigo (DOM) es para que los botones, paginacion y filtros de busqueda se acomoden a sus necesidades, si quieren pueden buscar mas info en la documentacion de datatables, pero en este caso no es necesario.
-    
-    
-            }
-    )   
+  
+    })   
 }
 
 
@@ -485,6 +518,15 @@ function cerrar_sesion(){
     window.location.reload()
 }
 
+function crear_word() {
+    const enlace = document.createElement('a');
+    enlace.href = 'database/controller_word2/controller_word2.php'; // ← cambia esto
+    enlace.download = 'Pruebas.docx'; // nombre sugerido
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+
+}
 function mostrar_toast(tipo, titulo, mensaje) {
     Swal.fire({
         icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
