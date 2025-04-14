@@ -1,0 +1,22 @@
+<?php
+// Ruta al archivo Excel generado
+$excelPath = __DIR__ . '/reporte.xlsx';
+
+// Ruta donde se guardará el PDF
+$pdfOutputDir = __DIR__;
+
+// Ruta al ejecutable de LibreOffice
+$libreOfficePath = '"C:\Program Files\LibreOffice\program\soffice.exe"';
+
+// Comando para convertir
+$command = $libreOfficePath . ' --headless --convert-to pdf --outdir ' . escapeshellarg($pdfOutputDir) . ' ' . escapeshellarg($excelPath);
+
+// Ejecutar el comando
+exec($command, $output, $resultCode);
+
+if ($resultCode === 0) {
+    echo "✅ PDF generado correctamente.";
+} else {
+    echo "❌ Error al generar PDF. Código de error: $resultCode";
+    print_r($output);
+}

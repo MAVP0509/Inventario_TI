@@ -9,5 +9,5 @@ $activeWorksheet = $spreadsheet->getActiveSheet();
 $activeWorksheet->setCellValue('A1', 'Hello World !');
 
 $writer = new Xlsx($spreadsheet);
-$writer->save('hello world.xlsx');
+$writer->save('Plantilla.xlsx');
 ?>
