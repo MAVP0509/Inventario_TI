@@ -1,3 +1,13 @@
+//En cuanto se recargue la página, limpiar la sessionStorage
+sessionStorage.clear()
+
+
+const originalSetItem = sessionStorage.setItem;
+sessionStorage.setItem = function(key, value) {
+    console.log(`🔍 sessionStorage.setItem -> ${key}:`, value);
+    originalSetItem.apply(this, arguments);
+}
+
 let respuesta = ""
 function server_usuario(model){
     return new Promise ((resolve,reject)=>{
@@ -133,6 +143,10 @@ async function validar_ingreso() {
             sessionStorage.setItem("log", 'true')
             sessionStorage.setItem("bienvenido", "Bienvenido " + resp.resultado[0])
             window.location.href = "usuario.html";
+            let inputs = document.getElementsByName('inputInit')
+            for (let i = 0; i < inputs.length; i++) {
+                const element = inputs[i].value = "";
+            }
             }
     }catch (error){
         mostrar_toast('error', 'Inventario TI', "No se pudo conectar al servidor");
