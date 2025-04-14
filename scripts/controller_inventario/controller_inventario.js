@@ -11,6 +11,7 @@ function server_inventario(model) {
             success: function(response) {
                 try {
                     resolve(JSON.parse(response))
+                    //console.log(resolve(JSON.parse(response)))
                     respuesta = response
                 } catch (error) {
                     reject(error)
@@ -125,13 +126,6 @@ async function consultar_informacion(params) {
                     }
                 },
                 {
-                    data: "mac_adress",
-                    render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
-                        return control;
-                    }
-                },
-                {
                     data: "ubicacion",
                     render: function(data, type, row) {
                         let control = `<label style="text-align: center">${data}</label>`
@@ -177,10 +171,19 @@ async function consultar_informacion(params) {
                 }
             ],
             dom: `
-                <'row'<'col-sm-3'l><'col-sm-6 text-center'f><'col-sm-3 text-right'B>>
+                <'row mb-2'<'col-sm-6 text-center'f><'col-sm-6 text-right'B>>
                 <'row'<'col-sm-12'tr>>
-                <'row'<'col-sm-5'i><'col-sm-7'p>>
+                <'row mt-2'<'col-sm-3'l><'col-sm-5 text-center'i><'col-sm-4 text-right'p>>
             `,
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json',
+                paginate: {
+                    first: '<i class="fas fa-angle-double-left"></i>',
+                    previous: '<i class="fas fa-angle-left"></i>',
+                    next: '<i class="fas fa-angle-right"></i>',
+                    last: '<i class="fas fa-angle-double-right"></i>'
+                },
+            },
             buttons: [
                 /* {
                     extend: 'excelHtml5',
@@ -216,7 +219,7 @@ async function consultar_informacion(params) {
                     action: function (e, dt, node, config) {
                         let modal = new bootstrap.Modal(document.getElementById('modal-registro'));
                         modal.show();
-                        mostrar_datos()
+                        //mostrar_datos()
                     }
                 },
                 {
@@ -253,7 +256,7 @@ async function consultar_informacion(params) {
 }
 
 let ususelect = [];
-async function mostrar_datos(params) {
+/* async function mostrar_datos(params) {
 
     let zona = "Base operativa región Sur";
     let registro = dayjs().format('YYYY-MM-DD HH:mm:ss');//new Date().toISOString().slice(0, 19).replace('T', ' ');
@@ -263,7 +266,7 @@ async function mostrar_datos(params) {
 
     let modal = new bootstrap.Modal(document.getElementById('modal-registro'));
     modal.show();
-}
+} */
 
 let selecreg ="";
 let modalE
@@ -284,7 +287,6 @@ async function mostrar_registro(params) {
         document.getElementById("edi-marca").value = selecreg.marca;
         document.getElementById("edi-modelo").value = selecreg.modelo;
         document.getElementById("edi-num-serie").value = selecreg.num_serie;
-        document.getElementById("edi-mac-adress").value = selecreg.mac_adress;
         document.getElementById("edi-ubicacion").value = selecreg.ubicacion;
         document.getElementById("edi-tag").value = selecreg.tag;
         document.getElementById("edi-usuario").value = selecreg.usuario;
@@ -320,8 +322,7 @@ async function crear_registro(params) {
         tipo: $("#inp-tipo").val().trim(),
         marca: $("#inp-marca").val().trim(),
         modelo: $("#inp-modelo").val().trim(),
-        num_serie: $("#inp-num-serie").val().trim(),
-        mac_adress: $("#inp-mac-adress").val().trim(),
+        num_serie: $("#inp-num-serie").val().trim().toUpperCase(),
         ubicacion: $("#inp-ubicacion").val().trim(),
         tag: $("#inp-tag").val().trim(),
         usuario: $("#inp-usuario").val().trim(),
@@ -339,8 +340,6 @@ async function crear_registro(params) {
         } else {
             mostrarAlerta('error', 'Error', 'No se pudo crear el registro. Inténtalo nuevamente.');
         }
-    /* modal = new bootstrap.Modal(document.getElementById('modal-registro'));
-    modal.show(); */
     
     let table = $('#tabla1').DataTable();
     table.destroy();
@@ -350,24 +349,27 @@ async function crear_registro(params) {
 }
 
 async function editar_registro(params) {
+    deshabilitar_campo();
     let model = {
         accion: 1,
         id: selecreg.id,
+        zona: $("#edi-zona").val().trim(),
         rubro: $("#edi-rubro").val().trim(),
         af: $("#edi-af").val().trim(),
         tipo: $("#edi-tipo").val().trim(),
         marca: $("#edi-marca").val().trim(),
         modelo: $("#edi-modelo").val().trim(),
-        num_serie: $("#edi-num-serie").val().trim(),
-        mac_adress: $("#edi-mac-adress").val().trim(),
+        num_serie: $("#edi-num-serie").val().trim().toUpperCase(),
         ubicacion: $("#edi-ubicacion").val().trim(),
         tag: $("#edi-tag").val().trim(),
         usuario: $("#edi-usuario").val().trim(),
         posicion: $("#edi-posicion").val().trim(),
+        fecha_entrega: $("#edi-fecha-entrega").val()
     }
 
     let server = await server_inventario(model);
     let response = JSON.parse(respuesta);
+
 
     if (response.resultado === true) {
         mostrar_alerta('success', '¡Edición exitosa!', 'El registro se ha actualizado correctamente.');
@@ -378,10 +380,6 @@ async function editar_registro(params) {
 
         consultar_informacion();
         modalE.hide();
-
-    /* consultar_informacion();
-    model = new bootstrap.Modal(document.getElementById('modal-editar'));
-    model.hide(); */
     
 }
 
@@ -410,18 +408,7 @@ async function desactivar_registro(params) {
         }
 } */
 
-function mostrar_alerta(tipo, titulo, mensaje) {
-    Swal.fire({
-        icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
-        title: titulo,
-        text: mensaje,
-        timer: 2000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-        toast: true,
-        position: 'top-end'
-    });
-}
+        //TODO: Validación de funciones
 
 async function confirmar_eliminacion() {
     if (selecreg.length === 0) {
@@ -443,3 +430,72 @@ async function confirmar_eliminacion() {
         });
     }
 }
+
+function deshabilitar_campo(){
+    // Al cambiar la opción en el select, bloqueamos o habilitamos el campo
+    $("#edi-rubro").on('change', function() {
+        if ($(this).val() !== "") {  // Si el valor no está vacío
+            $(this).prop('disabled', true);  // Bloquear el campo select
+        } else {
+            $(this).prop('disabled', false);  // Habilitar el campo si no tiene valor
+        }
+    });
+
+    // Verifica si el campo #edi-rubro ya tiene un valor
+    if ($("#edi-rubro").val() !== "") {
+        // Si tiene un valor, deshabilitar el campo
+        $("#edi-rubro").prop('disabled', false);
+    } else {
+        // Si no tiene un valor, habilitar el campo
+        $("#edi-rubro").prop('disabled', true);
+    }
+}
+
+$(document).ready(function() {
+    deshabilitar_campo();  // Llamamos a la función para asegurar que el campo se habilite/deshabilite al cargar
+});
+
+
+//TODO: Alertas, confirmaciones
+
+function mostrar_alerta(tipo, titulo, mensaje) {
+    Swal.fire({
+        icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
+        title: titulo,
+        text: mensaje,
+        timer: 2000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end'
+    });
+}
+
+//TODO: Configuración del select2
+/* $(document).ready(function() {
+    $(".select").select2({
+        theme: 'bootstrap4',
+        placeholder: "Selecciona un rubro", // Texto de ayuda
+        allowClear: true, // Permitir limpiar la selección
+        tags: true,
+        dropdownParent: $(parentID) // * Permite al menú despegable se adjunte al modal
+    });
+  }); */
+
+  $(document).ready(function() {
+    $(".select").each(function() { //recorre cada <select class="select">
+      const $select = $(this);
+  
+      // Encuentra el modal contenedor más cercano
+      const $modal = $select.closest('.modal'); //
+  
+      $select.select2({
+        theme: 'bootstrap4',
+        placeholder: "Selecciona un rubro",
+        allowClear: true,
+        tags: true,
+        dropdownParent: $modal.length ? $modal : $(document.body) // por si no está en modal
+      });
+    });
+  });
+  
