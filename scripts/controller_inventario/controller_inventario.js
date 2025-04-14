@@ -126,13 +126,6 @@ async function consultar_informacion(params) {
                     }
                 },
                 {
-                    data: "mac_adress",
-                    render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
-                        return control;
-                    }
-                },
-                {
                     data: "ubicacion",
                     render: function(data, type, row) {
                         let control = `<label style="text-align: center">${data}</label>`
@@ -178,10 +171,19 @@ async function consultar_informacion(params) {
                 }
             ],
             dom: `
-                <'row'<'col-sm-3'l><'col-sm-6 text-center'f><'col-sm-3 text-right'B>>
+                <'row mb-2'<'col-sm-6 text-center'f><'col-sm-6 text-right'B>>
                 <'row'<'col-sm-12'tr>>
-                <'row'<'col-sm-5'i><'col-sm-7'p>>
+                <'row mt-2'<'col-sm-3'l><'col-sm-5 text-center'i><'col-sm-4 text-right'p>>
             `,
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json',
+                paginate: {
+                    first: '<i class="fas fa-angle-double-left"></i>',
+                    previous: '<i class="fas fa-angle-left"></i>',
+                    next: '<i class="fas fa-angle-right"></i>',
+                    last: '<i class="fas fa-angle-double-right"></i>'
+                },
+            },
             buttons: [
                 /* {
                     extend: 'excelHtml5',
@@ -285,7 +287,6 @@ async function mostrar_registro(params) {
         document.getElementById("edi-marca").value = selecreg.marca;
         document.getElementById("edi-modelo").value = selecreg.modelo;
         document.getElementById("edi-num-serie").value = selecreg.num_serie;
-        document.getElementById("edi-mac-adress").value = selecreg.mac_adress;
         document.getElementById("edi-ubicacion").value = selecreg.ubicacion;
         document.getElementById("edi-tag").value = selecreg.tag;
         document.getElementById("edi-usuario").value = selecreg.usuario;
@@ -315,19 +316,18 @@ async function crear_registro(params) {
     
     let model = {
         accion: 0,
-        zona: $("#inp-zona").val().tirm(),
+        zona: $("#inp-zona").val().trim(),
         rubro: $("#inp-rubro").val().trim(),
         af: $("#inp-af").val().trim(),
         tipo: $("#inp-tipo").val().trim(),
         marca: $("#inp-marca").val().trim(),
         modelo: $("#inp-modelo").val().trim(),
         num_serie: $("#inp-num-serie").val().trim().toUpperCase(),
-        mac_adress: $("#inp-mac-adress").val().trim(),
         ubicacion: $("#inp-ubicacion").val().trim(),
         tag: $("#inp-tag").val().trim(),
         usuario: $("#inp-usuario").val().trim(),
         posicion: $("#inp-posicion").val().trim(),
-        fecha_entrega: $("inp-fecha-entrega").val().trim()
+        fecha_entrega: $("inp-fecha-entrega").val()
     }
 
     let server = await server_inventario(model);
@@ -360,7 +360,6 @@ async function editar_registro(params) {
         marca: $("#edi-marca").val().trim(),
         modelo: $("#edi-modelo").val().trim(),
         num_serie: $("#edi-num-serie").val().trim().toUpperCase(),
-        mac_adress: $("#edi-mac-adress").val().trim(),
         ubicacion: $("#edi-ubicacion").val().trim(),
         tag: $("#edi-tag").val().trim(),
         usuario: $("#edi-usuario").val().trim(),
