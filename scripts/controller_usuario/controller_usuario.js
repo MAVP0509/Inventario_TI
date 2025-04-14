@@ -22,7 +22,8 @@ function server_usuario(model) {
 
 
 $(document).ready(function (){
-    document.getElementById('fechanacReg').addEventListener('input',calcularEdad);
+    document.getElementById('fechanacReg').addEventListener('input',calcular_edadreg);
+    document.getElementById('fechanac').addEventListener('input',calcular_edadedit);
     document.getElementById('ver-passReg').addEventListener('click', ver_contraseña);
 
     $('#tbl-usuario').on('mouseover', '.icon', function() {
@@ -39,10 +40,28 @@ $(".icon").on('mouseout', function(e){
 })
 let toast = $('#liveToast')
 
+window.addEventListener('load', function () {
+    // Leemos el mensaje del registro desde localStorage
+    const mensajeRegistro = sessionStorage.getItem('bienvenido');
+    
+    if (mensajeRegistro) {
+        // Si el mensaje existe, mostramos el toast
+        mostrar_toast('success', 'Bienvenido', mensajeRegistro)
+
+
+        // Eliminamos el mensaje para evitar que aparezca nuevamente
+        sessionStorage.removeItem('bienvenido');
+    }
+})
+
+
 
 
 let usuarios = []
 async function consultar_usuarios() {
+    let usuarioLog = JSON.parse(sessionStorage.getItem('user'))
+    let user = document.getElementById('user')
+    user.textContent = usuarioLog.resultado[0] 
     let r = await server_usuario({accion : 2})
 
     usuarios = r.resultado
@@ -124,7 +143,7 @@ async function consultar_usuarios() {
                     {
                         data: "id",
                         render: function (data, type, row) {
-                            let control = `<div class="d-flex justify-content-center align-items-center" ><button type="button" tyle="text-align: center" class="btn btn-danger icon"  value="${data}" onclick="desactivar_usuario(this)" value="${data}"><i class="fa-solid fa-trash fa-lg"></i></button></div>`
+                            let control = `<div class="d-flex justify-content-center align-items-center" ><button type="button" tyle="text-align: center" class="btn btn-danger icon"  value="${data}" onclick="desactivar_usuariomsg(this)" value="${data}"><i class="fa-solid fa-trash fa-lg"></i></button></div>`
                             return control;
                         }
     
@@ -151,17 +170,16 @@ async function seleccionar_usuario(params) {
 
         if(element.id===params.value){
 
-            let model ={
+            /* let model ={
                 contraseña : element.contraseña
             }
-            console.log(model)
+            console.log(model) */
             usuSelect = element;
             break;
         }
         
     }
 
-    document.getElementById('usu').innerText=usuSelect.nombre
     document.getElementById('nombre').value=usuSelect.nombre
     document.getElementById('correo').value=usuSelect.correo
     document.getElementById('telefono').value=usuSelect.telefono
@@ -191,15 +209,9 @@ async function editar_usuario(params) {
 
     let resp=JSON.parse(respuesta)
     if(resp.resultado === true){
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-success');
-        toast.find('.toast-body').text('Usuario editado').css('color','white')
-        toast.toast('show')
+        mostrar_toast('success', 'Inventario TI', 'Usuario editado')
     }else if(resp.resultado === false){
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-danger');
-        toast.find('.toast-body').text('Error al editar usuario').css('color','white')
-        toast.toast('show')
+        mostrar_toast('error', 'Inventario TI', 'Error en la consulta')
     } 
     usuSelect = ""
     consultar_usuarios()
@@ -218,18 +230,16 @@ async function seleccionar_usuarios(params) {
     }
 }
 
-let modalElim
+
 async function mensaje_eliminar() {
 
     if (usuSeleccionado.length === 0) {
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-warning');
-        toast.find('.toast-body').text('Por favor, selecciona al menos un usuario para continuar').css('color','white')
-        toast.toast('show')
+        mostrar_toast('warning', 'Inventario TI', 'Por favor, selecciona al menos un usuario para continuar')
         return;
     }else{
-        modalElim = new bootstrap.Modal(document.getElementById('modalElim'))
-        modalElim.show()
+        mostrar_alert('warning', `¿Está seguro de eliminar ${usuSeleccionado.length} usuario(s)?`, false , eliminar_usuario)
+        /* modalElim = new bootstrap.Modal(document.getElementById('modalElim'))
+        modalElim.show() */
     }
 }
 
@@ -242,21 +252,14 @@ async function eliminar_usuario(params) {
         let response = await server_usuario(model);
         
         if (response.resultado) {
-            toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-            toast.addClass('bg-warning');
-            toast.find('.toast-body').text('Usuario(s) eliminado(s)').css('color','white')
-            toast.toast('show')
+            mostrar_toast('success', 'Inventario TI', 'Usuario(s) eliminado(s) correctamente')
+
             usuSeleccionado = [];
             let table = $("#tbl-usuario").DataTable()
             table.destroy()
             consultar_usuarios()
-            modalElim.hide()
         } else {
-            toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-            toast.addClass('bg-danger');
-            toast.find('.toast-body').text('Error en la consulta').css('color','white')
-            toast.toast('show')
-            modalElim.hide()
+            mostrar_toast('error', 'Inventario TI', 'Error en la consulta');
         }
         
 }
@@ -272,47 +275,49 @@ async function nuevo_usuario(params) {
 }
 
 async function insertar_usuario(params) {
-    try {
+
+    
+    if(!email || !tel || !nombre ||!fecha || !pass){
+        mostrar_toast('warning', 'Inventario TI', '¡Rellena todos los campos correctamente para continuar!');
+        return false;
+        
+
+    }else{
+    
         let model = {
-            accion : 0,
-            nombre : $('#nombreReg').val().trim(),
-            correo : $('#correoReg').val().trim(),
-            telefono : $('#telefonoReg').val().trim(),
-            fecha_nac : $('#fechanacReg').val().trim(),
-            edad : $('#edadReg').val().trim(),
-            contraseña : $('#contraseña').val().trim()
+        accion : 0,
+        nombre : $('#nombreReg').val().trim(),
+        correo : $('#correoReg').val().trim(),
+        telefono : $('#telefonoReg').val().trim(),
+        fecha_nac : $('#fechanacReg').val().trim(),
+        edad : $('#edadReg').val().trim(),
+        contraseña : $('#contraseña').val().trim()
         }
-    
+
         let server = await server_usuario(model)
-    
+
         let resp=JSON.parse(respuesta)
         if(resp.resultado === true){
-            toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-            toast.addClass('bg-success');
-            toast.find('.toast-body').text('Usuario registrado').css('color','white')
-            toast.toast('show')
+            mostrar_toast('success', 'Inventario TI', 'Usuario registrado correctamente')
         }else if(resp.resultado === false){
-            toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-            toast.addClass('bg-danger');
-            toast.find('.toast-body').text('Usuario ya existente').css('color','white')
-            toast.toast('show')
+            mostrar_toast('warning', 'Inventario TI', 'Usuario Usuario ya existente')
         } 
     
         let table = $("#tbl-usuario").DataTable()
         table.destroy()
         consultar_usuarios()
         modalReg.hide()
-    } catch (error) {
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-danger');
-        toast.find('.toast-body').text('Rellene correctamente los campos').css('color','white')
-        toast.toast('show')
+        
+        email = false
+        tel = false
+        nombre = false
+        fecha = false
+        pass = false
     }
-    
 }
 
-let vEdad=false
-function calcularEdad(){
+
+function calcular_edadreg(){
     let fechaNacimiento = new Date(document.getElementById('fechanacReg').value);
     let hoy = new Date();
     let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
@@ -324,19 +329,25 @@ function calcularEdad(){
     }
 
     document.getElementById('edadReg').value = edad;
+}
 
-    if (edad<18){
-        vEdad=false
-    }else{
-        vEdad=true
+function calcular_edadedit(){
+    let fechaNacimiento = new Date(document.getElementById('fechanac').value);
+    let hoy = new Date();
+    let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
+    
+    let mes = hoy.getMonth() - fechaNacimiento.getMonth();
+
+    if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
+        edad--;
     }
+
+    document.getElementById('edad').value = edad;
 }
 
 function ver_contraseña(){
     let regPasswordInput = document.getElementById('contraseñaReg')
-    let iconReg = document.getElementById('ver-passReg')   
-    let editPasswordInput = document.getElementById('contraseña')
-    let iconEdit = document.getElementById('ver-passEdit');  
+    let iconReg = document.getElementById('ver-passReg')    
 
     if (regPasswordInput.type === 'password') {
         regPasswordInput.type = 'text';
@@ -349,26 +360,163 @@ function ver_contraseña(){
     }
 }
 
+
+let usuDes
+async function desactivar_usuariomsg(params) {
+    for (let i = 0; i < usuarios.length; i++) {
+        const element = usuarios[i];
+
+        if(element.id===params.value){
+            usuDes = element;
+            break;
+        }
+        
+    }
+    mostrar_alert('warning', '¿Está seguro de eliminar este usuario?', false ,desactivar_usuario)
+}
+
 async function desactivar_usuario(params) {
     let model ={
         accion : 3,
-        id : params.value,
+        id : usuDes.id
     }
     
     let r = await server_usuario(model)
 
     if (r.resultado) {
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-warning');
-        toast.find('.toast-body').text('Usuario eliminado').css('color','white')
-        toast.toast('show')
+        mostrar_toast('success', 'Inventario TI', 'Usuario eliminado')
         let table = $("#tbl-usuario").DataTable()
         table.destroy()
         consultar_usuarios()
+        
     } else {
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-danger');
-        toast.find('.toast-body').text('Error en la consulta').css('color','white')
-        toast.toast('show')
+        mostrar_toast('error', 'Inventario TI', 'Error en la consulta')
     }
+}
+
+$("#log-out").on('mouseover', function(){
+    $(this).find('i').removeClass('fa-solid fa-door-closed fa-lg').addClass('fa-solid fa-door-open fa-xl');
+})
+$("#log-out").on('mouseout', function(){
+    $(this).find('i').removeClass('fa-solid fa-door-open fa-lg').addClass('fa-solid fa-door-closed fa-xl')
+})
+
+
+// *Función para comprobar el nombre en el modal de registrar usuario
+let nombre= false
+$('#nombreReg').on('input', function(e) {
+    //validar_nombre(e.currentTarget.value)
+    const regexNombre = /^[a-zA-ZáéíóúÁÉÍÓÚüÜ]{3,}$/
+    if(!regexNombre.test(e.currentTarget.value)){
+        document.getElementById('error-mensajeNombre').style = 'display : block; color:red;'
+        nombre=false
+    }else{
+        document.getElementById('error-mensajeNombre').style = ' display : none;'
+        nombre=true
+    }
+    
+}); 
+
+
+//*Función para comprobar el correo en el modal de registrar usuario
+let email=false
+$('#correoReg').on('input',function(e){
+    const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    if(!regexEmail.test(e.currentTarget.value)){
+        document.getElementById('error-mensajeEmail').style = 'display : block; color:red;'
+        email=false
+    }else{
+        document.getElementById('error-mensajeEmail').style = ' display : none;'
+        email=true
+    }
+}
+)
+
+let tel= false
+$('#telefonoReg').on('input', function() {
+    this.value= this.value.replace(/[^0-9]/g, '')
+    valTel = $(this).val();
+    if (valTel.length < 10 ||valTel.length === 0) {
+        document.getElementById('error-mensageTel').style = "display : block; color:red;"
+        tel=false
+    } else {
+        document.getElementById('error-mensageTel').style = "display : none;"
+        tel=true
+    }
+});
+
+
+//* Función para comprobar la fecha de nacimiento en el modal de registrar usuario
+let fecha= false
+$('#fechanacReg').on('input', function(e) {
+    //validar_nombre(e.currentTarget.value)
+    const regexFecha = /^\d{4}-\d{2}-\d{2}$/
+    if(!regexFecha.test(e.currentTarget.value)){
+        document.getElementById('error-mensageFecha').style = 'display : block; color:red;'
+        fecha=false
+    }else{
+        document.getElementById('error-mensageFecha').style = ' display : none;'
+        fecha=true
+    }
+    
+});
+
+
+let pass= false
+$('#contraseñaReg').on('input', function(e) {
+    //validar_nombre(e.currentTarget.value)
+    const regexPass = /^(?!\s*$).{2,}$/
+    if(!regexPass.test(e.currentTarget.value)){
+        document.getElementById('error-mensagePass').style = 'display : block; color:red;'
+        pass=false
+    }else{
+        document.getElementById('error-mensagePass').style = ' display : none;'
+        pass=true
+    }
+    
+});
+
+async function cerrar_sesionmsg() {
+    mostrar_alert('warning', `¿Seguro que quieres salir?`, false , cerrar_sesion)
+}
+
+function cerrar_sesion(){
+    sessionStorage.setItem('log','false')
+    window.location.reload()
+}
+
+function mostrar_toast(tipo, titulo, mensaje) {
+    Swal.fire({
+        icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
+        title: titulo,
+        text: mensaje,
+        timer: 2500,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end',
+        heightAuto : true,
+        theme : 'dark'
+    });
+}
+
+function mostrar_alert(tipo, mensaje, skip, funcion) {
+    Swal.fire({
+        title: 'Inventario TI',
+        text: mensaje,
+        icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        allowOutsideClick : skip, // true, false
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Aceptar <i class="fa-solid fa-thumbs-up fa-lg"></i>',
+        cancelButtonText: 'Cancelar <i class="fa-solid fa-thumbs-down fa-lg"></i>',
+        backdrop: `
+        rgba(0,0,123,0.4)` ,
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Si el usuario hace clic en "Aceptar", ejecutamos la función que pasamos como parámetro
+            funcion();
+        }
+    })
 }

@@ -1,3 +1,13 @@
+//En cuanto se recargue la página, limpiar la sessionStorage
+sessionStorage.clear()
+
+
+const originalSetItem = sessionStorage.setItem;
+sessionStorage.setItem = function(key, value) {
+    console.log(`🔍 sessionStorage.setItem -> ${key}:`, value);
+    originalSetItem.apply(this, arguments);
+}
+
 let respuesta = ""
 function server_usuario(model){
     return new Promise ((resolve,reject)=>{
@@ -30,6 +40,7 @@ function server_email(model){
             },
             success: function(response){
                 respuesta = response
+                Swal.close()
                 try {
                     resolve(JSON.parse(response))
                     console.log(JSON.parse(response))   
@@ -40,16 +51,21 @@ function server_email(model){
         })
     })
 }
+$(".icon").on('mouseover', function(){
+    $(this).find('i').addClass("fa-bounce");
+})
+$(".icon").on('mouseout', function(e){
+    $(this).find('i').removeClass("fa-bounce");
+})
+
+
 
 //Función para el formulario de registro
-let toast = $('#liveToast')
 async function registrarUsu(){
     try{
-        if (pass, email, tel, nombre, fecha, vEdad ===false ) {
-            toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-            toast.addClass('bg-danger');
-            toast.find('.toast-body').text('¡Rellena todos los campos correctamente para continuar!').css('color','white')
-            toast.toast('show')
+        if (!pass || !email || !tel || !nombre || !fecha || !vEdad  ) {
+            mostrar_toast('warning', 'Inventario TI', '¡Rellena todos los campos correctamente para continuar!');
+
             //console.log(pass, email, tel, nombre, fecha, edad)
             return false;
     
@@ -71,10 +87,8 @@ async function registrarUsu(){
                 localStorage.setItem('registroExitoso', '¡Usuario Registrado!');
                 window.location.href = "login.html"
             }else if(resp.resultado === false){
-                toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-                toast.addClass('bg-danger');
-                toast.find('.toast-body').text('Usuario ya existente').css('color','white')
-                toast.toast('show')
+                mostrar_toast('warning', 'Inventario TI', 'Usuario ya existente');
+
             } 
             
             /* let inputs = document.getElementsByName("inputReg");
@@ -83,10 +97,7 @@ async function registrarUsu(){
             } */
         }    
     }catch (error){
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-danger');
-        toast.find('.toast-body').text('No se puede conectar al servidor').css('color','white')
-        toast.toast('show')
+        mostrar_toast('error', 'Inventario TI', 'No se puedo conectar al servidor');
     }
     
 }
@@ -99,15 +110,9 @@ window.addEventListener('load', function () {
     
     if (mensajeRegistro) {
         // Si el mensaje existe, mostramos el toast
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-success');
-        toast.find('.toast-body').text(mensajeRegistro).css('color','white');
-        toast.toast('show');
+        mostrar_toast('success', 'Inventario TI', mensajeRegistro);
     }else if(mensajeContraseña){
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-success');
-        toast.find('.toast-body').text(mensajeContraseña).css('color','white');
-        toast.toast('show');
+        mostrar_toast('success', 'Inventario TI', mensajeContraseña);
     }
 
     localStorage.clear()
@@ -115,22 +120,20 @@ window.addEventListener('load', function () {
 
 //Función para el formulario de ingreso
 async function validar_ingreso() {
+ 
     try{
         let model = {
             accion: 0,
-            correo :$("#logcorreo").val().trim(),
+            correo : $("#logcorreo").val().trim(),
             contraseña : $("#logcontraseña").val().trim(),
     
         }
-    
+        
         let server = await server_usuario(model);
     
         let resp=JSON.parse(respuesta)
         if (resp.resultado === false){
-            toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-            toast.addClass('bg-danger');
-            toast.find('.toast-body').text("Usuario/contraseña no válidos").css('color','white')
-            toast.toast('show')
+            mostrar_toast('error', 'Inventario TI', "Usuario/contraseña no válidos");
             let inputs = document.getElementsByName("inputInit");
             for (let i = 0; i < inputs.length; i++) {
             const element = inputs[i].value = "";
@@ -139,13 +142,14 @@ async function validar_ingreso() {
             sessionStorage.setItem("user", respuesta)
             sessionStorage.setItem("log", 'true')
             sessionStorage.setItem("bienvenido", "Bienvenido " + resp.resultado[0])
-            window.location.href = "index.html";
+            window.location.href = "usuario.html";
+            let inputs = document.getElementsByName('inputInit')
+            for (let i = 0; i < inputs.length; i++) {
+                const element = inputs[i].value = "";
+            }
             }
     }catch (error){
-        toast.removeClass('bg-success bg-danger bg-info bg-warning bg-primary');
-        toast.addClass('bg-danger');
-        toast.find('.toast-body').text('No se puede conectar al servidor').css('color','white')
-        toast.toast('show')
+        mostrar_toast('error', 'Inventario TI', "No se pudo conectar al servidor");
     }
     
 }
@@ -176,6 +180,7 @@ $(document).ready(function () {
     document.getElementById('reg-contraseña').addEventListener('input', validar_contraseña);
     document.getElementById('fechanac').addEventListener('input',calcularEdad);
     document.getElementById('toggle-password-icon').addEventListener('click', togglePasswords);
+    document.getElementById('toggle-password-icon-log').addEventListener('click', ver_contraseña);
     
 });
 
@@ -225,12 +230,13 @@ function validar_contraseña(){
             errorMessage.style.display = 'block';
             errorMessage.textContent = 'Las contraseñas no coinciden';
             document.getElementById('conf-contraseña').style.borderColor = 'red';
+            pass = false
         } else {
             errorMessage.style.display = 'none';    
             document.getElementById('conf-contraseña').style.borderColor = 'green';
+            pass = true
         }
     }
-
     return true;
 
     }
@@ -372,15 +378,20 @@ $('#fechanac').on('input', function(e) {
 });
 
 
-/* let models ={
-    nombre : "Miguel",
-    edad : 23
-}
+function ver_contraseña(){
+    let logPasswordInput = document.getElementById('logcontraseña')
+    let iconLog = document.getElementById('toggle-password-icon-log')    
 
-sessionStorage.setItem("nombre", models)
-//sessionStorage.getItem
-console.log(sessionStorage.getItem("nombre"))
- */
+    if (logPasswordInput.type === 'password') {
+        logPasswordInput.type = 'text';
+        iconLog.classList.remove('fa-eye-slash');  
+        iconLog.classList.add('fa-eye');
+    } else if(logPasswordInput.type === 'text'){
+        logPasswordInput.type = 'password';
+        iconLog.classList.remove('fa-eye');
+        iconLog.classList.add('fa-eye-slash');
+    }
+}
 
 
 async function recuperar_contraseña() {
@@ -420,4 +431,41 @@ async function enlaceconParametros(token) {
     let urlConParametros = `${baseUrl}?${params.toString()}`;
 
     return urlConParametros;
+}
+
+
+function mostrar_toast(tipo, titulo, mensaje) {
+    Swal.fire({
+        icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
+        title: titulo,
+        text: mensaje,
+        timer: 2500,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end',
+        heighAuto : true,
+        theme : 'dark'
+    });
+}
+
+function cargando(){
+    Swal.fire({
+        title: 'Cargando...',
+        text: 'Por favor espere un momento',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        heightAuto: false,
+        color: "#716add",
+        backdrop: `
+        rgba(0,0,123,0.4)` ,
+        imageUrl: "diavaz.png",
+        imageWidth: 200,
+        imageHeight: 200,
+        imageAlt: "Custom image",
+        didOpen: () => {
+          Swal.showLoading();
+        }
+        
+      });
 }
