@@ -1,23 +1,33 @@
 <?php
+
+header('Content-Type: text/html; charset=UTF-8');
+date_default_timezone_set('America/Mexico_City');
+
+$clientejson = json_decode($_POST['trama']);
+
+$respuesta_servidor = new stdClass();
+
+
+if ($clientejson->accion == 0) {
+    $respuesta_servidor->resultado = generar_resguardo($clientejson);
+}
+
+print(json_encode($respuesta_servidor));
+
+
+function generar_resguardo($valores) {
+    
+}
+
+
+
+
+
+
+
+
+
 require __DIR__ . '/../../libraries/vendor/autoload.php';
-
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
-/* $spreadsheet = new Spreadsheet();
-$activeWorksheet = $spreadsheet->getActiveSheet();
-$activeWorksheet->setCellValue('A1', 'Hello World !');
-
-$writer = new Xlsx($spreadsheet);
-$writer->save('hello world.xlsx'); */
-
-
-//*Para escribir en un archivo xlsx.
-
-/* $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-$writer->setPreCalculateFormulas(false);        //? Por default, el escritor pre-calcula todas las fórmulas del archivo, esto puede afectar el rendimiento si se tienen muchas fórmulas así se desactiva
-$writer->save("05featuredemo.xlsx");
- */
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -31,7 +41,7 @@ function restablecer_anchos_columnas($worksheet, $anchos = []) {     //?Esto se 
     }
 }
 
-function restablecer_altura_filas($worksheet, $altos) {
+function restablecer_altura_filas($worksheet, $altos) {               //?Esto se hace, porque a la hora de generar la plantilla, el alto de las filas, se resetea
     foreach ($altos as $fila => $alto) {
         $worksheet->getRowDimension($fila)->setRowHeight($alto);
     }
