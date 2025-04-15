@@ -1,32 +1,5 @@
 <?php
 
-header('Content-Type: text/html; charset=UTF-8');
-date_default_timezone_set('America/Mexico_City');
-
-$clientejson = json_decode($_POST['trama']);
-
-$respuesta_servidor = new stdClass();
-
-
-if ($clientejson->accion == 0) {
-    $respuesta_servidor->resultado = generar_resguardo($clientejson);
-}
-
-print(json_encode($respuesta_servidor));
-
-
-function generar_resguardo($valores) {
-    
-}
-
-
-
-
-
-
-
-
-
 require __DIR__ . '/../../libraries/vendor/autoload.php';
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -46,6 +19,13 @@ function restablecer_altura_filas($worksheet, $altos) {               //?Esto se
         $worksheet->getRowDimension($fila)->setRowHeight($alto);
     }
 }
+
+
+$input = json_decode(file_get_contents('php://input'), true);
+
+$producto = $input['producto'] ?? 'Sin producto';
+$fecha = $input['fecha'] ?? date('Y-m-d');
+$usuario = $input['usuario'] ?? 'Desconocido';
 
 
 $spreadsheet = IOFactory::load('Plantilla2.xlsx');
@@ -127,12 +107,19 @@ restablecer_altura_filas($worksheet, [
 
 
 
-$worksheet->getCell('I8')->setValue(Date::PHPToExcel(new DateTime('2025-04-15')));
+$worksheet->getCell('I8')->setValue(Date::PHPToExcel(new DateTime($fecha)));
 $worksheet->getStyle('I8')->getNumberFormat()->setFormatCode('dd/mm/yyyy');
 
-$worksheet->getCell('C19')->setValue('PC');
+$worksheet->getCell('C19')->setValue($producto);
+
+
+// Configurar headers para descarga
+header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+header('Content-Disposition: attachment; filename="reporte.xlsx"');
+header('Cache-Control: max-age=0');
 
 $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
 
-$writer->save('prueba6.xlsx');
+$writer->save('php://output');
+exit;
 ?>
