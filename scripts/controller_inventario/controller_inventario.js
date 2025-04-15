@@ -499,6 +499,51 @@ function mostrar_alerta(tipo, titulo, mensaje) {
     });
   });
   
+  $(document).ready(function () {
+    fetch('database/controller_inventario/controller_inventario.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'trama=' + encodeURIComponent(JSON.stringify({ accion: 5 }))
+    })
+    .then(response => response.json())
+    .then(data => {
+      const opciones = data.resultado.map(item => ({
+        id: item.usuario || '',
+        text: item.usuario || ''
+      }));
+  
+      // Agrega opción vacía al principio
+    $('#select-usu').empty().append(new Option('', '', false, false));
+
+      $('#select-usu').select2({
+        theme: 'bootstrap4',
+        allowClear: true,
+        placeholder: 'Selecciona un usuario',
+        dropdownParent: $('#mdl-res'),
+        data: opciones
+      });
+    })
+
+    // Esto asegura que no haya valor seleccionado por default
+    $('#select-usu').val(null).trigger('change');
+
+    /* .catch(error => {
+      console.error('Error cargando usuarios:', error);
+    }); */
+  });
+
+
+
+let modalRes  
+function resguardo(){
+    modalRes = new bootstrap.Modal(document.getElementById('mdl-res'));
+    modalRes.show();
+}
+
+
+
 function descargar_excel() {
     fetch('database/controller_excel/controller_excel.php')
         .then(response => {

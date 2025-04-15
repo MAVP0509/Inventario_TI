@@ -17,6 +17,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = desactivar_datos($clientejson);
 }elseif ($clientejson->accion == 4) {
     $respuesta_servidor->resultado = eliminar_datos($clientejson);
+}elseif($clientejson->accion == 5) {
+    $respuesta_servidor->resultado = consultar_usuarios($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -81,4 +83,20 @@ function eliminar_datos($valores){
     
 }
 
+function consultar_usuarios() {
+    include("../conexion.php");
+    $sql = "SELECT DISTINCT usuario FROM inventario_ti_sur;";
+    $resultado = mysqli_query($con,$sql);
+    $datos = [];
+
+    while ($fila = mysqli_fetch_assoc($resultado)) {
+        $datos[] = [
+            'id' => $fila['usuario'],
+            'usuario' => $fila['usuario']
+
+        ];
+    }
+    return $datos;
+
+}
 ?>
