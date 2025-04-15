@@ -295,6 +295,7 @@ async function mostrar_registro(params) {
 
         modalE = new bootstrap.Modal(document.getElementById('modal-editar'));
         modalE.show();
+        console.log(selecreg)
 }
 
 selecreg = [];
@@ -307,7 +308,6 @@ async function selecionar_registro(params) {
     } else {
         selecreg.splice(index, 1); 
     } 
-    
 }
 
 let modal = ""
@@ -499,3 +499,28 @@ function mostrar_alerta(tipo, titulo, mensaje) {
     });
   });
   
+function descargar_excel() {
+    fetch('database/controller_excel/controller_excel.php')
+        .then(response => {
+            if (!response.ok) throw new Error('Error al generar el archivo');
+            return response.blob();
+        })
+        .then(blob => {
+            const nombreArchivo = 'Reporte_' + new Date().toISOString().slice(0, 10) + '.xlsx'; // Ejemplo: Reporte_2025-04-15.xlsx
+            const url = window.URL.createObjectURL(blob);
+
+            const enlace = document.createElement('a');
+            enlace.href = url;
+            enlace.download = nombreArchivo;
+            document.body.appendChild(enlace);
+            enlace.click();
+            document.body.removeChild(enlace);
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Ocurrió un error al generar el Excel.');
+        });
+
+    return false; // Para evitar que el enlace navegue
+}

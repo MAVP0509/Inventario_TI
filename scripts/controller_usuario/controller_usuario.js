@@ -527,6 +527,9 @@ function crear_word() {
     document.body.removeChild(enlace);
 
 }
+
+
+
 function mostrar_toast(tipo, titulo, mensaje) {
     Swal.fire({
         icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
