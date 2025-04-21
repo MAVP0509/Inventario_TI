@@ -500,6 +500,7 @@ function mostrar_alerta(tipo, titulo, mensaje) {
     });
   });
   
+  //*SELECT2 para hacer el resguardo
   $(document).ready(function () {
     fetch('database/controller_inventario/controller_inventario.php', {
       method: 'POST',
@@ -543,6 +544,12 @@ function resguardo(){
     modalRes.show();
 }
 
+function crear_resguardo(params) {
+    let valor = $('#select-usu').val();
+    let texto = $('#select-usu').find('option:selected').text();
+    //return { id: valor, nombre: texto };
+    console.log(valor,texto)
+}
 
 
 function descargar_excel() {
