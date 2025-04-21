@@ -20,15 +20,33 @@ function restablecer_altura_filas($worksheet, $altos) {               //?Esto se
     }
 }
 
+function ajustar_ancho_columnas($worksheet, $desdeFila, $hastaFila, $columnas) {
+    foreach ($columnas as $col) {
+        $maxLength = 0;
+
+        for ($fila = $desdeFila; $fila <= $hastaFila; $fila++) {
+            $valor = $worksheet->getCell("$col$fila")->getValue();
+            $valor = is_string($valor) ? $valor : strval($valor);
+            $longitud = strlen($valor);
+            if ($longitud > $maxLength) {
+                $maxLength = $longitud;
+            }
+        }
+
+        // Factor de ajuste (puedes experimentar con este valor)
+        $worksheet->getColumnDimension($col)->setWidth($maxLength * 0.95);
+    }
+}
 
 $input = json_decode(file_get_contents('php://input'), true);
+$datos = $input['datos'] ?? [];
 
 $producto = $input['producto'] ?? 'Sin producto';
 $fecha = $input['fecha'] ?? date('Y-m-d');
 $usuario = $input['usuario'] ?? 'Desconocido';
 
 
-$spreadsheet = IOFactory::load('Plantilla2.xlsx');
+$spreadsheet = IOFactory::load('Plantilla3.xlsx');
 $worksheet = $spreadsheet->getActiveSheet();
 
 // Configuración de impresión
@@ -47,7 +65,7 @@ $pageMargins->setLeft(0.5);
 $pageMargins->setRight(0.5);
 
 
-restablecer_anchos_columnas($worksheet, [
+/* restablecer_anchos_columnas($worksheet, [
     'A' => 14.84,
     'B' => 10.71,
     'C' => 10.71,
@@ -101,16 +119,43 @@ restablecer_altura_filas($worksheet, [
     37 => 15,
     38 => 15,
     39 => 15,
-]);
+]); */
+
+$fila = 19;
+$num = 1;
 
 
+foreach ($datos as $item) {
+    // Inserta una nueva fila antes de la fila actual
+    $worksheet->insertNewRowBefore($fila, 1);
 
+     // Reaplicar las combinaciones de celdas en la nueva fila
+     $worksheet->mergeCells("D$fila:E$fila");
+     $worksheet->mergeCells("F$fila:G$fila");
+     $worksheet->mergeCells("H$fila:I$fila");
 
+      // (Opcional) Copiar el estilo de la fila anterior (plantilla)
+    $worksheet->duplicateStyle($worksheet->getStyle("A18:I18"), "A$fila:I$fila");
+
+    // Luego escribe los datos en esa nueva fila
+    $worksheet->setCellValue("A$fila", $num);
+    $worksheet->setCellValue("B$fila", $item['tipo']);
+    $worksheet->setCellValue("C$fila", $item['marca']);
+    $worksheet->setCellValue("D$fila", $item['modelo']);
+    $worksheet->setCellValue("F$fila", $item['num_serie'] ?? '');
+    $worksheet->setCellValue("H$fila", $item['usuario']); // H e I combinadas
+   /*  $worksheet->setCellValue("G$fila", $item['usuario']);
+    $worksheet->setCellValue("H$fila", $item['posicion']); */
+
+    
+    $fila++; // Avanzas a la siguiente fila
+    $num++;
+}
 
 $worksheet->getCell('I8')->setValue(Date::PHPToExcel(new DateTime($fecha)));
 $worksheet->getStyle('I8')->getNumberFormat()->setFormatCode('dd/mm/yyyy');
 
-$worksheet->getCell('C19')->setValue($producto);
+//$worksheet->getCell('C19')->setValue($producto);
 
 
 // Configurar headers para descarga

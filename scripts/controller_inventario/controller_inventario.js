@@ -524,15 +524,29 @@ function resguardo(){
     modalRes.show();
 }
 
-function crear_resguardo(params) {
-    let valor = $('#select-usu').val();
+async function crear_resguardo(params) {
+    let model = {
+        accion : 6,
+        usuario : $('#select-usu').find('option:selected').text()
+    }
+    /* let valor = $('#select-usu').val();
     let texto = $('#select-usu').find('option:selected').text();
-    //return { id: valor, nombre: texto };
-    console.log(valor,texto)
+    return { id: valor, nombre: texto };
+    console.log(valor,texto) */
+    let server = await server_inventario(model)
+
+    if (server?.resultado?.length > 0) {
+        // Enviar los datos al PHP del Excel para generar el archivo
+        await descargar_excel({ datos: server.resultado });
+    } else {
+        alert("No se encontraron datos para generar el resguardo.");
+    }
+
+    modalRes.hide();
 }
 
-
-function descargar_excel() {
+//*funcion de prueba de descarga del excel
+/* function descargar_excel() {
     fetch('database/controller_excel/controller_excel.php')
         .then(response => {
             if (!response.ok) throw new Error('Error al generar el archivo');
@@ -556,5 +570,31 @@ function descargar_excel() {
         });
 
     return false; // Para evitar que el enlace navegue
-}
+} */
 
+async function descargar_excel(params) {
+    const response = await fetch('database/controller_excel/controller_excel.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(params)
+    });
+
+    if (!response.ok) {
+        alert('Error al generar el Excel');
+        return;
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const nombreArchivo = 'Reporte_' + new Date().toISOString().slice(0, 10) + '.xlsx';
+
+    const enlace = document.createElement('a');
+    enlace.href = url;
+    enlace.download = nombreArchivo;
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+    window.URL.revokeObjectURL(url);
+}

@@ -19,6 +19,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = eliminar_datos($clientejson);
 }elseif($clientejson->accion == 5) {
     $respuesta_servidor->resultado = consultar_usuarios($clientejson);
+}elseif($clientejson->accion == 6) {
+    $respuesta_servidor->resultado = consultar_por_usuario($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -98,5 +100,18 @@ function consultar_usuarios() {
     }
     return $datos;
 
+}
+
+function consultar_por_usuario($valores) {
+    include("../conexion.php");
+    
+    $sql = "SELECT * FROM inventario_ti_sur WHERE habilitado = 1 AND usuario = '$valores->usuario'";
+    $query = mysqli_query($con, $sql);
+    
+    $datos = [];
+    while ($fila = mysqli_fetch_assoc($query)) {
+        $datos[] = $fila;
+    }
+    return $datos;
 }
 ?>
