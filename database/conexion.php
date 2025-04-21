@@ -3,7 +3,7 @@
     $user="janny";
     //$user="root";
     $pass="janny789";
-    //$pass="root";
+    //$pass="78910";
     $server="10.11.134.194";
     //$server="localhost";
     $db="inventario_ti";
