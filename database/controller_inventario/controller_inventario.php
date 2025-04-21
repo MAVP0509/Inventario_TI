@@ -15,11 +15,11 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_datos($clientejson);
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = desactivar_datos($clientejson);
-}elseif ($clientejson->accion == 4) {
+} elseif ($clientejson->accion == 4) {
     $respuesta_servidor->resultado = eliminar_datos($clientejson);
-}elseif($clientejson->accion == 5) {
+} elseif ($clientejson->accion == 5) {
     $respuesta_servidor->resultado = consultar_usuarios($clientejson);
-}elseif($clientejson->accion == 6) {
+} elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = consultar_por_usuario($clientejson);
 }
 
@@ -33,7 +33,13 @@ function insertar_datos($valores) {
     $sql = "INSERT INTO inventario_ti_sur(zona, rubro, af, tipo, marca, modelo, num_serie, ubicacion, tag, usuario, posicion, fecha_entrega, habilitado) 
     VALUES ('$valores->zona', '$valores->rubro','$valores->af','$valores->tipo','$valores->marca','$valores->modelo', '$valores->num_serie', 
     '$valores->ubicacion', '$valores->tag', '$valores->usuario', '$valores->posicion', '$registro',1);";
-    return mysqli_query($con,$sql);
+    $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$valores->num_serie'";
+
+    if(mysqli_query($con, $sql_num)-> num_rows > 0) {
+        return false;
+    } else {
+        return mysqli_query($con,$sql);
+    }
 }
 
 function editar_datos($valores) {

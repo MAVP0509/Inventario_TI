@@ -312,6 +312,11 @@ async function selecionar_registro(params) {
 let modal = ""
 
 async function crear_registro(params) {
+
+    if (!zona || !rubro || !tipo || !ubicacion || !fecha_entrega) {
+        mostrar_alerta('error', 'Error', 'Debe llenar los campos. Inténtalo nuevamente.');
+
+    }
     
     let model = {
         accion: 0,
@@ -346,6 +351,7 @@ async function crear_registro(params) {
     let modal = new bootstrap.getInstance(document.getElementById('modal-registro'));
     modal.hide();
 }
+ document.ready().
 
 async function editar_registro(params) {
     deshabilitar_campo();
