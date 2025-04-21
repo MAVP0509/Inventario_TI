@@ -545,6 +545,12 @@ function mostrar_alerta(tipo, titulo, mensaje) {
   //TODO: Funciones para el resguardo
 let modalRes  
 function resguardo(){
+    let inputs = document.getElementsByName('resg-inpt')
+    for (let i = 0; i < inputs.length; i++) {
+        const element = inputs[i].value = "";
+    }
+    $('#select-usu').val(null).trigger('change');
+  
     modalRes = new bootstrap.Modal(document.getElementById('mdl-res'));
     modalRes.show();
 }
@@ -552,12 +558,9 @@ function resguardo(){
 async function crear_resguardo(params) {
     let model = {
         accion : 6,
-        usuario : $('#select-usu').find('option:selected').text()
+        usuario : $('#select-usu').find('option:selected').text(),
+        comentario : $('#txt-area').val().trim()
     }
-    /* let valor = $('#select-usu').val();
-    let texto = $('#select-usu').find('option:selected').text();
-    return { id: valor, nombre: texto };
-    console.log(valor,texto) */
     let server = await server_inventario(model)
 
     if (server?.resultado?.length > 0) {

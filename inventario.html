@@ -412,15 +412,17 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p id="modal-message">Escoja el usuario a generarle un resguardo</p>
-
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-solid fa-desktop"></i></span>
                         </div>
-                        <select class="form-control select" id="select-usu">
+                        <select class="form-control select" id="select-usu" name="resg-inpt">
                         </select>
                     </div>
+                    <label >Observaciones</label>
+                    <div class="input-group mb-3">
+                        <textarea class="form-control" id="txt-area" rows="4" name="resg-inpt"></textarea>
+                      </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal" id="mdl-btn-can">Cancelar</button>

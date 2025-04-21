@@ -8,42 +8,14 @@ use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 
 
-function restablecer_anchos_columnas($worksheet, $anchos = []) {     //?Esto se hace, porque a la hora de generar la plantilla, el ancho de las columnas, se resetea
-    foreach ($anchos as $columna => $ancho) {
-        $worksheet->getColumnDimension($columna)->setWidth($ancho);
-    }
-}
-
-function restablecer_altura_filas($worksheet, $altos) {               //?Esto se hace, porque a la hora de generar la plantilla, el alto de las filas, se resetea
-    foreach ($altos as $fila => $alto) {
-        $worksheet->getRowDimension($fila)->setRowHeight($alto);
-    }
-}
-
-function ajustar_ancho_columnas($worksheet, $desdeFila, $hastaFila, $columnas) {
-    foreach ($columnas as $col) {
-        $maxLength = 0;
-
-        for ($fila = $desdeFila; $fila <= $hastaFila; $fila++) {
-            $valor = $worksheet->getCell("$col$fila")->getValue();
-            $valor = is_string($valor) ? $valor : strval($valor);
-            $longitud = strlen($valor);
-            if ($longitud > $maxLength) {
-                $maxLength = $longitud;
-            }
-        }
-
-        // Factor de ajuste (puedes experimentar con este valor)
-        $worksheet->getColumnDimension($col)->setWidth($maxLength * 0.95);
-    }
-}
-
 $input = json_decode(file_get_contents('php://input'), true);
 $datos = $input['datos'] ?? [];
 
-$producto = $input['producto'] ?? 'Sin producto';
+$usuario = $datos[0]['usuario'] ?? '';
+$area = $datos[0]['posicion'] ?? '';
+$comentario = $datos[0]['comentario'] ?? '';
 $fecha = $input['fecha'] ?? date('Y-m-d');
-$usuario = $input['usuario'] ?? 'Desconocido';
+
 
 
 $spreadsheet = IOFactory::load('Plantilla3.xlsx');
@@ -65,69 +37,15 @@ $pageMargins->setLeft(0.5);
 $pageMargins->setRight(0.5);
 
 
-/* restablecer_anchos_columnas($worksheet, [
-    'A' => 14.84,
-    'B' => 10.71,
-    'C' => 10.71,
-    'D' => 10.71,
-    'E' => 10.71,
-    'F' => 10.71,
-    'G' => 10.71,
-    'H' => 10.71,
-    'I' => 20.86,
-    // Agrega las columnas necesarias según tu plantilla
-]);
-
-
-restablecer_altura_filas($worksheet, [
-    1 => 15,
-    2 => 15,
-    3 => 15,
-    4 => 15,
-    5 => 15,
-    6 => 15,
-    7 => 15,
-    8 => 15,
-    9 => 15,
-    10 => 15,
-    11 => 15,
-    12 => 15,
-    13 => 15,
-    14 => 15,
-    15 => 15,
-    16 => 15,
-    17 => 15,
-    18 => 15,
-    19 => 15,
-    20 => 15,
-    21 => 15,
-    22 => 15,
-    23 => 15,
-    24 => 15,
-    25 => 15,
-    26 => 15,
-    27 => 15,
-    28 => 24,
-    29 => 27,
-    30 => 15,
-    31 => 39,
-    32 => 15,
-    33 => 15,
-    34 => 15,
-    35 => 15,
-    36 => 15,
-    37 => 15,
-    38 => 15,
-    39 => 15,
-]); */
-
 $fila = 19;
 $num = 1;
+$filaInicio = 19;
 
+foreach ($datos as $index => $item) {
 
-foreach ($datos as $item) {
-    // Inserta una nueva fila antes de la fila actual
-    $worksheet->insertNewRowBefore($fila, 1);
+    if ($index > 0) {
+        $worksheet->insertNewRowBefore($fila, 1); // Solo insertas a partir de la segunda fila
+    }
 
      // Reaplicar las combinaciones de celdas en la nueva fila
      $worksheet->mergeCells("D$fila:E$fila");
@@ -143,19 +61,26 @@ foreach ($datos as $item) {
     $worksheet->setCellValue("C$fila", $item['marca']);
     $worksheet->setCellValue("D$fila", $item['modelo']);
     $worksheet->setCellValue("F$fila", $item['num_serie'] ?? '');
-    $worksheet->setCellValue("H$fila", $item['usuario']); // H e I combinadas
-   /*  $worksheet->setCellValue("G$fila", $item['usuario']);
-    $worksheet->setCellValue("H$fila", $item['posicion']); */
+    $worksheet->setCellValue("H$filaInicio", $comentario); // H e I combinadas
+   
 
     
     $fila++; // Avanzas a la siguiente fila
     $num++;
 }
 
+$filaFin = $fila - 1; // porque al final del bucle, $fila ya fue incrementado una más
+
+$worksheet->mergeCells("H$filaInicio:I$filaFin");
+
 $worksheet->getCell('I8')->setValue(Date::PHPToExcel(new DateTime($fecha)));
 $worksheet->getStyle('I8')->getNumberFormat()->setFormatCode('dd/mm/yyyy');
 
-//$worksheet->getCell('C19')->setValue($producto);
+$worksheet->setCellValue('C10', $usuario);
+$worksheet->setCellValue('G52', $usuario);
+
+$worksheet->setCellValue('C12', $area);
+$worksheet->setCellValue('G53', $area);
 
 
 // Configurar headers para descarga

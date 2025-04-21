@@ -112,6 +112,8 @@ function consultar_por_usuario($valores) {
     while ($fila = mysqli_fetch_assoc($query)) {
         $datos[] = $fila;
     }
+
+    $datos[0]['comentario'] = $valores->comentario ?? '';
     return $datos;
 }
 ?>
