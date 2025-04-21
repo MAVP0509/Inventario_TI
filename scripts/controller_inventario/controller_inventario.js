@@ -569,3 +569,7 @@ function descargar_excel() {
 
     return false; // Para evitar que el enlace navegue
 }
+
+function hola() {
+    console.log("olis")
+}
