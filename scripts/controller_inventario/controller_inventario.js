@@ -202,18 +202,8 @@ async function consultar_informacion(params) {
                 }, */
                 {
                     text: '<i class="fa-solid fa-pen-to-square fa-lg"></i> Crear registro',
-                    className: 'btn btn-sm btn-success icon',
+                    className: 'btn btn-success icon',
                     attr: {
-                        style: `
-                            background-color: #28a745; 
-                            color: white; 
-                            border-radius: 50px; 
-                            padding: 10px 20px; 
-                            font-size: 16px; 
-                            font-weight: bold; 
-                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
-                            transition: all 0.3s ease;
-                        `, // Estilos inline
                         title: 'Haz clic para agregar un registros'
                     },
                     action: function (e, dt, node, config) {
@@ -224,18 +214,8 @@ async function consultar_informacion(params) {
                 },
                 {
                     text: '<i class="fa-solid fa-trash fa-lg"></i> Eliminar registro',
-                    className: 'btn btn-sm btn-primary ',
+                    className: 'btn btn-primary icon',
                     attr: {
-                        style: `
-                            background-color:rgb(211, 38, 38); 
-                            color: white; 
-                            border-radius: 50px; 
-                            padding: 10px 20px; 
-                            font-size: 16px; 
-                            font-weight: bold; 
-                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
-                            transition: all 0.3s ease;
-                        `, // Estilos inline
                         title: 'Haz clic para eliminar un registro'
                     },
                     action: function (e, dt, node, config) {
