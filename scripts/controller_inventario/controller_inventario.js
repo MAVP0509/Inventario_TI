@@ -63,7 +63,7 @@ async function consultar_informacion(params) {
                     data: "id",
                     render: function(data, type, row) {
                         let control = `<div class="form-group form-check">
-                            <input type="checkbox" class="form-check-input check-change"
+                            <input type="checkbox" class="form-check-input"
                             onclick="selecionar_registro(${data})" value="${data}" id="check${data}">
                         </div>`
                         return control;
@@ -184,6 +184,23 @@ async function consultar_informacion(params) {
                     last: '<i class="fas fa-angle-double-right"></i>'
                 },
             },
+            select: {
+                style: 'multi',
+                selector: 'td:not(:first-child)'
+            },
+            rowCallback: function (row, data) {
+                $(row).on('click', function() {
+                    const checkbox = $(this).find('input[type="checkbox"]');
+                    const isChecked = checkbox.prop('checked');
+                    checkbox.prop('checked', !isChecked);
+                    if (!isChecked) {
+                        $(this).attr('style', 'background-color: #d1ecf1; color: #0c5460;');
+                    } else {
+                        $(this).removeAttr('style');
+                    }
+                    selecionar_registro(data.id);
+                });
+            },
             buttons: [
                 /* {
                     extend: 'excelHtml5',
@@ -214,7 +231,7 @@ async function consultar_informacion(params) {
                 },
                 {
                     text: '<i class="fa-solid fa-trash fa-lg"></i> Eliminar registro',
-                    className: 'btn btn-primary icon',
+                    className: 'btn btn-danger icon',
                     attr: {
                         title: 'Haz clic para eliminar un registro'
                     },
@@ -228,6 +245,7 @@ async function consultar_informacion(params) {
             resposive: true,
            
         });
+        
     } catch (error) {
         console.log(error)
     }
@@ -436,6 +454,13 @@ $(document).ready(function() {
     deshabilitar_campo();  // Llamamos a la función para asegurar que el campo se habilite/deshabilite al cargar
 });
 
+function validar_numero(){
+    let num_serie = /^[A-Z0-9]{10,20}$/
+
+    if (num_serie) {
+
+    }
+}
 
 //TODO: Alertas, confirmaciones
 
@@ -517,7 +542,7 @@ function mostrar_alerta(tipo, titulo, mensaje) {
   });
 
 
-
+  //TODO: Funciones para el resguardo
 let modalRes  
 function resguardo(){
     modalRes = new bootstrap.Modal(document.getElementById('mdl-res'));
