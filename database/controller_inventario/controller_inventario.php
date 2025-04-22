@@ -34,8 +34,10 @@ function insertar_datos($valores) {
     VALUES ('$valores->zona', '$valores->rubro','$valores->af','$valores->tipo','$valores->marca','$valores->modelo', '$valores->num_serie', 
     '$valores->ubicacion', '$valores->tag', '$valores->usuario', '$valores->posicion', '$registro',1);";
     $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$valores->num_serie'";
+    //var_dump($sql);
+    $query_num = mysqli_query($con, $sql_num);
 
-    if(mysqli_query($con, $sql_num)-> num_rows > 0) {
+    if($query_num-> num_rows > 0) {
         return false;
     } else {
         return mysqli_query($con,$sql);
