@@ -320,7 +320,6 @@ async function crear_registro(params) {
         "inp-rubro",
         "inp-tipo",
         "inp-ubicacion",
-        "inp-fecha-entrega",
     ];
 
     if(!validar_campos(validacion)){
@@ -347,12 +346,20 @@ async function crear_registro(params) {
     let respuesta = await server_inventario(model);
     let response = JSON.parse(respuesta);
 
-    if (response.resultado === true) {
+    /* if (response.resultado === true) {
         mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo crear el registro. Inténtalo nuevamente.');
         return;
-    }
+    } */
+
+    if(response.resultado === true){
+        mostrar_alerta('success', '!Registro exitoso¡', 'El regustro se ha creado correctamente.');
+        if (!response.resultado) {
+            const serie = document.getElementById('inp-num-serie');
+            serie.classList.add('is.invalid');
+        }
+    } 
 
     
     let table = $('#tabla1').DataTable();
