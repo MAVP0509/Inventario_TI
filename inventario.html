@@ -177,7 +177,7 @@
 
     <!--Modal registro del inventario-->
     <div class="modal fade" id="modal-registro" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Registro</h4>
@@ -186,100 +186,115 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <span id="md-reg"></span><br>
-                    <label>Zona Operativa</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-warehouse"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="inp-zona" placeholder="Zona">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Detalles del dispositivo</h5>
+                                <h6>Rubro</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-desktop"></i></span>
+                                    </div>
+                                    <select class="form-control select" id="inp-rubro">
+                                        <option></option>
+                                        <option value="Pc/Laptop">Pc/Laptop</option>
+                                        <option value="Teléfono">Teléfono</option>
+                                        <option value="Cámara">Cámara</option>
+                                        <option value="Site">Site</option>
+                                        <option value="Impresora">Impresora</option>
+                                        <option value="Salud Ocupacional">Salud Ocupacional</option>
+                                    </select>
+                                    <div class="invalid-feedback">Por gvaor, selecione un rubro</div>
+                                </div>
+                                <h6>Tipo de dispositivo</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-computer"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="inp-tipo" placeholder="Tipo de dispositivo">
+                                </div>
+                                <h6>Marca del dispositivo</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-trademark"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="inp-marca" placeholder="Marca del dispositivo">
+                                </div>
+                                <h6>Modelo del dispositivo</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="inp-modelo" placeholder="Modelo del dispositivo">
+                                </div>
+                                <h6>Numero de serie</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-square-binary"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="inp-num-serie" placeholder="Numero de serie">
+                                </div>                         
+                            </div> <!--col-->
+                            <div class="col-md-6">
+                                <h5>Identificación del activo</h5>
+                                <h6>Activo Fijo</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="inp-af" placeholder="AF">
+                                </div> 
+                                <h6>Etiqueta del dispositivo (TAG)</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-tag"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="inp-tag" placeholder="TAG">
+                                </div>
+                                <hr>
+                                <h5>Ubicación del dispositivo</h5>
+                                <h6>Zona Operativa</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-warehouse"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="inp-zona" placeholder="Zona">
+                                    <div class="invalid-feedback">Por favor, ingrese la zona operativa.</div>
+                                </div>
+                                <h6>Ubicacion del dispositivo</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="inp-ubicacion" placeholder="Ubicacion del dispositivo">
+                                </div>
+                            </div><!--col-->
+                            <h5>Información del usuario asignado</h5>
+                                    <h6>Nombre del usuario</h6>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control" id="inp-usuario" placeholder="usuario">
+                                    </div>
+                                    <h6>Cargo del usuario</h6>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fa-solid fa-id-card"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control" id="inp-posicion" placeholder="Cargo del usuario">
+                                    </div>
+                                    <h6>Fecha de entrega</h6>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                        </div>
+                                        <input type="date" class="form-control" id="inp-fecha-entrega">
+                                    </div>
+                        </div><!--row-->
                     </div>
-                    <label>Rubro</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-desktop"></i></span>
-                        </div>
-                        <select class="form-control select" id="inp-rubro">
-                            <option></option>
-                            <option value="Pc/Laptop">Pc/Laptop</option>
-                            <option value="Teléfono">Teléfono</option>
-                            <option value="Cámara">Cámara</option>
-                            <option value="Site">Site</option>
-                            <option value="Impresora">Impresora</option>
-                            <option value="Salud Ocupacional">Salud Ocupacional</option>
-                        </select>
-                    </div>
-                    <label>Activo Fijo</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="inp-af" placeholder="AF">
-                    </div>
-                    <label>Tipo de dispositivo</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-computer"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="inp-tipo" placeholder="Tipo de dispositivo">
-                    </div>
-                    <label>Marca del dispositivo</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-trademark"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="inp-marca" placeholder="Marca del dispositivo">
-                    </div>
-                    <label>Modelo del dispositivo</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="inp-modelo" placeholder="Modelo del dispositivo">
-                    </div>
-                    <label>Numero de serie</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-square-binary"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="inp-num-serie" placeholder="Numero de serie">
-                    </div>
-                    <label>Ubicacion del dispositivo</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="inp-ubicacion" placeholder="Ubicacion del dispositivo">
-                    </div>
-                    <label>Etiqueta del dispositivo (TAG)</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-tag"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="inp-tag" placeholder="TAG">
-                    </div>
-                    <label>Nombre del usuario</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="inp-usuario" placeholder="usuario">
-                    </div>
-                    <label>Cargo del usuario</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-id-card"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="inp-posicion" placeholder="Cargo del usuario">
-                    </div>
-                    <label>Fecha de entrega</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
-                        </div>
-                        <input type="date" class="form-control" id="inp-fecha-entrega">
-                    </div>
-                </div>
+                </div><!--body-->
+                    
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success" id="guardar-registro" onclick="crear_registro()">Guardar</button>
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
@@ -290,7 +305,7 @@
 
     <!--Modal editar registro del inventario-->
     <div class="modal fade" id="modal-editar" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title">Registro</h4>
@@ -299,99 +314,110 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <span id="md-reg"></span><br>
-                    <label>Zona Operativa</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-warehouse"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="edi-zona">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Detalles del dispositivo</h5>
+                                <h6>Rubro</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-desktop"></i></span>
+                                    </div>
+                                    <select class="form-control select" id="edi-rubro">
+                                        <option >Pc/Laptop</option>
+                                        <option>Teléfono</option>
+                                        <option>Cámara</option>
+                                        <option>Site</option>
+                                        <option>Impresora</option>
+                                        <option>Salud Ocupacional</option>
+                                    </select>
+                                </div>
+                                <h6>Tipo de dispositivo</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-computer"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="edi-tipo" placeholder="Tipo de dispositivo">
+                                </div>
+                                <h6>Marca del dispositivo</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-trademark"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="edi-marca" placeholder="Marca del dispositivo">
+                                </div>
+                                <h6>Modelo del dispositivo</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="edi-modelo" placeholder="Modelo del dispositivo">
+                                </div>
+                                <h6>Numero de serie</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-square-binary"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="edi-num-serie" maxlength="30" placeholder="Numero de serie">
+                                </div>
+                            </div><!--col-->
+                            <div class="col-md-6">
+                                <h5>Identificación del activo</h5>
+                                <h6>Activo Fijo</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="edi-af" placeholder="AF">
+                                </div>
+                                <h6>Etiqueta del dispositivo (TAG)</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-tag"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="edi-tag" placeholder="TAG">
+                                </div>
+                                <h5>Ubicación del dispositivo</h5>
+                                <h6>Zona Operativa</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-warehouse"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="edi-zona">
+                                </div>
+                                <hr>
+                                <h6>Ubicacion del dispositivo</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="edi-ubicacion" placeholder="Ubicacion del dispositivo">
+                                </div>
+                            </div><!--col-->
+                            <h6>Nombre del usuario</h6>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                                </div>
+                                <input type="text" class="form-control" id="edi-usuario" placeholder="usuario">
+                            </div>
+                            <h6>Cargo del usuario</h6>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fa-solid fa-id-card"></i></span>
+                                </div>
+                                <input type="text" class="form-control" id="edi-posicion" placeholder="Cargo del usuario">
+                            </div>
+                            <h6>Fecha de entrega</h6>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                </div>
+                                <input type="date" class="form-control" id="edi-fecha-entrega">
+                            </div>
+                        </div><!--row-->
                     </div>
-                    <label>Rubro</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-desktop"></i></span>
-                        </div>
-                        <select class="form-control select" id="edi-rubro">
-                            <option >Pc/Laptop</option>
-                            <option>Teléfono</option>
-                            <option>Cámara</option>
-                            <option>Site</option>
-                            <option>Impresora</option>
-                            <option>Salud Ocupacional</option>
-                        </select>
-                    </div>
-                    <label>Activo Fijo</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="edi-af" placeholder="AF">
-                    </div>
-                    <label>Tipo de dispositivo</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-computer"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="edi-tipo" placeholder="Tipo de dispositivo">
-                    </div>
-                    <label>Marca del dispositivo</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-trademark"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="edi-marca" placeholder="Marca del dispositivo">
-                    </div>
-                    <label>Modelo del dispositivo</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="edi-modelo" placeholder="Modelo del dispositivo">
-                    </div>
-                    <label>Numero de serie</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-square-binary"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="edi-num-serie" maxlength="30" placeholder="Numero de serie">
-                    </div>
-                    <label>Ubicacion del dispositivo</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="edi-ubicacion" placeholder="Ubicacion del dispositivo">
-                    </div>
-                    <label>Etiqueta del dispositivo (TAG)</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-tag"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="edi-tag" placeholder="TAG">
-                    </div>
-                    <label>Nombre del usuario</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="edi-usuario" placeholder="usuario">
-                    </div>
-                    <label>Cargo del usuario</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-id-card"></i></span>
-                        </div>
-                        <input type="text" class="form-control" id="edi-posicion" placeholder="Cargo del usuario">
-                    </div>
-                    <label>Fecha de entrega</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
-                        </div>
-                        <input type="date" class="form-control" id="edi-fecha-entrega">
-                    </div>
-                </div>
+                </div> <!--body-->
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success" id="editar-registro" onclick="editar_registro()">Guardar</button>
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>

@@ -209,20 +209,22 @@ async function consultar_informacion(params) {
                 },
             },
             select: {
-                style: 'multi',
-                selector: 'td:not(:first-child)'
+                style: 'multi', // Permite selecionar múltiples filas
+                selector: 'td:not(:first-child)' // Evita selecionar al hacer click en el checkbox (opcional)
             },
             rowCallback: function (row, data) {
                 $(row).on('click', function() {
                     const checkbox = $(this).find('input[type="checkbox"]');
                     const isChecked = checkbox.prop('checked');
-                    checkbox.prop('checked', !isChecked);
+                    
+                    checkbox.prop('checked', !isChecked); // Alterna el estado del checkbox
+                    // Muestra la selección
                     if (!isChecked) {
-                        $(this).attr('style', 'background-color: #d1ecf1; color: #0c5460;');
+                        $(this).attr('style', 'background-color: #d1ecf1; color: #0c5460;'); // Estilo para seleccionado
                     } else {
-                        $(this).removeAttr('style');
+                        $(this).removeAttr('style'); // Deselecionar
                     }
-                    selecionar_registro(data.id);
+                    selecionar_registro(data.id); // Llama a la función para manejar la selección
                 });
             },
             buttons: [
@@ -248,7 +250,7 @@ async function consultar_informacion(params) {
                         title: 'Haz clic para agregar un registros'
                     },
                     action: function (e, dt, node, config) {
-                        let modal = new bootstrap.Modal(document.getElementById('modal-registro'));
+                        modal = new bootstrap.Modal(document.getElementById('modal-registro'));
                         modal.show();
                         //mostrar_datos()
                     }
@@ -333,10 +335,22 @@ async function selecionar_registro(params) {
     } 
 }
 
-let modal = ""
+let modal
 
 async function crear_registro(params) {
-    
+
+    const validacion = [
+        "inp-zona",
+        "inp-rubro",
+        "inp-tipo",
+        "inp-ubicacion",
+    ];
+
+    if(!validar_campos(validacion)){
+        mostrar_alerta('error', 'Error', 'Rellena los campos. Inténtelo nuevamente')
+        return;
+    }
+
     let model = {
         accion: 0,
         zona: $("#inp-zona").val().trim(),
@@ -353,21 +367,30 @@ async function crear_registro(params) {
         fecha_entrega: $("inp-fecha-entrega").val()
     }
 
-    let server = await server_inventario(model);
+    let respuesta = await server_inventario(model);
     let response = JSON.parse(respuesta);
 
-    
-        if (response.resultado === true) {
-            mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
-            
-        } else {
-            mostrarAlerta('error', 'Error', 'No se pudo crear el registro. Inténtalo nuevamente.');
+    /* if (response.resultado === true) {
+        mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
+    } else {
+        mostrar_alerta('error', 'Error', 'No se pudo crear el registro. Inténtalo nuevamente.');
+        return;
+    } */
+
+    if(response.resultado === true){
+        mostrar_alerta('success', '!Registro exitoso¡', 'El regustro se ha creado correctamente.');
+        if (!response.resultado) {
+            const serie = document.getElementById('inp-num-serie');
+            serie.classList.add('is.invalid');
         }
+    } 
+
     
     let table = $('#tabla1').DataTable();
     table.destroy();
     consultar_informacion();
-    let modal = new bootstrap.getInstance(document.getElementById('modal-registro'));
+    //let modal = new bootstrap.getInstance(document.getElementById('modal-registro'));
+    //let modal = $('#modal-registro');
     modal.hide();
 }
 
@@ -478,12 +501,31 @@ $(document).ready(function() {
     deshabilitar_campo();  // Llamamos a la función para asegurar que el campo se habilite/deshabilite al cargar
 });
 
-function validar_numero(){
-    let num_serie = /^[A-Z0-9]{10,20}$/
+function validar_campos(campos) {
+    let valido = true;
 
-    if (num_serie) {
+    campos.forEach(id => {
+        const campo = document.getElementById(id);
+        if (!campo) {
+            valido = false;
+            return;
+        }
 
-    }
+        if (!campo.value.trim()) {
+            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
+            valido = false;
+        } else {
+            campo.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
+        }
+
+        campo.addEventListener('input', function () {
+            if (campo.value.trim()) {
+                campo.classList.remove('is-invalid');
+            }
+        });
+    });
+
+    return valido;
 }
 
 //TODO: Alertas, confirmaciones
@@ -567,7 +609,7 @@ function mostrar_alerta(tipo, titulo, mensaje) {
 
 
   //TODO: Funciones para el resguardo
-let modalRes  
+let modalRes 
 function resguardo(){
     let inputs = document.getElementsByName('resg-inpt')
     for (let i = 0; i < inputs.length; i++) {
