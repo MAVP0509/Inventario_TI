@@ -30,7 +30,8 @@ function resguardo($valores){
     $area = $datos[0]->posicion ?? '';
     $comentario = $datos[0]->comentario ?? '';
     //$fecha = $input['fecha'] ?? date('Y-m-d');
-    $fecha = date('Y-m-d');
+    $fecha = $datos[0]->fecha ?? date('Y-m-d');
+    $fechaFormato =  (new DateTime($fecha))->format('d/m/Y');
 
 
     $spreadsheet = IOFactory::load('Plantilla3.xlsx');
@@ -110,8 +111,8 @@ function resguardo($valores){
 
     $worksheet->mergeCells("H$filaInicio:I$filaFin");
 
-    $worksheet->getCell('I8')->setValue(Date::PHPToExcel(new DateTime($fecha)));
-    $worksheet->getStyle('I8')->getNumberFormat()->setFormatCode('dd/mm/yyyy');
+    $worksheet->getCell('I8')->setValue($fechaFormato);
+    
 
 
     $worksheet->setCellValue('C10', $usuario);

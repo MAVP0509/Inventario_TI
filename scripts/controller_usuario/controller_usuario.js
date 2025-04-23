@@ -308,7 +308,8 @@ async function insertar_usuario(params) {
         if(resp.resultado === true){
             mostrar_toast('success', 'Inventario TI', 'Usuario registrado correctamente')
         }else if(resp.resultado === false){
-            mostrar_toast('warning', 'Inventario TI', 'Usuario Usuario ya existente')
+            mostrar_toast('warning', 'Inventario TI', 'El correo ya está registrado')
+            return;
         } 
     
         let table = $("#tbl-usuario").DataTable()
@@ -409,7 +410,7 @@ async function desactivar_usuario(params) {
 let nombre= false
 $('#nombreReg').on('input', function(e) {
     //validar_nombre(e.currentTarget.value)
-    const regexNombre = /^[a-zA-ZáéíóúÁÉÍÓÚüÜ]{3,}$/
+    const regexNombre = /^[a-zA-ZáéíóúÁÉÍÓÚüÜ\s]{3,}$/
     if(!regexNombre.test(e.currentTarget.value)){
         document.getElementById('error-mensajeNombre').style = 'display : block; color:red;'
         nombre=false

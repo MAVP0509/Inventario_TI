@@ -623,6 +623,11 @@ function resguardo(){
         const element = inputs[i].value = "";
     }
     $('#select-usu').val(null).trigger('change');
+
+    $(document).ready(function() {
+        let hoy = new Date().toISOString().split('T')[0];
+        $('#fecha-resguardo').val(hoy);
+    });
   
     modalRes = new bootstrap.Modal(document.getElementById('mdl-res'));
     modalRes.show();
@@ -639,7 +644,8 @@ async function crear_resguardo(params) {
     let model = {
         accion : 6,
         usuario : $('#select-usu').find('option:selected').text(),
-        comentario : $('#txt-area').val().trim()
+        comentario : $('#txt-area').val().trim(),
+        fecha: $('#fecha-resguardo').val()
     }
     let server = await server_inventario(model)
 

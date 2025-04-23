@@ -445,10 +445,28 @@
                         <select class="form-control select" id="select-usu" name="resg-inpt">
                         </select>
                     </div>
-                    <label >Observaciones</label>
-                    <div class="input-group mb-3">
-                        <textarea class="form-control" id="txt-area" rows="4" name="resg-inpt"></textarea>
-                      </div>
+                    <div class="card collapsed-card card-outline card-primary">
+                        <div class="card-header" data-card-widget="collapse" style="cursor: pointer;">
+                            <h3 class="card-title">Más opciones</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                            </div>
+                        </div>
+                        <div class="card-body" style="display:none;">
+                            <label >Observaciones</label>
+                            <div class="input-group mb-3">
+                                <textarea class="form-control" id="txt-area" rows="4" name="resg-inpt"></textarea>
+                            </div>
+                            <label >Fecha de entrega</label>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                </div>
+                                <input type="date" class="form-control" id="fecha-resguardo">
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cancelar <i class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
