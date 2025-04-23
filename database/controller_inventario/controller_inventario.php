@@ -37,7 +37,7 @@ function insertar_datos($valores) {
 
     $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$valores->num_serie'";
     //var_dump($sql_num);
-    $datos_num = mysqli_query($con, $sql_num);
+    $query_num = mysqli_query($con, $sql_num);
 
     $sql = "INSERT INTO inventario_ti_sur(zona, rubro, af, tipo, marca, modelo, num_serie, ubicacion, tag, usuario, posicion, fecha_entrega, habilitado) 
         VALUES ('$valores->zona', '$valores->rubro','$valores->af','$valores->tipo','$valores->marca','$valores->modelo', '$valores->num_serie', 
