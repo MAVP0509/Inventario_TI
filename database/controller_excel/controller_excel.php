@@ -60,13 +60,18 @@ function resguardo($valores){
         
         $worksheet->insertNewRowBefore($fila, 1); // Solo insertas a partir de la segunda fila
 
+        
+
          // Reaplicar las combinaciones de celdas en la nueva fila
          $worksheet->mergeCells("D$fila:E$fila");
          $worksheet->mergeCells("F$fila:G$fila");
          $worksheet->mergeCells("H$fila:I$fila");
 
-          // (Opcional) Copiar el estilo de la fila anterior (plantilla)
+          //Copiar el estilo de la fila anterior (plantilla)
         $worksheet->duplicateStyle($worksheet->getStyle("A18:I18"), "A$fila:I$fila");
+
+        // Quitar negrita de toda la fila
+        $worksheet->getStyle("A$fila:I$fila")->getFont()->setBold(false);
 
         // Luego escribe los datos en esa nueva fila
         $worksheet->setCellValue("A$fila", $num);
@@ -86,8 +91,11 @@ function resguardo($valores){
             $worksheet->mergeCells("F$fila:G$fila");
             $worksheet->mergeCells("H$fila:I$fila");
 
-            // (Opcional) Copiar el estilo de la fila anterior (plantilla)
+            //  Copiar el estilo de la fila anterior (plantilla)
             $worksheet->duplicateStyle($worksheet->getStyle("A18:I18"), "A$fila:I$fila");
+
+            // Activar negrita solo para la celda del tag
+            $worksheet->getStyle("D$fila")->getFont()->setBold(true);
 
             $worksheet->setCellValue("D$fila", $item->tag);
             $fila++;
