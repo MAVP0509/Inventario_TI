@@ -42,7 +42,7 @@ function resguardo($valores){
     $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LETTER);
     $pageSetup->setFitToPage(true);
     $pageSetup->setFitToWidth(1);
-    $pageSetup->setFitToHeight(1);
+    $pageSetup->setFitToHeight(0);
 
     //ajustando márgenes
     $pageMargins = $worksheet->getPageMargins();
@@ -77,6 +77,23 @@ function resguardo($valores){
         $worksheet->setCellValue("H$filaInicio", $comentario); // H e I combinadas
 
         $fila++; // Avanzas a la siguiente fila
+
+        if ($item->tag != null){
+            $worksheet->insertNewRowBefore($fila, 1);
+
+            // Reaplicar las combinaciones de celdas en la nueva fila
+            $worksheet->mergeCells("D$fila:E$fila");
+            $worksheet->mergeCells("F$fila:G$fila");
+            $worksheet->mergeCells("H$fila:I$fila");
+
+            // (Opcional) Copiar el estilo de la fila anterior (plantilla)
+            $worksheet->duplicateStyle($worksheet->getStyle("A18:I18"), "A$fila:I$fila");
+
+            $worksheet->setCellValue("D$fila", $item->tag);
+            $fila++;
+        }
+
+        
         $num++;
     }
     $worksheet->removeRow($fila); // Elimina la fila extra insertada al final
