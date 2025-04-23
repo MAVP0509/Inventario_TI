@@ -46,6 +46,20 @@ function server_excel(model) {
 
 }
 
+window.addEventListener('load', function () {
+    // Leemos el mensaje del registro desde localStorage
+    const mensajeRegistro = sessionStorage.getItem('bienvenido');
+    
+    if (mensajeRegistro) {
+        // Si el mensaje existe, mostramos el toast
+        mostrar_alerta('success', 'Bienvenido', mensajeRegistro);
+
+
+
+        // Eliminamos el mensaje para evitar que aparezca nuevamente
+        sessionStorage.removeItem('bienvenido');
+    }
+})
 
 $(document).ready(function (){
 
@@ -55,13 +69,6 @@ $(document).ready(function (){
         $(this).find('i').removeClass('fa-bounce');
     });
 })
-$(".icon").on('mouseover', function(){
-    $(this).find('i').addClass("fa-bounce");
-})
-$(".icon").on('mouseout', function(e){
-    $(this).find('i').removeClass("fa-bounce");
-})
-let toast = $('#liveToast')
 
 let datos = [];
 
@@ -446,7 +453,7 @@ async function desactivar_registro(params) {
             consultar_informacion();
 
         } else {
-            mostrarAlerta('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
+            mostrar_alerta('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
         }
 }
 
@@ -692,6 +699,11 @@ function resguardo(){
         const element = inputs[i].value = "";
     }
     $('#select-usu').val(null).trigger('change');
+
+    $(document).ready(function() {
+        let hoy = new Date().toISOString().split('T')[0];
+        $('#fecha-resguardo').val(hoy);
+    });
   
     modalRes = new bootstrap.Modal(document.getElementById('mdl-res'));
     modalRes.show();
@@ -708,7 +720,8 @@ async function crear_resguardo(params) {
     let model = {
         accion : 6,
         usuario : $('#select-usu').find('option:selected').text(),
-        comentario : $('#txt-area').val().trim()
+        comentario : $('#txt-area').val().trim(),
+        fecha: $('#fecha-resguardo').val()
     }
     let server = await server_inventario(model)
 

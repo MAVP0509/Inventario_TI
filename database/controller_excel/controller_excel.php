@@ -30,7 +30,8 @@ function resguardo($valores){
     $area = $datos[0]->posicion ?? '';
     $comentario = $datos[0]->comentario ?? '';
     //$fecha = $input['fecha'] ?? date('Y-m-d');
-    $fecha = date('Y-m-d');
+    $fecha = $datos[0]->fecha ?? date('Y-m-d');
+    $fechaFormato =  (new DateTime($fecha))->format('d/m/Y');
 
 
     $spreadsheet = IOFactory::load('Plantilla3.xlsx');
@@ -60,13 +61,18 @@ function resguardo($valores){
         
         $worksheet->insertNewRowBefore($fila, 1); // Solo insertas a partir de la segunda fila
 
+        
+
          // Reaplicar las combinaciones de celdas en la nueva fila
          $worksheet->mergeCells("D$fila:E$fila");
          $worksheet->mergeCells("F$fila:G$fila");
          $worksheet->mergeCells("H$fila:I$fila");
 
-          // (Opcional) Copiar el estilo de la fila anterior (plantilla)
+          //Copiar el estilo de la fila anterior (plantilla)
         $worksheet->duplicateStyle($worksheet->getStyle("A18:I18"), "A$fila:I$fila");
+
+        // Quitar negrita de toda la fila
+        $worksheet->getStyle("A$fila:I$fila")->getFont()->setBold(false);
 
         // Luego escribe los datos en esa nueva fila
         $worksheet->setCellValue("A$fila", $num);
@@ -86,8 +92,11 @@ function resguardo($valores){
             $worksheet->mergeCells("F$fila:G$fila");
             $worksheet->mergeCells("H$fila:I$fila");
 
-            // (Opcional) Copiar el estilo de la fila anterior (plantilla)
+            //  Copiar el estilo de la fila anterior (plantilla)
             $worksheet->duplicateStyle($worksheet->getStyle("A18:I18"), "A$fila:I$fila");
+
+            // Activar negrita solo para la celda del tag
+            $worksheet->getStyle("D$fila")->getFont()->setBold(true);
 
             $worksheet->setCellValue("D$fila", $item->tag);
             $fila++;
@@ -102,8 +111,8 @@ function resguardo($valores){
 
     $worksheet->mergeCells("H$filaInicio:I$filaFin");
 
-    $worksheet->getCell('I8')->setValue(Date::PHPToExcel(new DateTime($fecha)));
-    $worksheet->getStyle('I8')->getNumberFormat()->setFormatCode('dd/mm/yyyy');
+    $worksheet->getCell('I8')->setValue($fechaFormato);
+    
 
 
     $worksheet->setCellValue('C10', $usuario);

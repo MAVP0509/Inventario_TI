@@ -103,7 +103,7 @@ function eliminar_datos($valores){
 
 function consultar_usuarios() {
     include("../conexion.php");
-    $sql = "SELECT DISTINCT usuario FROM inventario_ti_sur;";
+    $sql = "SELECT DISTINCT usuario FROM inventario_ti_sur where usuario != 'NA';";
     $resultado = mysqli_query($con,$sql);
     $datos = [];
 
@@ -130,6 +130,7 @@ function consultar_por_usuario($valores) {
     }
 
     $datos[0]['comentario'] = $valores->comentario ?? '';
+    $datos[0]['fecha'] = $valores->fecha ?? '';
     return $datos;
 }
 
