@@ -36,3 +36,4 @@ convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Abraha
 Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Abraham_Palayot_Sanchez.pdf
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Abraham_Palayot_Sanchez.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Abraham_Palayot_Sanchez.pdf using filter : calc_pdf_Export
 Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Abraham_Palayot_Sanchez.pdf
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristell_Hernandez_Contreras.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristell_Hernandez_Contreras.pdf using filter : calc_pdf_Export
