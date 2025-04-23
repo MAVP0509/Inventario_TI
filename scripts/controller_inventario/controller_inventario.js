@@ -46,6 +46,20 @@ function server_excel(model) {
 
 }
 
+window.addEventListener('load', function () {
+    // Leemos el mensaje del registro desde localStorage
+    const mensajeRegistro = sessionStorage.getItem('bienvenido');
+    
+    if (mensajeRegistro) {
+        // Si el mensaje existe, mostramos el toast
+        mostrar_alerta('success', 'Bienvenido', mensajeRegistro);
+
+
+
+        // Eliminamos el mensaje para evitar que aparezca nuevamente
+        sessionStorage.removeItem('bienvenido');
+    }
+})
 
 $(document).ready(function (){
 
@@ -55,13 +69,6 @@ $(document).ready(function (){
         $(this).find('i').removeClass('fa-bounce');
     });
 })
-$(".icon").on('mouseover', function(){
-    $(this).find('i').addClass("fa-bounce");
-})
-$(".icon").on('mouseout', function(e){
-    $(this).find('i').removeClass("fa-bounce");
-})
-let toast = $('#liveToast')
 
 let datos = [];
 
@@ -439,7 +446,7 @@ async function desactivar_registro(params) {
             consultar_informacion();
 
         } else {
-            mostrarAlerta('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
+            mostrar_alerta('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
         }
 }
 

@@ -1,4 +1,4 @@
-let respuesta
+ let respuesta
 function server_usuario(model) {
     return new Promise ((resolve,reject)=>{
         $.ajax({
@@ -32,29 +32,6 @@ $(document).ready(function (){
         $(this).find('i').removeClass('fa-bounce');
     });
 })
-$(".icon").on('mouseover', function(){
-    $(this).find('i').addClass("fa-bounce");
-})
-$(".icon").on('mouseout', function(e){
-    $(this).find('i').removeClass("fa-bounce");
-})
-let toast = $('#liveToast')
-
-window.addEventListener('load', function () {
-    // Leemos el mensaje del registro desde localStorage
-    const mensajeRegistro = sessionStorage.getItem('bienvenido');
-    
-    if (mensajeRegistro) {
-        // Si el mensaje existe, mostramos el toast
-        mostrar_toast('success', 'Bienvenido', mensajeRegistro)
-
-
-        // Eliminamos el mensaje para evitar que aparezca nuevamente
-        sessionStorage.removeItem('bienvenido');
-    }
-})
-
-
 
 
 let usuarios = []
@@ -163,12 +140,12 @@ async function consultar_usuarios() {
                     },
                 },
                 buttons:[
-                    {   text : 'word',
+                    /*{   text : 'word',
                         action: function (e, dt, node, config) {
                             crear_word()
                         }
                     },
-                    /* {
+                     {
                         extend: 'excelHtml5',
                         text: 'Exportar a Excel',
                         className: 'btn btn-sm btn-success'
@@ -190,8 +167,6 @@ async function consultar_usuarios() {
   
     })   
 }
-
-
 
 
 let usuSelect = ""
@@ -427,12 +402,7 @@ async function desactivar_usuario(params) {
     }
 }
 
-$("#log-out").on('mouseover', function(){
-    $(this).find('i').removeClass('fa-solid fa-door-closed fa-lg').addClass('fa-solid fa-door-open fa-xl');
-})
-$("#log-out").on('mouseout', function(){
-    $(this).find('i').removeClass('fa-solid fa-door-open fa-lg').addClass('fa-solid fa-door-closed fa-xl')
-})
+
 
 
 // *Función para comprobar el nombre en el modal de registrar usuario
@@ -509,14 +479,7 @@ $('#contraseñaReg').on('input', function(e) {
     
 });
 
-async function cerrar_sesionmsg() {
-    mostrar_alert('warning', `¿Seguro que quieres salir?`, false , cerrar_sesion)
-}
 
-function cerrar_sesion(){
-    sessionStorage.setItem('log','false')
-    window.location.reload()
-}
 
 function crear_word() {
     const enlace = document.createElement('a');
@@ -550,11 +513,12 @@ function mostrar_alert(tipo, mensaje, skip, funcion) {
         text: mensaje,
         icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
         showCancelButton: true,
-        confirmButtonColor: '#d33',
+        confirmButtonColor: '#0000FF',
         allowOutsideClick : skip, // true, false
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Aceptar <i class="fa-solid fa-thumbs-up fa-lg"></i>',
-        cancelButtonText: 'Cancelar <i class="fa-solid fa-thumbs-down fa-lg"></i>',
+        cancelButtonColor: '#FF0000',
+        confirmButtonText: 'Aceptar <i class="fa-solid fa-circle-check fa-lg">',
+        cancelButtonText: 'Cancelar <i class="fa-solid fa-xmark fa-lg"></i>',
+        reverseButtons: true, //* 👉 Esto cambia el orden de los botones
         backdrop: `
         rgba(0,0,123,0.4)` ,
     }).then((result) => {
