@@ -541,7 +541,6 @@ function mostrar_toast(tipo, titulo, mensaje) {
         toast: true,
         position: 'top-end',
         heightAuto : true,
-        theme : 'dark'
     });
 }
 

@@ -23,6 +23,30 @@ function server_inventario(model) {
 
 }
 
+function server_excel(model) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: "POST",
+            url: "database/controller_excel/controller_excel.php",
+            data: {
+                trama: JSON.stringify(model)
+            },
+            success: function(response) {
+                try {
+                    resolve(JSON.parse(response))
+                    //console.log(resolve(JSON.parse(response)))
+                    respuesta = response
+                } catch (error) {
+                    reject(error)
+                }
+            }
+        })
+    });
+
+
+}
+
+
 $(document).ready(function (){
 
     $('#tabla1').on('mouseover', '.icon', function() {
@@ -587,81 +611,60 @@ function mostrar_alerta(tipo, titulo, mensaje) {
   //TODO: Funciones para el resguardo
 let modalRes 
 function resguardo(){
+    let inputs = document.getElementsByName('resg-inpt')
+    for (let i = 0; i < inputs.length; i++) {
+        const element = inputs[i].value = "";
+    }
+    $('#select-usu').val(null).trigger('change');
+  
     modalRes = new bootstrap.Modal(document.getElementById('mdl-res'));
     modalRes.show();
 }
 
+let infoResguardo
 async function crear_resguardo(params) {
+
+    let select = document.getElementById('select-usu')
+    if (select.value === "") {
+        mostrar_alerta('error', 'Error', 'Seleccione al menos un usuario. Inténtalo nuevamente.')
+        return
+    }
     let model = {
         accion : 6,
-        usuario : $('#select-usu').find('option:selected').text()
+        usuario : $('#select-usu').find('option:selected').text(),
+        comentario : $('#txt-area').val().trim()
     }
-    /* let valor = $('#select-usu').val();
-    let texto = $('#select-usu').find('option:selected').text();
-    return { id: valor, nombre: texto };
-    console.log(valor,texto) */
     let server = await server_inventario(model)
 
-    if (server?.resultado?.length > 0) {
-        // Enviar los datos al PHP del Excel para generar el archivo
-        await descargar_excel({ datos: server.resultado });
-    } else {
-        alert("No se encontraron datos para generar el resguardo.");
-    }
-
+    
+    infoResguardo = server.resultado
+    //console.log(infoResguardo)
+    mostrar_alerta('warning', 'Inventario TI', 'Espere un momento');
     modalRes.hide();
+    descargar_excel()
 }
 
-//*funcion de prueba de descarga del excel
-/* function descargar_excel() {
-    fetch('database/controller_excel/controller_excel.php')
-        .then(response => {
-            if (!response.ok) throw new Error('Error al generar el archivo');
-            return response.blob();
-        })
-        .then(blob => {
-            const nombreArchivo = 'Reporte_' + new Date().toISOString().slice(0, 10) + '.xlsx'; // Ejemplo: Reporte_2025-04-15.xlsx
-            const url = window.URL.createObjectURL(blob);
-
-            const enlace = document.createElement('a');
-            enlace.href = url;
-            enlace.download = nombreArchivo;
-            document.body.appendChild(enlace);
-            enlace.click();
-            document.body.removeChild(enlace);
-            window.URL.revokeObjectURL(url);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Ocurrió un error al generar el Excel.');
-        });
-
-    return false; // Para evitar que el enlace navegue
-} */
 
 async function descargar_excel(params) {
-    const response = await fetch('database/controller_excel/controller_excel.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(params)
-    });
 
-    if (!response.ok) {
-        alert('Error al generar el Excel');
-        return;
+    let model = {
+        accion : 0,
+        datos: infoResguardo
     }
+    let server = await server_excel(model)
 
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const nombreArchivo = 'Reporte_' + new Date().toISOString().slice(0, 10) + '.xlsx';
+    let ruta = JSON.parse(respuesta)
+    // Elimina comillas si vienen así: '"C:\\ruta\\archivo.xlsx"'
+    ruta.resultado = ruta.resultado.replace(/^"|"$/g, '');
 
-    const enlace = document.createElement('a');
-    enlace.href = url;
-    enlace.download = nombreArchivo;
-    document.body.appendChild(enlace);
-    enlace.click();
-    document.body.removeChild(enlace);
-    window.URL.revokeObjectURL(url);
+    // Reemplaza las \ por /
+    ruta.resultado = ruta.resultado.replace(/\\/g, '/');
+
+    // Cambia la extensión
+    ruta.resultado = ruta.resultado.replace(/\.xlsx$/i, '.pdf');
+
+    ruta.resultado = ruta.resultado.replace("C:/xampp/htdocs", "http://localhost")
+    console.log(ruta.resultado)
+    window.open(ruta.resultado, '_blank');
 }
+
