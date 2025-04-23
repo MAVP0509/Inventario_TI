@@ -529,3 +529,22 @@ function mostrar_alert(tipo, mensaje, skip, funcion) {
         }
     })
 }
+
+//TODO air date picker
+$('#modalInsertar').on('shown.bs.modal', function () {
+    inicializarDatepicker();
+});
+
+function inicializarDatepicker() {
+    if (!document.querySelector('#fechanacReg')._airDatepicker) {
+        new AirDatepicker('#fechanacReg', {
+            autoClose: true,
+            dateFormat: 'yyyy-MM-dd',
+            defaultDate: new Date(),
+            locale: {
+                days: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+                months: ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
+            }
+        });
+    }
+}
