@@ -337,8 +337,8 @@ async function selecionar_registro(params) {
 
 let modal
 
-async function crear_registro(params) {
-
+async function crear_registro() {
+    // Campos requeridos para validación
     const validacion = [
         "inp-zona",
         "inp-rubro",
@@ -346,11 +346,13 @@ async function crear_registro(params) {
         "inp-ubicacion",
     ];
 
-    if(!validar_campos(validacion)){
-        mostrar_alerta('error', 'Error', 'Rellena los campos. Inténtelo nuevamente')
+    // Validar campos
+    if (!validar_campos(validacion)) {
+        mostrar_alerta('error', 'Error', 'Rellena los campos. Inténtelo nuevamente');
         return;
     }
 
+    // Crear el modelo con los datos del formulario
     let model = {
         accion: 0,
         zona: $("#inp-zona").val().trim(),
@@ -364,38 +366,43 @@ async function crear_registro(params) {
         tag: $("#inp-tag").val().trim(),
         usuario: $("#inp-usuario").val().trim(),
         posicion: $("#inp-posicion").val().trim(),
-        fecha_entrega: $("inp-fecha-entrega").val()
-    }
+        fecha_entrega: $("#inp-fecha-entrega").val()
+    };
 
+    // Enviar datos al servidor
     let respuesta = await server_inventario(model);
-    let response = JSON.parse(respuesta);
 
-    /* if (response.resultado === true) {
+    // Validar respuesta del servidor
+    const serie = document.getElementById('inp-num-serie');
+    serie.classList.remove('is-invalid'); // Remover clase de error si existía
+
+    if (respuesta.resultado === true) {
+        let table = $('#tabla1').DataTable();
+        table.destroy();
+        consultar_informacion();
+        modal.hide();
         mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
+    } else if (respuesta.resultado === false) {
+        if (respuesta.mensaje === "Número de serie duplicado") {
+            serie.classList.add('is-invalid'); // Marcar el campo como inválido si hay un número de serie duplicado
+            mostrar_alerta('warning', 'Número de serie duplicado', 'Este número de serie ya está registrado.');
+        } else {
+            mostrar_alerta('error', 'Error', 'No se pudo crear el registro. Inténtalo nuevamente.');
+        }
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo crear el registro. Inténtalo nuevamente.');
-        return;
-    } */
+    }
 
-    if(response.resultado === true){
-        mostrar_alerta('success', '!Registro exitoso¡', 'El regustro se ha creado correctamente.');
-        if (!response.resultado) {
-            const serie = document.getElementById('inp-num-serie');
-            serie.classList.add('is.invalid');
-        }
-    } 
-
-    
-    let table = $('#tabla1').DataTable();
-    table.destroy();
-    consultar_informacion();
-    //let modal = new bootstrap.getInstance(document.getElementById('modal-registro'));
-    //let modal = $('#modal-registro');
-    modal.hide();
 }
 
 async function editar_registro(params) {
     deshabilitar_campo();
+    const validacion = [
+        "inp-zona",
+        "inp-rubro",
+        "inp-tipo",
+        "inp-ubicacion",
+    ];
     let model = {
         accion: 1,
         id: selecreg.id,
@@ -607,6 +614,75 @@ function mostrar_alerta(tipo, titulo, mensaje) {
     }); */
   });
 
+  $(document).ready(function () {
+    fetch('database/controller_inventario/controller_inventario.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'trama=' + encodeURIComponent(JSON.stringify({ accion: 7 }))
+    })
+    .then(response => response.json())
+    .then(data => {
+      const opciones = data.resultado.map(item => ({
+        id: item.rubro || '',
+        text: item.rubro || ''
+      }));
+  
+      // Agrega opción vacía al principio
+    $('#inp-rubro').empty().append(new Option('', '', false, false));
+
+      $('#inp-rubro').select2({
+        theme: 'bootstrap4',
+        allowClear: true,
+        placeholder: 'Selecciona un rubro',
+        dropdownParent: $('#modal-registro'),
+        data: opciones
+      });
+    })
+
+    // Esto asegura que no haya valor seleccionado por default
+    $('#inp-rubro').val(null).trigger('change');
+
+    /* .catch(error => {
+      console.error('Error cargando usuarios:', error);
+    }); */
+  });
+
+  $(document).ready(function () {
+    fetch('database/controller_inventario/controller_inventario.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'trama=' + encodeURIComponent(JSON.stringify({ accion: 8 }))
+    })
+    .then(response => response.json())
+    .then(data => {
+      const opciones = data.resultado.map(item => ({
+        id: item.tipo || '',
+        text: item.tipo || ''
+      }));
+  
+      // Agrega opción vacía al principio
+    $('#inp-tipo').empty().append(new Option('', '', false, false));
+
+      $('#inp-tipo').select2({
+        theme: 'bootstrap4',
+        allowClear: true,
+        placeholder: 'Selecciona un tipo',
+        dropdownParent: $('#modal-registro'),
+        data: opciones
+      });
+    })
+
+    // Esto asegura que no haya valor seleccionado por default
+    $('#inp-tipo').val(null).trigger('change');
+
+    /* .catch(error => {
+      console.error('Error cargando usuarios:', error);
+    }); */
+  });
 
   //TODO: Funciones para el resguardo
 let modalRes 
