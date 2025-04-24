@@ -42,8 +42,7 @@ function server_email(model){
                 respuesta = response
                 Swal.close()
                 try {
-                    resolve(JSON.parse(response))
-                    console.log(JSON.parse(response))   
+                    resolve(JSON.parse(response))  
                 } catch (error) {
                     reject(error)
                 }
@@ -322,7 +321,7 @@ document.getElementById('logcontraseña').addEventListener('keydown', function(e
       event.preventDefault(); // Evita que se recargue la página si estás usando AJAX
       document.getElementById('btn-ini').click(); // Llama al botón que hace el login
     }
-  });
+});
 
 
 //TODO Función para navegar entre formularios del login
@@ -403,9 +402,13 @@ $('.Comprobarmail').on('input',function(e){
 
 //TODO Función de recuperación de la contraseña y funciones derivadas
 async function recuperar_contraseña() {
+    //let dominio = window.location.hostname
+    //let puerto = location.port
     let model ={
         accion : 0,
-        correo : $("#repcorreo").val().trim()
+        correo : $("#repcorreo").val().trim(),
+        dominio : window.location.hostname,
+        puerto : location.port
     }
     
     let response = await server_email(model);
@@ -439,6 +442,16 @@ async function enlaceconParametros(token) {
 
     return urlConParametros;
 }
+
+//? Función para mandar el correo con la tecla "Enter"
+document.getElementById('repcorreo').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Evita que se recargue la página si estás usando AJAX
+      document.getElementById('btn-recuperar').click(); // Llama al botón que hace el login
+
+      document.getElementById('repcorreo').value = ""
+    }
+});
 
 
 //TODO funciones para mostrar mensajes en pantalla

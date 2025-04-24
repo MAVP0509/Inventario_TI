@@ -34,6 +34,7 @@ function server_excel(model) {
             success: function(response) {
                 try {
                     resolve(JSON.parse(response))
+                    Swal.close()
                     //console.log(resolve(JSON.parse(response)))
                     respuesta = response
                 } catch (error) {
@@ -61,19 +62,28 @@ window.addEventListener('load', function () {
     }
 })
 
-$(document).ready(function (){
+/* $(document).ready(function (){
 
     $('#tabla1').on('mouseover', '.icon', function() {
         $(this).find('i').addClass('fa-bounce');  // Agregar una clase extra si lo deseas
     }).on('mouseout', '.icon', function() {
         $(this).find('i').removeClass('fa-bounce');
     });
-})
+}) */
+
+$(document).on('mouseover', '.icon', function() {
+    $(this).find('i').addClass('fa-bounce');
+}).on('mouseout', '.icon', function() {
+    $(this).find('i').removeClass('fa-bounce');
+});
 
 let datos = [];
 
 async function consultar_informacion(params) {
-
+    let usuarioLog = JSON.parse(sessionStorage.getItem('user'))
+    let user = document.getElementById('user')
+    user.textContent = usuarioLog.resultado[0]
+    
     let model = {
         accion: 2
     };
@@ -202,7 +212,7 @@ async function consultar_informacion(params) {
                 }
             ],
             dom: `
-                <'row mb-2'<'col-sm-6 text-left'f><'col-sm-6 text-right'B>>
+                <'row mb-2'<'col-sm-6 text-left'f><'col-sm-6 text-right'<'btn-group'B>>>
                 <'row'<'col-sm-12'tr>>
                 <'row mt-2'<'col-sm-3'l><'col-sm-5 text-center'i><'col-sm-4 text-right'p>>
             `,
@@ -235,24 +245,12 @@ async function consultar_informacion(params) {
                 });
             },
             buttons: [
-                /* {
-                    extend: 'excelHtml5',
-                    text: 'Exportar a Excel',
-                    className: 'btn btn-sm btn-success'
-                },
                 {
-                    extend: 'pdfHtml5',
-                    text: 'Exportar a PDF',
-                    className: 'btn btn-sm btn-danger'
-                },
-                {
-                    extend: 'print',
-                    text: 'Imprimir',
-                    className: 'btn btn-sm btn-primary'
-                }, */
-                {
-                    text: '<i class="fa-solid fa-pen-to-square fa-lg"></i> Crear registro',
-                    className: 'btn btn-success icon',
+                    html: `<div>
+                            <button type="button" class="btn btn-success rounded mr-3 icon" onclick="resguardo()" >
+                            <i class="fa-solid fa-pen-to-square fa-lg"></i> Crear Registro</button>
+                        </div>`,//'<i class="fa-solid fa-pen-to-square fa-lg"></i> Crear registro',
+                    //className: 'btn btn-success rounded mr-3 icon',
                     attr: {
                         title: 'Haz clic para agregar un registros'
                     },
@@ -263,8 +261,11 @@ async function consultar_informacion(params) {
                     }
                 },
                 {
-                    text: '<i class="fa-solid fa-trash fa-lg"></i> Eliminar registro',
-                    className: 'btn btn-danger icon',
+                    html: `<div>
+                            <button type="button" style="text-align: center" class="btn btn-danger rounded  icon" >
+                            <i class="fa-solid fa-trash fa-lg"></i> Eliminar Registro</button>
+                        </div>`,//'<i class="fa-solid fa-trash fa-lg"></i> Eliminar registro',
+                    //className: 'btn btn-danger rounded icon',
                     attr: {
                         title: 'Haz clic para eliminar un registro'
                     },
@@ -704,7 +705,9 @@ function resguardo(){
         let hoy = new Date().toISOString().split('T')[0];
         $('#fecha-resguardo').val(hoy);
     });
-  
+    
+    
+
     modalRes = new bootstrap.Modal(document.getElementById('mdl-res'));
     modalRes.show();
 }
@@ -728,14 +731,15 @@ async function crear_resguardo(params) {
     
     infoResguardo = server.resultado
     //console.log(infoResguardo)
-    mostrar_alerta('warning', 'Inventario TI', 'Espere un momento');
     modalRes.hide();
     descargar_excel()
+    mostrar_toast_cargando()
 }
 
 
 async function descargar_excel(params) {
-
+    dominio = window.location.hostname,
+    puerto = location.port
     let model = {
         accion : 0,
         datos: infoResguardo
@@ -752,8 +756,31 @@ async function descargar_excel(params) {
     // Cambia la extensión
     ruta.resultado = ruta.resultado.replace(/\.xlsx$/i, '.pdf');
 
-    ruta.resultado = ruta.resultado.replace("C:/xampp/htdocs", "http://localhost")
+    ruta.resultado = ruta.resultado.replace("C:/xampp/htdocs", "http://"+dominio+":"+puerto)
     console.log(ruta.resultado)
     window.open(ruta.resultado, '_blank');
 }
 
+function mostrar_toast_cargando() {
+    Swal.fire({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        showCloseButton: false,
+        timer: undefined, // No cerrar automáticamente
+        allowOutsideClick: false,
+        background: '#fff',
+        html: `
+            <div style="display: flex; align-items: center;">
+                <i class="fas fa-spinner fa-spin fa-lg" style="margin-right: 10px; color: #007bff;"></i>
+                <span style="font-weight: 500;">Cargando...</span>
+            </div>
+        `,
+        didOpen: () => {
+            //Swal.showLoading(); // Esto muestra el spinner
+        }
+    });
+}
+
+
+   

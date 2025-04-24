@@ -20,6 +20,28 @@ function server_usuario(model) {
     })
 }
 
+function server_email(model){
+    return new Promise ((resolve,reject)=>{
+        $.ajax({
+            type: "POST",
+            url: "database/controller_email/controller_email.php",
+            data: {
+                trama:JSON.stringify(model)
+            },
+            success: function(response){
+                Swal.close()
+                respuesta = response
+                try {
+                    resolve(JSON.parse(response))
+                    console.log(JSON.parse(response))   
+                } catch (error) {
+                    reject(error)
+                }
+            }
+        })
+    })
+}
+
 
 $(document).ready(function (){
     document.getElementById('fechanacReg').addEventListener('input',calcular_edadreg);
@@ -162,7 +184,7 @@ async function consultar_usuarios() {
                     }, */
                 ],
                 stateSave: true,
-                resposive: true,
+                responsive: true,
                 //!Esta parte del codigo (DOM) es para que los botones, paginacion y filtros de busqueda se acomoden a sus necesidades, si quieren pueden buscar mas info en la documentacion de datatables, pero en este caso no es necesario.
   
     })   
@@ -482,6 +504,27 @@ $('#contraseñaReg').on('input', function(e) {
 
 
 
+async function recuperar_contraseña() {
+    let model ={
+        accion : 0,
+        correo : $("#correo").val().trim(),
+        dominio : window.location.hostname,
+        puerto : location.port
+    }
+    
+    let response = await server_email(model);
+    
+    if(response.resultado === true) {
+        mostrar_toast('success', 'Correo Enviado', 'Se enviado un correo al usuario para recuperar su contraseña')
+        console.log(window.location.hostname);
+    } else {
+        mostrar_toast('error', 'Error', 'No se envio el correo al usuario')
+    }
+    
+}
+
+
+
 function crear_word() {
     const enlace = document.createElement('a');
     enlace.href = 'database/controller_word2/controller_word2.php'; // ← cambia esto
@@ -530,21 +573,23 @@ function mostrar_alert(tipo, mensaje, skip, funcion) {
     })
 }
 
-//TODO air date picker
-$('#modalInsertar').on('shown.bs.modal', function () {
-    inicializarDatepicker();
-});
-
-function inicializarDatepicker() {
-    if (!document.querySelector('#fechanacReg')._airDatepicker) {
-        new AirDatepicker('#fechanacReg', {
-            autoClose: true,
-            dateFormat: 'yyyy-MM-dd',
-            defaultDate: new Date(),
-            locale: {
-                days: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
-                months: ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
-            }
-        });
-    }
+function mostrar_toast_cargando() {
+    Swal.fire({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        showCloseButton: false,
+        timer: undefined, // No cerrar automáticamente
+        allowOutsideClick: false,
+        background: '#fff',
+        html: `
+            <div style="display: flex; align-items: center;">
+                <i class="fas fa-spinner fa-spin fa-lg" style="margin-right: 10px; color: #007bff;"></i>
+                <span style="font-weight: 500;">Cargando...</span>
+            </div>
+        `,
+        didOpen: () => {
+            //Swal.showLoading(); // Esto muestra el spinner
+        }
+    });
 }
