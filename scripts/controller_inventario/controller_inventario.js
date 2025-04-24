@@ -9,6 +9,7 @@ function server_inventario(model) {
                 trama: JSON.stringify(model)
             },
             success: function(response) {
+                //console.log(response);
                 try {
                     resolve(JSON.parse(response))
                     //console.log(resolve(JSON.parse(response)))
@@ -221,6 +222,10 @@ async function consultar_informacion(params) {
             },
             rowCallback: function (row, data) {
                 $(row).on('click', function() {
+
+                    if ($(event.target).closest('.btn-warning.icon').length > 0) {
+                        return;
+                    }
                     const checkbox = $(this).find('input[type="checkbox"]');
                     const isChecked = checkbox.prop('checked');
                     
@@ -257,8 +262,9 @@ async function consultar_informacion(params) {
                         title: 'Haz clic para agregar un registros'
                     },
                     action: function (e, dt, node, config) {
-                        modal = new bootstrap.Modal(document.getElementById('modal-registro'));
-                        modal.show();
+                        limpiar();
+                        //modal = new bootstrap.Modal(document.getElementById('modal-registro'));
+                        //modal.show();
                         //mostrar_datos()
                     }
                 },
@@ -330,15 +336,15 @@ async function mostrar_registro(params) {
         console.log(selecreg)
 }
 
-selecreg = [];
+let selec = [];
 
 async function selecionar_registro(params) {
 
-    let index = selecreg.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
+    let index = selec.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
     if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
-        selecreg.push(params); // Añade uno o más elementos al final de un array
+        selec.push(params); // Añade uno o más elementos al final de un array
     } else {
-        selecreg.splice(index, 1); 
+        selec.splice(index, 1); 
     } 
 }
 
@@ -542,6 +548,22 @@ function validar_campos(campos) {
     return valido;
 }
 
+function limpiar(){
+    let input = document.getElementsByName('mdl-reg');
+    for (let i = 0; i < input.length; i++) {
+        const element = input[i].value = "";
+    }
+    //$select.val(null).trigger('change');
+
+    // modal = new bootstrap.Modal(document.getElementById('modal-registro'));
+    $("#modal-registro").modal('show'/* {
+        backdrop: 'static',
+        keyboard: false
+    
+    } */);
+    //modal.show();
+}
+
 //TODO: Alertas, confirmaciones
 
 function mostrar_alerta(tipo, titulo, mensaje) {
@@ -568,7 +590,7 @@ function mostrar_alerta(tipo, titulo, mensaje) {
     });
   }); */
 
-  $(document).ready(function() {
+ /*  $(document).ready(function() {
     $(".select").each(function() { //recorre cada <select class="select">
       const $select = $(this);
   
@@ -583,7 +605,7 @@ function mostrar_alerta(tipo, titulo, mensaje) {
         dropdownParent: $modal.length ? $modal : $(document.body) // por si no está en modal
       });
     });
-  });
+  }); */
   
   //*SELECT2 para hacer el resguardo
   $(document).ready(function () {
@@ -621,75 +643,60 @@ function mostrar_alerta(tipo, titulo, mensaje) {
     }); */
   });
 
-  $(document).ready(function () {
-    fetch('database/controller_inventario/controller_inventario.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: 'trama=' + encodeURIComponent(JSON.stringify({ accion: 7 }))
-    })
-    .then(response => response.json())
-    .then(data => {
-      const opciones = data.resultado.map(item => ({
-        id: item.rubro || '',
-        text: item.rubro || ''
-      }));
-  
-      // Agrega opción vacía al principio
-    $('#inp-rubro').empty().append(new Option('', '', false, false));
+  async function general_select2({selectId, tabla, campo, placeholder, dropdownParent}){
+    try {
+        const response = await server_inventario({
+            accion: 9,
+            tabla: tabla, 
+            campo: campo
+        });
 
-      $('#inp-rubro').select2({
-        theme: 'bootstrap4',
-        allowClear: true,
-        placeholder: 'Selecciona un rubro',
-        dropdownParent: $('#modal-registro'),
-        data: opciones
-      });
-    })
+        //console.log('Respuesta del servidor para select2:', response);
 
-    // Esto asegura que no haya valor seleccionado por default
-    $('#inp-rubro').val(null).trigger('change');
+        const opciones = response.resultado.map(item => ({
+            id: item[campo] || '',
+            text: item[campo] || ''
+          }));
 
-    /* .catch(error => {
-      console.error('Error cargando usuarios:', error);
-    }); */
+        const $select = $('#' + selectId);
+        $select.empty().append(new Option('', '', false, false));
+
+        $select.select2({
+            theme: 'bootstrap4',
+            allowClear: true,
+            placeholder: placeholder,
+            tags: true,
+            dropdownParent: $(dropdownParent),
+            data: opciones
+        });
+
+        $select.val(null).trigger('change');
+
+    } catch (error) {
+        
+    }
+  }
+
+  general_select2({
+    selectId: 'inp-rubro',
+    tabla: 'inventario_ti_sur',
+    campo: 'rubro',
+    placeholder: 'Seleciona un rubro',
+    dropdownParent: '#modal-registro',
+    tags:true
   });
 
-  $(document).ready(function () {
-    fetch('database/controller_inventario/controller_inventario.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: 'trama=' + encodeURIComponent(JSON.stringify({ accion: 8 }))
-    })
-    .then(response => response.json())
-    .then(data => {
-      const opciones = data.resultado.map(item => ({
-        id: item.tipo || '',
-        text: item.tipo || ''
-      }));
-  
-      // Agrega opción vacía al principio
-    $('#inp-tipo').empty().append(new Option('', '', false, false));
-
-      $('#inp-tipo').select2({
-        theme: 'bootstrap4',
-        allowClear: true,
-        placeholder: 'Selecciona un tipo',
-        dropdownParent: $('#modal-registro'),
-        data: opciones
-      });
-    })
-
-    // Esto asegura que no haya valor seleccionado por default
-    $('#inp-tipo').val(null).trigger('change');
-
-    /* .catch(error => {
-      console.error('Error cargando usuarios:', error);
-    }); */
+  general_select2({
+    selectId: 'inp-tipo',
+    tabla: 'inventario_ti_sur',
+    campo: 'tipo',
+    placeholder: 'Seleciona un tipo',
+    dropdownParent: '#modal-registro',
+    tags: true
   });
+
+  //modal.removeAttribute('inert');
+
 
   //TODO: Funciones para el resguardo
 let modalRes 

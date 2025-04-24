@@ -176,7 +176,7 @@
     </div>
 
     <!--Modal registro del inventario-->
-    <div class="modal fade" id="modal-registro" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="modal-registro">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -216,7 +216,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><i class="fa-solid fa-warehouse"></i></span>
                                             </div>
-                                            <input type="text" class="form-control" id="inp-zona" placeholder="Zona">
+                                            <input type="text" class="form-control" id="inp-zona" name="mdl-reg" placeholder="Zona">
                                             <div class="invalid-feedback">Por favor, ingrese la zona operativa.</div>
                                         </div>
                                         <h6>Ubicacion del dispositivo</h6>
@@ -224,7 +224,8 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
                                             </div>
-                                            <input type="text" class="form-control" id="inp-ubicacion" placeholder="Ubicacion del dispositivo">
+                                            <input type="text" class="form-control" id="inp-ubicacion" name="mdl-reg" placeholder="Ubicacion del dispositivo">
+                                            <div class="invalid-feedback">Por favor, ingrese una ubicacion.</div>
                                         </div>  
                                     </div><!--col-->
                                 </div>
@@ -244,21 +245,21 @@
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-text"><i class="fa-solid fa-trademark"></i></span>
                                                     </div>
-                                                    <input type="text" class="form-control" id="inp-marca" placeholder="Marca del dispositivo">
+                                                    <input type="text" class="form-control" id="inp-marca" name="mdl-reg" placeholder="Marca del dispositivo">
                                                 </div>
                                                 <h6>Modelo del dispositivo</h6>
                                                 <div class="input-group mb-3">
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                                                     </div>
-                                                    <input type="text" class="form-control" id="inp-modelo" placeholder="Modelo del dispositivo">
+                                                    <input type="text" class="form-control" id="inp-modelo" name="mdl-reg" placeholder="Modelo del dispositivo">
                                                 </div>
                                                 <h6>Numero de serie</h6>
                                                 <div class="input-group mb-3">
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-text"><i class="fa-solid fa-square-binary"></i></span>
                                                     </div>
-                                                    <input type="text" class="form-control" id="inp-num-serie" placeholder="Numero de serie">
+                                                    <input type="text" class="form-control" id="inp-num-serie" name="mdl-reg" placeholder="Numero de serie">
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
@@ -268,14 +269,14 @@
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                                                     </div>
-                                                    <input type="text" class="form-control" id="inp-af" placeholder="AF">
+                                                    <input type="text" class="form-control" id="inp-af" name="mdl-reg" placeholder="AF">
                                                 </div> 
                                                 <h6>Etiqueta del dispositivo (TAG)</h6>
                                                 <div class="input-group mb-3">
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-text"><i class="fa-solid fa-tag"></i></span>
                                                     </div>
-                                                    <input type="text" class="form-control" id="inp-tag" placeholder="TAG">
+                                                    <input type="text" class="form-control" id="inp-tag" name="mdl-reg" placeholder="TAG">
                                                 </div>
                                             </div>
                                         </div>
@@ -287,21 +288,21 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                                     </div>
-                                    <input type="text" class="form-control" id="inp-usuario" placeholder="usuario">
+                                    <input type="text" class="form-control" id="inp-usuario" name="mdl-reg" placeholder="usuario">
                                 </div>
                                 <h6>Cargo del usuario</h6>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-id-card"></i></span>
                                     </div>
-                                    <input type="text" class="form-control" id="inp-posicion" placeholder="Cargo del usuario">
+                                    <input type="text" class="form-control" id="inp-posicion" name="mdl-reg" placeholder="Cargo del usuario">
                                 </div>
                                 <h6>Fecha de entrega</h6>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <input type="date" class="form-control" id="inp-fecha-entrega">
+                                    <input type="date" class="form-control" id="inp-fecha-entrega" name="mdl-reg">
                                 </div>
                             </div><!--Col12-->
                         </div><!--row-->
@@ -317,7 +318,7 @@
     </div>
 
     <!--Modal editar registro del inventario-->
-    <div class="modal fade" id="modal-editar" aria-hidden="true">
+    <div class="modal fade" id="modal-editar">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
