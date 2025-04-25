@@ -23,26 +23,67 @@ function server_inventario(model) {
 
 }
 
-$(document).ready(function (){
+function server_excel(model) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: "POST",
+            url: "database/controller_excel/controller_excel.php",
+            data: {
+                trama: JSON.stringify(model)
+            },
+            success: function(response) {
+                try {
+                    resolve(JSON.parse(response))
+                    Swal.close()
+                    //console.log(resolve(JSON.parse(response)))
+                    respuesta = response
+                } catch (error) {
+                    reject(error)
+                }
+            }
+        })
+    });
+
+
+}
+
+window.addEventListener('load', function () {
+    // Leemos el mensaje del registro desde localStorage
+    const mensajeRegistro = sessionStorage.getItem('bienvenido');
+    
+    if (mensajeRegistro) {
+        // Si el mensaje existe, mostramos el toast
+        mostrar_alerta('success', 'Bienvenido', mensajeRegistro);
+
+
+
+        // Eliminamos el mensaje para evitar que aparezca nuevamente
+        sessionStorage.removeItem('bienvenido');
+    }
+})
+
+/* $(document).ready(function (){
 
     $('#tabla1').on('mouseover', '.icon', function() {
         $(this).find('i').addClass('fa-bounce');  // Agregar una clase extra si lo deseas
     }).on('mouseout', '.icon', function() {
         $(this).find('i').removeClass('fa-bounce');
     });
-})
-$(".icon").on('mouseover', function(){
-    $(this).find('i').addClass("fa-bounce");
-})
-$(".icon").on('mouseout', function(e){
-    $(this).find('i').removeClass("fa-bounce");
-})
-let toast = $('#liveToast')
+}) */
+
+$(document).on('mouseover', '.icon', function() {
+    $(this).find('i').addClass('fa-bounce');
+}).on('mouseout', '.icon', function() {
+    $(this).find('i').removeClass('fa-bounce');
+});
 
 let datos = [];
 
 async function consultar_informacion(params) {
-
+    let usuarioLog = JSON.parse(sessionStorage.getItem('user'))
+    let user = document.getElementById('user')
+    user.textContent = usuarioLog.resultado[0]
+    
     let model = {
         accion: 2
     };
@@ -63,7 +104,7 @@ async function consultar_informacion(params) {
                     data: "id",
                     render: function(data, type, row) {
                         let control = `<div class="form-group form-check">
-                            <input type="checkbox" class="form-check-input check-change"
+                            <input type="checkbox" class="form-check-input"
                             onclick="selecionar_registro(${data})" value="${data}" id="check${data}">
                         </div>`
                         return control;
@@ -171,7 +212,7 @@ async function consultar_informacion(params) {
                 }
             ],
             dom: `
-                <'row mb-2'<'col-sm-6 text-left'f><'col-sm-6 text-right'B>>
+                <'row mb-2'<'col-sm-6 text-left'f><'col-sm-6 text-right'<'btn-group'B>>>
                 <'row'<'col-sm-12'tr>>
                 <'row mt-2'<'col-sm-3'l><'col-sm-5 text-center'i><'col-sm-4 text-right'p>>
             `,
@@ -184,69 +225,61 @@ async function consultar_informacion(params) {
                     last: '<i class="fas fa-angle-double-right"></i>'
                 },
             },
+            select: {
+                style: 'multi', // Permite selecionar múltiples filas
+                selector: 'td:not(:first-child)' // Evita selecionar al hacer click en el checkbox (opcional)
+            },
+            rowCallback: function (row, data) {
+                $(row).on('click', function() {
+                    const checkbox = $(this).find('input[type="checkbox"]');
+                    const isChecked = checkbox.prop('checked');
+                    
+                    checkbox.prop('checked', !isChecked); // Alterna el estado del checkbox
+                    // Muestra la selección
+                    if (!isChecked) {
+                        $(this).attr('style', 'background-color: #d1ecf1; color: #0c5460;'); // Estilo para seleccionado
+                    } else {
+                        $(this).removeAttr('style'); // Deselecionar
+                    }
+                    selecionar_registro(data.id); // Llama a la función para manejar la selección
+                });
+            },
             buttons: [
-                /* {
-                    extend: 'excelHtml5',
-                    text: 'Exportar a Excel',
-                    className: 'btn btn-sm btn-success'
-                },
                 {
-                    extend: 'pdfHtml5',
-                    text: 'Exportar a PDF',
-                    className: 'btn btn-sm btn-danger'
-                },
-                {
-                    extend: 'print',
-                    text: 'Imprimir',
-                    className: 'btn btn-sm btn-primary'
-                }, */
-                {
-                    text: '<i class="fa-solid fa-pen-to-square fa-lg"></i> Crear registro',
-                    className: 'btn btn-sm btn-success icon',
+                    html: `<div>
+                            <button type="button" class="btn btn-success rounded mr-3 icon" onclick="resguardo()" >
+                            <i class="fa-solid fa-pen-to-square fa-lg"></i> Crear Registro</button>
+                        </div>`,//'<i class="fa-solid fa-pen-to-square fa-lg"></i> Crear registro',
+                    //className: 'btn btn-success rounded mr-3 icon',
                     attr: {
-                        style: `
-                            background-color: #28a745; 
-                            color: white; 
-                            border-radius: 50px; 
-                            padding: 10px 20px; 
-                            font-size: 16px; 
-                            font-weight: bold; 
-                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
-                            transition: all 0.3s ease;
-                        `, // Estilos inline
                         title: 'Haz clic para agregar un registros'
                     },
                     action: function (e, dt, node, config) {
-                        let modal = new bootstrap.Modal(document.getElementById('modal-registro'));
+                        modal = new bootstrap.Modal(document.getElementById('modal-registro'));
                         modal.show();
                         //mostrar_datos()
                     }
                 },
                 {
-                    text: '<i class="fa-solid fa-trash fa-lg"></i> Eliminar registro',
-                    className: 'btn btn-sm btn-primary ',
+                    html: `<div>
+                            <button type="button" style="text-align: center" class="btn btn-danger rounded  icon" >
+                            <i class="fa-solid fa-trash fa-lg"></i> Eliminar Registro</button>
+                        </div>`,//'<i class="fa-solid fa-trash fa-lg"></i> Eliminar registro',
+                    //className: 'btn btn-danger rounded icon',
                     attr: {
-                        style: `
-                            background-color:rgb(211, 38, 38); 
-                            color: white; 
-                            border-radius: 50px; 
-                            padding: 10px 20px; 
-                            font-size: 16px; 
-                            font-weight: bold; 
-                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
-                            transition: all 0.3s ease;
-                        `, // Estilos inline
                         title: 'Haz clic para eliminar un registro'
                     },
                     action: function (e, dt, node, config) {
                         confirmar_eliminacion();
                     }
                 },
+                
             ],
             stateSave: true,
             resposive: true,
            
         });
+        
     } catch (error) {
         console.log(error)
     }
@@ -310,10 +343,24 @@ async function selecionar_registro(params) {
     } 
 }
 
-let modal = ""
+let modal
 
-async function crear_registro(params) {
-    
+async function crear_registro() {
+    // Campos requeridos para validación
+    const validacion = [
+        "inp-zona",
+        "inp-rubro",
+        "inp-tipo",
+        "inp-ubicacion",
+    ];
+
+    // Validar campos
+    if (!validar_campos(validacion)) {
+        mostrar_alerta('error', 'Error', 'Rellena los campos. Inténtelo nuevamente');
+        return;
+    }
+
+    // Crear el modelo con los datos del formulario
     let model = {
         accion: 0,
         zona: $("#inp-zona").val().trim(),
@@ -327,29 +374,43 @@ async function crear_registro(params) {
         tag: $("#inp-tag").val().trim(),
         usuario: $("#inp-usuario").val().trim(),
         posicion: $("#inp-posicion").val().trim(),
-        fecha_entrega: $("inp-fecha-entrega").val()
+        fecha_entrega: $("#inp-fecha-entrega").val()
+    };
+
+    // Enviar datos al servidor
+    let respuesta = await server_inventario(model);
+
+    // Validar respuesta del servidor
+    const serie = document.getElementById('inp-num-serie');
+    serie.classList.remove('is-invalid'); // Remover clase de error si existía
+
+    if (respuesta.resultado === true) {
+        let table = $('#tabla1').DataTable();
+        table.destroy();
+        consultar_informacion();
+        modal.hide();
+        mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
+    } else if (respuesta.resultado === false) {
+        if (respuesta.mensaje === "Número de serie duplicado") {
+            serie.classList.add('is-invalid'); // Marcar el campo como inválido si hay un número de serie duplicado
+            mostrar_alerta('warning', 'Número de serie duplicado', 'Este número de serie ya está registrado.');
+        } else {
+            mostrar_alerta('error', 'Error', 'No se pudo crear el registro. Inténtalo nuevamente.');
+        }
+    } else {
+        mostrar_alerta('error', 'Error', 'No se pudo crear el registro. Inténtalo nuevamente.');
     }
 
-    let server = await server_inventario(model);
-    let response = JSON.parse(respuesta);
-
-    
-        if (response.resultado === true) {
-            mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
-            
-        } else {
-            mostrarAlerta('error', 'Error', 'No se pudo crear el registro. Inténtalo nuevamente.');
-        }
-    
-    let table = $('#tabla1').DataTable();
-    table.destroy();
-    consultar_informacion();
-    let modal = new bootstrap.getInstance(document.getElementById('modal-registro'));
-    modal.hide();
 }
 
 async function editar_registro(params) {
     deshabilitar_campo();
+    const validacion = [
+        "inp-zona",
+        "inp-rubro",
+        "inp-tipo",
+        "inp-ubicacion",
+    ];
     let model = {
         accion: 1,
         id: selecreg.id,
@@ -393,7 +454,7 @@ async function desactivar_registro(params) {
             consultar_informacion();
 
         } else {
-            mostrarAlerta('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
+            mostrar_alerta('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
         }
 }
 
@@ -455,6 +516,32 @@ $(document).ready(function() {
     deshabilitar_campo();  // Llamamos a la función para asegurar que el campo se habilite/deshabilite al cargar
 });
 
+function validar_campos(campos) {
+    let valido = true;
+
+    campos.forEach(id => {
+        const campo = document.getElementById(id);
+        if (!campo) {
+            valido = false;
+            return;
+        }
+
+        if (!campo.value.trim()) {
+            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
+            valido = false;
+        } else {
+            campo.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
+        }
+
+        campo.addEventListener('input', function () {
+            if (campo.value.trim()) {
+                campo.classList.remove('is-invalid');
+            }
+        });
+    });
+
+    return valido;
+}
 
 //TODO: Alertas, confirmaciones
 
@@ -499,6 +586,7 @@ function mostrar_alerta(tipo, titulo, mensaje) {
     });
   });
   
+  //*SELECT2 para hacer el resguardo
   $(document).ready(function () {
     fetch('database/controller_inventario/controller_inventario.php', {
       method: 'POST',
@@ -534,38 +622,165 @@ function mostrar_alerta(tipo, titulo, mensaje) {
     }); */
   });
 
+  $(document).ready(function () {
+    fetch('database/controller_inventario/controller_inventario.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'trama=' + encodeURIComponent(JSON.stringify({ accion: 7 }))
+    })
+    .then(response => response.json())
+    .then(data => {
+      const opciones = data.resultado.map(item => ({
+        id: item.rubro || '',
+        text: item.rubro || ''
+      }));
+  
+      // Agrega opción vacía al principio
+    $('#inp-rubro').empty().append(new Option('', '', false, false));
 
+      $('#inp-rubro').select2({
+        theme: 'bootstrap4',
+        allowClear: true,
+        placeholder: 'Selecciona un rubro',
+        dropdownParent: $('#modal-registro'),
+        data: opciones
+      });
+    })
 
-let modalRes  
+    // Esto asegura que no haya valor seleccionado por default
+    $('#inp-rubro').val(null).trigger('change');
+
+    /* .catch(error => {
+      console.error('Error cargando usuarios:', error);
+    }); */
+  });
+
+  $(document).ready(function () {
+    fetch('database/controller_inventario/controller_inventario.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: 'trama=' + encodeURIComponent(JSON.stringify({ accion: 8 }))
+    })
+    .then(response => response.json())
+    .then(data => {
+      const opciones = data.resultado.map(item => ({
+        id: item.tipo || '',
+        text: item.tipo || ''
+      }));
+  
+      // Agrega opción vacía al principio
+    $('#inp-tipo').empty().append(new Option('', '', false, false));
+
+      $('#inp-tipo').select2({
+        theme: 'bootstrap4',
+        allowClear: true,
+        placeholder: 'Selecciona un tipo',
+        dropdownParent: $('#modal-registro'),
+        data: opciones
+      });
+    })
+
+    // Esto asegura que no haya valor seleccionado por default
+    $('#inp-tipo').val(null).trigger('change');
+
+    /* .catch(error => {
+      console.error('Error cargando usuarios:', error);
+    }); */
+  });
+
+  //TODO: Funciones para el resguardo
+let modalRes 
 function resguardo(){
+    let inputs = document.getElementsByName('resg-inpt')
+    for (let i = 0; i < inputs.length; i++) {
+        const element = inputs[i].value = "";
+    }
+    $('#select-usu').val(null).trigger('change');
+
+    $(document).ready(function() {
+        let hoy = new Date().toISOString().split('T')[0];
+        $('#fecha-resguardo').val(hoy);
+    });
+    
+    
+
     modalRes = new bootstrap.Modal(document.getElementById('mdl-res'));
     modalRes.show();
 }
 
+let infoResguardo
+async function crear_resguardo(params) {
 
+    let select = document.getElementById('select-usu')
+    if (select.value === "") {
+        mostrar_alerta('error', 'Error', 'Seleccione al menos un usuario. Inténtalo nuevamente.')
+        return
+    }
+    let model = {
+        accion : 6,
+        usuario : $('#select-usu').find('option:selected').text(),
+        comentario : $('#txt-area').val().trim(),
+        fecha: $('#fecha-resguardo').val()
+    }
+    let server = await server_inventario(model)
 
-function descargar_excel() {
-    fetch('database/controller_excel/controller_excel.php')
-        .then(response => {
-            if (!response.ok) throw new Error('Error al generar el archivo');
-            return response.blob();
-        })
-        .then(blob => {
-            const nombreArchivo = 'Reporte_' + new Date().toISOString().slice(0, 10) + '.xlsx'; // Ejemplo: Reporte_2025-04-15.xlsx
-            const url = window.URL.createObjectURL(blob);
-
-            const enlace = document.createElement('a');
-            enlace.href = url;
-            enlace.download = nombreArchivo;
-            document.body.appendChild(enlace);
-            enlace.click();
-            document.body.removeChild(enlace);
-            window.URL.revokeObjectURL(url);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Ocurrió un error al generar el Excel.');
-        });
-
-    return false; // Para evitar que el enlace navegue
+    
+    infoResguardo = server.resultado
+    //console.log(infoResguardo)
+    modalRes.hide();
+    descargar_excel()
+    mostrar_toast_cargando()
 }
+
+
+async function descargar_excel(params) {
+    dominio = window.location.hostname,
+    puerto = location.port
+    let model = {
+        accion : 0,
+        datos: infoResguardo
+    }
+    let server = await server_excel(model)
+
+    let ruta = JSON.parse(respuesta)
+    // Elimina comillas si vienen así: '"C:\\ruta\\archivo.xlsx"'
+    ruta.resultado = ruta.resultado.replace(/^"|"$/g, '');
+
+    // Reemplaza las \ por /
+    ruta.resultado = ruta.resultado.replace(/\\/g, '/');
+
+    // Cambia la extensión
+    ruta.resultado = ruta.resultado.replace(/\.xlsx$/i, '.pdf');
+
+    ruta.resultado = ruta.resultado.replace("C:/xampp/htdocs", "http://"+dominio+":"+puerto)
+    console.log(ruta.resultado)
+    window.open(ruta.resultado, '_blank');
+}
+
+function mostrar_toast_cargando() {
+    Swal.fire({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        showCloseButton: false,
+        timer: undefined, // No cerrar automáticamente
+        allowOutsideClick: false,
+        background: '#fff',
+        html: `
+            <div style="display: flex; align-items: center;">
+                <i class="fas fa-spinner fa-spin fa-lg" style="margin-right: 10px; color: #007bff;"></i>
+                <span style="font-weight: 500;">Cargando...</span>
+            </div>
+        `,
+        didOpen: () => {
+            //Swal.showLoading(); // Esto muestra el spinner
+        }
+    });
+}
+
+
+   

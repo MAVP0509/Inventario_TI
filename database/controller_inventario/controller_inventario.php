@@ -15,10 +15,16 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_datos($clientejson);
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = desactivar_datos($clientejson);
-}elseif ($clientejson->accion == 4) {
+} elseif ($clientejson->accion == 4) {
     $respuesta_servidor->resultado = eliminar_datos($clientejson);
-}elseif($clientejson->accion == 5) {
+} elseif ($clientejson->accion == 5) {
     $respuesta_servidor->resultado = consultar_usuarios($clientejson);
+} elseif ($clientejson->accion == 6) {
+    $respuesta_servidor->resultado = consultar_por_usuario($clientejson);
+} elseif ($clientejson->accion == 7) {
+    $respuesta_servidor->resultado = consultar_rubro($clientejson);
+} elseif ($clientejson->accion == 8) {
+    $respuesta_servidor->resultado = consultar_tipo($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -28,10 +34,22 @@ print(json_encode($respuesta_servidor));
 function insertar_datos($valores) {
     include("../conexion.php");
     $registro = date("Y-m-d H:i:s");
+
+    $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$valores->num_serie'";
+    //var_dump($sql_num);
+    $query_num = mysqli_query($con, $sql_num);
+
     $sql = "INSERT INTO inventario_ti_sur(zona, rubro, af, tipo, marca, modelo, num_serie, ubicacion, tag, usuario, posicion, fecha_entrega, habilitado) 
-    VALUES ('$valores->zona', '$valores->rubro','$valores->af','$valores->tipo','$valores->marca','$valores->modelo', '$valores->num_serie', 
-    '$valores->ubicacion', '$valores->tag', '$valores->usuario', '$valores->posicion', '$registro',1);";
-    return mysqli_query($con,$sql);
+        VALUES ('$valores->zona', '$valores->rubro','$valores->af','$valores->tipo','$valores->marca','$valores->modelo', '$valores->num_serie', 
+        '$valores->ubicacion', '$valores->tag', '$valores->usuario', '$valores->posicion', '$registro',1);";
+    //$query = mysqli_query($con, $sql);
+
+    if(mysqli_num_rows($query_num) > 0) {
+        echo json_encode(["resultado" => false, "mensaje" => "Número de serie duplicado"]);
+        exit;
+    } else {
+        return mysqli_query($con, $sql);
+    }
 }
 
 function editar_datos($valores) {
@@ -85,7 +103,7 @@ function eliminar_datos($valores){
 
 function consultar_usuarios() {
     include("../conexion.php");
-    $sql = "SELECT DISTINCT usuario FROM inventario_ti_sur;";
+    $sql = "SELECT DISTINCT usuario FROM inventario_ti_sur where usuario != 'NA';";
     $resultado = mysqli_query($con,$sql);
     $datos = [];
 
@@ -98,5 +116,52 @@ function consultar_usuarios() {
     }
     return $datos;
 
+}
+
+function consultar_por_usuario($valores) {
+    include("../conexion.php");
+    
+    $sql = "SELECT * FROM inventario_ti_sur WHERE habilitado = 1 AND usuario = '$valores->usuario'";
+    $query = mysqli_query($con, $sql);
+    
+    $datos = [];
+    while ($fila = mysqli_fetch_assoc($query)) {
+        $datos[] = $fila;
+    }
+
+    $datos[0]['comentario'] = $valores->comentario ?? '';
+    $datos[0]['fecha'] = $valores->fecha ?? '';
+    return $datos;
+}
+
+function consultar_rubro(){
+    include("../conexion.php");
+    $sql = "SELECT DISTINCT rubro from inventario_ti_sur;";
+    $query = mysqli_query($con, $sql);
+    $datos = [];
+
+    while ($fila = mysqli_fetch_assoc($query)) {
+        $datos[] = [
+            'id' => $fila['rubro'],
+            'rubro' => $fila['rubro']
+        ];
+    }
+
+    return $datos;
+}
+function consultar_tipo(){
+    include("../conexion.php");
+    $sql = "SELECT DISTINCT tipo from inventario_ti_sur;";
+    $query = mysqli_query($con, $sql);
+    $datos = [];
+
+    while ($fila = mysqli_fetch_assoc($query)) {
+        $datos[] = [
+            'id' => $fila['tipo'],
+            'tipo' => $fila['tipo']
+        ];
+    }
+
+    return $datos;
 }
 ?>

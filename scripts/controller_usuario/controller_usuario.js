@@ -1,4 +1,4 @@
-let respuesta
+ let respuesta
 function server_usuario(model) {
     return new Promise ((resolve,reject)=>{
         $.ajax({
@@ -20,6 +20,28 @@ function server_usuario(model) {
     })
 }
 
+function server_email(model){
+    return new Promise ((resolve,reject)=>{
+        $.ajax({
+            type: "POST",
+            url: "database/controller_email/controller_email.php",
+            data: {
+                trama:JSON.stringify(model)
+            },
+            success: function(response){
+                Swal.close()
+                respuesta = response
+                try {
+                    resolve(JSON.parse(response))
+                    console.log(JSON.parse(response))   
+                } catch (error) {
+                    reject(error)
+                }
+            }
+        })
+    })
+}
+
 
 $(document).ready(function (){
     document.getElementById('fechanacReg').addEventListener('input',calcular_edadreg);
@@ -32,29 +54,6 @@ $(document).ready(function (){
         $(this).find('i').removeClass('fa-bounce');
     });
 })
-$(".icon").on('mouseover', function(){
-    $(this).find('i').addClass("fa-bounce");
-})
-$(".icon").on('mouseout', function(e){
-    $(this).find('i').removeClass("fa-bounce");
-})
-let toast = $('#liveToast')
-
-window.addEventListener('load', function () {
-    // Leemos el mensaje del registro desde localStorage
-    const mensajeRegistro = sessionStorage.getItem('bienvenido');
-    
-    if (mensajeRegistro) {
-        // Si el mensaje existe, mostramos el toast
-        mostrar_toast('success', 'Bienvenido', mensajeRegistro)
-
-
-        // Eliminamos el mensaje para evitar que aparezca nuevamente
-        sessionStorage.removeItem('bienvenido');
-    }
-})
-
-
 
 
 let usuarios = []
@@ -163,12 +162,12 @@ async function consultar_usuarios() {
                     },
                 },
                 buttons:[
-                    {   text : 'word',
+                    /*{   text : 'word',
                         action: function (e, dt, node, config) {
                             crear_word()
                         }
                     },
-                    /* {
+                     {
                         extend: 'excelHtml5',
                         text: 'Exportar a Excel',
                         className: 'btn btn-sm btn-success'
@@ -185,13 +184,11 @@ async function consultar_usuarios() {
                     }, */
                 ],
                 stateSave: true,
-                resposive: true,
+                responsive: true,
                 //!Esta parte del codigo (DOM) es para que los botones, paginacion y filtros de busqueda se acomoden a sus necesidades, si quieren pueden buscar mas info en la documentacion de datatables, pero en este caso no es necesario.
   
     })   
 }
-
-
 
 
 let usuSelect = ""
@@ -333,7 +330,8 @@ async function insertar_usuario(params) {
         if(resp.resultado === true){
             mostrar_toast('success', 'Inventario TI', 'Usuario registrado correctamente')
         }else if(resp.resultado === false){
-            mostrar_toast('warning', 'Inventario TI', 'Usuario Usuario ya existente')
+            mostrar_toast('warning', 'Inventario TI', 'El correo ya está registrado')
+            return;
         } 
     
         let table = $("#tbl-usuario").DataTable()
@@ -427,19 +425,14 @@ async function desactivar_usuario(params) {
     }
 }
 
-$("#log-out").on('mouseover', function(){
-    $(this).find('i').removeClass('fa-solid fa-door-closed fa-lg').addClass('fa-solid fa-door-open fa-xl');
-})
-$("#log-out").on('mouseout', function(){
-    $(this).find('i').removeClass('fa-solid fa-door-open fa-lg').addClass('fa-solid fa-door-closed fa-xl')
-})
+
 
 
 // *Función para comprobar el nombre en el modal de registrar usuario
 let nombre= false
 $('#nombreReg').on('input', function(e) {
     //validar_nombre(e.currentTarget.value)
-    const regexNombre = /^[a-zA-ZáéíóúÁÉÍÓÚüÜ]{3,}$/
+    const regexNombre = /^[a-zA-ZáéíóúÁÉÍÓÚüÜ\s]{3,}$/
     if(!regexNombre.test(e.currentTarget.value)){
         document.getElementById('error-mensajeNombre').style = 'display : block; color:red;'
         nombre=false
@@ -509,14 +502,28 @@ $('#contraseñaReg').on('input', function(e) {
     
 });
 
-async function cerrar_sesionmsg() {
-    mostrar_alert('warning', `¿Seguro que quieres salir?`, false , cerrar_sesion)
+
+
+async function recuperar_contraseña() {
+    let model ={
+        accion : 0,
+        correo : $("#correo").val().trim(),
+        dominio : window.location.hostname,
+        puerto : location.port
+    }
+    
+    let response = await server_email(model);
+    
+    if(response.resultado === true) {
+        mostrar_toast('success', 'Correo Enviado', 'Se enviado un correo al usuario para recuperar su contraseña')
+        console.log(window.location.hostname);
+    } else {
+        mostrar_toast('error', 'Error', 'No se envio el correo al usuario')
+    }
+    
 }
 
-function cerrar_sesion(){
-    sessionStorage.setItem('log','false')
-    window.location.reload()
-}
+
 
 function crear_word() {
     const enlace = document.createElement('a');
@@ -541,7 +548,6 @@ function mostrar_toast(tipo, titulo, mensaje) {
         toast: true,
         position: 'top-end',
         heightAuto : true,
-        theme : 'dark'
     });
 }
 
@@ -551,11 +557,12 @@ function mostrar_alert(tipo, mensaje, skip, funcion) {
         text: mensaje,
         icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
         showCancelButton: true,
-        confirmButtonColor: '#d33',
+        confirmButtonColor: '#0000FF',
         allowOutsideClick : skip, // true, false
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Aceptar <i class="fa-solid fa-thumbs-up fa-lg"></i>',
-        cancelButtonText: 'Cancelar <i class="fa-solid fa-thumbs-down fa-lg"></i>',
+        cancelButtonColor: '#FF0000',
+        confirmButtonText: 'Aceptar <i class="fa-solid fa-circle-check fa-lg">',
+        cancelButtonText: 'Cancelar <i class="fa-solid fa-xmark fa-lg"></i>',
+        reverseButtons: true, //* 👉 Esto cambia el orden de los botones
         backdrop: `
         rgba(0,0,123,0.4)` ,
     }).then((result) => {
@@ -564,4 +571,25 @@ function mostrar_alert(tipo, mensaje, skip, funcion) {
             funcion();
         }
     })
+}
+
+function mostrar_toast_cargando() {
+    Swal.fire({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        showCloseButton: false,
+        timer: undefined, // No cerrar automáticamente
+        allowOutsideClick: false,
+        background: '#fff',
+        html: `
+            <div style="display: flex; align-items: center;">
+                <i class="fas fa-spinner fa-spin fa-lg" style="margin-right: 10px; color: #007bff;"></i>
+                <span style="font-weight: 500;">Cargando...</span>
+            </div>
+        `,
+        didOpen: () => {
+            //Swal.showLoading(); // Esto muestra el spinner
+        }
+    });
 }

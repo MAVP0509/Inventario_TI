@@ -25,7 +25,7 @@
         <!--Col de Iniciar sesión-->
         <div class="col" style="display: block;" id="colblock">
             <div class="card text-center" style="width: 50vh;">
-                <div class="card-body">
+                <div class="card-body" id="form-login">
                     <h5>Iniciar sesión</h5><br>
                     <!--Logotipo del usuario-->
                     <i class="fa-solid fa-circle-user fa-5x"></i><br><br>
@@ -39,7 +39,6 @@
                             placeholder="Correo eléctronico" name="inputInit">
                     </div>
                     <span id="error-mensajeEmail-log" style="display: none; color:red;">Ingresa un correo válido</span>
-
                     <!--input de la contraseña-->
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
@@ -155,7 +154,7 @@
                         <button type="button" class="btn btn-danger icon" onclick="toggleForms(false)">Cancelar <i
                                 class="fa-solid fa-right-from-bracket fa-lg"></i></button>
                         <button type="button" class="btn btn-primary icon"
-                            onclick="recuperar_contraseña(), cargando()">Buscar <i
+                            onclick="recuperar_contraseña(), cargando()" id="btn-recuperar">Buscar <i
                                 class="fa-solid fa-magnifying-glass fa-lg"></i></button>
                     </div>
                     <div class="alert alert-success" role="alert" id="mensaje-correo-success" style="display: none;">
