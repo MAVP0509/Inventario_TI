@@ -255,11 +255,11 @@ async function consultar_informacion(params) {
                 },
                 {
                     html: `<div>
-                            <button type="button" class="btn btn-success rounded mr-3 icon" onclick="resguardo()" >
+                            <button type="button" class="btn btn-success rounded mr-3 icon" onclick="limpiar()" >
                             <i class="fa-solid fa-pen-to-square fa-lg"></i> Crear Registro</button>
                         </div>`,//'<i class="fa-solid fa-pen-to-square fa-lg"></i> Crear registro',
                     //className: 'btn btn-success rounded mr-3 icon',
-                    attr: {
+                   /*  attr: {
                         title: 'Haz clic para agregar un registros'
                     },
                     action: function (e, dt, node, config) {
@@ -267,20 +267,20 @@ async function consultar_informacion(params) {
                         //modal = new bootstrap.Modal(document.getElementById('modal-registro'));
                         //modal.show();
                         //mostrar_datos()
-                    }
+                    } */
                 },
                 {
                     html: `<div>
-                            <button type="button" style="text-align: center" class="btn btn-danger rounded  icon" >
+                            <button type="button" onclick="confirmar_eliminacion()" style="text-align: center" class="btn btn-danger rounded icon">
                             <i class="fa-solid fa-trash fa-lg"></i> Eliminar Registro</button>
                         </div>`,//'<i class="fa-solid fa-trash fa-lg"></i> Eliminar registro',
                     //className: 'btn btn-danger rounded icon',
-                    attr: {
+                    /* attr: {
                         title: 'Haz clic para eliminar un registro'
                     },
                     action: function (e, dt, node, config) {
                         confirmar_eliminacion();
-                    }
+                    } */
                 },
                 
             ],
@@ -521,9 +521,9 @@ async function confirmar_eliminacion() {
     }
 } */
 
-$(document).ready(function() {
+/* $(document).ready(function() {
     deshabilitar_campo();  // Llamamos a la función para asegurar que el campo se habilite/deshabilite al cargar
-});
+}); */
 
 function validar_campos(campos) {
     let valido = true;
