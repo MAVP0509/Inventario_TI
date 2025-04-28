@@ -647,7 +647,7 @@ function mostrar_alerta(tipo, titulo, mensaje) {
   });
 
   async function general_select2({selectId, tabla, campo, placeholder, dropdownParent}){
-    try {
+    //try {
         const response = await server_inventario({
             accion: 9,
             tabla: tabla, 
@@ -675,9 +675,9 @@ function mostrar_alerta(tipo, titulo, mensaje) {
 
         $select.val(null).trigger('change');
 
-    } catch (error) {
+    //} catch (error) {
         
-    }
+    //}
   }
 
   general_select2({
