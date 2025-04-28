@@ -322,6 +322,25 @@ async function mostrar_registro(params) {
             break;
         }
     }
+
+    general_select2({
+        selectId: 'edi-rubro',
+        tabla: 'inventario_ti_sur',
+        campo: 'rubro',
+        placeholder: 'Selecione un rubro',
+        dropdownParent: '#modal-editar',
+        tags: true
+      })
+    
+      general_select2({
+        selectId: 'edi-tipo',
+        tabla: 'inventario_ti_sur',
+        campo: 'tipo',
+        placeholder: 'Selecione un rubro',
+        dropdownParent: '#modal-editar',
+        tags: true
+      })
+      
         document.getElementById("edi-zona").value = selecreg.zona;
         document.getElementById("edi-rubro").value = selecreg.rubro;
         document.getElementById("edi-af").value = selecreg.af;
@@ -415,7 +434,7 @@ async function crear_registro() {
 }
 
 async function editar_registro(params) {
-    deshabilitar_campo();
+    //deshabilitar_campo();
     const validacion = [
         "inp-zona",
         "inp-rubro",
@@ -580,7 +599,7 @@ function limpiar_campos(){
         dropdownParent: '#modal-registro',
         tags: true
       });
-      
+
     // modal = new bootstrap.Modal(document.getElementById('modal-registro'));
     $("#modal-registro").modal('show');
     //modal.show();
@@ -688,24 +707,6 @@ function mostrar_alerta(tipo, titulo, mensaje) {
         
     //}
   }
-
-  general_select2({
-    selectId: 'edi-rubro',
-    tabla: 'inventario_ti_sur',
-    campo: 'rubro',
-    placeholder: 'Selecione un rubro',
-    dropdownParent: '#modal-editar',
-    tags: true
-  })
-
-  general_select2({
-    selectId: 'edi-tipo',
-    tabla: 'inventario_ti_sur',
-    campo: 'tipo',
-    placeholder: 'Selecione un rubro',
-    dropdownParent: '#modal-editar',
-    tags: true
-  })
 
   //modal.removeAttribute('inert');
 
