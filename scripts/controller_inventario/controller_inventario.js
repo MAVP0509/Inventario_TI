@@ -255,11 +255,11 @@ async function consultar_informacion(params) {
                 },
                 {
                     html: `<div>
-                            <button type="button" class="btn btn-success rounded mr-3 icon" onclick="limpiar()" >
+                            <button type="button" class="btn btn-success rounded mr-3 icon" onclick="limpiar_campos()" >
                             <i class="fa-solid fa-pen-to-square fa-lg"></i> Crear Registro</button>
                         </div>`,//'<i class="fa-solid fa-pen-to-square fa-lg"></i> Crear registro',
                     //className: 'btn btn-success rounded mr-3 icon',
-                   /*  attr: {
+                    /* attr: {
                         title: 'Haz clic para agregar un registros'
                     },
                     action: function (e, dt, node, config) {
@@ -356,7 +356,7 @@ let modal
 
 async function crear_registro() {
     // Campos requeridos para validación
-    
+
     const validacion = [
         "inp-zona",
         "inp-rubro",
@@ -398,7 +398,7 @@ async function crear_registro() {
         let table = $('#tabla1').DataTable();
         table.destroy();
         consultar_informacion();
-        modal.hide();
+        $("#modal-registro").modal('hide');
         mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
     } else if (respuesta.resultado === false) {
         if (respuesta.mensaje === "Número de serie duplicado") {
@@ -521,9 +521,9 @@ async function confirmar_eliminacion() {
         // Si no tiene un valor, habilitar el campo
         $("#edi-rubro").prop('disabled', true);
     }
-} */
+}
 
-/* $(document).ready(function() {
+$(document).ready(function() {
     deshabilitar_campo();  // Llamamos a la función para asegurar que el campo se habilite/deshabilite al cargar
 }); */
 
@@ -552,9 +552,9 @@ function validar_campos(campos) {
     });
 
     return valido;
-} 
+}
 
-function limpiar(){
+function limpiar_campos(){
     let input = document.getElementsByName('mdl-reg');
     for (let i = 0; i < input.length; i++) {
         const element = input[i].value = "";
@@ -562,6 +562,25 @@ function limpiar(){
     $('.select').each(function () {
         $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
     });
+
+    general_select2({
+        selectId: 'inp-rubro',
+        tabla: 'inventario_ti_sur',
+        campo: 'rubro',
+        placeholder: 'Seleciona un rubro',
+        dropdownParent: '#modal-registro',
+        tags:true
+      });
+    
+      general_select2({
+        selectId: 'inp-tipo',
+        tabla: 'inventario_ti_sur',
+        campo: 'tipo',
+        placeholder: 'Seleciona un tipo',
+        dropdownParent: '#modal-registro',
+        tags: true
+      });
+      
     // modal = new bootstrap.Modal(document.getElementById('modal-registro'));
     $("#modal-registro").modal('show');
     //modal.show();
@@ -583,16 +602,6 @@ function mostrar_alerta(tipo, titulo, mensaje) {
 }
 
 //TODO: Configuración del select2
-/* $(document).ready(function() {
-    $(".select").select2({
-        theme: 'bootstrap4',
-        placeholder: "Selecciona un rubro", // Texto de ayuda
-        allowClear: true, // Permitir limpiar la selección
-        tags: true,
-        dropdownParent: $(parentID) // * Permite al menú despegable se adjunte al modal
-    });
-  }); */
-
  /*  $(document).ready(function() {
     $(".select").each(function() { //recorre cada <select class="select">
       const $select = $(this);
@@ -679,24 +688,6 @@ function mostrar_alerta(tipo, titulo, mensaje) {
         
     //}
   }
-
-  general_select2({
-    selectId: 'inp-rubro',
-    tabla: 'inventario_ti_sur',
-    campo: 'rubro',
-    placeholder: 'Seleciona un rubro',
-    dropdownParent: '#modal-registro',
-    tags:true
-  });
-
-  general_select2({
-    selectId: 'inp-tipo',
-    tabla: 'inventario_ti_sur',
-    campo: 'tipo',
-    placeholder: 'Seleciona un tipo',
-    dropdownParent: '#modal-registro',
-    tags: true
-  });
 
   general_select2({
     selectId: 'edi-rubro',
