@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="libraries/fontawesome-free-6.7.2-web/css/all.min.css">
     <link rel= "stylesheet" href="libraries/bootstrap-4.6.2-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="dist/css/adminlte.min.css">
     <link rel="stylesheet" href="libraries/DataTables/datatables.min.css">
-    <!-- CSS de Air Datepicker -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/air-datepicker@3.3.5/air-datepicker.min.css">
+    
+
     
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
     
@@ -60,23 +61,21 @@
           <!-- Sidebar Menu -->
           <nav class="mt-2">
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-              <!-- Add icons to the links using the .nav-icon class
-                  with font-awesome or any other icon font library -->
                 <li class="nav-item">
-                  <a href="usuario.html" class="nav-link active">
+                  <a href="inventario.html" class="nav-link active">
+                    <i class="nav-icon fa-solid fa-cubes"></i>
+                    <p>
+                      Inventario
+                    </p>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="#" class="nav-link">
                       <i class="nav-icon fa-solid fa-users"></i>
                       <p>
                         Usuarios
                       </p>
                   </a>
-                </li>
-                <li class="nav-item">
-                    <a href="inventario.html" class="nav-link active">
-                        <i class="nav-icon fa-solid fa-cubes"></i>
-                        <p>
-                            Inventario
-                        </p>
-                    </a>
                 </li>
             </ul>
           </nav>
@@ -110,8 +109,8 @@
                                 Usuarios
                               </h3>
                               <div class="d-flex justify-content-end mb-3">
-                                <button type="button" onclick="nuevo_usuario()" class="btn btn-info icon">Nuevo Usuario <i class="fa-solid fa-plus fa-lg"></i></button>
-                                <button type="button" onclick="mensaje_eliminar()" class="btn btn-danger icon" style="margin-left: 10px;">Eliminar Usuario <i class="fa-solid fa-trash fa-lg"></i></button>
+                                <!-- <button type="button" onclick="nuevo_usuario()" class="btn btn-info icon">Nuevo Usuario <i class="fa-solid fa-plus fa-lg"></i></button>
+                                <button type="button" onclick="mensaje_eliminar()" class="btn btn-danger icon" style="margin-left: 10px;">Eliminar Usuario <i class="fa-solid fa-trash fa-lg"></i></button> -->
                               </div>
                             </div><!-- /.card-header -->
 
@@ -123,7 +122,7 @@
                                       </div>
                                       <div class="row">
                                           <div class="col-sm-12">
-                                              <table id="tbl-usuario" class="table table-bordered table-hover dataTable dtr-inline " aria-describedby="Tabla de usuarios">
+                                              <table id="tbl-usuario" class="table table-bordered table-hover dataTable dtr-inline table-responsive" aria-describedby="Tabla de usuarios">
                                                   <thead>
                                                       <tr>
                                                           <th></th>
@@ -235,12 +234,22 @@
                             <input type="datetime" class="form-control" id="fecha_reg" disabled>
                         </div>
                         <label for="contraseña" class="form-label">Contraseña</label>
-                        <div class="input-group mb-3">
+                        <div class="input-group mb-3 ">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i id="ver-passEdit" class="fa-solid fa-eye-slash" style="cursor: pointer;"></i></span>
                             </div>
-                            
                             <input type="password" class="form-control" id="contraseña" disabled>
+                            <!-- <span class="input-group-append">
+                              <button type="button" class="btn btn-info btn-flat">Resetear</button>
+                            </span> -->
+                            <div class="input-group-append dropdown">
+                              <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="drop-menu">
+                                Resetear
+                              </button>
+                              <div class="dropdown-menu dropdown-menu-right icon" aria-labelledby="drop-menu">
+                                <a class="dropdown-item " href="#" onclick="recuperar_contraseña(), mostrar_toast_cargando()"><i class="fa-solid fa-envelope fa-lg"></i> Enviar correo</a>
+                              </div>
+                            </div>
                         </div>
                 </div>
                 <div class="modal-footer">
@@ -286,7 +295,7 @@
                 <label for="fechanacReg">Fecha de nacimiento</label>
                 <span id="error-mensageFecha" style="display: none; color:red;">Ingresa una fecha válida</span>
                 <div class="input-group mb-3">
-                        <input type="text" class="form-control" id="fechanacReg" placeholder="Fecha de nacimiento" name="insertMdl">
+                        <input type="date" class="form-control" id="fechanacReg" placeholder="Fecha de nacimiento" name="insertMdl">
                 </div>
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
@@ -313,14 +322,16 @@
 </body>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/air-datepicker@3.3.5/air-datepicker.min.js"></script>     <!-- JS de Air Datepicker -->
     <script src="scripts/controller_usuario/controller_usuario.js"></script>
     <script src="scripts/controller_acceso/controller_acceso.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="dist/js/adminlte.min.js"></script>
     <script src="libraries/DataTables/datatables.min.js"></script>
-    <script src="dist/js/adminlte.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
+
+
     
 </html>

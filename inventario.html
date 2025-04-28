@@ -17,6 +17,11 @@
 
     <div class="wrapper">
 
+        <!-- Preloader -->
+        <div class="preloader flex-column justify-content-center align-items-center">
+            <img src="diavaz.png" alt="DiavazLogo" height="60" width="60">
+        </div>
+
         <nav class="main-header navbar navbar-expand navbar-white navbar-light fixed-top">
             
             <ul class="navbar-nav">
@@ -47,11 +52,19 @@
                         <img src="user2.png" class="imagen-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info">
-                        <a href="#" class="d-block">Name user</a>
+                        <a href="#" class="d-block" id="user">Name user</a>
                     </div>
                 </div>
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column"  data-widget="treeview" role="menu" data-accordion="false">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fa-solid fa-cubes"></i>
+                                <p>
+                                  Inventario
+                                </p>
+                            </a>
+                        </li>
                         <li class="nav-item">
                             <a href="usuario.html" class="nav-link active">
                                 <i class="nav-icon fa-solid fa-users"></i>
@@ -60,14 +73,6 @@
                                 </p>
                             </a>
                           </li>
-                        <li class="nav-item">
-                            <a href="inventario.html" class="nav-link active">
-                                <i class="nav-icon fa-solid fa-cubes"></i>
-                                <p>
-                                  Inventario
-                                </p>
-                            </a>
-                        </li>
                     </ul>
                 </nav>
             </div>
@@ -97,7 +102,7 @@
                                 <div class="card-header">
                                     <h3 class="card-title">Tabla Inventario de TI</h3>
                                     <div class="d-flex justify-content-end mb-3">
-                                        <button type="button" onclick="resguardo()" class="btn btn-info icon" style="margin-left: 10px;" href="#" >Resguardo <i class="fa-solid fa-file-export fa-lg"></i></button>
+                                        <!-- <button type="button" onclick="resguardo()" class="btn btn-info icon" style="margin-left: 10px;" href="#" >Resguardo <i class="fa-solid fa-file-export fa-lg"></i></button> -->
                                     </div>
                                 </div>
                                 <!--Card Body-->
@@ -475,19 +480,19 @@
                 <div class="modal-body">
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-desktop"></i></span>
+                            <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                         </div>
                         <select class="form-control select" id="select-usu" name="resg-inpt">
                         </select>
                     </div>
                     <div class="card collapsed-card card-outline card-primary">
-                        <div class="card-header" data-card-widget="collapse" style="cursor: pointer;">
+                        <div class="card-header" data-card-widget="collapse" style="cursor: pointer;" >
                             <h3 class="card-title">Más opciones</h3>
                             <div class="card-tools">
                                 <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
                             </div>
                         </div>
-                        <div class="card-body" style="display:none;">
+                        <div class="card-body" style="display:none;" id="collapse-resguardo" >
                             <label >Observaciones</label>
                             <div class="input-group mb-3">
                                 <textarea class="form-control" id="txt-area" rows="4" name="resg-inpt"></textarea>

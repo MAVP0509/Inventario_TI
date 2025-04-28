@@ -21,25 +21,25 @@ use PHPMailer\PHPMailer\PHPMailer;
     //print($clientejson->nombre);
 
     if ($clientejson->accion==0) {
-        $respuesta_servidor->resultado = verificar_email($clientejson->correo);
+        $respuesta_servidor->resultado = verificar_email($clientejson);
     } 
     print(json_encode($respuesta_servidor));
 
 
-    function verificar_email($correo){ //Verifica que el correo existe y genera el token
+    function verificar_email($valores){ //Verifica que el correo existe y genera el token
         include("../conexion.php");
 
-        $sql="SELECT * FROM usuario WHERE correo= '$correo'";
+        $sql="SELECT * FROM usuario WHERE correo= '$valores->correo'";
         $query = mysqli_query($con,$sql);
 
         if ($query->num_rows > 0) { //verifica email
             $usuario =mysqli_fetch_assoc($query);
             $token = bin2hex(random_bytes(16)); //Creación del token
             $token_expiracion = date("Y-m-d H:i:s", time() + 300); //fecha del token
-            token_expirados($correo);
-            $update_token_sql = "UPDATE usuario SET token = '$token', token_expiracion = '$token_expiracion' WHERE correo = '$correo'";
+            token_expirados($valores->correo);
+            $update_token_sql = "UPDATE usuario SET token = '$token', token_expiracion = '$token_expiracion' WHERE correo = '$valores->correo'";
             if (mysqli_query($con, $update_token_sql)) {
-                return email_recuperacion($correo, $token);
+                return email_recuperacion($valores, $token);
             }
             else {
                 return false;
@@ -79,8 +79,11 @@ use PHPMailer\PHPMailer\PHPMailer;
             $mail->CharSet = 'UTF-8';
             // Configuración del remitente y destinatario
             $mail->setFrom('janny.garcia703@gmail.com', 'Inventario_TI');
-            $mail->addAddress($destino, 'Destinatario');
-            $reset_link = "http://localhost/Inventario_TI/recuperacion.html?ftygui=$token";
+            $mail->addAddress($destino->correo, 'Destinatario');
+            //$IP = exec("curl https://checkip.amazonaws.com");
+            //$Puerto = $_SERVER['SERVER_PORT'];
+
+            $reset_link = "http://$destino->dominio:$destino->puerto/Inventario_TI/recuperacion.html?ftygui=$token";
             // $mail->addReplyTo('otra-direccion@dominio.com', 'Responder a'); // Opcional: dirección de respuesta
         
             // Contenido del correo
