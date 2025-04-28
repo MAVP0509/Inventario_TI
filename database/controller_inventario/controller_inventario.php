@@ -18,10 +18,8 @@ if ($clientejson->accion == 0) {
 } elseif ($clientejson->accion == 4) {
     $respuesta_servidor->resultado = eliminar_datos($clientejson);
 } elseif ($clientejson->accion == 5) {
-    $respuesta_servidor->resultado = consultar_usuarios($clientejson);
-} elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = consultar_por_usuario($clientejson);
-} elseif ($clientejson->accion == 9) {
+} elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = consultar_distintos($clientejson->tabla, $clientejson->campo);
 }
 
@@ -109,23 +107,6 @@ function eliminar_datos($valores)
         $sql = "DELETE FROM inventario_ti_sur where id='$valores->id';";
         return mysqli_query($con, $sql);
     }
-}
-
-function consultar_usuarios()
-{
-    include("../conexion.php");
-    $sql = "SELECT DISTINCT usuario FROM inventario_ti_sur where usuario != 'NA';";
-    $resultado = mysqli_query($con, $sql);
-    $datos = [];
-
-    while ($fila = mysqli_fetch_assoc($resultado)) {
-        $datos[] = [
-            'id' => $fila['usuario'],
-            'usuario' => $fila['usuario']
-
-        ];
-    }
-    return $datos;
 }
 
 function consultar_por_usuario($valores)

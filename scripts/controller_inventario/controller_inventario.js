@@ -257,17 +257,7 @@ async function consultar_informacion(params) {
                     html: `<div>
                             <button type="button" class="btn btn-success rounded mr-3 icon" onclick="limpiar_campos()" >
                             <i class="fa-solid fa-pen-to-square fa-lg"></i> Crear Registro</button>
-                        </div>`,//'<i class="fa-solid fa-pen-to-square fa-lg"></i> Crear registro',
-                    //className: 'btn btn-success rounded mr-3 icon',
-                    /* attr: {
-                        title: 'Haz clic para agregar un registros'
-                    },
-                    action: function (e, dt, node, config) {
-                        limpiar();
-                        //modal = new bootstrap.Modal(document.getElementById('modal-registro'));
-                        //modal.show();
-                        //mostrar_datos()
-                    } */
+                        </div>`
                 },
                 {
                     html: `<div>
@@ -293,22 +283,7 @@ async function consultar_informacion(params) {
         console.log(error)
     }
 
-
-
 }
-
-let ususelect = [];
-/* async function mostrar_datos(params) {
-
-    let zona = "Base operativa región Sur";
-    let registro = dayjs().format('YYYY-MM-DD HH:mm:ss');//new Date().toISOString().slice(0, 19).replace('T', ' ');
-
-    $("#inp-zona").val(zona);
-    $("#inp-fecha-entrega").val(registro);
-
-    let modal = new bootstrap.Modal(document.getElementById('modal-registro'));
-    modal.show();
-} */
 
 let selecreg ="";
 let modalE
@@ -316,31 +291,44 @@ let modalE
 async function mostrar_registro(params) {
     for (let i = 0; i < datos.length; i++) {
         const element = datos[i];
-
         if(element.id===params.value){
             selecreg = element;
             break;
         }
     }
-
-    general_select2({
+    // Limpia y carga los select
+    await general_select2({
         selectId: 'edi-rubro',
         tabla: 'inventario_ti_sur',
         campo: 'rubro',
         placeholder: 'Selecione un rubro',
         dropdownParent: '#modal-editar',
         tags: true
-      })
+    })
     
-      general_select2({
+    await general_select2({
         selectId: 'edi-tipo',
         tabla: 'inventario_ti_sur',
         campo: 'tipo',
         placeholder: 'Selecione un rubro',
         dropdownParent: '#modal-editar',
         tags: true
-      })
-
+    })
+    
+    await general_select2({
+        selectId: 'edi-usuario',
+        tabla: 'inventario_ti_sur',
+        campo: 'usuario',
+        placeholder: 'Seleccione un usuario',
+        dropdownParent: '#modal-editar',
+    })
+    await general_select2({
+        selectId: 'edi-posicion',
+        tabla: 'inventario_ti_sur',
+        campo: 'posicion',
+        placeholder: 'Seleccione un cargo',
+        dropdownParent: '#modal-editar',
+    })
         document.getElementById("edi-zona").value = selecreg.zona;
         $('#edi-rubro').val(selecreg.rubro).trigger('change');
         document.getElementById("edi-af").value = selecreg.af;
@@ -350,38 +338,28 @@ async function mostrar_registro(params) {
         document.getElementById("edi-num-serie").value = selecreg.num_serie;
         document.getElementById("edi-ubicacion").value = selecreg.ubicacion;
         document.getElementById("edi-tag").value = selecreg.tag;
-        document.getElementById("edi-usuario").value = selecreg.usuario;
-        document.getElementById("edi-posicion").value = selecreg.posicion;
+        $('#edi-usuario').val(selecreg.usuario).trigger('change');
+        $('#edi-posicion').val(selecreg.posicion).trigger('change');
         document.getElementById("edi-fecha-entrega").value = selecreg.fecha_entrega;
 
         modalE = new bootstrap.Modal(document.getElementById('modal-editar'));
         modalE.show();
-        console.log(selecreg)
 }
 
-let selec = [];
-
-async function selecionar_registro(params) {
-
-    let index = selec.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
-    if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
-        selec.push(params); // Añade uno o más elementos al final de un array
-    } else {
-        selec.splice(index, 1); 
-    } 
-}
-
-let modal
+let ususelect = [];
 
 async function crear_registro() {
     // Campos requeridos para validación
-
     const validacion = [
         "inp-zona",
         "inp-rubro",
         "inp-tipo",
         "inp-ubicacion",
     ];
+
+    if (!$('#inp-tag').prop('disabled')) {
+        validacion.push('inp-tag');
+    }
 
     // Validar campos
     if (!validar_campos(validacion)) {
@@ -475,7 +453,7 @@ async function editar_registro(params) {
 }
 
 async function desactivar_registro(params) {
-    let response = await server_inventario({ accion: 3, id: selec });
+    let response = await server_inventario({ accion: 3, id: select });
         if (response.resultado === true) {
             mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
 
@@ -501,26 +479,38 @@ async function desactivar_registro(params) {
 
         //TODO: Validación de funciones
 
-async function confirmar_eliminacion() {
-    if (selec.length === 0) {
-        mostrar_alerta('error', 'Error', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
+let select = [];
+
+async function selecionar_registro(params) {
+
+    let index = select.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
+    if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
+        select.push(params); // Añade uno o más elementos al final de un array
     } else {
-        Swal.fire({
-            title: '¿Está seguro de eliminarlo?',
-            text: "Esta acción no se puede deshacer.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                desactivar_registro(); // Llama a la función para eliminar el registro
-            }
-        });
-    }
+        select.splice(index, 1); 
+    } 
 }
+
+    async function confirmar_eliminacion() {
+        if (selec.length === 0) {
+            mostrar_alerta('error', 'Error', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
+        } else {
+            Swal.fire({
+                title: '¿Está seguro de eliminarlo?',
+                text: "Esta acción no se puede deshacer.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    desactivar_registro(); // Llama a la función para eliminar el registro
+                }
+            });
+        }
+    }
 
 /* function deshabilitar_campo(){
     // Al cambiar la opción en el select, bloqueamos o habilitamos el campo
@@ -556,12 +546,22 @@ function validar_campos(campos) {
             return;
         }
 
-        if (!campo.value.trim()) {
+        if ($(campo).hasClass('is-required') && !campo.value.trim()) {
+            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
+            valido = false;
+        } else if (!campo.value.trim()) {
             campo.classList.add('is-invalid'); // Agrega la clase de advertencia
             valido = false;
         } else {
             campo.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
         }
+
+        /* if (!campo.value.trim()) {
+            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
+            valido = false;
+        } else {
+            campo.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
+        } */
 
         campo.addEventListener('input', function () {
             if (campo.value.trim()) {
@@ -574,12 +574,15 @@ function validar_campos(campos) {
 }
 
 function limpiar_campos(){
-    let input = document.getElementsByName('mdl-reg');
-    for (let i = 0; i < input.length; i++) {
-        const element = input[i].value = "";
+    let inputs = document.getElementsByName('mdl-reg');
+    for (let i = 0; i < inputs.length; i++) {
+        inputs[i].value = ""; // Limpia el valor del input
+        inputs[i].classList.remove('is-invalid'); // Elimina la clase de validación
     }
+    
     $('.select').each(function () {
         $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
+        $(this).removeClass('is-invalid'); // Elimina la clase de validación
     });
 
     general_select2({
@@ -588,10 +591,10 @@ function limpiar_campos(){
         campo: 'rubro',
         placeholder: 'Seleciona un rubro',
         dropdownParent: '#modal-registro',
-        tags:true
+        tags: true
       });
     
-      general_select2({
+    general_select2({
         selectId: 'inp-tipo',
         tabla: 'inventario_ti_sur',
         campo: 'tipo',
@@ -599,6 +602,22 @@ function limpiar_campos(){
         dropdownParent: '#modal-registro',
         tags: true
       });
+
+    general_select2({
+        selectId: 'inp-usuario',
+        tabla: 'inventario_ti_sur',
+        campo: 'usuario',
+        placeholder: 'Seleccione un usuario',
+        dropdownParent: '#modal-registro',
+    });
+
+    general_select2({
+        selectId: 'inp-posicion',
+        tabla: 'inventario_ti_sur',
+        campo: 'posicion',
+        placeholder: 'Seleccione un cargo',
+        dropdownParent: '#modal-registro',
+    });
 
     // modal = new bootstrap.Modal(document.getElementById('modal-registro'));
     $("#modal-registro").modal('show');
@@ -639,45 +658,11 @@ function mostrar_alerta(tipo, titulo, mensaje) {
   }); */
   
   //*SELECT2 para hacer el resguardo
-  $(document).ready(function () {
-    fetch('database/controller_inventario/controller_inventario.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: 'trama=' + encodeURIComponent(JSON.stringify({ accion: 5 }))
-    })
-    .then(response => response.json())
-    .then(data => {
-      const opciones = data.resultado.map(item => ({
-        id: item.usuario || '',
-        text: item.usuario || ''
-      }));
-  
-      // Agrega opción vacía al principio
-    $('#select-usu').empty().append(new Option('', '', false, false));
-
-      $('#select-usu').select2({
-        theme: 'bootstrap4',
-        allowClear: true,
-        placeholder: 'Selecciona un usuario',
-        dropdownParent: $('#mdl-res'),
-        data: opciones
-      });
-    })
-
-    // Esto asegura que no haya valor seleccionado por default
-    $('#select-usu').val(null).trigger('change');
-
-    /* .catch(error => {
-      console.error('Error cargando usuarios:', error);
-    }); */
-  });
 
   async function general_select2({selectId, tabla, campo, placeholder, dropdownParent}){
     //try {
         const response = await server_inventario({
-            accion: 9,
+            accion: 6,
             tabla: tabla, 
             campo: campo
         });
@@ -708,7 +693,20 @@ function mostrar_alerta(tipo, titulo, mensaje) {
     //}
   }
 
-  //modal.removeAttribute('inert');
+  $(document).ready(function () {
+    // Escucha cambios en el campo "inp-tipo"
+    $('#inp-tipo').on('change', function () {
+        const tipoSeleccionado = $(this).val(); // Obtiene el valor seleccionado
+
+        if (tipoSeleccionado === 'Laptop' || tipoSeleccionado === 'Desktop') {
+            // Habilita el campo TAG y lo hace obligatorio
+            $('#inp-tag').prop('disabled', false).addClass('is-required');
+        } else {
+            // Deshabilita el campo TAG y elimina la obligatoriedad
+            $('#inp-tag').prop('disabled', true).removeClass('is-required').val('');
+        }
+    });
+});
 
 
   //TODO: Funciones para el resguardo
@@ -725,7 +723,13 @@ function resguardo(){
         $('#fecha-resguardo').val(hoy);
     });
     
-    
+    general_select2({
+        selectId: 'select-usu',
+        tabla: 'inventario_ti_sur',
+        campo: 'usuario',
+        placeholder: 'Selecione un usuario',
+        dropdownParent: '#mdl-res'
+    });
 
     modalRes = new bootstrap.Modal(document.getElementById('mdl-res'));
     modalRes.show();
@@ -740,7 +744,7 @@ async function crear_resguardo(params) {
         return
     }
     let model = {
-        accion : 6,
+        accion : 5,
         usuario : $('#select-usu').find('option:selected').text(),
         comentario : $('#txt-area').val().trim(),
         fecha: $('#fecha-resguardo').val()
