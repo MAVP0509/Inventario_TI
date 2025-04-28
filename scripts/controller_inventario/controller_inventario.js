@@ -497,7 +497,7 @@ async function confirmar_eliminacion() {
     }
 }
 
-function deshabilitar_campo(){
+/* function deshabilitar_campo(){
     // Al cambiar la opción en el select, bloqueamos o habilitamos el campo
     $("#edi-rubro").on('change', function() {
         if ($(this).val() !== "") {  // Si el valor no está vacío
@@ -515,7 +515,7 @@ function deshabilitar_campo(){
         // Si no tiene un valor, habilitar el campo
         $("#edi-rubro").prop('disabled', true);
     }
-}
+} */
 
 $(document).ready(function() {
     deshabilitar_campo();  // Llamamos a la función para asegurar que el campo se habilite/deshabilite al cargar
@@ -553,14 +553,11 @@ function limpiar(){
     for (let i = 0; i < input.length; i++) {
         const element = input[i].value = "";
     }
-    //$select.val(null).trigger('change');
-
+    $('.select').each(function () {
+        $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
+    });
     // modal = new bootstrap.Modal(document.getElementById('modal-registro'));
-    $("#modal-registro").modal('show'/* {
-        backdrop: 'static',
-        keyboard: false
-    
-    } */);
+    $("#modal-registro").modal('show');
     //modal.show();
 }
 
@@ -695,6 +692,24 @@ function mostrar_alerta(tipo, titulo, mensaje) {
     tags: true
   });
 
+  general_select2({
+    selectId: 'edi-rubro',
+    tabla: 'inventario_ti_sur',
+    campo: 'rubro',
+    placeholder: 'Selecione un rubro',
+    dropdownParent: '#modal-editar',
+    tags: true
+  })
+
+  general_select2({
+    selectId: 'edi-tipo',
+    tabla: 'inventario_ti_sur',
+    campo: 'tipo',
+    placeholder: 'Selecione un rubro',
+    dropdownParent: '#modal-editar',
+    tags: true
+  })
+
   //modal.removeAttribute('inert');
 
 
@@ -763,4 +778,3 @@ async function descargar_excel(params) {
     console.log(ruta.resultado)
     window.open(ruta.resultado, '_blank');
 }
-
