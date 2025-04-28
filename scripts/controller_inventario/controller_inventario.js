@@ -340,11 +340,11 @@ async function mostrar_registro(params) {
         dropdownParent: '#modal-editar',
         tags: true
       })
-      
+
         document.getElementById("edi-zona").value = selecreg.zona;
-        document.getElementById("edi-rubro").value = selecreg.rubro;
+        $('#edi-rubro').val(selecreg.rubro).trigger('change');
         document.getElementById("edi-af").value = selecreg.af;
-        document.getElementById("edi-tipo").value = selecreg.tipo;
+        $('#edi-tipo').val(selecreg.tipo).trigger('change');
         document.getElementById("edi-marca").value = selecreg.marca;
         document.getElementById("edi-modelo").value = selecreg.modelo;
         document.getElementById("edi-num-serie").value = selecreg.num_serie;
