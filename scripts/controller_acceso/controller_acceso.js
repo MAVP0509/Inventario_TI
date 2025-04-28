@@ -39,6 +39,50 @@ function cerrar_sesion(){
 }
 
 
+userRole = sessionStorage.getItem('rol') || 'user';
+
+fetch('sidebar.html')
+  .then(res => res.text())
+  .then(html => {
+    const container = document.getElementById('sidebar-container');
+    container.innerHTML = html;
+
+    // Filtra elementos según el rol
+    const items = container.querySelectorAll('[data-role]');
+    items.forEach(item => {
+      const allowedRoles = item.getAttribute('data-role').split(',');
+      if (!allowedRoles.includes(userRole)) {
+        item.remove(); // o item.style.display = 'none';
+      }
+    });
+
+    /* // Opcional: mostrar nombre del usuario si lo tienes guardado
+    const username = sessionStorage.getItem('userName') || 'Usuario';
+    const userDisplay = container.querySelector('#user');
+    if (userDisplay) userDisplay.textContent = username; */
+    let usuarioLog = JSON.parse(sessionStorage.getItem('user'))
+    let user = document.getElementById('user')
+    user.textContent = usuarioLog.resultado[0] 
+
+     // ✅ Agregar clase 'active' a la opción del menú actual
+    const currentPage = window.location.pathname.split('/').pop(); // Ej: 'usuario.html'
+    const links = container.querySelectorAll('.nav-link');
+
+    links.forEach(link => {
+      const href = link.getAttribute('href');
+      if (href === currentPage) {
+        link.classList.add('active');
+        link.classList.add('bg-lightblue');
+      } else {
+        link.classList.remove('active');
+        link.classList.remove('bg-lightblue');
+      }
+    });
+
+  })
+  .catch(err => console.error('Error al cargar sidebar:', err));
+
+
 function mostrar_alert(tipo, mensaje, skip, funcion) {
     Swal.fire({
         title: 'Inventario TI',

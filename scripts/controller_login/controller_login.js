@@ -287,6 +287,7 @@ async function validar_ingreso() {
         }else{
             sessionStorage.setItem("user", respuesta)
             sessionStorage.setItem("log", 'true')
+            sessionStorage.setItem("rol", resp.resultado[5])
             sessionStorage.setItem("bienvenido", "Bienvenido " + resp.resultado[0])
             window.location.href = "inventario.html";
             let inputs = document.getElementsByName('inputInit')

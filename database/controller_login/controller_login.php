@@ -36,7 +36,7 @@
         if ($query->num_rows > 0) {
             $user = mysqli_fetch_assoc($query);
             if (password_verify($valores->contraseña, $user['contraseña'])) {
-                $result =[$user['nombre'] , $user['correo'], $user['edad'],$user['telefono'],$user['fecha_reg']];
+                $result =[$user['nombre'] , $user['correo'], $user['edad'],$user['telefono'],$user['fecha_reg'],$user['rol']];
                 return $result;
             }else{
                 return false;
@@ -50,8 +50,8 @@
         include("../conexion.php");
         $registro =date("Y-m-d H:i:s");
         $hashed_contraseña =password_hash($valores->contraseña, PASSWORD_BCRYPT);
-        $sql="INSERT INTO usuario(nombre,correo,contraseña,edad,telefono,fecha_nac,fecha_reg,habilitado) VALUES ('$valores->nombre',
-        '$valores->correo','$hashed_contraseña','$valores->edad', '$valores->telefono','$valores->fecha_nac','$registro',1)";
+        $sql="INSERT INTO usuario(nombre,correo,contraseña,edad,telefono,fecha_nac,fecha_reg,habilitado,rol) VALUES ('$valores->nombre',
+        '$valores->correo','$hashed_contraseña','$valores->edad', '$valores->telefono','$valores->fecha_nac','$registro',1,'user')";
         //var_dump($sql);
         $sql_val_mail="SELECT * FROM usuario WHERE correo= '$valores->correo'";
         //$query_mail=mysqli_query($con,$sql_val_mail);

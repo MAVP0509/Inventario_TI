@@ -58,9 +58,9 @@ $(document).ready(function (){
 
 let usuarios = []
 async function consultar_usuarios() {
-    let usuarioLog = JSON.parse(sessionStorage.getItem('user'))
+    /* let usuarioLog = JSON.parse(sessionStorage.getItem('user'))
     let user = document.getElementById('user')
-    user.textContent = usuarioLog.resultado[0] 
+    user.textContent = usuarioLog.resultado[0]  */
     let r = await server_usuario({accion : 2})
 
     usuarios = r.resultado

@@ -81,9 +81,9 @@ window.addEventListener('load', function () {
 let datos = [];
 
 async function consultar_informacion(params) {
-    let usuarioLog = JSON.parse(sessionStorage.getItem('user'))
+    /* let usuarioLog = JSON.parse(sessionStorage.getItem('user'))
     let user = document.getElementById('user')
-    user.textContent = usuarioLog.resultado[0]
+    user.textContent = usuarioLog.resultado[0] */
     
     let model = {
         accion: 2
