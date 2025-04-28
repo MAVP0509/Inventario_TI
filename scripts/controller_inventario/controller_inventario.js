@@ -271,15 +271,15 @@ async function consultar_informacion(params) {
                 },
                 {
                     html: `<div>
-                            <button type="button" onclick="confirmar_eliminacion()" style="text-align: center" class="btn btn-danger rounded icon">
+                            <button type="button" style="text-align: center" class="btn btn-danger rounded icon" onclick="confirmar_eliminacion()" >
                             <i class="fa-solid fa-trash fa-lg"></i> Eliminar Registro</button>
                         </div>`,//'<i class="fa-solid fa-trash fa-lg"></i> Eliminar registro',
                     //className: 'btn btn-danger rounded icon',
                     /* attr: {
                         title: 'Haz clic para eliminar un registro'
                     },
-                    action: function (e, dt, node, config) {
-                        confirmar_eliminacion();
+                    /* action: function (e, dt, node, config) {
+                        
                     } */
                 },
                 
@@ -356,6 +356,7 @@ let modal
 
 async function crear_registro() {
     // Campos requeridos para validación
+    
     const validacion = [
         "inp-zona",
         "inp-rubro",
@@ -409,6 +410,7 @@ async function crear_registro() {
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo crear el registro. Inténtalo nuevamente.');
     }
+    
 
 }
 
@@ -454,7 +456,7 @@ async function editar_registro(params) {
 }
 
 async function desactivar_registro(params) {
-    let response = await server_inventario({ accion: 3, id: selecreg });
+    let response = await server_inventario({ accion: 3, id: selec });
         if (response.resultado === true) {
             mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
 
@@ -481,7 +483,7 @@ async function desactivar_registro(params) {
         //TODO: Validación de funciones
 
 async function confirmar_eliminacion() {
-    if (selecreg.length === 0) {
+    if (selec.length === 0) {
         mostrar_alerta('error', 'Error', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
     } else {
         Swal.fire({
@@ -489,8 +491,8 @@ async function confirmar_eliminacion() {
             text: "Esta acción no se puede deshacer.",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar'
         }).then((result) => {
@@ -550,7 +552,7 @@ function validar_campos(campos) {
     });
 
     return valido;
-}
+} 
 
 function limpiar(){
     let input = document.getElementsByName('mdl-reg');
