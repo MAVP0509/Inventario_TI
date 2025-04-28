@@ -162,26 +162,16 @@ async function consultar_usuarios() {
                     },
                 },
                 buttons:[
-                    /*{   text : 'word',
-                        action: function (e, dt, node, config) {
-                            crear_word()
-                        }
-                    },
-                     {
-                        extend: 'excelHtml5',
-                        text: 'Exportar a Excel',
-                        className: 'btn btn-sm btn-success'
+                    {
+                        html: `<div>
+                            <button type="button" onclick="nuevo_usuario()" class="btn btn-success icon"><i class="fa-solid fa-plus fa-lg"></i> Nuevo Usuario</button>
+                        </div>`,
                     },
                     {
-                        extend: 'pdfHtml5',
-                        text: 'Exportar a PDF',
-                        className: 'btn btn-sm btn-danger'
+                        html: `<div>
+                            <button type="button" onclick="mensaje_eliminar()" class="btn btn-danger icon" style="margin-left: 10px;"><i class="fa-solid fa-trash fa-lg"></i> Eliminar Usuario</button>
+                        </div>`,
                     },
-                    {
-                        extend: 'print',
-                        text: 'Imprimir',
-                        className: 'btn btn-sm btn-primary'
-                    }, */
                 ],
                 stateSave: true,
                 responsive: true,

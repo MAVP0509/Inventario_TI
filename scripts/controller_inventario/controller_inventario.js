@@ -71,11 +71,11 @@ window.addEventListener('load', function () {
     });
 }) */
 
-$(document).on('mouseover', '.icon', function() {
+/* $(document).on('mouseover', '.icon', function() {
     $(this).find('i').addClass('fa-bounce');
 }).on('mouseout', '.icon', function() {
     $(this).find('i').removeClass('fa-bounce');
-});
+}); */
 
 let datos = [];
 
@@ -245,6 +245,9 @@ async function consultar_informacion(params) {
                 });
             },
             buttons: [
+                {
+                    html: `<button type="button" onclick="resguardo()" class="btn btn-info icon rounded mr-3" style="margin-left: 10px;" href="#" ><i class="fa-solid fa-file-export fa-lg"></i> Resguardo</button>`,
+                },
                 {
                     html: `<div>
                             <button type="button" class="btn btn-success rounded mr-3 icon" onclick="resguardo()" >

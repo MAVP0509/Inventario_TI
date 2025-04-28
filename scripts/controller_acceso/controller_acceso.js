@@ -22,6 +22,13 @@ $("#log-out").on('mouseout', function(){
 })
 
 
+$(document).on('mouseover', '.icon', function() {
+    $(this).find('i').addClass('fa-bounce');
+}).on('mouseout', '.icon', function() {
+    $(this).find('i').removeClass('fa-bounce');
+});
+
+
 async function cerrar_sesionmsg() {
     mostrar_alert('warning', `¿Seguro que quieres salir?`, false , cerrar_sesion)
 }
