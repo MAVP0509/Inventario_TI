@@ -275,7 +275,7 @@ async function consultar_informacion(params) {
                             <i class="fa-solid fa-trash fa-lg"></i> Eliminar Registro</button>
                         </div>`,//'<i class="fa-solid fa-trash fa-lg"></i> Eliminar registro',
                     //className: 'btn btn-danger rounded icon',
-                    attr: {
+                    /* attr: {
                         title: 'Haz clic para eliminar un registro'
                     },
                     /* action: function (e, dt, node, config) {

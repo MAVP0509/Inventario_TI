@@ -131,8 +131,13 @@ function consultar_usuarios()
 function consultar_por_usuario($valores)
 {
     include("../conexion.php");
-
-    $sql = "SELECT * FROM inventario_ti_sur WHERE habilitado = 1 AND usuario = '$valores->usuario'";
+    $sql = "SELECT * FROM inventario_ti_sur WHERE habilitado = 1 AND usuario = '$valores->usuario'
+        ORDER BY 
+        CASE 
+        WHEN tipo = 'laptop' THEN 1
+        WHEN tipo = 'desktop' THEN 2
+        ELSE 3
+        END;";
     $query = mysqli_query($con, $sql);
 
     $datos = [];

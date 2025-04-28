@@ -35,8 +35,7 @@
                             <!--icono del input-->
                             <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
                         </div>
-                        <input type="email" class="form-control Comprobarmail" id="logcorreo"
-                            placeholder="Correo eléctronico" name="inputInit">
+                        <input type="email" class="form-control Comprobarmail" id="logcorreo" placeholder="Correo eléctronico" name="inputInit" autocomplete="off">
                     </div>
                     <span id="error-mensajeEmail-log" style="display: none; color:red;">Ingresa un correo válido</span>
                     <!--input de la contraseña-->
@@ -45,9 +44,9 @@
                             <span class="input-group-text verContraseña"><i id="toggle-password-icon-log"
                                     class="fa-solid fa-eye-slash" style="cursor: pointer;"></i></span>
                         </div>
-                        <input type="password" class="form-control" id="logcontraseña" placeholder="Contraseña"
-                            name="inputInit">
+                        <input type="password" class="form-control" id="logcontraseña" placeholder="Contraseña" name="inputInit">
                     </div>
+                    <span id="caps-lock-msg" style="display: none;"><i class="fa-solid fa-triangle-exclamation fa-shake fa-lg"></i> Bloq Mayús está activado</span><br><br>
 
                     <a clas="form-sublink" href="#" onclick="toggleForms(false, true)">¿Olvidaste tu contraseña?</a><br>
                     <br><button class="btn btn-primary icon" id="btn-ini" onclick="validar_ingreso()">Iniciar sesión <i
@@ -69,38 +68,33 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                         </div>
-                        <input type="text" class="form-control" id="nombre" placeholder="Nombre completo"
-                            name="inputReg" required>
+                        <input type="text" class="form-control" id="nombre" placeholder="Nombre completo" name="inputReg" autocomplete="off">
                     </div>
                     <span id="error-mensajeNombre" style="display: none; color:red;">Ingresa un nombre válido</span>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
                         </div>
-                        <input type="email" class="form-control Comprobarmail" id="regcorreo"
-                            placeholder="Correo eléctronico" name="inputReg" required>
+                        <input type="email" class="form-control Comprobarmail" id="regcorreo" placeholder="Correo eléctronico" name="inputReg" autocomplete="off">
                     </div>
                     <span id="error-mensajeEmail-reg" style="display: none; color:red;">Ingresa un correo válido</span>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
                         </div>
-                        <input type="tel" class="form-control" id="telefono" maxlength="10"
-                            placeholder="Número de teléfono" name="inputReg">
+                        <input type="tel" class="form-control" id="telefono" maxlength="10" placeholder="Número de teléfono" name="inputReg" autocomplete="off">
                     </div>
                     <span id="error-mensageTel" style="display: none; color:red;">Ingresa un número válido</span>
                     <div class="form-row form-group">
                         <div class="col">
-                            <input type="date" class="form-control" id="fechanac" placeholder="Fecha de nacimiento"
-                                name="inputReg">
+                            <input type="date" class="form-control" id="fechanac" placeholder="Fecha de nacimiento" name="inputReg" autocomplete="off">
                         </div>
                         <div class="col">
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa-solid fa-image-portrait"></i></span>
                                 </div>
-                                <input type="number" class="form-control" id="edad" placeholder="Edad" name="inputReg"
-                                    disabled>
+                                <input type="number" class="form-control" id="edad" placeholder="Edad" name="inputReg" disabled>
                             </div>
                         </div>
                     </div>
@@ -146,8 +140,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
                         </div>
-                        <input type="email" class="form-control Comprobarmail" id="repcorreo"
-                            placeholder="Correo eléctronico" required>
+                        <input type="email" class="form-control Comprobarmail" id="repcorreo" placeholder="Correo eléctronico" autocomplete="off">
                     </div>
                     <span id="error-mensajeEmail-rep" style="display: none; color:red;">Ingresa un correo válido</span>
                     <div class="form-group">

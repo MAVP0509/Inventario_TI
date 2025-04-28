@@ -323,6 +323,19 @@ document.getElementById('logcontraseña').addEventListener('keydown', function(e
     }
 });
 
+//? Función para detectar si la tecla bloq mayus está activada
+let capsMsg = document.getElementById('caps-lock-msg');
+
+document.addEventListener('keydown', (e) => {
+    const capsOn = e.getModifierState && e.getModifierState('CapsLock');
+    capsMsg.style.display = capsOn ? 'inline' : 'none';
+});
+
+document.addEventListener('keyup', (e) => {
+    const capsOn = e.getModifierState && e.getModifierState('CapsLock');
+    capsMsg.style.display = capsOn ? 'inline' : 'none';
+});
+
 
 //TODO Función para navegar entre formularios del login
 async function toggleForms(showRegister = false, showRecovery = false){
