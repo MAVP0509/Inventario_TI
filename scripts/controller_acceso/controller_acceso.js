@@ -56,10 +56,9 @@ fetch('sidebar.html')
       }
     });
 
-    /* // Opcional: mostrar nombre del usuario si lo tienes guardado
-    const username = sessionStorage.getItem('userName') || 'Usuario';
-    const userDisplay = container.querySelector('#user');
-    if (userDisplay) userDisplay.textContent = username; */
+    $(function () {
+      $('[data-widget="treeview"]').Treeview('init');
+    });
     let usuarioLog = JSON.parse(sessionStorage.getItem('user'))
     let user = document.getElementById('user')
     user.textContent = usuarioLog.resultado[0] 
@@ -71,11 +70,20 @@ fetch('sidebar.html')
     links.forEach(link => {
       const href = link.getAttribute('href');
       if (href === currentPage) {
-        link.classList.add('active');
-        link.classList.add('bg-lightblue');
+        link.classList.add('active', 'bg-lightblue');
+    
+        // Si es un submenú, abrir el padre
+        const treeviewMenu = link.closest('.nav-treeview');
+        if (treeviewMenu) {
+          const parentLi = treeviewMenu.closest('.nav-item');
+          parentLi.classList.add('menu-open');
+    
+          const parentLink = parentLi.querySelector('.nav-link');
+          parentLink.classList.add('active');
+        }
+    
       } else {
-        link.classList.remove('active');
-        link.classList.remove('bg-lightblue');
+        link.classList.remove('active', 'bg-lightblue');
       }
     });
 
