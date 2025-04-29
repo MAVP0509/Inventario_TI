@@ -128,6 +128,9 @@ function consultar_por_usuario($valores)
 
     $datos[0]['comentario'] = $valores->comentario ?? '';
     $datos[0]['fecha'] = $valores->fecha ?? '';
+
+    $sql_fecha_update = "UPDATE inventario_ti_sur SET fecha_entrega = '$valores->fecha' where usuario = '$valores->usuario'";
+    mysqli_query($con,$sql_fecha_update);
     return $datos;
 }
 
@@ -171,7 +174,7 @@ function consultar_distintos($tabla, $campo)
     $tabla = mysqli_real_escape_string($con, $tabla);
     $campo = mysqli_real_escape_string($con, $campo);
 
-    $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE `$campo` IS NOT NULL AND `$campo` <> '';";
+    $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE `$campo` IS NOT NULL AND `$campo` <> '' AND '$campo' NOT LIKE 'NA';";
     $query = mysqli_query($con, $sql);
 
     $datos = [];

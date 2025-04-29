@@ -659,7 +659,7 @@ function mostrar_alerta(tipo, titulo, mensaje) {
   
   //*SELECT2 para hacer el resguardo
 
-  async function general_select2({selectId, tabla, campo, placeholder, dropdownParent}){
+  async function general_select2({selectId, tabla, campo, placeholder, dropdownParent, tags}){
     //try {
         const response = await server_inventario({
             accion: 6,
@@ -681,7 +681,7 @@ function mostrar_alerta(tipo, titulo, mensaje) {
             theme: 'bootstrap4',
             allowClear: true,
             placeholder: placeholder,
-            tags: true,
+            tags: tags,
             dropdownParent: $(dropdownParent),
             data: opciones
         });
@@ -728,7 +728,8 @@ function resguardo(){
         tabla: 'inventario_ti_sur',
         campo: 'usuario',
         placeholder: 'Selecione un usuario',
-        dropdownParent: '#mdl-res'
+        dropdownParent: '#mdl-res',
+        tags: false
     });
 
     modalRes = new bootstrap.Modal(document.getElementById('mdl-res'));
@@ -754,6 +755,11 @@ async function crear_resguardo(params) {
     
     infoResguardo = server.resultado
     //console.log(infoResguardo)
+    let table = $('#tabla1').DataTable();
+    table.destroy();
+    consultar_informacion();
+
+
     modalRes.hide();
     descargar_excel()
     mostrar_toast_cargando()
@@ -800,7 +806,7 @@ function mostrar_toast_cargando() {
             </div>
         `,
         didOpen: () => {
-            //Swal.showLoading(); // Esto muestra el spinner
+            //Swal.showLoading(); Esto muestra el spinner por default de SweetAlert, pero ya no es necesario, ya que se usa uno de fontAwesome
         }
     });
 }

@@ -78,8 +78,8 @@ fetch('sidebar.html')
           const parentLi = treeviewMenu.closest('.nav-item');
           parentLi.classList.add('menu-open');
     
-          const parentLink = parentLi.querySelector('.nav-link');
-          parentLink.classList.add('active');
+          /* const parentLink = parentLi.querySelector('.nav-link');
+          parentLink.classList.add('active'); */
         }
     
       } else {
