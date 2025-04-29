@@ -39,6 +39,58 @@ function cerrar_sesion(){
 }
 
 
+userRole = sessionStorage.getItem('rol') || 'user';
+
+fetch('sidebar.html')
+  .then(res => res.text())
+  .then(html => {
+    const container = document.getElementById('sidebar-container');
+    container.innerHTML = html;
+
+    // Filtra elementos según el rol
+    const items = container.querySelectorAll('[data-role]');
+    items.forEach(item => {
+      const allowedRoles = item.getAttribute('data-role').split(',');
+      if (!allowedRoles.includes(userRole)) {
+        item.remove(); // o item.style.display = 'none';
+      }
+    });
+
+    $(function () {
+      $('[data-widget="treeview"]').Treeview('init');
+    });
+    let usuarioLog = JSON.parse(sessionStorage.getItem('user'))
+    let user = document.getElementById('user')
+    user.textContent = usuarioLog.resultado[0] 
+
+     // ✅ Agregar clase 'active' a la opción del menú actual
+    const currentPage = window.location.pathname.split('/').pop(); // Ej: 'usuario.html'
+    const links = container.querySelectorAll('.nav-link');
+
+    links.forEach(link => {
+      const href = link.getAttribute('href');
+      if (href === currentPage) {
+        link.classList.add('active', 'bg-lightblue');
+    
+        // Si es un submenú, abrir el padre
+        const treeviewMenu = link.closest('.nav-treeview');
+        if (treeviewMenu) {
+          const parentLi = treeviewMenu.closest('.nav-item');
+          parentLi.classList.add('menu-open');
+    
+          /* const parentLink = parentLi.querySelector('.nav-link');
+          parentLink.classList.add('active'); */
+        }
+    
+      } else {
+        link.classList.remove('active', 'bg-lightblue');
+      }
+    });
+
+  })
+  .catch(err => console.error('Error al cargar sidebar:', err));
+
+
 function mostrar_alert(tipo, mensaje, skip, funcion) {
     Swal.fire({
         title: 'Inventario TI',

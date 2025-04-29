@@ -66,9 +66,9 @@ window.addEventListener('load', function () {
 let datos = [];
 
 async function consultar_informacion(params) {
-    let usuarioLog = JSON.parse(sessionStorage.getItem('user'))
+    /* let usuarioLog = JSON.parse(sessionStorage.getItem('user'))
     let user = document.getElementById('user')
-    user.textContent = usuarioLog.resultado[0]
+    user.textContent = usuarioLog.resultado[0] */
     
     let model = {
         accion: 2
@@ -741,6 +741,11 @@ async function crear_resguardo(params) {
     
     infoResguardo = server.resultado
     //console.log(infoResguardo)
+    let table = $('#tabla1').DataTable();
+    table.destroy();
+    consultar_informacion();
+
+
     modalRes.hide();
     descargar_excel()
     mostrar_toast_cargando()
@@ -787,7 +792,7 @@ function mostrar_toast_cargando() {
             </div>
         `,
         didOpen: () => {
-            //Swal.showLoading(); // Esto muestra el spinner
+            //Swal.showLoading(); Esto muestra el spinner por default de SweetAlert, pero ya no es necesario, ya que se usa uno de fontAwesome
         }
     });
 }
