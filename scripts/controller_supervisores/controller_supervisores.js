@@ -123,7 +123,7 @@ async function consultar_informacion(params) {
 
 }
 
-//*Controlar el switch de la tabla para activar o desactivar supervisores
+//*TODO Controlar el switch de la tabla para activar o desactivar supervisores
 $('#tabla1 tbody').on('change', '.switch-toggle', function () {
     const switchElement = $(this);
     const id = switchElement.data('id');
@@ -193,16 +193,11 @@ $('#tabla1 tbody').on('change', '.switch-toggle', function () {
     }
 });
 
-
-
-
-
-
 async function supervisor_habilitado(model) {
     await server_supervisor(model)
 }
 
-
+//TODO Funciones para un nuevo supervisor
 function nuevo_supervisor(){
     limpiar_campos_nuevo_supervisor()
 
@@ -242,8 +237,6 @@ async function insertar_supervisor() {
         return
     }
 }
-
-
 
 function validar_campos(campos) {
     let valido = true;
@@ -315,6 +308,7 @@ function limpiar_campos_nuevo_supervisor(){
     });
 }
 
+//TODO Funciones para editar los supervisores
 let selecreg =""
 
 async function mostrar_registro(params) {
@@ -357,6 +351,10 @@ async function mostrar_registro(params) {
         $('#edi-region').val(selecreg.region).trigger('change');
 
         $("#modalEditar").modal('show');
+}
+
+async function editar_supervisor(params) {
+    
 }
 
 async function general_select2({selectId, tabla, campo, placeholder, dropdownParent, tags}){
