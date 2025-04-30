@@ -92,14 +92,14 @@ async function consultar_usuarios() {
                     {
                         data: 'nombre',
                         render: function (data, type, row) {
-                            let control = `<label style="font-weight: normal">${data}</label>`
+                            let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                             return control;
                         }
                     },
                     {
                         data: "correo",
                         render: function (data, type, row) {
-                            let control = `<label style="font-weight: normal">${data}</label>`
+                            let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                             return control;
                         }
     
@@ -107,14 +107,14 @@ async function consultar_usuarios() {
                     {
                         data: 'edad',
                         render: function (data, type, row) {
-                            let control = `<label style="font-weight: normal">${data}</label>`
+                            let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                             return control;
                         }
                     },
                     {
                         data: "telefono",
                         render: function (data, type, row) {
-                            let control = `<label style="font-weight: normal">${data}</label>`
+                            let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                             return control;
                         }
     
@@ -122,14 +122,14 @@ async function consultar_usuarios() {
                     {
                         data: 'fecha_nac',
                         render: function (data, type, row) {
-                            let control = `<label style="font-weight: normal">${data}</label>`
+                            let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                             return control;
                         }
                     },
                     {
                         data: "fecha_reg",
                         render: function (data, type, row) {
-                            let control = `<label style="font-weight: normal">${data}</label>`
+                            let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                             return control;
                         }
     
@@ -179,7 +179,7 @@ async function consultar_usuarios() {
                         } else {
                             $(this).removeAttr('style');
                         }
-                        selecionar_registro(data.id);
+                        seleccionar_usuarios(data.id);
                     });
                 },
                 buttons:[
@@ -297,9 +297,9 @@ async function eliminar_usuario(params) {
             mostrar_toast('success', 'Inventario TI', 'Usuario(s) eliminado(s) correctamente')
 
             usuSeleccionado = [];
-            let table = $("#tbl-usuario").DataTable()
-            table.destroy()
-            consultar_usuarios()
+            let table = $("#tbl-usuario").DataTable();
+            table.destroy();
+            consultar_usuarios();
         } else {
             mostrar_toast('error', 'Inventario TI', 'Error en la consulta');
         }

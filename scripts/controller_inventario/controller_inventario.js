@@ -89,7 +89,7 @@ async function consultar_informacion(params) {
                     data: "id",
                     render: function(data, type, row) {
                         let control = `<div class="form-group form-check">
-                            <input type="checkbox" class="form-check-input"
+                            <input type="checkbox" class="form-check-input form-control-lg"
                             onclick="selecionar_registro(${data})" value="${data}" id="check${data}">
                         </div>`
                         return control;
@@ -98,91 +98,91 @@ async function consultar_informacion(params) {
                 {
                     data: "id",
                     render: function(data, type, row, meta) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
-                        return meta.row + 1;
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${meta.row + 1}</label>`;
+                        return control;
                     }
                 },
                 {
                     data: "zona",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
                     }
                 },
                 {
                     data: "rubro",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
                     }, 
                 },
                 {
                     data: "af",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
                     }, 
                 },
                 {
                     data: "tipo",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
                     }, 
                 },
                 {
                     data: "marca",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
                     }, 
                 },
                 {
                     data: "modelo",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
                     }
                 },
                 {
                     data: "num_serie",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
                     }, 
                 },
                 {
                     data: "ubicacion",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
                     }, 
                 },
                 {
                     data: "tag",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
                     }, 
                 },
                 {
                     data: "usuario",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
                     }, 
                 },
                 {
                     data: "posicion",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
                     }, 
                 },
                 {
                     data: "fecha_entrega",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
                     }, 
                 },
@@ -220,6 +220,7 @@ async function consultar_informacion(params) {
                     if ($(event.target).closest('.btn-warning.icon').length > 0) {
                         return;
                     }
+                    
                     const checkbox = $(this).find('input[type="checkbox"]');
                     const isChecked = checkbox.prop('checked');
                     
@@ -476,7 +477,7 @@ async function selecionar_registro(params) {
 }
 
 async function confirmar_eliminacion() {
-    if (selec.length === 0) {
+    if (select.length === 0) {
         mostrar_alerta('error', 'Error', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
     } else {
         Swal.fire({
