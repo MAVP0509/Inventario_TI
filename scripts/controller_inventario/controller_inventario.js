@@ -340,6 +340,9 @@ async function crear_registro() {
         "inp-rubro",
         "inp-tipo",
         "inp-ubicacion",
+        "inp-marca",
+        "inp-modelo",
+        "inp-num-serie",
     ];
 
     if (!$('#inp-tag').prop('disabled')) {
