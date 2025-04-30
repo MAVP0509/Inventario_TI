@@ -12,6 +12,14 @@
     <link rel="stylesheet" href="libraries/select2/css/select2-bootstrap4.min.css">
     <link rel="stylesheet" href="libraries/select2/css/select2.min.css">
 
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.2.2/css/fixedColumns.dataTables.min.css">
+
+<!-- JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/fixedcolumns/4.2.2/js/dataTables.fixedColumns.min.js"></script>
+
 </head>
 <body class="hold-transition sidebar-mini layout-fixed" onload="consultar_informacion()">
 
@@ -115,11 +123,11 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-sm-12">
-                                                <table class="table table-bordered table-hover dataTable dtr-inline table-responsive table-striped" id="tabla1" aria-describedby="Tabla de usuarios">
+                                                <table class="table table-bordered table-hover dataTable dtr-inline table-striped" id="tabla1" aria-describedby="Tabla de usuarios" style="width: 100%;">
                                                     <thead>
                                                         <tr>
                                                             <th></th>
-                                                            <th>
+                                                            <th style="text-align: center;">
                                                                 ID
                                                             </th>
                                                             <th>
@@ -128,7 +136,7 @@
                                                             <th>
                                                                 Rubro
                                                             </th>
-                                                            <th style="text-align: center;">
+                                                            <th>
                                                                 AF
                                                             </th>
                                                             <th>
@@ -262,40 +270,26 @@
                                             data-content="Indica el lugar específico dentro de la zona donde se encuentra físicamente el dispositivo. Puede ser un nombre de área, oficina.">
                                             <div class="invalid-feedback">Por favor, ingrese una ubicacion.</div>
                                         </div>
-                                        <div class="card card-outline card-primary collapsed-card">
-                                            <div class="card-header" data-card-widget="collapse" style="cursor: pointer;">
-                                                <h3 class="card-title">Más opciones</h3>
-                                                <div class="card-tools">
-                                                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
-                                                </div>
+                                        <h5>Identificación del activo</h5>
+                                        <h6>Activo Fijo</h6>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                                             </div>
-                                            <div class="card-body">
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <h5>Identificación del activo</h5>
-                                                        <h6>Activo Fijo</h6>
-                                                        <div class="input-group mb-3">
-                                                            <div class="input-group-prepend">
-                                                                <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
-                                                            </div>
-                                                            <input type="text" class="form-control" id="inp-af" name="mdl-reg" placeholder="AF" autocomplete="off"
-                                                            data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción"
-                                                            data-content="Es el número de identificación único del dispositivo dentro del inventario.">
-                                                        </div> 
-                                                        <h6>Etiqueta del dispositivo (TAG)</h6>
-                                                        <div class="input-group mb-3">
-                                                            <div class="input-group-prepend">
-                                                                <span class="input-group-text"><i class="fa-solid fa-tag"></i></span>
-                                                            </div>
-                                                            <input type="text" class="form-control" id="inp-tag" name="mdl-reg" placeholder="TAG" autocomplete="off"
-                                                            data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción"
-                                                            data-content="Es un identificador o código asociado al dispositivo, que puede ser utilizado para la gestión del inventario, seguimiento, o categorización.">
-                                                            <div class="invalid-feedback">Por favor, ingrese un TAG.</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                            <input type="text" class="form-control" id="inp-af" name="mdl-reg" placeholder="AF" autocomplete="off"
+                                            data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción"
+                                            data-content="Es el número de identificación único del dispositivo dentro del inventario.">
+                                        </div> 
+                                        <h6>Etiqueta del dispositivo (TAG)</h6>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fa-solid fa-tag"></i></span>
                                             </div>
-                                        </div><!--Card collapsed-->
+                                            <input type="text" class="form-control" id="inp-tag" name="mdl-reg" placeholder="TAG" autocomplete="off"
+                                            data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción"
+                                            data-content="Es un identificador o código asociado al dispositivo, que puede ser utilizado para la gestión del inventario, seguimiento, o categorización.">
+                                            <div class="invalid-feedback">Por favor, ingrese un TAG.</div>
+                                        </div>
                                     </div><!--col-->
                                 </div>
                                 <hr>
@@ -367,6 +361,27 @@
                                             </div>
                                             <select class="form-control select" id="edi-tipo" ></select>
                                         </div>
+                                        <h6>Marca del dispositivo</h6>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fa-solid fa-trademark"></i></span>
+                                            </div>
+                                            <input type="text" class="form-control" id="edi-marca" placeholder="Marca del dispositivo" autocomplete="off">
+                                        </div>
+                                        <h6>Modelo del dispositivo</h6>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                                            </div>
+                                            <input type="text" class="form-control" id="edi-modelo" placeholder="Modelo del dispositivo" autocomplete="off">
+                                        </div>
+                                        <h6>Numero de serie</h6>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fa-solid fa-square-binary"></i></span>
+                                            </div>
+                                            <input type="text" class="form-control" id="edi-num-serie" maxlength="30" placeholder="Numero de serie" autocomplete="off">
+                                        </div>
                                     </div><!--col-->
                                     <div class="col-md-6">
                                         <h5>Ubicación del dispositivo</h5>
@@ -384,61 +399,24 @@
                                             </div>
                                             <input type="text" class="form-control" id="edi-ubicacion" placeholder="Ubicacion del dispositivo" autocomplete="off">
                                         </div>
+                                        <h5>Identificación del activo</h5>
+                                        <h6>Activo Fijo</h6>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                                            </div>
+                                            <input type="text" class="form-control" id="edi-af" placeholder="AF" autocomplete="off">
+                                        </div>
+                                        <h6>Etiqueta del dispositivo (TAG)</h6>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fa-solid fa-tag"></i></span>
+                                            </div>
+                                            <input type="text" class="form-control" id="edi-tag" placeholder="TAG" autocomplete="off">
+                                        </div>
                                     </div><!--col-->
                                 </div>
-                                <div class="card card-outline card-primary collapsed-card">
-                                    <div class="card-header" data-card-widget="collapse" style="cursor: pointer;">
-                                        <h3 class="card-title">Más opciones</h3>
-                                        <div class="card-tools">
-                                            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
-                                        </div>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <h5>Detalles del dispositivo</h5>
-                                                <h6>Marca del dispositivo</h6>
-                                                <div class="input-group mb-3">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fa-solid fa-trademark"></i></span>
-                                                    </div>
-                                                    <input type="text" class="form-control" id="edi-marca" placeholder="Marca del dispositivo" autocomplete="off">
-                                                </div>
-                                                <h6>Modelo del dispositivo</h6>
-                                                <div class="input-group mb-3">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
-                                                    </div>
-                                                    <input type="text" class="form-control" id="edi-modelo" placeholder="Modelo del dispositivo" autocomplete="off">
-                                                </div>
-                                                <h6>Numero de serie</h6>
-                                                <div class="input-group mb-3">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fa-solid fa-square-binary"></i></span>
-                                                    </div>
-                                                    <input type="text" class="form-control" id="edi-num-serie" maxlength="30" placeholder="Numero de serie" autocomplete="off">
-                                                </div>
-                                            </div><!--col-->
-                                            <div class="col-md-6">
-                                                <h5>Identificación del activo</h5>
-                                                <h6>Activo Fijo</h6>
-                                                <div class="input-group mb-3">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
-                                                    </div>
-                                                    <input type="text" class="form-control" id="edi-af" placeholder="AF" autocomplete="off">
-                                                </div>
-                                                <h6>Etiqueta del dispositivo (TAG)</h6>
-                                                <div class="input-group mb-3">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text"><i class="fa-solid fa-tag"></i></span>
-                                                    </div>
-                                                    <input type="text" class="form-control" id="edi-tag" placeholder="TAG" autocomplete="off">
-                                                </div>
-                                            </div><!--col-->
-                                        </div>
-                                    </div>
-                                </div>
+                                <hr>
                                 <h5 class="input-title">Información del usuario asignado</h5>
                                 <h6>Nombre del usuario</h6>
                                 <div class="input-group mb-3">
