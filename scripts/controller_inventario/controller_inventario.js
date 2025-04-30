@@ -63,21 +63,6 @@ window.addEventListener('load', function () {
     }
 })
 
-/* $(document).ready(function (){
-
-    $('#tabla1').on('mouseover', '.icon', function() {
-        $(this).find('i').addClass('fa-bounce');  // Agregar una clase extra si lo deseas
-    }).on('mouseout', '.icon', function() {
-        $(this).find('i').removeClass('fa-bounce');
-    });
-}) */
-
-/* $(document).on('mouseover', '.icon', function() {
-    $(this).find('i').addClass('fa-bounce');
-}).on('mouseout', '.icon', function() {
-    $(this).find('i').removeClass('fa-bounce');
-}); */
-
 let datos = [];
 
 async function consultar_informacion(params) {
@@ -89,7 +74,6 @@ async function consultar_informacion(params) {
         accion: 2
     };
     
-
     let response = await server_inventario(model);
     //console.log(response);
     datos = response.resultado;
@@ -114,93 +98,93 @@ async function consultar_informacion(params) {
                 {
                     data: "id",
                     render: function(data, type, row, meta) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
                         return meta.row + 1;
                     }
                 },
                 {
                     data: "zona",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
                         return control;
                     }
                 },
                 {
                     data: "rubro",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
                         return control;
-                    }
+                    }, 
                 },
                 {
                     data: "af",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
                         return control;
-                    }
+                    }, 
                 },
                 {
                     data: "tipo",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
                         return control;
-                    }
+                    }, 
                 },
                 {
                     data: "marca",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
                         return control;
-                    }
+                    }, 
                 },
                 {
                     data: "modelo",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
                         return control;
                     }
                 },
                 {
                     data: "num_serie",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
                         return control;
-                    }
+                    }, 
                 },
                 {
                     data: "ubicacion",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
                         return control;
-                    }
+                    }, 
                 },
                 {
                     data: "tag",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
                         return control;
-                    }
+                    }, 
                 },
                 {
                     data: "usuario",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
                         return control;
-                    }
+                    }, 
                 },
                 {
                     data: "posicion",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
                         return control;
-                    }
+                    }, 
                 },
                 {
                     data: "fecha_entrega",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
                         return control;
-                    }
+                    }, 
                 },
                 {
                     data: "id",
@@ -214,7 +198,7 @@ async function consultar_informacion(params) {
             ],
             dom: `
                 <'row mb-2'<'col-sm-6 text-left'f><'col-sm-6 text-right'<'btn-group'B>>>
-                <'row'<'col-sm-12'tr>>
+                <'row'<'col-sm-12 text-center'tr>>
                 <'row mt-2'<'col-sm-3'l><'col-sm-5 text-center'i><'col-sm-4 text-right'p>>
             `,
             language: {
@@ -491,26 +475,26 @@ async function selecionar_registro(params) {
     } 
 }
 
-    async function confirmar_eliminacion() {
-        if (selec.length === 0) {
-            mostrar_alerta('error', 'Error', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
-        } else {
-            Swal.fire({
-                title: '¿Está seguro de eliminarlo?',
-                text: "Esta acción no se puede deshacer.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    desactivar_registro(); // Llama a la función para eliminar el registro
-                }
-            });
-        }
+async function confirmar_eliminacion() {
+    if (selec.length === 0) {
+        mostrar_alerta('error', 'Error', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
+    } else {
+        Swal.fire({
+            title: '¿Está seguro de eliminarlo?',
+            text: "Esta acción no se puede deshacer.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                desactivar_registro(); // Llama a la función para eliminar el registro
+            }
+        });
     }
+}
 
 /* function deshabilitar_campo(){
     // Al cambiar la opción en el select, bloqueamos o habilitamos el campo
@@ -609,6 +593,7 @@ function limpiar_campos(){
         campo: 'usuario',
         placeholder: 'Seleccione un usuario',
         dropdownParent: '#modal-registro',
+        tags: true
     });
 
     general_select2({
@@ -617,6 +602,7 @@ function limpiar_campos(){
         campo: 'posicion',
         placeholder: 'Seleccione un cargo',
         dropdownParent: '#modal-registro',
+        tags: true
     });
 
     // modal = new bootstrap.Modal(document.getElementById('modal-registro'));
@@ -811,5 +797,14 @@ function mostrar_toast_cargando() {
     });
 }
 
-
+$(document).ready(function () {
+    
+    $('.select').select2().attr({
+    'data-toggle': 'popover',
+      'data-trigger': 'hover',
+      'data-content': 'Este es un select potenciado con Select2.',
+      'title': 'Información adicional'
+    });
+    $('[data-toggle="popover"]').popover();
+});
    

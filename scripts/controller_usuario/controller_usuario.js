@@ -75,29 +75,31 @@ async function consultar_usuarios() {
                     {
                         data: 'id',
                         render: function (data, type, row) {
-                            let control = `<div class="form-check d-flex justify-content-center align-middle" ><input type="checkbox" class="form-check-input check-change" 
-                            onclick="seleccionar_usuarios(${data})" value="${data}"></div>`
+                            let control = `<div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" 
+                                onclick="seleccionar_usuarios(${data})" value="${data}" id="check${data}">
+                            </div>`
                             return control;
                         }
                     },
                     {
                         data: 'id',
-                        render: function (data, type, row) {
+                        render: function (data, type, row, meta) {
                             let control = `<label style="text-align: center">${data}</label>`
-                            return control;
+                            return meta.row + 1;
                         }
                     },
                     {
                         data: 'nombre',
                         render: function (data, type, row) {
-                            let control = `<label style="text-align: center">${data}</label>`
+                            let control = `<label style="font-weight: normal">${data}</label>`
                             return control;
                         }
                     },
                     {
                         data: "correo",
                         render: function (data, type, row) {
-                            let control = `<label style="text-align: center">${data}</label>`
+                            let control = `<label style="font-weight: normal">${data}</label>`
                             return control;
                         }
     
@@ -105,14 +107,14 @@ async function consultar_usuarios() {
                     {
                         data: 'edad',
                         render: function (data, type, row) {
-                            let control = `<label style="text-align: center">${data}</label>`
+                            let control = `<label style="font-weight: normal">${data}</label>`
                             return control;
                         }
                     },
                     {
                         data: "telefono",
                         render: function (data, type, row) {
-                            let control = `<label style="text-align: center">${data}</label>`
+                            let control = `<label style="font-weight: normal">${data}</label>`
                             return control;
                         }
     
@@ -120,36 +122,33 @@ async function consultar_usuarios() {
                     {
                         data: 'fecha_nac',
                         render: function (data, type, row) {
-                            let control = `<label style="text-align: center">${data}</label>`
+                            let control = `<label style="font-weight: normal">${data}</label>`
                             return control;
                         }
                     },
                     {
                         data: "fecha_reg",
                         render: function (data, type, row) {
-                            let control = `<label style="text-align: center">${data}</label>`
+                            let control = `<label style="font-weight: normal">${data}</label>`
                             return control;
                         }
     
                     },
                     {
-                        data: 'id',
-                        render: function (data, type, row) {
-                            let control = `<div class="d-flex justify-content-center align-items-center"><button type="button" style="text-align: center" class="btn btn-warning icon" id="${data}"  value="${data}" onclick="seleccionar_usuario(this)"><i class="fa-solid fa-pen-to-square fa-lg"></i></button></div>`
-                            return control;
-                        }
-                    },
-                    {
                         data: "id",
                         render: function (data, type, row) {
-                            let control = `<div class="d-flex justify-content-center align-items-center" ><button type="button" tyle="text-align: center" class="btn btn-danger icon"  value="${data}" onclick="desactivar_usuariomsg(this)" value="${data}"><i class="fa-solid fa-trash fa-lg"></i></button></div>`
+                            let control = `<div class="d-flex justify-content-center align-items-center">
+                                <button type="button" style="text-align: center" class="btn btn-warning icon" id="${data}" value="${data}" onclick="seleccionar_usuario(this)">
+                                    <i class="fa-solid fa-pen-to-square fa-lg"></i>
+                                </button>
+                            </div>`
                             return control;
                         }
                     }
                 ], 
                 dom: `
                     <'row mb-2'<'col-sm-6 text-left'f><'col-sm-6 text-right'B>>
-                    <'row'<'col-sm-12'tr>>
+                    <'row'<'col-sm-12 text-center'tr>>
                     <'row mt-2'<'col-sm-3'l><'col-sm-5 text-center'i><'col-sm-4 text-right'p>>
                 `,
                 language: {
@@ -161,6 +160,28 @@ async function consultar_usuarios() {
                         last: '<i class="fas fa-angle-double-right"></i>'
                     },
                 },
+                select: {
+                    style: 'multi',
+                    selector: 'td:not(:first-child)'
+                },
+                rowCallback: function (row, data){
+                    $(row).on('click', function () {
+                        if ($(event.target).closest('.btn-warning.icon').length > 0) {
+                            return;
+                        }
+
+                        const checkbox = $(this).find('input[type="checkbox"]');
+                        const ischecked = checkbox.prop('checked');
+
+                        checkbox.prop('checked', !ischecked);
+                        if (!ischecked) {
+                            $(this).attr('style', 'background-color: #d1ecf1; color: #0c5460;');
+                        } else {
+                            $(this).removeAttr('style');
+                        }
+                        selecionar_registro(data.id);
+                    });
+                },
                 buttons:[
                     {
                         html: `<div>
@@ -169,7 +190,8 @@ async function consultar_usuarios() {
                     },
                     {
                         html: `<div>
-                            <button type="button" onclick="mensaje_eliminar()" class="btn btn-danger icon" style="margin-left: 10px;"><i class="fa-solid fa-trash fa-lg"></i> Eliminar Usuario</button>
+                            <button type="button" onclick="mensaje_eliminar()" class="btn btn-danger icon" style="margin-left: 10px;">
+                            <i class="fa-solid fa-trash fa-lg"></i> Eliminar Usuario</button>
                         </div>`,
                     },
                 ],
@@ -255,9 +277,9 @@ async function mensaje_eliminar() {
 
     if (usuSeleccionado.length === 0) {
         mostrar_toast('warning', 'Inventario TI', 'Por favor, selecciona al menos un usuario para continuar')
-        return;
+        
     }else{
-        mostrar_alert('warning', `¿Está seguro de eliminar ${usuSeleccionado.length} usuario(s)?`, false , eliminar_usuario)
+        mostrar_alert('warning', `¿Está seguro de eliminar ${usuSeleccionado.length} usuario(s)?`, false, eliminar_usuario);
         /* modalElim = new bootstrap.Modal(document.getElementById('modalElim'))
         modalElim.show() */
     }
@@ -582,4 +604,17 @@ function mostrar_toast_cargando() {
             //Swal.showLoading(); // Esto muestra el spinner
         }
     });
+}
+
+// TODO: seleciona usuarios por id
+let select = [];
+
+async function selecionar_registro(params) {
+
+    let index = select.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
+    if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
+        select.push(params); // Añade uno o más elementos al final de un array
+    } else {
+        select.splice(index, 1); 
+    } 
 }
