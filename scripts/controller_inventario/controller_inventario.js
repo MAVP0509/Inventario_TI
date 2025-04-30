@@ -241,13 +241,13 @@ async function consultar_informacion(params) {
                 {
                     html: `<div>
                             <button type="button" class="btn btn-success rounded mr-3 icon" onclick="limpiar_campos()" >
-                            <i class="fa-solid fa-pen-to-square fa-lg"></i> Crear Registro</button>
+                            <i class="fa-solid fa-plus fa-lg"></i> Crear Registro</button>
                         </div>`
                 },
                 {
                     html: `<div>
                             <button type="button" style="text-align: center" class="btn btn-danger rounded icon" onclick="confirmar_eliminacion()" >
-                            <i class="fa-solid fa-trash fa-lg"></i> Eliminar Registro</button>
+                            <i class="fa-solid fa-trash-can fa-lg"></i> Eliminar Registro</button>
                         </div>`
                 },
                 
