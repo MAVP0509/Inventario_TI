@@ -39,9 +39,25 @@ function insertar_supervisor($valores){
 //* Edita un supervisor ya existente
 function editar_supervisor($valores){
     include("../conexion.php");
-    $sql = "UPDATE supervisor SET nombre='$valores->nombre', cargo='$valores->cargo', region='$valores->region' WHERE id='$valores->id';";
-    //var_dump($sql);
-    return mysqli_query($con,$sql);
+
+    $msgError = "Primero deshabilite el supervisor antes de editarlo";
+
+    $sql_region ="SELECT habilitado FROM supervisor WHERE nombre = '$valores->nombre'";
+    $query = mysqli_query($con,$sql_region);
+    $array = array();
+    while ($fila = mysqli_fetch_object($query)){
+        array_push($array, $fila);  //* Se guardan los registros en un array
+    }
+
+    $habilitado = $array[0]->habilitado;
+    if($habilitado == 1){
+        return $msgError;
+    }else{
+        $sql = "UPDATE supervisor SET nombre='$valores->nombre', cargo='$valores->cargo', region='$valores->region', habilitado = 0 WHERE id='$valores->id';";
+        //var_dump($sql);
+        return mysqli_query($con,$sql);
+    }
+
 }
 
 //* Consulta los supervisores de la tabla supervisor para mostrarlos en el programa

@@ -124,7 +124,9 @@ async function consultar_informacion(params) {
 }
 
 //*TODO Controlar el switch de la tabla para activar o desactivar supervisores
+
 $('#tabla1 tbody').on('change', '.switch-toggle', function () {
+
     const switchElement = $(this);
     const id = switchElement.data('id');
     const isChecked = switchElement.is(':checked');
@@ -137,11 +139,13 @@ $('#tabla1 tbody').on('change', '.switch-toggle', function () {
 
     // Contar cuántos están habilitados en la misma región
     let habilitadosEnRegion = 0;
+
     data.each(function (item) {
         if (item.region === region && parseInt(item.habilitado) === 1) {
             habilitadosEnRegion++;
         }
-    });
+    }); 
+   
 
     if (isChecked) {
         // Validar: si ya hay uno habilitado en la región, deshabilitarlo
@@ -177,7 +181,6 @@ $('#tabla1 tbody').on('change', '.switch-toggle', function () {
     } else {
         // Si este es el único habilitado, no permitir deshabilitar
         if (habilitadosEnRegion <= 1) {
-            //alert('Debe haber al menos un supervisor habilitado por región.');
             mostrar_toast('warning', 'Advertencia', 'Debe haber un supervisor habilitado por región.');
             switchElement.prop('checked', true);
             return;
@@ -190,6 +193,17 @@ $('#tabla1 tbody').on('change', '.switch-toggle', function () {
             id: id,
             habilitado: 0
         });
+
+             checkbox.prop('checked', true);
+
+            // Actualizar en DataTable y backend
+            primerSupervisor.habilitado = 1;
+            supervisor_habilitado({
+                accion: 3,
+                id: primerSupervisor.id,
+                habilitado: 1
+            }); 
+
     }
 });
 
@@ -376,7 +390,10 @@ async function editar_supervisor(params) {
     let server = await server_supervisor(model)
     let resultado = JSON.parse(respuesta)
 
-    if(resultado.resultado === true){
+    if (typeof resultado.resultado === 'string'){
+        mostrar_toast("error", "Error", resultado.resultado); // Muestra el mensaje que venga en el string
+        return;
+    }else if(resultado.resultado === true){    
         mostrar_toast("success", "Éxito", "Supervisor editado exitosamente")
         consultar_informacion()
         $("#modalEditar").modal('hide')

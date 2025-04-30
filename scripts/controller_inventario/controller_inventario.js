@@ -700,13 +700,14 @@ function mostrar_alerta(tipo, titulo, mensaje) {
 
 
   //TODO: Funciones para el resguardo
-let modalRes 
 function resguardo(){
     let inputs = document.getElementsByName('resg-inpt')
     for (let i = 0; i < inputs.length; i++) {
         const element = inputs[i].value = "";
     }
     $('#select-usu').val(null).trigger('change');
+    $('#select-supervisor').val(null).trigger('change');
+
 
     $(document).ready(function() {
         let hoy = new Date().toISOString().split('T')[0];
@@ -722,21 +723,34 @@ function resguardo(){
         tags: false
     });
 
-    modalRes = new bootstrap.Modal(document.getElementById('mdl-res'));
-    modalRes.show();
+    general_select2({
+        selectId: 'select-region',
+        tabla: 'supervisor',
+        campo: 'region',
+        placeholder: 'Selecione una región',
+        dropdownParent: '#mdl-res',
+        tags: false
+    });
+
+    $("#mdl-res").modal('show')
 }
 
 let infoResguardo
 async function crear_resguardo(params) {
 
-    let select = document.getElementById('select-usu')
-    if (select.value === "") {
-        mostrar_alerta('error', 'Error', 'Seleccione al menos un usuario. Inténtalo nuevamente.')
-        return
+    const validacion = [
+        "select-usu",
+        "select-region",
+    ];
+    if (!validar_campos(validacion)) {
+        mostrar_alerta('error', 'Error', 'Rellena los campos. Inténtelo nuevamente');
+        return;
     }
+
     let model = {
         accion : 5,
-        usuario : $('#select-usu').find('option:selected').text(),
+        usuario : $('#select-usu').val().trim(),
+        region : $('#select-region').val().trim(),
         comentario : $('#txt-area').val().trim(),
         fecha: $('#fecha-resguardo').val()
     }
@@ -750,9 +764,9 @@ async function crear_resguardo(params) {
     consultar_informacion();
 
 
-    modalRes.hide();
-    descargar_excel()
+    $("#mdl-res").modal('hide')
     mostrar_toast_cargando()
+    descargar_excel()
 }
 
 

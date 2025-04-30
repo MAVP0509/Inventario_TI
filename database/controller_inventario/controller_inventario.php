@@ -18,13 +18,12 @@ if ($clientejson->accion == 0) {
 } elseif ($clientejson->accion == 4) {
     $respuesta_servidor->resultado = eliminar_datos($clientejson);
 } elseif ($clientejson->accion == 5) {
-    $respuesta_servidor->resultado = consultar_por_usuario($clientejson);
+    $respuesta_servidor->resultado = consultar_para_resguardo($clientejson);
 } elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = consultar_distintos($clientejson->tabla, $clientejson->campo);
 }
 
 print(json_encode($respuesta_servidor));
-
 
 
 function insertar_datos($valores)
@@ -80,7 +79,6 @@ function consultar_datos()
     return $array;
 }
 
-
 function desactivar_datos($valores)
 {
     include("../conexion.php");
@@ -109,7 +107,7 @@ function eliminar_datos($valores)
     }
 }
 
-function consultar_por_usuario($valores)
+function consultar_para_resguardo($valores)
 {
     include("../conexion.php");
     $sql = "SELECT * FROM inventario_ti_sur WHERE habilitado = 1 AND usuario = '$valores->usuario'
@@ -129,8 +127,23 @@ function consultar_por_usuario($valores)
     $datos[0]['comentario'] = $valores->comentario ?? '';
     $datos[0]['fecha'] = $valores->fecha ?? '';
 
+    $sql_supervisor = "SELECT * FROM supervisor WHERE region = '$valores->region' AND  habilitado = 1";
+    $query2 = mysqli_query($con,$sql_supervisor);
+
+    $supervisor = [];
+    while($row = mysqli_fetch_assoc($query2)){
+        $supervisor[] = $row;
+    }
+
+    $datos[0]['supervisor'] = $supervisor[0]['nombre'];
+    $datos[0]['cargo'] = $supervisor[0]['cargo'];
+    $datos[0]['region'] = $supervisor[0]['region'];
+
+    //Actualizando la fecha de entrega de todos los equipos del resguardo
     $sql_fecha_update = "UPDATE inventario_ti_sur SET fecha_entrega = '$valores->fecha' where usuario = '$valores->usuario'";
     mysqli_query($con,$sql_fecha_update);
+
+
     return $datos;
 }
 

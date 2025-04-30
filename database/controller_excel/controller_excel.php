@@ -32,6 +32,9 @@ function resguardo($valores){
     //$fecha = $input['fecha'] ?? date('Y-m-d');
     $fecha = $datos[0]->fecha ?? date('Y-m-d');
     $fechaFormato =  (new DateTime($fecha))->format('d/m/Y');
+    $region = $datos[0]->region ?? '';
+    $supervisor = $datos[0]->supervisor ?? '';
+    $cargoSupervisor = $datos[0]->cargo ?? '';
 
 
     $spreadsheet = IOFactory::load('Plantilla3.xlsx');
@@ -117,6 +120,14 @@ function resguardo($valores){
 
     $worksheet->setCellValue('C10', $usuario);
     $worksheet->setCellValue('C12', $area);
+    $worksheet->setCellValue('F12', $region);
+
+    $filaSupervisor = 17 + $fila;
+    $filaCargoSupervisor = $filaSupervisor + 1;
+    $worksheet->setCellValue("B$filaSupervisor", $supervisor);
+    $worksheet->setCellValue("B$filaCargoSupervisor", $cargoSupervisor);
+
+
     $UserName = explode(" ",$usuario);
     $UserName = join("_",$UserName);
     

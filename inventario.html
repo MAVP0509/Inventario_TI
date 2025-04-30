@@ -489,8 +489,15 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                         </div>
-                        <select class="form-control select" id="select-usu" name="resg-inpt">
-                        </select>
+                        <select class="form-control select" id="select-usu"></select>  
+                        <div class="invalid-feedback">Por favor, seleccione un usuario.</div>                      
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa-solid fa-map-location-dot"></i></span>
+                        </div>
+                        <select class="form-control select" id="select-region"></select>
+                        <div class="invalid-feedback">Por favor, seleccione una región.</div>
                     </div>
                     <div class="card collapsed-card card-outline card-primary">
                         <div class="card-header" data-card-widget="collapse" style="cursor: pointer;" >
@@ -502,7 +509,7 @@
                         <div class="card-body" style="display:none;" id="collapse-resguardo" >
                             <label >Observaciones</label>
                             <div class="input-group mb-3">
-                                <textarea class="form-control" id="txt-area" rows="4" name="resg-inpt"></textarea>
+                                <textarea class="form-control" id="txt-area" rows="3" name="resg-inpt"></textarea>
                             </div>
                             <label >Fecha de entrega</label>
                             <div class="input-group mb-3">
