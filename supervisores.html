@@ -99,7 +99,7 @@
                             <div class="card">
                                 <!--Card header-->
                                 <div class="card-header">
-                                    <h3 class="card-title">Tabla Supervisores</h3>
+                                    <h3 class="card-title"><i class="fa-solid fa-table"></i> Supervisores</h3>
                                     <div class="d-flex justify-content-end mb-3">
                                     </div>
                                 </div>
@@ -113,7 +113,7 @@
                                         <div class="row">
                                             <div class="col-sm-12">
                                                 <div class="table-responsive">
-                                                    <table class="table table-bordered table-hover dataTable dtr-inline" id="tabla1" aria-describedby="Tabla de usuarios">
+                                                    <table class="table table-bordered table-hover dataTable dtr-inline table-striped" id="tabla1" aria-describedby="Tabla de usuarios">
                                                     <thead>
                                                         <tr>
                                                             <th>
@@ -134,9 +134,6 @@
                                                             <th>
                                                                 Editar
                                                             </th>
-                                                            <th>
-                                                                Eliminar
-                                                            </th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="tbl-body">
@@ -154,6 +151,95 @@
                 </div>
             </section> <!--Container-->
 
+        </div>
+    </div>
+
+        <!-- Modal Editar-->
+    <div class="modal fade" id="modalEditar" style="display : none;" aria-hidden="true" >
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Editar</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <label for="edi-nombre" style = "display: block;">Nombre</label>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                            </div>
+                            <select class="form-control select" id="edi-nombre"></select>
+                            <div class="invalid-feedback">Por favor, seleccione un nombre.</div>
+                        </div>
+                        <label for="edi-cargo">Cargo</label>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa-solid fa-briefcase"></i></span>
+                            </div>
+                            <select class="form-control select" id="edi-cargo"></select>
+                            <div class="invalid-feedback">Por favor, seleccione un cargo.</div>
+                        </div>
+                        <label for="edi-region" class="form-label">Región</label>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa-solid fa-map-location-dot"></i></span>
+                            </div>
+                            <select class="form-control select" id="edi-region"></select>
+                            <div class="invalid-feedback">Por favor, seleccione una región.</div>
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal">Cancelar <i class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+                    <button type="button" class="btn btn-success icon" onclick="editar_supervisor()">Guardar <i class="fa-solid fa-floppy-disk fa-lg"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal nuevo supervisor-->
+    <div class="modal fade" id="modalInsertar" style="display : none;" aria-hidden="true" >
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Nuevo Supervisor</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                        <label for="inp-nombre" style = "display: block;">Nombre</label>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                            </div>
+                            <select class="form-control select" id="inp-nombre"></select>
+                            <div class="invalid-feedback">Por favor, seleccione un nombre.</div>
+                        </div>
+                        <label for="inp-cargo">Cargo</label>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa-solid fa-briefcase"></i></span>
+                            </div>
+                            <select class="form-control select" id="inp-cargo"></select>
+                            <div class="invalid-feedback">Por favor, seleccione un cargo.</div>
+                        </div>
+                        <label for="inp-region" class="form-label">Región</label>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa-solid fa-map-location-dot"></i></span>
+                            </div>
+                            <select class="form-control select" id="inp-region"></select>
+                            <div class="invalid-feedback">Por favor, seleccione una región.</div>
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal">Cancelar <i class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+                    <button type="button" class="btn btn-success icon" onclick="insertar_supervisor()">Guardar <i class="fa-solid fa-floppy-disk fa-lg"></i></button>
+                </div>
+            </div>
         </div>
     </div>
 </body>
