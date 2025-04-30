@@ -354,7 +354,36 @@ async function mostrar_registro(params) {
 }
 
 async function editar_supervisor(params) {
+    // Campos requeridos para validación
+    const validacion = [
+        "edi-nombre",
+        "edi-cargo",
+        "edi-region",
+    ];
+    if (!validar_campos(validacion)) {
+        mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente');
+        return;
+    }
+
+    let model = {
+        accion : 1,
+        id : selecreg.id,
+        nombre : $('#edi-nombre').val().trim(),
+        cargo  : $('#edi-cargo').val().trim(),
+        region : $('#edi-region').val().trim(),
+    }
     
+    let server = await server_supervisor(model)
+    let resultado = JSON.parse(respuesta)
+
+    if(resultado.resultado === true){
+        mostrar_toast("success", "Éxito", "Supervisor editado exitosamente")
+        consultar_informacion()
+        $("#modalEditar").modal('hide')
+    }else{
+        mostrar_toast("error", "Error", "Supervisor no pudo editarse")
+        return
+    }
 }
 
 async function general_select2({selectId, tabla, campo, placeholder, dropdownParent, tags}){

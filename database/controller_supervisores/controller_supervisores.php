@@ -40,6 +40,7 @@ function insertar_supervisor($valores){
 function editar_supervisor($valores){
     include("../conexion.php");
     $sql = "UPDATE supervisor SET nombre='$valores->nombre', cargo='$valores->cargo', region='$valores->region' WHERE id='$valores->id';";
+    //var_dump($sql);
     return mysqli_query($con,$sql);
 }
 
