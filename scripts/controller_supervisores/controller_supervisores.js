@@ -123,6 +123,7 @@ async function consultar_informacion(params) {
 
 }
 
+//*Controlar el switch de la tabla para activar o desactivar supervisores
 $('#tabla1 tbody').on('change', '.switch-toggle', function () {
     const switchElement = $(this);
     const id = switchElement.data('id');
@@ -193,27 +194,6 @@ $('#tabla1 tbody').on('change', '.switch-toggle', function () {
 });
 
 
-//*Controlar el switch de la tabla para activar o desactivar supervisores
-/* $('#tabla1 tbody').on('change', '.switch-toggle', function () {
-    const id = $(this).data('id');
-    const habilitado = $(this).is(':checked');
-    let value
-
-    if (habilitado){
-        value = 1
-    }else{
-        value = 0
-    }
-
-    let model = {
-        accion : 3,
-        id : id,
-        habilitado : value
-    }
-
-    supervisor_habilitado(model)
-    //console.log(`ID: ${id}, nuevo estado: ${habilitado}`);
-}); */
 
 
 
