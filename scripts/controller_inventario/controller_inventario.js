@@ -98,7 +98,7 @@ async function consultar_informacion(params) {
                 {
                     data: "id",
                     render: function(data, type, row, meta) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${meta.row + 1}</label>`;
+                        let control = `<label style="font-weight: normal; font-size: 12px; text-align: center;">${meta.row + 1}</label>`;
                         return control;
                     }
                 },
@@ -193,7 +193,7 @@ async function consultar_informacion(params) {
                                         <button type="button" style="text-align: center" class="btn btn-warning icon" id="${data}" value="${data}" onclick="mostrar_registro(this)">
                                         <i class="fa-solid fa-pen-to-square fa-lg"></i></button></div>`
                                         return control;
-                    }
+                    }, //orderable: false
                 }
             ],
             dom: `
@@ -248,20 +248,17 @@ async function consultar_informacion(params) {
                     html: `<div>
                             <button type="button" style="text-align: center" class="btn btn-danger rounded icon" onclick="confirmar_eliminacion()" >
                             <i class="fa-solid fa-trash fa-lg"></i> Eliminar Registro</button>
-                        </div>`,//'<i class="fa-solid fa-trash fa-lg"></i> Eliminar registro',
-                    //className: 'btn btn-danger rounded icon',
-                    /* attr: {
-                        title: 'Haz clic para eliminar un registro'
-                    },
-                    /* action: function (e, dt, node, config) {
-                        
-                    } */
+                        </div>`
                 },
                 
             ],
             stateSave: true,
             resposive: true,
-           
+            //autoWidth: false,
+            scrollX: true,
+            /* fixedColumns: {
+                start: 1, en
+            } */
         });
         
     } catch (error) {

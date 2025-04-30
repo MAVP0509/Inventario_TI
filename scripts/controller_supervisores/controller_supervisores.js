@@ -43,28 +43,28 @@ async function consultar_informacion(params) {
                 {
                     data: "id",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
                         return control;
                     }
                 },
                 {
                     data: "nombre",
                     render: function(data, type, row, meta) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
                         return control
                     }
                 },
                 {
                     data: "cargo",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
                         return control;
                     }
                 },
                 {
                     data: "region",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
                         return control;
                     }
                 },
@@ -92,7 +92,7 @@ async function consultar_informacion(params) {
             ],
             dom: `
                 <'row mb-2'<'col-sm-6 text-left'f><'col-sm-6 text-right'<'btn-group'B>>>
-                <'row'<'col-sm-12'tr>>
+                <'row'<'col-sm-12 text-center'tr>>
                 <'row mt-2'<'col-sm-3'l><'col-sm-5 text-center'i><'col-sm-4 text-right'p>>
             `,
             language: {
