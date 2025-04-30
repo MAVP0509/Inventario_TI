@@ -260,6 +260,18 @@ async function consultar_informacion(params) {
                 start: 1, en
             } */
         });
+
+        $('#tabla1_filter input').on('keyup', function () {
+            const searchValue = $(this).val();
+            const searchRegex = searchValue
+                .split(',') // Divide los valores por comas
+                .map(val => val.trim()) // Elimina espacios en blanco
+                .filter(val => val !== '') // Elimina valores vacíos
+                .join('|'); // Une los valores con el operador OR para la expresión regular
+        
+            const table = $('#tabla1').DataTable();
+            table.search(searchRegex, true, false).draw(); // Habilita búsqueda con regex
+        });
         
     } catch (error) {
         console.log(error)
