@@ -26,7 +26,14 @@ print(json_encode($respuesta_servidor));//? envía la respuesta de la base de da
 function insertar_supervisor($valores){
     include("../conexion.php");
     $sql = "INSERT INTO supervisor(nombre,cargo,region,habilitado) VALUES ('$valores->nombre','$valores->cargo','$valores->region',0);";
-    return mysqli_query($con,$sql);
+
+    $sql_val_name = "SELECT * FROM supervisor WHERE nombre = '$valores->nombre'";
+    if (mysqli_query($con,$sql_val_name)-> num_rows > 0){
+        return false;
+    }else{
+        return mysqli_query($con,$sql);    
+    }
+    
 }
 
 //* Edita un supervisor ya existente

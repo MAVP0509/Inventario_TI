@@ -107,7 +107,7 @@ async function consultar_informacion(params) {
             buttons: [
                 {
                     html: `<div>
-                            <button type="button" onclick="nuevo_supervisor()" class="btn btn-success icon"><i class="fa-solid fa-plus fa-lg"></i> Nuevo Usuario</button>
+                            <button type="button" onclick="nuevo_supervisor()" class="btn btn-success icon"><i class="fa-solid fa-plus fa-lg"></i> Nuevo Supervisor</button>
                         </div>`,
                 },
                 
@@ -123,9 +123,78 @@ async function consultar_informacion(params) {
 
 }
 
+$('#tabla1 tbody').on('change', '.switch-toggle', function () {
+    const switchElement = $(this);
+    const id = switchElement.data('id');
+    const isChecked = switchElement.is(':checked');
+
+    const table = $('#tabla1').DataTable();
+    const rowData = table.row(switchElement.closest('tr')).data();
+    const region = rowData.region;
+
+    const data = table.rows().data();
+
+    // Contar cuántos están habilitados en la misma región
+    let habilitadosEnRegion = 0;
+    data.each(function (item) {
+        if (item.region === region && parseInt(item.habilitado) === 1) {
+            habilitadosEnRegion++;
+        }
+    });
+
+    if (isChecked) {
+        // Validar: si ya hay uno habilitado en la región, deshabilitarlo
+        if (habilitadosEnRegion >= 1) {
+            data.each(function (item, index) {
+                if (item.region === region && item.id !== id && parseInt(item.habilitado) === 1) {
+                    // Deshabilitar visualmente
+                    const rowIdx = table.row(function (idx, data, node) {
+                        return data.id === item.id;
+                    });
+                    const checkbox = $(table.row(rowIdx).node()).find('.switch-toggle');
+                    checkbox.prop('checked', false);
+
+                    // Actualizar en DataTable y backend
+                    item.habilitado = 0;
+                    supervisor_habilitado({
+                        accion: 3,
+                        id: item.id,
+                        habilitado: 0
+                    });
+                }
+            });
+        }
+
+        // Actualizar actual habilitado
+        rowData.habilitado = 1;
+        supervisor_habilitado({
+            accion: 3,
+            id: id,
+            habilitado: 1
+        });
+
+    } else {
+        // Si este es el único habilitado, no permitir deshabilitar
+        if (habilitadosEnRegion <= 1) {
+            //alert('Debe haber al menos un supervisor habilitado por región.');
+            mostrar_toast('warning', 'Advertencia', 'Debe haber un supervisor habilitado por región.');
+            switchElement.prop('checked', true);
+            return;
+        }
+
+        // Actualizar y guardar
+        rowData.habilitado = 0;
+        supervisor_habilitado({
+            accion: 3,
+            id: id,
+            habilitado: 0
+        });
+    }
+});
+
 
 //*Controlar el switch de la tabla para activar o desactivar supervisores
-$('#tabla1 tbody').on('change', '.switch-toggle', function () {
+/* $('#tabla1 tbody').on('change', '.switch-toggle', function () {
     const id = $(this).data('id');
     const habilitado = $(this).is(':checked');
     let value
@@ -144,7 +213,10 @@ $('#tabla1 tbody').on('change', '.switch-toggle', function () {
 
     supervisor_habilitado(model)
     //console.log(`ID: ${id}, nuevo estado: ${habilitado}`);
-});
+}); */
+
+
+
 
 async function supervisor_habilitado(model) {
     await server_supervisor(model)
@@ -152,7 +224,7 @@ async function supervisor_habilitado(model) {
 
 
 function nuevo_supervisor(){
-    limpiar_campos()
+    limpiar_campos_nuevo_supervisor()
 
     $("#modalInsertar").modal('show');
 }
@@ -165,8 +237,29 @@ async function insertar_supervisor() {
         "inp-region",
     ];
     if (!validar_campos(validacion)) {
-        mostrar_alerta('error', 'Error', 'Rellena los campos. Inténtelo nuevamente');
+        mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente');
         return;
+    }
+
+    let model = {
+        accion : 0,
+        nombre : $('#inp-nombre').val().trim(),
+        cargo  : $('#inp-cargo').val().trim(),
+        region : $('#inp-region').val().trim(),
+    }
+
+    let server = await server_supervisor(model)
+
+    let resultado = JSON.parse(respuesta)
+
+    if(resultado.resultado === true){
+        mostrar_toast("success", "Supervisor registrado", "El supervisor ha sido registrado exitosamente")
+        consultar_informacion()   
+        $("#modalInsertar").modal('hide');
+
+    }else{
+        mostrar_toast("error", "Error", "Supervisor ya existente")
+        return
     }
 }
 
@@ -192,13 +285,6 @@ function validar_campos(campos) {
             campo.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
         }
 
-        /* if (!campo.value.trim()) {
-            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
-            valido = false;
-        } else {
-            campo.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
-        } */
-
         campo.addEventListener('input', function () {
             if (campo.value.trim()) {
                 campo.classList.remove('is-invalid');
@@ -209,12 +295,12 @@ function validar_campos(campos) {
     return valido;
 }
 
-function limpiar_campos(){
-    let inputs = document.getElementsByName('insertMdl');
+function limpiar_campos_nuevo_supervisor(){
+    /* let inputs = document.getElementsByName('insertMdl');
     for (let i = 0; i < inputs.length; i++) {
         inputs[i].value = ""; // Limpia el valor del input
         inputs[i].classList.remove('is-invalid'); // Elimina la clase de validación
-    }
+    } */
     
     $('.select').each(function () {
         $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
@@ -226,7 +312,7 @@ function limpiar_campos(){
         tabla: 'inventario_ti_sur',
         campo: 'usuario',
         placeholder: 'Seleciona un usuario',
-        dropdownParent: '#insertMdl',
+        dropdownParent: '#modalInsertar',
         tags: true
       });
     
@@ -235,25 +321,62 @@ function limpiar_campos(){
         tabla: 'inventario_ti_sur',
         campo: 'posicion',
         placeholder: 'Seleciona un cargo',
-        dropdownParent: '#modal-registro',
+        dropdownParent: '#modalInsertar',
         tags: true
       });
 
     general_select2({
-        selectId: 'inp-usuario',
+        selectId: 'inp-region',
+        tabla: 'supervisor',
+        campo: 'region',
+        placeholder: 'Seleccione una región',
+        dropdownParent: '#modalInsertar',
+        tags: true,
+    });
+}
+
+let selecreg =""
+
+async function mostrar_registro(params) {
+    for (let i = 0; i < datos.length; i++) {
+        const element = datos[i];
+        if(element.id===params.value){
+            selecreg = element;
+            break;
+        }
+    }
+    // Limpia y carga los select
+    await general_select2({
+        selectId: 'edi-nombre',
         tabla: 'inventario_ti_sur',
         campo: 'usuario',
-        placeholder: 'Seleccione un usuario',
-        dropdownParent: '#modal-registro',
-    });
-
-    general_select2({
-        selectId: 'inp-posicion',
+        placeholder: 'Selecione un nombre',
+        dropdownParent: '#modalEditar',
+        tags: true
+    })
+    
+    await general_select2({
+        selectId: 'edi-cargo',
         tabla: 'inventario_ti_sur',
         campo: 'posicion',
-        placeholder: 'Seleccione un cargo',
-        dropdownParent: '#modal-registro',
-    });
+        placeholder: 'Selecione un cargo',
+        dropdownParent: '#modalEditar',
+        tags: true
+    })
+    
+    await general_select2({
+        selectId: 'edi-region',
+        tabla: 'supervisor',
+        campo: 'region',
+        placeholder: 'Seleccione una region',
+        dropdownParent: '#modalEditar',
+    })
+    
+        $('#edi-nombre').val(selecreg.nombre).trigger('change');
+        $('#edi-cargo').val(selecreg.cargo).trigger('change');
+        $('#edi-region').val(selecreg.region).trigger('change');
+
+        $("#modalEditar").modal('show');
 }
 
 async function general_select2({selectId, tabla, campo, placeholder, dropdownParent, tags}){
@@ -288,4 +411,17 @@ async function general_select2({selectId, tabla, campo, placeholder, dropdownPar
     //} catch (error) {
         
     //}
-  }
+}
+
+function mostrar_toast(tipo, titulo, mensaje) {
+    Swal.fire({
+        icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
+        title: titulo,
+        text: mensaje,
+        timer: 2500,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end',
+    });
+}

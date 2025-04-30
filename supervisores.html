@@ -165,72 +165,34 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                        <label for="nombre" style = "display: block;">Nombre</label>
+                    <label for="edi-nombre" style = "display: block;">Nombre</label>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                             </div>
-                            <input type="text" class="form-control" id="nombreEdit" autocomplete="off">
+                            <select class="form-control select" id="edi-nombre"></select>
+                            <div class="invalid-feedback">Por favor, seleccione un nombre.</div>
                         </div>
-                        <label for="correo">Correo</label>
+                        <label for="edi-cargo">Cargo</label>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
+                                <span class="input-group-text"><i class="fa-solid fa-briefcase"></i></span>
                             </div>
-
-                            <input type="email" class="form-control" id="correo" autocomplete="off">
+                            <select class="form-control select" id="edi-cargo"></select>
+                            <div class="invalid-feedback">Por favor, seleccione un cargo.</div>
                         </div>
-                        <label for="telefono" class="form-label">Telefono</label>
+                        <label for="edi-region" class="form-label">Región</label>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+                                <span class="input-group-text"><i class="fa-solid fa-map-location-dot"></i></span>
                             </div>
-
-                            <input type="tel" class="form-control" id="telefono" maxlength="10" autocomplete="off">
-                        </div>
-                        <label for="fechanac" class="form-label">Fecha de nacimiento</label>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
-                            </div>
-                            <input type="date" class="form-control" id="fechanac" >
-                        </div>
-                        <label for="edad" class="form-label">Edad</label>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fa-solid fa-image-portrait"></i></span>         
-                            </div>       
-                            <input type="number" class="form-control" id="edad" disabled>
-                        </div>
-                        <label for="fecha_reg" class="form-label">Fecha de registro</label>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
-                            </div>
-                            <input type="datetime" class="form-control" id="fecha_reg" disabled>
-                        </div>
-                        <label for="contraseña" class="form-label">Contraseña</label>
-                        <div class="input-group mb-3 ">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i id="ver-passEdit" class="fa-solid fa-eye-slash" style="cursor: pointer;"></i></span>
-                            </div>
-                            <input type="password" class="form-control" id="contraseña" disabled>
-                            <!-- <span class="input-group-append">
-                              <button type="button" class="btn btn-info btn-flat">Resetear</button>
-                            </span> -->
-                            <div class="input-group-append dropdown">
-                              <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="drop-menu">
-                                Resetear
-                              </button>
-                              <div class="dropdown-menu dropdown-menu-right icon" aria-labelledby="drop-menu">
-                                <a class="dropdown-item " href="#" onclick="recuperar_contraseña(), mostrar_toast_cargando()"><i class="fa-solid fa-envelope fa-lg"></i> Enviar correo</a>
-                              </div>
-                            </div>
+                            <select class="form-control select" id="edi-region"></select>
+                            <div class="invalid-feedback">Por favor, seleccione una región.</div>
                         </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger icon" data-dismiss="modal">Cancelar <i class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
-                    <button type="button" class="btn btn-success icon" onclick="editar_usuario()">Guardar <i class="fa-solid fa-floppy-disk fa-lg"></i></button>
+                    <button type="button" class="btn btn-success icon" onclick="">Guardar <i class="fa-solid fa-floppy-disk fa-lg"></i></button>
                 </div>
             </div>
         </div>
@@ -248,7 +210,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                        <label for="nombre" style = "display: block;">Nombre</label>
+                        <label for="inp-nombre" style = "display: block;">Nombre</label>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
@@ -256,7 +218,7 @@
                             <select class="form-control select" id="inp-nombre"></select>
                             <div class="invalid-feedback">Por favor, seleccione un nombre.</div>
                         </div>
-                        <label for="cargo">Cargo</label>
+                        <label for="inp-cargo">Cargo</label>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa-solid fa-briefcase"></i></span>
@@ -264,7 +226,7 @@
                             <select class="form-control select" id="inp-cargo"></select>
                             <div class="invalid-feedback">Por favor, seleccione un cargo.</div>
                         </div>
-                        <label for="region" class="form-label">Región</label>
+                        <label for="inp-region" class="form-label">Región</label>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa-solid fa-map-location-dot"></i></span>
