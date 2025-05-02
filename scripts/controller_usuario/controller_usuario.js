@@ -20,6 +20,28 @@ function server_usuario(model) {
     })
 }
 
+function server_email(model){
+    return new Promise ((resolve,reject)=>{
+        $.ajax({
+            type: "POST",
+            url: "database/controller_email/controller_email.php",
+            data: {
+                trama:JSON.stringify(model)
+            },
+            success: function(response){
+                Swal.close()
+                respuesta = response
+                try {
+                    resolve(JSON.parse(response))
+                    console.log(JSON.parse(response))   
+                } catch (error) {
+                    reject(error)
+                }
+            }
+        })
+    })
+}
+
 
 $(document).ready(function (){
     document.getElementById('fechanacReg').addEventListener('input',calcular_edadreg);
@@ -36,9 +58,9 @@ $(document).ready(function (){
 
 let usuarios = []
 async function consultar_usuarios() {
-    let usuarioLog = JSON.parse(sessionStorage.getItem('user'))
+    /* let usuarioLog = JSON.parse(sessionStorage.getItem('user'))
     let user = document.getElementById('user')
-    user.textContent = usuarioLog.resultado[0] 
+    user.textContent = usuarioLog.resultado[0]  */
     let r = await server_usuario({accion : 2})
 
     usuarios = r.resultado
@@ -53,29 +75,31 @@ async function consultar_usuarios() {
                     {
                         data: 'id',
                         render: function (data, type, row) {
-                            let control = `<div class="form-check d-flex justify-content-center align-middle" ><input type="checkbox" class="form-check-input check-change" 
-                            onclick="seleccionar_usuarios(${data})" value="${data}"></div>`
+                            let control = `<div class="form-group form-check">
+                                <input type="checkbox" class="form-check-input" 
+                                onclick="seleccionar_usuarios(${data})" value="${data}" id="check${data}">
+                            </div>`
                             return control;
                         }
                     },
                     {
                         data: 'id',
-                        render: function (data, type, row) {
+                        render: function (data, type, row, meta) {
                             let control = `<label style="text-align: center">${data}</label>`
-                            return control;
+                            return meta.row + 1;
                         }
                     },
                     {
                         data: 'nombre',
                         render: function (data, type, row) {
-                            let control = `<label style="text-align: center">${data}</label>`
+                            let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                             return control;
                         }
                     },
                     {
                         data: "correo",
                         render: function (data, type, row) {
-                            let control = `<label style="text-align: center">${data}</label>`
+                            let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                             return control;
                         }
     
@@ -83,14 +107,14 @@ async function consultar_usuarios() {
                     {
                         data: 'edad',
                         render: function (data, type, row) {
-                            let control = `<label style="text-align: center">${data}</label>`
+                            let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                             return control;
                         }
                     },
                     {
                         data: "telefono",
                         render: function (data, type, row) {
-                            let control = `<label style="text-align: center">${data}</label>`
+                            let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                             return control;
                         }
     
@@ -98,36 +122,33 @@ async function consultar_usuarios() {
                     {
                         data: 'fecha_nac',
                         render: function (data, type, row) {
-                            let control = `<label style="text-align: center">${data}</label>`
+                            let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                             return control;
                         }
                     },
                     {
                         data: "fecha_reg",
                         render: function (data, type, row) {
-                            let control = `<label style="text-align: center">${data}</label>`
+                            let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                             return control;
                         }
     
                     },
                     {
-                        data: 'id',
-                        render: function (data, type, row) {
-                            let control = `<div class="d-flex justify-content-center align-items-center"><button type="button" style="text-align: center" class="btn btn-warning icon" id="${data}"  value="${data}" onclick="seleccionar_usuario(this)"><i class="fa-solid fa-pen-to-square fa-lg"></i></button></div>`
-                            return control;
-                        }
-                    },
-                    {
                         data: "id",
                         render: function (data, type, row) {
-                            let control = `<div class="d-flex justify-content-center align-items-center" ><button type="button" tyle="text-align: center" class="btn btn-danger icon"  value="${data}" onclick="desactivar_usuariomsg(this)" value="${data}"><i class="fa-solid fa-trash fa-lg"></i></button></div>`
+                            let control = `<div class="d-flex justify-content-center align-items-center">
+                                <button type="button" style="text-align: center" class="btn btn-warning icon" id="${data}" value="${data}" onclick="seleccionar_usuario(this)">
+                                    <i class="fa-solid fa-pen-to-square fa-lg"></i>
+                                </button>
+                            </div>`
                             return control;
                         }
                     }
                 ], 
                 dom: `
                     <'row mb-2'<'col-sm-6 text-left'f><'col-sm-6 text-right'B>>
-                    <'row'<'col-sm-12'tr>>
+                    <'row'<'col-sm-12 text-center'tr>>
                     <'row mt-2'<'col-sm-3'l><'col-sm-5 text-center'i><'col-sm-4 text-right'p>>
                 `,
                 language: {
@@ -139,30 +160,43 @@ async function consultar_usuarios() {
                         last: '<i class="fas fa-angle-double-right"></i>'
                     },
                 },
-                buttons:[
-                    /*{   text : 'word',
-                        action: function (e, dt, node, config) {
-                            crear_word()
+                select: {
+                    style: 'multi',
+                    selector: 'td:not(:first-child)'
+                },
+                rowCallback: function (row, data){
+                    $(row).on('click', function () {
+                        if ($(event.target).closest('.btn-warning.icon').length > 0) {
+                            return;
                         }
-                    },
-                     {
-                        extend: 'excelHtml5',
-                        text: 'Exportar a Excel',
-                        className: 'btn btn-sm btn-success'
+
+                        const checkbox = $(this).find('input[type="checkbox"]');
+                        const ischecked = checkbox.prop('checked');
+
+                        checkbox.prop('checked', !ischecked);
+                        if (!ischecked) {
+                            $(this).attr('style', 'background-color: #d1ecf1; color: #0c5460;');
+                        } else {
+                            $(this).removeAttr('style');
+                        }
+                        seleccionar_usuarios(data.id);
+                    });
+                },
+                buttons:[
+                    {
+                        html: `<div>
+                            <button type="button" onclick="nuevo_usuario()" class="btn btn-success icon"><i class="fa-solid fa-plus fa-lg"></i> Nuevo Usuario</button>
+                        </div>`,
                     },
                     {
-                        extend: 'pdfHtml5',
-                        text: 'Exportar a PDF',
-                        className: 'btn btn-sm btn-danger'
+                        html: `<div>
+                            <button type="button" onclick="mensaje_eliminar()" class="btn btn-danger icon" style="margin-left: 10px;">
+                            <i class="fa-solid fa-trash fa-lg"></i> Eliminar Usuario</button>
+                        </div>`,
                     },
-                    {
-                        extend: 'print',
-                        text: 'Imprimir',
-                        className: 'btn btn-sm btn-primary'
-                    }, */
                 ],
                 stateSave: true,
-                resposive: true,
+                responsive: true,
                 //!Esta parte del codigo (DOM) es para que los botones, paginacion y filtros de busqueda se acomoden a sus necesidades, si quieren pueden buscar mas info en la documentacion de datatables, pero en este caso no es necesario.
   
     })   
@@ -243,9 +277,9 @@ async function mensaje_eliminar() {
 
     if (usuSeleccionado.length === 0) {
         mostrar_toast('warning', 'Inventario TI', 'Por favor, selecciona al menos un usuario para continuar')
-        return;
+        
     }else{
-        mostrar_alert('warning', `¿Está seguro de eliminar ${usuSeleccionado.length} usuario(s)?`, false , eliminar_usuario)
+        mostrar_alert('warning', `¿Está seguro de eliminar ${usuSeleccionado.length} usuario(s)?`, false, eliminar_usuario);
         /* modalElim = new bootstrap.Modal(document.getElementById('modalElim'))
         modalElim.show() */
     }
@@ -263,9 +297,9 @@ async function eliminar_usuario(params) {
             mostrar_toast('success', 'Inventario TI', 'Usuario(s) eliminado(s) correctamente')
 
             usuSeleccionado = [];
-            let table = $("#tbl-usuario").DataTable()
-            table.destroy()
-            consultar_usuarios()
+            let table = $("#tbl-usuario").DataTable();
+            table.destroy();
+            consultar_usuarios();
         } else {
             mostrar_toast('error', 'Inventario TI', 'Error en la consulta');
         }
@@ -482,6 +516,27 @@ $('#contraseñaReg').on('input', function(e) {
 
 
 
+async function recuperar_contraseña() {
+    let model ={
+        accion : 0,
+        correo : $("#correo").val().trim(),
+        dominio : window.location.hostname,
+        puerto : location.port
+    }
+    
+    let response = await server_email(model);
+    
+    if(response.resultado === true) {
+        mostrar_toast('success', 'Correo Enviado', 'Se enviado un correo al usuario para recuperar su contraseña')
+        console.log(window.location.hostname);
+    } else {
+        mostrar_toast('error', 'Error', 'No se envio el correo al usuario')
+    }
+    
+}
+
+
+
 function crear_word() {
     const enlace = document.createElement('a');
     enlace.href = 'database/controller_word2/controller_word2.php'; // ← cambia esto
@@ -530,21 +585,36 @@ function mostrar_alert(tipo, mensaje, skip, funcion) {
     })
 }
 
-//TODO air date picker
-$('#modalInsertar').on('shown.bs.modal', function () {
-    inicializarDatepicker();
-});
+function mostrar_toast_cargando() {
+    Swal.fire({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        showCloseButton: false,
+        timer: undefined, // No cerrar automáticamente
+        allowOutsideClick: false,
+        background: '#fff',
+        html: `
+            <div style="display: flex; align-items: center;">
+                <i class="fas fa-spinner fa-spin fa-lg" style="margin-right: 10px; color: #007bff;"></i>
+                <span style="font-weight: 500;">Cargando...</span>
+            </div>
+        `,
+        didOpen: () => {
+            //Swal.showLoading(); // Esto muestra el spinner
+        }
+    });
+}
 
-function inicializarDatepicker() {
-    if (!document.querySelector('#fechanacReg')._airDatepicker) {
-        new AirDatepicker('#fechanacReg', {
-            autoClose: true,
-            dateFormat: 'yyyy-MM-dd',
-            defaultDate: new Date(),
-            locale: {
-                days: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
-                months: ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
-            }
-        });
-    }
+// TODO: seleciona usuarios por id
+let select = [];
+
+async function selecionar_registro(params) {
+
+    let index = select.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
+    if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
+        select.push(params); // Añade uno o más elementos al final de un array
+    } else {
+        select.splice(index, 1); 
+    } 
 }

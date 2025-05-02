@@ -35,6 +35,7 @@ function server_excel(model) {
             success: function(response) {
                 try {
                     resolve(JSON.parse(response))
+                    Swal.close()
                     //console.log(resolve(JSON.parse(response)))
                     respuesta = response
                 } catch (error) {
@@ -62,24 +63,17 @@ window.addEventListener('load', function () {
     }
 })
 
-$(document).ready(function (){
-
-    $('#tabla1').on('mouseover', '.icon', function() {
-        $(this).find('i').addClass('fa-bounce');  // Agregar una clase extra si lo deseas
-    }).on('mouseout', '.icon', function() {
-        $(this).find('i').removeClass('fa-bounce');
-    });
-})
-
 let datos = [];
 
 async function consultar_informacion(params) {
-
+    /* let usuarioLog = JSON.parse(sessionStorage.getItem('user'))
+    let user = document.getElementById('user')
+    user.textContent = usuarioLog.resultado[0] */
+    
     let model = {
         accion: 2
     };
     
-
     let response = await server_inventario(model);
     //console.log(response);
     datos = response.resultado;
@@ -95,7 +89,7 @@ async function consultar_informacion(params) {
                     data: "id",
                     render: function(data, type, row) {
                         let control = `<div class="form-group form-check">
-                            <input type="checkbox" class="form-check-input"
+                            <input type="checkbox" class="form-check-input form-control-lg"
                             onclick="selecionar_registro(${data})" value="${data}" id="check${data}">
                         </div>`
                         return control;
@@ -104,93 +98,93 @@ async function consultar_informacion(params) {
                 {
                     data: "id",
                     render: function(data, type, row, meta) {
-                        let control = `<label style="text-align: center">${data}</label>`
-                        return meta.row + 1;
+                        let control = `<label style="font-weight: normal; font-size: 12px; text-align: center;">${meta.row + 1}</label>`;
+                        return control;
                     }
                 },
                 {
                     data: "zona",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
                     }
                 },
                 {
                     data: "rubro",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
-                    }
+                    }, 
                 },
                 {
                     data: "af",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
-                    }
+                    }, 
                 },
                 {
                     data: "tipo",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
-                    }
+                    }, 
                 },
                 {
                     data: "marca",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
-                    }
+                    }, 
                 },
                 {
                     data: "modelo",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
                     }
                 },
                 {
                     data: "num_serie",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
-                    }
+                    }, 
                 },
                 {
                     data: "ubicacion",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
-                    }
+                    }, 
                 },
                 {
                     data: "tag",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
-                    }
+                    }, 
                 },
                 {
                     data: "usuario",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
-                    }
+                    }, 
                 },
                 {
                     data: "posicion",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
-                    }
+                    }, 
                 },
                 {
                     data: "fecha_entrega",
                     render: function(data, type, row) {
-                        let control = `<label style="text-align: center">${data}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
                         return control;
-                    }
+                    }, 
                 },
                 {
                     data: "id",
@@ -199,12 +193,12 @@ async function consultar_informacion(params) {
                                         <button type="button" style="text-align: center" class="btn btn-warning icon" id="${data}" value="${data}" onclick="mostrar_registro(this)">
                                         <i class="fa-solid fa-pen-to-square fa-lg"></i></button></div>`
                                         return control;
-                    }
+                    }, //orderable: false
                 }
             ],
             dom: `
-                <'row mb-2'<'col-sm-6 text-left'f><'col-sm-6 text-right'B>>
-                <'row'<'col-sm-12'tr>>
+                <'row mb-2'<'col-sm-6 text-left'f><'col-sm-6 text-right'<'btn-group'B>>>
+                <'row'<'col-sm-12 text-center'tr>>
                 <'row mt-2'<'col-sm-3'l><'col-sm-5 text-center'i><'col-sm-4 text-right'p>>
             `,
             language: {
@@ -226,6 +220,7 @@ async function consultar_informacion(params) {
                     if ($(event.target).closest('.btn-warning.icon').length > 0) {
                         return;
                     }
+                    
                     const checkbox = $(this).find('input[type="checkbox"]');
                     const isChecked = checkbox.prop('checked');
                     
@@ -240,71 +235,49 @@ async function consultar_informacion(params) {
                 });
             },
             buttons: [
-                /* {
-                    extend: 'excelHtml5',
-                    text: 'Exportar a Excel',
-                    className: 'btn btn-sm btn-success'
+                {
+                    html: `<button type="button" onclick="resguardo()" class="btn btn-info icon rounded mr-3" style="margin-left: 10px;" href="#" ><i class="fa-solid fa-file-export fa-lg"></i> Resguardo</button>`,
                 },
                 {
-                    extend: 'pdfHtml5',
-                    text: 'Exportar a PDF',
-                    className: 'btn btn-sm btn-danger'
+                    html: `<div>
+                            <button type="button" class="btn btn-success rounded mr-3 icon" onclick="limpiar_campos()" >
+                            <i class="fa-solid fa-pen-to-square fa-lg"></i> Crear Registro</button>
+                        </div>`
                 },
                 {
-                    extend: 'print',
-                    text: 'Imprimir',
-                    className: 'btn btn-sm btn-primary'
-                }, */
-                {
-                    text: '<i class="fa-solid fa-pen-to-square fa-lg"></i> Crear registro',
-                    className: 'btn btn-success icon',
-                    attr: {
-                        title: 'Haz clic para agregar un registros'
-                    },
-                    action: function (e, dt, node, config) {
-                        limpiar();
-                        //modal = new bootstrap.Modal(document.getElementById('modal-registro'));
-                        //modal.show();
-                        //mostrar_datos()
-                    }
-                },
-                {
-                    text: '<i class="fa-solid fa-trash fa-lg"></i> Eliminar registro',
-                    className: 'btn btn-danger icon',
-                    attr: {
-                        title: 'Haz clic para eliminar un registro'
-                    },
-                    action: function (e, dt, node, config) {
-                        confirmar_eliminacion();
-                    }
+                    html: `<div>
+                            <button type="button" style="text-align: center" class="btn btn-danger rounded icon" onclick="confirmar_eliminacion()" >
+                            <i class="fa-solid fa-trash fa-lg"></i> Eliminar Registro</button>
+                        </div>`
                 },
                 
             ],
             stateSave: true,
             resposive: true,
-           
+            //autoWidth: false,
+            scrollX: true,
+            /* fixedColumns: {
+                start: 1, en
+            } */
+        });
+
+        $('#tabla1_filter input').on('keyup', function () {
+            const searchValue = $(this).val();
+            const searchRegex = searchValue
+                .split(',') // Divide los valores por comas
+                .map(val => val.trim()) // Elimina espacios en blanco
+                .filter(val => val !== '') // Elimina valores vacíos
+                .join('|'); // Une los valores con el operador OR para la expresión regular
+        
+            const table = $('#tabla1').DataTable();
+            table.search(searchRegex, true, false).draw(); // Habilita búsqueda con regex
         });
         
     } catch (error) {
         console.log(error)
     }
 
-
-
 }
-
-let ususelect = [];
-/* async function mostrar_datos(params) {
-
-    let zona = "Base operativa región Sur";
-    let registro = dayjs().format('YYYY-MM-DD HH:mm:ss');//new Date().toISOString().slice(0, 19).replace('T', ' ');
-
-    $("#inp-zona").val(zona);
-    $("#inp-fecha-entrega").val(registro);
-
-    let modal = new bootstrap.Modal(document.getElementById('modal-registro'));
-    modal.show();
-} */
 
 let selecreg ="";
 let modalE
@@ -312,43 +285,62 @@ let modalE
 async function mostrar_registro(params) {
     for (let i = 0; i < datos.length; i++) {
         const element = datos[i];
-
         if(element.id===params.value){
             selecreg = element;
             break;
         }
     }
+    // Limpia y carga los select
+    await general_select2({
+        selectId: 'edi-rubro',
+        tabla: 'inventario_ti_sur',
+        campo: 'rubro',
+        placeholder: 'Selecione un rubro',
+        dropdownParent: '#modal-editar',
+        tags: true
+    })
+    
+    await general_select2({
+        selectId: 'edi-tipo',
+        tabla: 'inventario_ti_sur',
+        campo: 'tipo',
+        placeholder: 'Selecione un rubro',
+        dropdownParent: '#modal-editar',
+        tags: true
+    })
+    
+    await general_select2({
+        selectId: 'edi-usuario',
+        tabla: 'inventario_ti_sur',
+        campo: 'usuario',
+        placeholder: 'Seleccione un usuario',
+        dropdownParent: '#modal-editar',
+    })
+    await general_select2({
+        selectId: 'edi-posicion',
+        tabla: 'inventario_ti_sur',
+        campo: 'posicion',
+        placeholder: 'Seleccione un cargo',
+        dropdownParent: '#modal-editar',
+    })
         document.getElementById("edi-zona").value = selecreg.zona;
-        document.getElementById("edi-rubro").value = selecreg.rubro;
+        $('#edi-rubro').val(selecreg.rubro).trigger('change');
         document.getElementById("edi-af").value = selecreg.af;
-        document.getElementById("edi-tipo").value = selecreg.tipo;
+        $('#edi-tipo').val(selecreg.tipo).trigger('change');
         document.getElementById("edi-marca").value = selecreg.marca;
         document.getElementById("edi-modelo").value = selecreg.modelo;
         document.getElementById("edi-num-serie").value = selecreg.num_serie;
         document.getElementById("edi-ubicacion").value = selecreg.ubicacion;
         document.getElementById("edi-tag").value = selecreg.tag;
-        document.getElementById("edi-usuario").value = selecreg.usuario;
-        document.getElementById("edi-posicion").value = selecreg.posicion;
+        $('#edi-usuario').val(selecreg.usuario).trigger('change');
+        $('#edi-posicion').val(selecreg.posicion).trigger('change');
         document.getElementById("edi-fecha-entrega").value = selecreg.fecha_entrega;
 
         modalE = new bootstrap.Modal(document.getElementById('modal-editar'));
         modalE.show();
-        console.log(selecreg)
 }
 
-let selec = [];
-
-async function selecionar_registro(params) {
-
-    let index = selec.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
-    if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
-        selec.push(params); // Añade uno o más elementos al final de un array
-    } else {
-        selec.splice(index, 1); 
-    } 
-}
-
-let modal
+let ususelect = [];
 
 async function crear_registro() {
     // Campos requeridos para validación
@@ -357,7 +349,14 @@ async function crear_registro() {
         "inp-rubro",
         "inp-tipo",
         "inp-ubicacion",
+        "inp-marca",
+        "inp-modelo",
+        "inp-num-serie",
     ];
+
+    if (!$('#inp-tag').prop('disabled')) {
+        validacion.push('inp-tag');
+    }
 
     // Validar campos
     if (!validar_campos(validacion)) {
@@ -393,7 +392,7 @@ async function crear_registro() {
         let table = $('#tabla1').DataTable();
         table.destroy();
         consultar_informacion();
-        modal.hide();
+        $("#modal-registro").modal('hide');
         mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
     } else if (respuesta.resultado === false) {
         if (respuesta.mensaje === "Número de serie duplicado") {
@@ -405,11 +404,12 @@ async function crear_registro() {
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo crear el registro. Inténtalo nuevamente.');
     }
+    
 
 }
 
 async function editar_registro(params) {
-    deshabilitar_campo();
+    //deshabilitar_campo();
     const validacion = [
         "inp-zona",
         "inp-rubro",
@@ -450,7 +450,7 @@ async function editar_registro(params) {
 }
 
 async function desactivar_registro(params) {
-    let response = await server_inventario({ accion: 3, id: selecreg });
+    let response = await server_inventario({ accion: 3, id: select });
         if (response.resultado === true) {
             mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
 
@@ -476,8 +476,20 @@ async function desactivar_registro(params) {
 
         //TODO: Validación de funciones
 
+let select = [];
+
+async function selecionar_registro(params) {
+
+    let index = select.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
+    if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
+        select.push(params); // Añade uno o más elementos al final de un array
+    } else {
+        select.splice(index, 1); 
+    } 
+}
+
 async function confirmar_eliminacion() {
-    if (selecreg.length === 0) {
+    if (select.length === 0) {
         mostrar_alerta('error', 'Error', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
     } else {
         Swal.fire({
@@ -485,8 +497,8 @@ async function confirmar_eliminacion() {
             text: "Esta acción no se puede deshacer.",
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar'
         }).then((result) => {
@@ -497,7 +509,7 @@ async function confirmar_eliminacion() {
     }
 }
 
-function deshabilitar_campo(){
+/* function deshabilitar_campo(){
     // Al cambiar la opción en el select, bloqueamos o habilitamos el campo
     $("#edi-rubro").on('change', function() {
         if ($(this).val() !== "") {  // Si el valor no está vacío
@@ -519,7 +531,7 @@ function deshabilitar_campo(){
 
 $(document).ready(function() {
     deshabilitar_campo();  // Llamamos a la función para asegurar que el campo se habilite/deshabilite al cargar
-});
+}); */
 
 function validar_campos(campos) {
     let valido = true;
@@ -531,12 +543,22 @@ function validar_campos(campos) {
             return;
         }
 
-        if (!campo.value.trim()) {
+        if ($(campo).hasClass('is-required') && !campo.value.trim()) {
+            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
+            valido = false;
+        } else if (!campo.value.trim()) {
             campo.classList.add('is-invalid'); // Agrega la clase de advertencia
             valido = false;
         } else {
             campo.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
         }
+
+        /* if (!campo.value.trim()) {
+            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
+            valido = false;
+        } else {
+            campo.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
+        } */
 
         campo.addEventListener('input', function () {
             if (campo.value.trim()) {
@@ -548,19 +570,56 @@ function validar_campos(campos) {
     return valido;
 }
 
-function limpiar(){
-    let input = document.getElementsByName('mdl-reg');
-    for (let i = 0; i < input.length; i++) {
-        const element = input[i].value = "";
+function limpiar_campos(){
+    let inputs = document.getElementsByName('mdl-reg');
+    for (let i = 0; i < inputs.length; i++) {
+        inputs[i].value = ""; // Limpia el valor del input
+        inputs[i].classList.remove('is-invalid'); // Elimina la clase de validación
     }
-    //$select.val(null).trigger('change');
+    
+    $('.select').each(function () {
+        $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
+        $(this).removeClass('is-invalid'); // Elimina la clase de validación
+    });
+
+    general_select2({
+        selectId: 'inp-rubro',
+        tabla: 'inventario_ti_sur',
+        campo: 'rubro',
+        placeholder: 'Seleciona un rubro',
+        dropdownParent: '#modal-registro',
+        tags: true
+      });
+    
+    general_select2({
+        selectId: 'inp-tipo',
+        tabla: 'inventario_ti_sur',
+        campo: 'tipo',
+        placeholder: 'Seleciona un tipo',
+        dropdownParent: '#modal-registro',
+        tags: true
+      });
+
+    general_select2({
+        selectId: 'inp-usuario',
+        tabla: 'inventario_ti_sur',
+        campo: 'usuario',
+        placeholder: 'Seleccione un usuario',
+        dropdownParent: '#modal-registro',
+        tags: true
+    });
+
+    general_select2({
+        selectId: 'inp-posicion',
+        tabla: 'inventario_ti_sur',
+        campo: 'posicion',
+        placeholder: 'Seleccione un cargo',
+        dropdownParent: '#modal-registro',
+        tags: true
+    });
 
     // modal = new bootstrap.Modal(document.getElementById('modal-registro'));
-    $("#modal-registro").modal(/* {
-        backdrop: 'static',
-        keyboard: false
-    
-    } */);
+    $("#modal-registro").modal('show');
     //modal.show();
 }
 
@@ -580,16 +639,6 @@ function mostrar_alerta(tipo, titulo, mensaje) {
 }
 
 //TODO: Configuración del select2
-/* $(document).ready(function() {
-    $(".select").select2({
-        theme: 'bootstrap4',
-        placeholder: "Selecciona un rubro", // Texto de ayuda
-        allowClear: true, // Permitir limpiar la selección
-        tags: true,
-        dropdownParent: $(parentID) // * Permite al menú despegable se adjunte al modal
-    });
-  }); */
-
  /*  $(document).ready(function() {
     $(".select").each(function() { //recorre cada <select class="select">
       const $select = $(this);
@@ -608,45 +657,11 @@ function mostrar_alerta(tipo, titulo, mensaje) {
   }); */
   
   //*SELECT2 para hacer el resguardo
-  $(document).ready(function () {
-    fetch('database/controller_inventario/controller_inventario.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: 'trama=' + encodeURIComponent(JSON.stringify({ accion: 5 }))
-    })
-    .then(response => response.json())
-    .then(data => {
-      const opciones = data.resultado.map(item => ({
-        id: item.usuario || '',
-        text: item.usuario || ''
-      }));
-  
-      // Agrega opción vacía al principio
-    $('#select-usu').empty().append(new Option('', '', false, false));
 
-      $('#select-usu').select2({
-        theme: 'bootstrap4',
-        allowClear: true,
-        placeholder: 'Selecciona un usuario',
-        dropdownParent: $('#mdl-res'),
-        data: opciones
-      });
-    })
-
-    // Esto asegura que no haya valor seleccionado por default
-    $('#select-usu').val(null).trigger('change');
-
-    /* .catch(error => {
-      console.error('Error cargando usuarios:', error);
-    }); */
-  });
-
-  async function general_select2({selectId, tabla, campo, placeholder, dropdownParent}){
-    try {
+  async function general_select2({selectId, tabla, campo, placeholder, dropdownParent, tags}){
+    //try {
         const response = await server_inventario({
-            accion: 9,
+            accion: 6,
             tabla: tabla, 
             campo: campo
         });
@@ -665,37 +680,32 @@ function mostrar_alerta(tipo, titulo, mensaje) {
             theme: 'bootstrap4',
             allowClear: true,
             placeholder: placeholder,
-            tags: true,
+            tags: tags,
             dropdownParent: $(dropdownParent),
             data: opciones
         });
 
         $select.val(null).trigger('change');
 
-    } catch (error) {
+    //} catch (error) {
         
-    }
+    //}
   }
 
-  general_select2({
-    selectId: 'inp-rubro',
-    tabla: 'inventario_ti_sur',
-    campo: 'rubro',
-    placeholder: 'Seleciona un rubro',
-    dropdownParent: '#modal-registro',
-    tags:true
-  });
+  $(document).ready(function () {
+    // Escucha cambios en el campo "inp-tipo"
+    $('#inp-tipo').on('change', function () {
+        const tipoSeleccionado = $(this).val(); // Obtiene el valor seleccionado
 
-  general_select2({
-    selectId: 'inp-tipo',
-    tabla: 'inventario_ti_sur',
-    campo: 'tipo',
-    placeholder: 'Seleciona un tipo',
-    dropdownParent: '#modal-registro',
-    tags: true
-  });
-
-  //modal.removeAttribute('inert');
+        if (tipoSeleccionado === 'Laptop' || tipoSeleccionado === 'Desktop') {
+            // Habilita el campo TAG y lo hace obligatorio
+            $('#inp-tag').prop('disabled', false).addClass('is-required');
+        } else {
+            // Deshabilita el campo TAG y elimina la obligatoriedad
+            $('#inp-tag').prop('disabled', true).removeClass('is-required').val('');
+        }
+    });
+});
 
 
   //TODO: Funciones para el resguardo
@@ -711,7 +721,16 @@ function resguardo(){
         let hoy = new Date().toISOString().split('T')[0];
         $('#fecha-resguardo').val(hoy);
     });
-  
+    
+    general_select2({
+        selectId: 'select-usu',
+        tabla: 'inventario_ti_sur',
+        campo: 'usuario',
+        placeholder: 'Selecione un usuario',
+        dropdownParent: '#mdl-res',
+        tags: false
+    });
+
     modalRes = new bootstrap.Modal(document.getElementById('mdl-res'));
     modalRes.show();
 }
@@ -725,7 +744,7 @@ async function crear_resguardo(params) {
         return
     }
     let model = {
-        accion : 6,
+        accion : 5,
         usuario : $('#select-usu').find('option:selected').text(),
         comentario : $('#txt-area').val().trim(),
         fecha: $('#fecha-resguardo').val()
@@ -735,14 +754,20 @@ async function crear_resguardo(params) {
     
     infoResguardo = server.resultado
     //console.log(infoResguardo)
-    mostrar_alerta('warning', 'Inventario TI', 'Espere un momento');
+    let table = $('#tabla1').DataTable();
+    table.destroy();
+    consultar_informacion();
+
+
     modalRes.hide();
     descargar_excel()
+    mostrar_toast_cargando()
 }
 
 
 async function descargar_excel(params) {
-
+    dominio = window.location.hostname,
+    puerto = location.port
     let model = {
         accion : 0,
         datos: infoResguardo
@@ -759,8 +784,40 @@ async function descargar_excel(params) {
     // Cambia la extensión
     ruta.resultado = ruta.resultado.replace(/\.xlsx$/i, '.pdf');
 
-    ruta.resultado = ruta.resultado.replace("C:/xampp/htdocs", "http://localhost")
+    ruta.resultado = ruta.resultado.replace("C:/xampp/htdocs", "http://"+dominio+":"+puerto)
     console.log(ruta.resultado)
     window.open(ruta.resultado, '_blank');
 }
 
+function mostrar_toast_cargando() {
+    Swal.fire({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        showCloseButton: false,
+        timer: undefined, // No cerrar automáticamente
+        allowOutsideClick: false,
+        background: '#fff',
+        html: `
+            <div style="display: flex; align-items: center;">
+                <i class="fas fa-spinner fa-spin fa-lg" style="margin-right: 10px; color: #007bff;"></i>
+                <span style="font-weight: 500;">Cargando...</span>
+            </div>
+        `,
+        didOpen: () => {
+            //Swal.showLoading(); Esto muestra el spinner por default de SweetAlert, pero ya no es necesario, ya que se usa uno de fontAwesome
+        }
+    });
+}
+
+$(document).ready(function () {
+    
+    $('.select').select2().attr({
+    'data-toggle': 'popover',
+      'data-trigger': 'hover',
+      'data-content': 'Este es un select potenciado con Select2.',
+      'title': 'Información adicional'
+    });
+    $('[data-toggle="popover"]').popover();
+});
+   

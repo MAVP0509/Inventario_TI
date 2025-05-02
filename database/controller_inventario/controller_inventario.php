@@ -18,10 +18,8 @@ if ($clientejson->accion == 0) {
 } elseif ($clientejson->accion == 4) {
     $respuesta_servidor->resultado = eliminar_datos($clientejson);
 } elseif ($clientejson->accion == 5) {
-    $respuesta_servidor->resultado = consultar_usuarios($clientejson);
-} elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = consultar_por_usuario($clientejson);
-} elseif ($clientejson->accion == 9) {
+} elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = consultar_distintos($clientejson->tabla, $clientejson->campo);
 }
 
@@ -111,28 +109,16 @@ function eliminar_datos($valores)
     }
 }
 
-function consultar_usuarios()
-{
-    include("../conexion.php");
-    $sql = "SELECT DISTINCT usuario FROM inventario_ti_sur where usuario != 'NA';";
-    $resultado = mysqli_query($con, $sql);
-    $datos = [];
-
-    while ($fila = mysqli_fetch_assoc($resultado)) {
-        $datos[] = [
-            'id' => $fila['usuario'],
-            'usuario' => $fila['usuario']
-
-        ];
-    }
-    return $datos;
-}
-
 function consultar_por_usuario($valores)
 {
     include("../conexion.php");
-
-    $sql = "SELECT * FROM inventario_ti_sur WHERE habilitado = 1 AND usuario = '$valores->usuario'";
+    $sql = "SELECT * FROM inventario_ti_sur WHERE habilitado = 1 AND usuario = '$valores->usuario'
+        ORDER BY 
+        CASE 
+        WHEN tipo = 'laptop' THEN 1
+        WHEN tipo = 'desktop' THEN 2
+        ELSE 3
+        END;";
     $query = mysqli_query($con, $sql);
 
     $datos = [];
@@ -142,6 +128,9 @@ function consultar_por_usuario($valores)
 
     $datos[0]['comentario'] = $valores->comentario ?? '';
     $datos[0]['fecha'] = $valores->fecha ?? '';
+
+    $sql_fecha_update = "UPDATE inventario_ti_sur SET fecha_entrega = '$valores->fecha' where usuario = '$valores->usuario'";
+    mysqli_query($con,$sql_fecha_update);
     return $datos;
 }
 
@@ -185,7 +174,7 @@ function consultar_distintos($tabla, $campo)
     $tabla = mysqli_real_escape_string($con, $tabla);
     $campo = mysqli_real_escape_string($con, $campo);
 
-    $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE `$campo` IS NOT NULL AND `$campo` <> '';";
+    $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE `$campo` IS NOT NULL AND `$campo` <> '' AND '$campo' NOT LIKE 'NA';";
     $query = mysqli_query($con, $sql);
 
     $datos = [];

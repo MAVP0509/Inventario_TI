@@ -1,0 +1,48 @@
+<!-- sidebar.html -->
+<div class="sidebar">
+    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+      <div class="image">
+        <img src="user2.png" class="img-circle elevation-2" alt="User Image">
+      </div>
+      <div class="info">
+        <a href="#" class="d-block" id="user">Name user</a>
+      </div>
+    </div>
+  
+    <nav class="mt-2">
+      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+  
+        <!-- Visible para todos los roles -->
+        <li class="nav-item" data-role="admin,user">
+          <a href="inventario.html" class="nav-link">
+            <i class="nav-icon fa-solid fa-cubes"></i>
+            <p>Inventario</p>
+          </a>
+        </li>
+  
+        <!-- Solo visible para admin -->
+        <li class="nav-item" data-role="admin">
+          <a href="usuario.html" class="nav-link">
+            <i class="nav-icon fa-solid fa-users"></i>
+            <p>Usuarios</p>
+          </a>
+        </li>
+
+        <li class="nav-item" data-role="admin">
+            <a href="#" class="nav-link">
+                <i class="nav-icon fa-solid fa-gear"></i>
+                <p>Configuración<i class="right fa-solid fa-angle-left"></i></p>
+            </a>
+            <ul class="nav nav-treeview">
+                <li class="nav-item">
+                    <a href="supervisores.html" class="nav-link">
+                      <i class="fa-solid fa-users-gear nav-icon"></i>
+                        <p>Supervisores</p>
+                    </a>
+                </li>
+            </ul>
+        </li>
+  
+      </ul>
+    </nav>
+  </div>

@@ -42,8 +42,7 @@ function server_email(model){
                 respuesta = response
                 Swal.close()
                 try {
-                    resolve(JSON.parse(response))
-                    console.log(JSON.parse(response))   
+                    resolve(JSON.parse(response))  
                 } catch (error) {
                     reject(error)
                 }
@@ -64,14 +63,34 @@ $(".icon").on('mouseout', function(e){
 
 //TODO Función para el formulario de registro y sus funciones derivadas
 async function registrarUsu(){
+
+    const validacion = [
+        "nombre",
+        "regcorreo",
+        "reg-contraseña",
+        "telefono",
+        "fechanac"
+    ]
+
+    if (!validar_campos(validacion)) {
+        mostrar_toast('error', 'Error', 'Rellena todos los campos correctamente para continuar. Inténtalo de nuevo.');
+        return;
+    }
     try{
-        if (!pass || !email || !tel || !nombre || !fecha || !vEdad  ) {
+        /* if (!pass || !email || !tel || !nombre || !fecha || !vEdad  ) {
             mostrar_toast('warning', 'Inventario TI', '¡Rellena todos los campos correctamente para continuar!');
 
             //console.log(pass, email, tel, nombre, fecha, edad)
             return false;
     
-        }else {
+        }else { */
+            
+            
+            /* let inputs = document.getElementsByName("inputReg");
+            for (let i = 0; i < inputs.length; i++) {
+                const element = inputs[i].value = "";
+            } 
+        }    */
             let model = {
                 accion : 1,
                 nombre: $("#nombre").val().trim(),
@@ -81,27 +100,40 @@ async function registrarUsu(){
                 telefono : $("#telefono").val().trim(),
                 fecha_nac : $("#fechanac").val().trim(),
             };
+
         
-            let server = await server_usuario(model);
+            let respuesta = await server_usuario(model);
         
-            let resp=JSON.parse(respuesta)
-            if(resp.resultado === true){
+            if(respuesta.resultado === true){
                 localStorage.setItem('registroExitoso', '¡Usuario Registrado!');
                 window.location.href = "login.html"
-            }else if(resp.resultado === false){
+            }else if(respuesta.resultado === false){
                 mostrar_toast('warning', 'Inventario TI', 'El correo ya está registrado');
 
             } 
-            
-            /* let inputs = document.getElementsByName("inputReg");
-            for (let i = 0; i < inputs.length; i++) {
-                const element = inputs[i].value = "";
-            } */
-        }    
     }catch (error){
         mostrar_toast('error', 'Inventario TI', 'No se puedo conectar al servidor');
     }
     
+}
+
+function validar_campos(campos) {
+    let valido = true;
+    
+    campos.forEach(id => {
+        const campo = document.getElementById(id);
+        if (!campo) {
+            valido = false;
+            return;
+        }
+
+        if (!campo.value.trim()) {
+            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
+            valido = false;
+        } else {
+            campo.classList.remove('is-invalid');
+        }
+    });
 }
 
 //* Función para validar la edad del usuario
@@ -178,6 +210,7 @@ function validar_contraseña() {
             pass = true
         }
     }
+    
     return true;
 
 }
@@ -288,6 +321,7 @@ async function validar_ingreso() {
         }else{
             sessionStorage.setItem("user", respuesta)
             sessionStorage.setItem("log", 'true')
+            sessionStorage.setItem("rol", resp.resultado[5])
             sessionStorage.setItem("bienvenido", "Bienvenido " + resp.resultado[0])
             window.location.href = "inventario.html";
             let inputs = document.getElementsByName('inputInit')
@@ -322,7 +356,20 @@ document.getElementById('logcontraseña').addEventListener('keydown', function(e
       event.preventDefault(); // Evita que se recargue la página si estás usando AJAX
       document.getElementById('btn-ini').click(); // Llama al botón que hace el login
     }
-  });
+});
+
+//? Función para detectar si la tecla bloq mayus está activada
+let capsMsg = document.getElementById('caps-lock-msg');
+
+document.addEventListener('keydown', (e) => {
+    const capsOn = e.getModifierState && e.getModifierState('CapsLock');
+    capsMsg.style.display = capsOn ? 'inline' : 'none';
+});
+
+document.addEventListener('keyup', (e) => {
+    const capsOn = e.getModifierState && e.getModifierState('CapsLock');
+    capsMsg.style.display = capsOn ? 'inline' : 'none';
+});
 
 
 //TODO Función para navegar entre formularios del login
@@ -403,9 +450,13 @@ $('.Comprobarmail').on('input',function(e){
 
 //TODO Función de recuperación de la contraseña y funciones derivadas
 async function recuperar_contraseña() {
+    //let dominio = window.location.hostname
+    //let puerto = location.port
     let model ={
         accion : 0,
-        correo : $("#repcorreo").val().trim()
+        correo : $("#repcorreo").val().trim(),
+        dominio : window.location.hostname,
+        puerto : location.port
     }
     
     let response = await server_email(model);
@@ -440,6 +491,16 @@ async function enlaceconParametros(token) {
     return urlConParametros;
 }
 
+//? Función para mandar el correo con la tecla "Enter"
+document.getElementById('repcorreo').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Evita que se recargue la página si estás usando AJAX
+      document.getElementById('btn-recuperar').click(); // Llama al botón que hace el login
+
+      document.getElementById('repcorreo').value = ""
+    }
+});
+
 
 //TODO funciones para mostrar mensajes en pantalla
 function mostrar_toast(tipo, titulo, mensaje) {
@@ -452,7 +513,7 @@ function mostrar_toast(tipo, titulo, mensaje) {
         showConfirmButton: false,
         toast: true,
         position: 'top-end',
-        heighAuto : true,
+        //heightAuto : true,
     });
 }
 
