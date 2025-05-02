@@ -556,7 +556,7 @@ function limpiar(){
     //$select.val(null).trigger('change');
 
     // modal = new bootstrap.Modal(document.getElementById('modal-registro'));
-    $("#modal-registro").modal('show'/* {
+    $("#modal-registro").modal(/* {
         backdrop: 'static',
         keyboard: false
     
