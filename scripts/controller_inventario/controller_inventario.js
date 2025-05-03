@@ -105,84 +105,85 @@ async function consultar_informacion(params) {
                 {
                     data: "zona",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
+                        //data ? data.replace(/_/g, '...') : "NA"
                         return control;
                     }
                 },
                 {
                     data: "rubro",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
                         return control;
                     }, 
                 },
                 {
                     data: "af",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
                         return control;
                     }, 
                 },
                 {
                     data: "tipo",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
                         return control;
                     }, 
                 },
                 {
                     data: "marca",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
                         return control;
                     }, 
                 },
                 {
                     data: "modelo",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
                         return control;
                     }
                 },
                 {
                     data: "num_serie",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
                         return control;
                     }, 
                 },
                 {
                     data: "ubicacion",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
                         return control;
                     }, 
                 },
                 {
                     data: "tag",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
                         return control;
                     }, 
                 },
                 {
                     data: "usuario",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
                         return control;
                     }, 
                 },
                 {
                     data: "posicion",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
                         return control;
                     }, 
                 },
                 {
                     data: "fecha_entrega",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
+                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
                         return control;
                     }, 
                 },
@@ -254,23 +255,37 @@ async function consultar_informacion(params) {
             ],
             stateSave: true,
             resposive: true,
-            //autoWidth: false,
+            autoWidth: false,
             scrollX: true,
-            /* fixedColumns: {
-                start: 1, en
-            } */
+            fixedColumns: {
+                right: 1
+            },
         });
 
-        $('#tabla1_filter input').on('keyup', function () {
-            const searchValue = $(this).val();
-            const searchRegex = searchValue
-                .split(',') // Divide los valores por comas
-                .map(val => val.trim()) // Elimina espacios en blanco
-                .filter(val => val !== '') // Elimina valores vacíos
-                .join('|'); // Une los valores con el operador OR para la expresión regular
+        const table = $('#tabla1').DataTable();
+
+        $('.dataTables_filter input').off().on('input', function () {
+            const searchValue = this.value.trim(); // Captura el valor ingresado
+            console.log('Valor ingresado:', searchValue);
         
-            const table = $('#tabla1').DataTable();
-            table.search(searchRegex, true, false).draw(); // Habilita búsqueda con regex
+            if (searchValue === '') {
+                table.search('').draw(); // Limpia la búsqueda si está vacío
+                return;
+            }
+        
+            // Divide los términos por comas, elimina espacios y caracteres especiales
+            const terms = searchValue.split(',').map(term =>
+                term.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+            ).filter(term => term !== '');
+        
+            console.log('Términos procesados:', terms);
+        
+            // Une los términos con el operador OR para crear una expresión regular
+            const regex = terms.join('|');
+            console.log('Expresión regular generada:', regex);
+        
+            // Aplica la búsqueda con la expresión regular
+            table.search(regex, true, false).draw(); // true: usa regex, false: desactiva búsqueda inteligente
         });
         
     } catch (error) {
@@ -278,6 +293,7 @@ async function consultar_informacion(params) {
     }
 
 }
+
 
 let selecreg ="";
 let modalE
