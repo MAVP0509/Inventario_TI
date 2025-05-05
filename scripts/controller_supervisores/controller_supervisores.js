@@ -114,7 +114,27 @@ async function consultar_informacion(params) {
             ],
             stateSave: true,
             responsive: true,
-           
+            
+            initComplete: function () {
+                $('#tabla1 tbody tr').each(function () {
+                    const row = $(this);
+                    const switchElement = row.find('.switch-toggle');
+                    const isChecked = switchElement.is(':checked');
+        
+                    if (isChecked) {
+                        const editButton = row.find('button');
+                        editButton.prop('disabled', true);
+                        editButton.attr({
+                            'data-toggle': 'popover',
+                            'data-trigger': 'hover',
+                            'data-html': 'true',
+                            'data-placement': 'top',
+                            'data-content': '<div class="bg-warning text-dark p-1 rounded">Deshabilite para editar</div>',
+                        });
+                        editButton.popover(); // Inicializa el popover
+                    }
+                }
+            )}
         });
         
     } catch (error) {
@@ -122,6 +142,7 @@ async function consultar_informacion(params) {
     }
 
 }
+
 
 //*TODO Controlar el switch de la tabla para activar o desactivar supervisores
 
@@ -166,8 +187,15 @@ $('#tabla1 tbody').on('change', '.switch-toggle', function () {
                         id: item.id,
                         habilitado: 0
                     });
+
+                    // También actualiza su botón
+                const oldEditButton = $(table.row(rowIdx).node()).find('button');
+                oldEditButton.prop('disabled', false);
+                oldEditButton.removeAttr('data-toggle data-trigger data-html title data-content');
+                oldEditButton.popover('dispose');
                 }
             });
+
         }
 
         // Actualizar actual habilitado
@@ -178,14 +206,25 @@ $('#tabla1 tbody').on('change', '.switch-toggle', function () {
             habilitado: 1
         });
 
+        const editButton = switchElement.closest('tr').find('button');
+        editButton.prop('disabled', true);
+        editButton.attr({
+            'data-toggle': 'popover',
+            'data-placement': 'top',
+            'data-trigger': 'hover',
+            'data-html': 'true',
+            'data-content': '<div class="bg-warning text-dark p-1 rounded">Deshabilite para editar</div>',
+        });
+        editButton.popover(); // Inicializa el popover
+
     } else {
+
         // Si este es el único habilitado, no permitir deshabilitar
         if (habilitadosEnRegion <= 1) {
             mostrar_toast('warning', 'Advertencia', 'Debe haber un supervisor habilitado por región.');
             switchElement.prop('checked', true);
             return;
         }
-
         // Actualizar y guardar
         rowData.habilitado = 0;
         supervisor_habilitado({
@@ -194,15 +233,21 @@ $('#tabla1 tbody').on('change', '.switch-toggle', function () {
             habilitado: 0
         });
 
-             checkbox.prop('checked', true);
+         // Rehabilitar el botón y quitar el popover
+        const editButton = switchElement.closest('tr').find('button');
+        editButton.prop('disabled', false);
+        editButton.removeAttr('data-toggle data-trigger data-html title data-content');
+        editButton.popover('dispose');
 
-            // Actualizar en DataTable y backend
-            primerSupervisor.habilitado = 1;
-            supervisor_habilitado({
-                accion: 3,
-                id: primerSupervisor.id,
-                habilitado: 1
-            }); 
+
+         checkbox.prop('checked', true);
+        // Actualizar en DataTable y backend
+        primerSupervisor.habilitado = 1;
+        supervisor_habilitado({
+            accion: 3,
+            id: primerSupervisor.id,
+            habilitado: 1
+        }); 
 
     }
 });
