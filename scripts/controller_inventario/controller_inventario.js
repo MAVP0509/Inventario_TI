@@ -257,36 +257,28 @@ async function consultar_informacion(params) {
             resposive: true,
             autoWidth: false,
             scrollX: true,
+            serverSide: false,
             /* fixedColumns: {
                 right: 1
             }, */
         });
 
-        const table = $('#tabla1').DataTable();
+        // Re-asigna evento de búsqueda global
+$('.dataTables_filter input').off().on('input', function () {
+    const searchValue = this.value.trim();
+    if (searchValue === '') {
+        table.search('').draw();
+        return;
+    }
 
-        $('.dataTables_filter input').off().on('input', function () {
-            const searchValue = this.value.trim(); // Captura el valor ingresado
-            console.log('Valor ingresado:', searchValue);
-        
-            if (searchValue === '') {
-                table.search('').draw(); // Limpia la búsqueda si está vacío
-                return;
-            }
-        
-            // Divide los términos por comas, elimina espacios y caracteres especiales
-            const terms = searchValue.split(',').map(term =>
-                term.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-            ).filter(term => term !== '');
-        
-            console.log('Términos procesados:', terms);
-        
-            // Une los términos con el operador OR para crear una expresión regular
-            const regex = terms.join('|');
-            console.log('Expresión regular generada:', regex);
-        
-            // Aplica la búsqueda con la expresión regular
-            table.search(regex, true, false).draw(); // true: usa regex, false: desactiva búsqueda inteligente
-        });
+    const terms = searchValue.split(',').map(term =>
+        term.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    ).filter(term => term !== '');
+
+    const regex = terms.join('|');
+    table.search(regex, true, false).draw();
+});
+
         
     } catch (error) {
         console.log(error)
