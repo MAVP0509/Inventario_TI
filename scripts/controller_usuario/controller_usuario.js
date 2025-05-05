@@ -319,12 +319,25 @@ async function nuevo_usuario(params) {
 async function insertar_usuario(params) {
 
     
-    if(!email || !tel || !nombre ||!fecha || !pass){
+    /* if(!email || !tel || !nombre ||!fecha || !pass){
         mostrar_toast('warning', 'Inventario TI', '¡Rellena todos los campos correctamente para continuar!');
         return false;
         
+    }else{ */
 
-    }else{
+    const validacion = [
+        "nombreReg",
+        "correoReg",
+        "telefonoReg", 
+        "fechanacReg",
+        "contraseñaReg",
+    ];
+
+    // Validar campos
+    if (!validar_campos(validacion)) {
+        mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente');
+        return;
+    }
     
         let model = {
         accion : 0,
@@ -351,12 +364,12 @@ async function insertar_usuario(params) {
         consultar_usuarios()
         modalReg.hide()
         
-        email = false
+        /* email = false
         tel = false
         nombre = false
         fecha = false
-        pass = false
-    }
+        pass = false */
+    //}
 }
 
 
@@ -617,4 +630,31 @@ async function selecionar_registro(params) {
     } else {
         select.splice(index, 1); 
     } 
+}
+
+function validar_campos(campos) {
+    let valido = true;
+
+    campos.forEach(id => {
+        const campo = document.getElementById(id);
+        if (!campo) {
+            valido = false;
+            return;
+        }
+
+        if (!campo.value.trim()) {
+            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
+            valido = false;
+        } else {
+            campo.classList.remove  ('is-invalid'); // Remueve la clase si el campo es válido
+        }
+
+        campo.addEventListener('input', function () {
+            if (campo.value.trim()) {
+                campo.classList.remove('is-invalid');
+            }
+        });
+    });
+
+    return valido;
 }

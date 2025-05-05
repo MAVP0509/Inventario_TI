@@ -123,58 +123,32 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-sm-12">
-                                                <table class="table table-bordered table-hover dataTable dtr-inline table-striped" id="tabla1" aria-describedby="Tabla de usuarios" style="width: 100%;">
-                                                    <thead>
-                                                        <tr>
-                                                            <th></th>
-                                                            <th style="text-align: center;">
-                                                                ID
-                                                            </th>
-                                                            <th>
-                                                                Zona
-                                                            </th>
-                                                            <th>
-                                                                Rubro
-                                                            </th>
-                                                            <th>
-                                                                AF
-                                                            </th>
-                                                            <th>
-                                                                Tipo
-                                                            </th>
-                                                            <th>
-                                                                Marca
-                                                            </th>
-                                                            <th>
-                                                                Modelo
-                                                            </th>
-                                                            <th>
-                                                                Numero de serie
-                                                            </th>
-                                                            <th>
-                                                                Ubicación
-                                                            </th>
-                                                            <th>
-                                                                TAG
-                                                            </th>
-                                                            <th>
-                                                                Usuario
-                                                            </th>
-                                                            <th>
-                                                                Posición
-                                                            </th>
-                                                            <th>
-                                                                Fecha de entrega
-                                                            </th>
-                                                            <th>
-                                                                Editar
-                                                            </th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="tbl-body">
-                                                        
-                                                    </tbody>
-                                                </table>
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered table-hover dataTable dtr-inline table-striped" id="tabla1" aria-describedby="Tabla de usuarios" style="width: 100%;">
+                                                        <thead>
+                                                            <tr>
+                                                                <th></th>
+                                                                <th>ID</th>
+                                                                <th>Zona</th>
+                                                                <th>Rubro</th>
+                                                                <th>AF</th>
+                                                                <th>Tipo</th>
+                                                                <th>Marca</th>
+                                                                <th>Modelo</th>
+                                                                <th>Numero de serie</th>
+                                                                <th>Ubicación</th>
+                                                                <th>TAG</th>
+                                                                <th>Usuario</th>
+                                                                <th>Posición</th>
+                                                                <th>Fecha de entrega</th>
+                                                                <th>Editar</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="tbl-body">
+                                                            
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -229,6 +203,7 @@
                                             </div>
                                             <input type="text" class="form-control" id="inp-marca" name="mdl-reg" placeholder="Marca del dispositivo" autocomplete="off"
                                             data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción" data-content="Es la marca del dispositivo">
+                                            <div class="invalid-feedback">Por favor, ingrese una marca de dispositivo.</div>
                                         </div>
                                         <h6>Modelo del dispositivo</h6>
                                         <div class="input-group mb-3">
@@ -237,6 +212,7 @@
                                             </div>
                                             <input type="text" class="form-control" id="inp-modelo" name="mdl-reg" placeholder="Modelo del dispositivo" autocomplete="off"
                                             data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción" data-content="Es el modelo específico del dispositivo.">
+                                            <div class="invalid-feedback">Por favor, ingrese un modelo de dispositivo.</div>
                                         </div>
                                         <h6>Numero de serie</h6>
                                         <div class="input-group mb-3">
@@ -246,6 +222,7 @@
                                             <input type="text" class="form-control" id="inp-num-serie" name="mdl-reg" placeholder="Numero de serie" autocomplete="off"
                                             data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción"
                                             data-content="Es un identificador único que permite rastrear el dispositivo. Cada dispositivo tiene un número de serie único.">
+                                            <div class="invalid-feedback">Por favor, ingrese un número de serie.</div>
                                         </div>                     
                                     </div> <!--col-->
                                     <div class="col-md-6">
@@ -268,7 +245,7 @@
                                             <input type="text" class="form-control" id="inp-ubicacion" name="mdl-reg" placeholder="Ubicacion del dispositivo" autocomplete="off"
                                             data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción"
                                             data-content="Indica el lugar específico dentro de la zona donde se encuentra físicamente el dispositivo. Puede ser un nombre de área, oficina.">
-                                            <div class="invalid-feedback">Por favor, ingrese una ubicacion.</div>
+                                            <div class="invalid-feedback">Por favor, ingrese una ubicación.</div>
                                         </div>
                                         <h5>Identificación del activo</h5>
                                         <h6>Activo Fijo</h6>
