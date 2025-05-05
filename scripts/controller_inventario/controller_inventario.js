@@ -257,9 +257,9 @@ async function consultar_informacion(params) {
             resposive: true,
             autoWidth: false,
             scrollX: true,
-            fixedColumns: {
+            /* fixedColumns: {
                 right: 1
-            },
+            }, */
         });
 
         const table = $('#tabla1').DataTable();
