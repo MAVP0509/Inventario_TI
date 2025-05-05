@@ -376,7 +376,7 @@ async function crear_registro() {
 
     // Validar campos
     if (!validar_campos(validacion)) {
-        mostrar_alerta('error', 'Error', 'Rellena los campos. Inténtelo nuevamente');
+        mostrar_alerta('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
         return;
     }
 

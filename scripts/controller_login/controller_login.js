@@ -134,6 +134,7 @@ function validar_campos(campos) {
             campo.classList.remove('is-invalid');
         }
     });
+    return valido;
 }
 
 //* Función para validar la edad del usuario
@@ -302,6 +303,17 @@ window.addEventListener('load', function () {
 async function validar_ingreso() {
  
     try{
+
+        const validacion = [
+            "logcorreo",
+            "logcontraseña",
+        ];
+
+        if (!validar_campos(validacion)) {
+            mostrar_toast('error', 'Error', 'Rellene los campos. Inténtelo nuevamente.');
+            return;
+        }
+        
         let model = {
             accion: 0,
             correo : $("#logcorreo").val().trim(),
