@@ -21,6 +21,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_por_usuario($clientejson);
 } elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = consultar_distintos($clientejson->tabla, $clientejson->campo);
+} elseif ($clientejson->accion == 7){
+    $respuesta_servidor->resultado = consultar_historico($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -167,8 +169,7 @@ function consultar_tipo()
     return $datos;
 }
 
-function consultar_distintos($tabla, $campo)
-{
+function consultar_distintos($tabla, $campo){
     include("../conexion.php");
     //Validación para evitar inyecciones
     $tabla = mysqli_real_escape_string($con, $tabla);
@@ -188,3 +189,13 @@ function consultar_distintos($tabla, $campo)
 
     return $datos;
 }
+
+function consultar_historico($valores){
+    include("../conexion.php");
+
+    $sql = "INSERT INTO historico (inventario_id, usuario, fecha_entrega, accion, fecha_evento, habilitado, observaciones) 
+    VALUES ('$valores->inventario_id', '$valores->zona', '$valores->rubro', '$valores->af', '$valores->tipo', '$valores->marca', '$valores->modelo', '$valores->num_serie', '$valores->ubicacion', '$valores->tag', '$valores->usuario', '$valores->posicion', '$valores->fecha_entrega', '$valores->accion', '$valores->fecha_evento', '$valores->habilitado', '$valores->observaciones')";
+    $query = mysqli_query($con, $sql);
+}
+
+?>

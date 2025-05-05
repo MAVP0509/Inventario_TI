@@ -113,8 +113,17 @@ async function consultar_informacion(params) {
                 {
                     data: "rubro",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
-                        return control;
+                        if (type === 'display') {
+                            // Mostrar texto estilizado, truncado
+                            return `<label style="font-weight: normal; font-size: 12px;">${
+                                data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"
+                            }</label>`;
+                        } else if (type === 'filter' || type === 'sort') {
+                            // Devolver solo texto plano para búsqueda y ordenamiento
+                            return data || "NA";
+                        }
+                        return data;
+                    
                     }, 
                 },
                 {
@@ -198,7 +207,7 @@ async function consultar_informacion(params) {
                 }
             ],
             dom: `
-                <'row mb-2'<'col-sm-6 text-left'f><'col-sm-6 text-right'<'btn-group'B>>>
+                <'row mb-2'<'col-sm-4 text-left'f><'col-sm-8 text-right'<'btn-group'B>>>
                 <'row'<'col-sm-12 text-center'tr>>
                 <'row mt-2'<'col-sm-3'l><'col-sm-5 text-center'i><'col-sm-4 text-right'p>>
             `,
@@ -247,8 +256,14 @@ async function consultar_informacion(params) {
                 },
                 {
                     html: `<div>
-                            <button type="button" style="text-align: center" class="btn btn-danger rounded icon" onclick="confirmar_eliminacion()" >
+                            <button type="button" style="text-align: center" class="btn btn-danger rounded mr-3 icon" onclick="confirmar_eliminacion()" >
                             <i class="fa-solid fa-trash fa-lg"></i> Eliminar Registro</button>
+                        </div>`
+                },
+                {
+                    html: `<div>
+                            <button type="button" class="btn btn-light rounded mr-3 icon" onclick="consultar_historico()">
+                            <i class="fa-solid fa-clock-rotate-left"></i> Historial</button>
                         </div>`
                 },
                 
@@ -264,20 +279,20 @@ async function consultar_informacion(params) {
         });
 
         // Re-asigna evento de búsqueda global
-$('.dataTables_filter input').off().on('input', function () {
-    const searchValue = this.value.trim();
-    if (searchValue === '') {
-        table.search('').draw();
-        return;
-    }
-
-    const terms = searchValue.split(',').map(term =>
-        term.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    ).filter(term => term !== '');
-
-    const regex = terms.join('|');
-    table.search(regex, true, false).draw();
-});
+        $('.dataTables_filter input').off().on('input', function () {
+            const searchValue = this.value.trim();
+            if (searchValue === '') {
+                table.search('').draw();
+                return;
+            }
+        
+            const terms = searchValue.split(',').map(term =>
+                term.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+            ).filter(term => term !== '');
+        
+            const regex = terms.join('|');
+            table.search(regex, true, false).draw();
+        });
 
         
     } catch (error) {
@@ -470,6 +485,14 @@ async function desactivar_registro(params) {
             mostrar_alerta('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
         }
 }
+
+async function registrar_historico() {
+    
+}
+
+async function consultar_historico(){
+
+};
 
 /* async function eliminar_registro(params) {
     let response = await server_inventario({ accion: 4, id: id });

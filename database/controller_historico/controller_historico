@@ -1,0 +1,24 @@
+<?php
+
+header('Content_type: text/html; charset=UTF-8');
+date_default_timezone_set('America/Mexico_City');
+
+$clientejson = json_decode($_POST['trama']);
+
+$respuesta_servidor = new stdClass();
+
+if ($clientejson->accion == 0) {
+    $respuesta_servidor->resultado = consultar_historico($clientejson);
+}
+
+print(json_encode($respuesta_servidor));
+
+function consultar_historico($valores){
+    include("../conexion.php");
+
+    $sql = "INSERT INTO historico (inventario_id, zona, rubro, af, tipo, marca, modelo, num_serie, ubicacion, tag, usuario, posicion, fecha_entrega, accion, fecha_evento, habilitado, observaciones) 
+    VALUES ('$valores->inventario_id', '$valores->zona', '$valores->rubro', '$valores->af', '$valores->tipo', '$valores->marca', '$valores->modelo', '$valores->num_serie', '$valores->ubicacion', '$valores->tag', '$valores->usuario', '$valores->posicion', '$valores->fecha_entrega', '$valores->accion', '$valores->fecha_evento', '$valores->habilitado', '$valores->observaciones')";
+    $query = mysqli_query($con, $sql);
+}
+
+?>
