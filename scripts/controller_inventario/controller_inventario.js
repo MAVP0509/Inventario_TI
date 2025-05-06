@@ -20,8 +20,6 @@ function server_inventario(model) {
             }
         })
     });
-
-
 }
 
 function server_excel(model) {
@@ -44,8 +42,6 @@ function server_excel(model) {
             }
         })
     });
-
-
 }
 
 window.addEventListener('load', function () {
@@ -272,7 +268,7 @@ async function consultar_informacion(params) {
             resposive: true,
             autoWidth: false,
             scrollX: true,
-            serverSide: false,
+            //serverSide: false,
             /* fixedColumns: {
                 right: 1
             }, */
@@ -485,14 +481,6 @@ async function desactivar_registro(params) {
             mostrar_alerta('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
         }
 }
-
-async function registrar_historico() {
-    
-}
-
-async function consultar_historico(){
-
-};
 
 /* async function eliminar_registro(params) {
     let response = await server_inventario({ accion: 4, id: id });
