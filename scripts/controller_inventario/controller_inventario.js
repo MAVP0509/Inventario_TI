@@ -86,7 +86,7 @@ async function consultar_informacion(params) {
             data: datos,
             columns: [
                 {
-                    data: "id",
+                    data: "id_equipo",
                     render: function(data, type, row) {
                         let control = `<div class="form-group form-check">
                             <input type="checkbox" class="form-check-input form-control-lg"
@@ -96,7 +96,7 @@ async function consultar_informacion(params) {
                     }
                 },
                 {
-                    data: "id",
+                    data: "id_equipo",
                     render: function(data, type, row, meta) {
                         let control = `<label style="font-weight: normal; font-size: 12px; text-align: center;">${meta.row + 1}</label>`;
                         return control;
@@ -188,7 +188,7 @@ async function consultar_informacion(params) {
                     }, 
                 },
                 {
-                    data: "id",
+                    data: "id_equipo",
                     render: function(data, type, row) {
                         let control = `<div class="d-flex justify-content-center align-items-center">
                                         <button type="button" style="text-align: center" class="btn btn-warning icon" id="${data}" value="${data}" onclick="mostrar_registro(this)">
@@ -255,9 +255,9 @@ async function consultar_informacion(params) {
             ],
             stateSave: true,
             resposive: true,
-            autoWidth: false,
+            //autoWidth: false,
             scrollX: true,
-            serverSide: false,
+            //serverSide: false,
             /* fixedColumns: {
                 right: 1
             }, */
@@ -293,15 +293,16 @@ let modalE
 async function mostrar_registro(params) {
     for (let i = 0; i < datos.length; i++) {
         const element = datos[i];
-        if(element.id===params.value){
+        if(element.id_equipo===params.value){
             selecreg = element;
+            console.log(selecreg)
             break;
         }
     }
     // Limpia y carga los select
     await general_select2({
         selectId: 'edi-rubro',
-        tabla: 'inventario_ti_sur',
+        tabla: 'cat_rubro',
         campo: 'rubro',
         placeholder: 'Selecione un rubro',
         dropdownParent: '#modal-editar',
@@ -310,7 +311,7 @@ async function mostrar_registro(params) {
     
     await general_select2({
         selectId: 'edi-tipo',
-        tabla: 'inventario_ti_sur',
+        tabla: 'cat_tipo',
         campo: 'tipo',
         placeholder: 'Selecione un rubro',
         dropdownParent: '#modal-editar',
@@ -319,15 +320,15 @@ async function mostrar_registro(params) {
     
     await general_select2({
         selectId: 'edi-usuario',
-        tabla: 'inventario_ti_sur',
-        campo: 'usuario',
+        tabla: 'cat_usuarios',
+        campo: 'nombre',
         placeholder: 'Seleccione un usuario',
         dropdownParent: '#modal-editar',
     })
     await general_select2({
         selectId: 'edi-posicion',
-        tabla: 'inventario_ti_sur',
-        campo: 'posicion',
+        tabla: 'cat_usuarios',
+        campo: 'cargo',
         placeholder: 'Seleccione un cargo',
         dropdownParent: '#modal-editar',
     })
