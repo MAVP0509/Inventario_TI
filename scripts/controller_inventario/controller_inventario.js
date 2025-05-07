@@ -258,7 +258,7 @@ async function consultar_informacion(params) {
                 },
                 {
                     html: `<div>
-                            <button type="button" class="btn btn-light rounded mr-3 icon" onclick="consultar_historico()">
+                            <button type="button" class="btn btn-light rounded mr-3 icon" onclick="">
                             <i class="fa-solid fa-clock-rotate-left"></i> Historial</button>
                         </div>`
                 },
@@ -412,6 +412,7 @@ async function crear_registro() {
         table.destroy();
         consultar_informacion();
         $("#modal-registro").modal('hide');
+        await generar_historico('Registrar', model.num_serie, JSON.stringify(model));
         mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
     } else if (respuesta.resultado === false) {
         if (respuesta.mensaje === "Número de serie duplicado") {
@@ -457,8 +458,8 @@ async function editar_registro(params) {
 
 
     if (response.resultado === true) {
+        await generar_historico('Editar', model.num_serie, JSON.stringify(model));
         mostrar_alerta('success', '¡Edición exitosa!', 'El registro se ha actualizado correctamente.');
-        
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo editar el registro. Inténtalo nuevamente.');
     }
@@ -471,6 +472,8 @@ async function editar_registro(params) {
 async function desactivar_registro(params) {
     let response = await server_inventario({ accion: 3, id: select });
         if (response.resultado === true) {
+            const dispositivo = datos.find(d => d.id === select[0]);
+            await generar_historico('Desactivar', dispositivo.num_serie);
             mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
 
             let table = $('#tabla1').DataTable();
@@ -839,4 +842,4 @@ $(document).ready(function () {
     });
     $('[data-toggle="popover"]').popover();
 });
-   
+
