@@ -40,24 +40,35 @@ function server_inventario(model) {
     
 }
 
-
-async function generar_historico(evento, num_serie, detalles = "") {
+async function consultar_historico(evento, num_serie, detalles = "") {
     const usuario = JSON.parse(sessionStorage.getItem('user')); // Obtener usuario en sesión
     const fecha_evento = new Date().toISOString();
 
     const model = {
         accion: 0, // Acción para registrar en el historial
+        id: id,
         fecha_evento: fecha_evento,
-        usuario: usuario.resultado[0].nombre, // Nombre del usuario
+        usuario: usuario.resultado[0], // Nombre del usuario
         evento: evento, // Evento realizado (Registrar, Editar, etc.)
         num_serie: num_serie, // Número de serie del dispositivo
-        tipo: tipo
     };
 
-    await server_historico(model);
+    let datos = await server_historico(model);
+
+    var table = new Tabulator("#tbl01", {
+        data: datos.resultado,
+        columns: [
+            {title: "Id", field: "id"},
+            {title: "Fecha", field: "fecha_evento"},
+            {title: "Zona", field: "zona"},
+            {title: "Usuario", field: "usuario"},
+            {title: "Evento", field: "evento"},
+
+        ],
+    });
 }
 
-async function consultar_historico(num_serie) {
+async function generar_historico(num_serie) {
     const model = {
         accion: 1,
         num_serie: num_serie
