@@ -34,6 +34,15 @@ function insertar_datos($valores){
     
     $registro = date("Y-m-d H:i:s");
 
+    $val_usuario;
+    if (ctype_digit($valores->usuario)) {
+        // Es un string de solo dígitos: probablemente un ID existente
+        $val_usuario = $valores->usuario;
+    } else {
+        // No es un número válido: el usuario ingresó una nueva opción
+        $val_usuario = 5;
+    }
+
     if ($valores->num_serie != "") {
         $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$valores->num_serie'";
         //var_dump($sql_num);
@@ -41,7 +50,7 @@ function insertar_datos($valores){
 
         $sql = "INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, habilitado) 
         VALUES ('$valores->zona', '$valores->rubro','$valores->af','$valores->tipo','$valores->marca','$valores->modelo', '$valores->num_serie', 
-        '$valores->ubicacion', '$valores->tag', '$valores->usuario', '$registro',1);";
+        '$valores->ubicacion', '$valores->tag', '$val_usuario', '$registro',1);";
         //$query = mysqli_query($con, $sql);|
     
         if (mysqli_num_rows($query_num) > 0) {
@@ -251,7 +260,7 @@ function consultar_distintos($tabla, $campo){
     $tabla = mysqli_real_escape_string($con, $tabla);
     $campo = mysqli_real_escape_string($con, $campo);
 
-    $sql = "SELECT DISTINCT id, `$campo` FROM `$tabla` WHERE `$campo` IS NOT NULL AND `$campo` <> '' AND '$campo' NOT LIKE 'NA';";
+    $sql = "SELECT DISTINCT `$campo`,id FROM `$tabla` WHERE  `$campo` <> 'NA';";
     $query = mysqli_query($con, $sql);
 
     $datos = [];
@@ -278,6 +287,7 @@ function verificar_nuevos_id($valor) {
         return $nuevo_rubro;
     }
 }
+
 function registrar_historico($valores){
     include("../conexion.php");
 
