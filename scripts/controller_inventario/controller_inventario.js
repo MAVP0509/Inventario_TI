@@ -313,7 +313,16 @@ async function mostrar_registro(params) {
         selectId: 'edi-tipo',
         tabla: 'cat_tipo',
         campo: 'tipo',
-        placeholder: 'Selecione un rubro',
+        placeholder: 'Selecione un tipo',
+        dropdownParent: '#modal-editar',
+        tags: true
+    })
+
+    await general_select2({
+        selectId: 'edi-marca',
+        tabla: 'cat_marca',
+        campo: 'marca',
+        placeholder: 'Seleccione una marca',
         dropdownParent: '#modal-editar',
         tags: true
     })
@@ -325,24 +334,25 @@ async function mostrar_registro(params) {
         placeholder: 'Seleccione un usuario',
         dropdownParent: '#modal-editar',
     })
-    await general_select2({
+    /* await general_select2({
         selectId: 'edi-posicion',
         tabla: 'cat_usuarios',
         campo: 'cargo',
         placeholder: 'Seleccione un cargo',
         dropdownParent: '#modal-editar',
-    })
+        tags: true,
+    }) */
         document.getElementById("edi-zona").value = selecreg.zona;
-        $('#edi-rubro').val(selecreg.rubro).trigger('change');
+        rellenar_select(selecreg.rubro,"edi-rubro")
         document.getElementById("edi-af").value = selecreg.af;
-        $('#edi-tipo').val(selecreg.tipo).trigger('change');
-        document.getElementById("edi-marca").value = selecreg.marca;
+        rellenar_select(selecreg.tipo,"edi-tipo")
+        rellenar_select(selecreg.marca,"edi-marca")
         document.getElementById("edi-modelo").value = selecreg.modelo;
         document.getElementById("edi-num-serie").value = selecreg.num_serie;
         document.getElementById("edi-ubicacion").value = selecreg.ubicacion;
         document.getElementById("edi-tag").value = selecreg.tag;
-        $('#edi-usuario').val(selecreg.usuario).trigger('change');
-        $('#edi-posicion').val(selecreg.posicion).trigger('change');
+        rellenar_select(selecreg.usuario,"edi-usuario")
+        //rellenar_select(selecreg.posicion,"edi-posicion")
         document.getElementById("edi-fecha-entrega").value = selecreg.fecha_entrega;
 
         modalE = new bootstrap.Modal(document.getElementById('modal-editar'));
@@ -427,7 +437,7 @@ async function editar_registro(params) {
     ];
     let model = {
         accion: 1,
-        id: selecreg.id,
+        id: selecreg.id_equipo,
         zona: $("#edi-zona").val().trim(),
         rubro: $("#edi-rubro").val().trim(),
         af: $("#edi-af").val().trim(),
@@ -438,7 +448,7 @@ async function editar_registro(params) {
         ubicacion: $("#edi-ubicacion").val().trim(),
         tag: $("#edi-tag").val().trim(),
         usuario: $("#edi-usuario").val().trim(),
-        posicion: $("#edi-posicion").val().trim(),
+        //posicion: $("#edi-posicion").select2('data')[0].text,
         fecha_entrega: $("#edi-fecha-entrega").val()
     }
 
@@ -593,7 +603,7 @@ function limpiar_campos(){
 
     general_select2({
         selectId: 'inp-rubro',
-        tabla: 'inventario_ti_sur',
+        tabla: 'cat_rubro',
         campo: 'rubro',
         placeholder: 'Seleciona un rubro',
         dropdownParent: '#modal-registro',
@@ -602,7 +612,7 @@ function limpiar_campos(){
     
     general_select2({
         selectId: 'inp-tipo',
-        tabla: 'inventario_ti_sur',
+        tabla: 'cat_tipo',
         campo: 'tipo',
         placeholder: 'Seleciona un tipo',
         dropdownParent: '#modal-registro',
@@ -610,9 +620,18 @@ function limpiar_campos(){
       });
 
     general_select2({
+        selectId: 'inp-marca',
+        tabla: 'cat_marca',
+        campo: 'marca',
+        placeholder: 'Seleccione una marca',
+        dropdownParent: '#modal-registro',
+        tags: true
+    })
+
+    general_select2({
         selectId: 'inp-usuario',
-        tabla: 'inventario_ti_sur',
-        campo: 'usuario',
+        tabla: 'cat_usuarios',
+        campo: 'nombre',
         placeholder: 'Seleccione un usuario',
         dropdownParent: '#modal-registro',
         tags: true
@@ -620,8 +639,8 @@ function limpiar_campos(){
 
     general_select2({
         selectId: 'inp-posicion',
-        tabla: 'inventario_ti_sur',
-        campo: 'posicion',
+        tabla: 'cat_usuarios',
+        campo: 'cargo',
         placeholder: 'Seleccione un cargo',
         dropdownParent: '#modal-registro',
         tags: true
@@ -665,7 +684,7 @@ function mostrar_alerta(tipo, titulo, mensaje) {
     });
   }); */
   
-  //*SELECT2 para hacer el resguardo
+  //TODO Funciones de los Select2
 
   async function general_select2({selectId, tabla, campo, placeholder, dropdownParent, tags}){
     //try {
@@ -678,7 +697,7 @@ function mostrar_alerta(tipo, titulo, mensaje) {
         //console.log('Respuesta del servidor para select2:', response);
 
         const opciones = response.resultado.map(item => ({
-            id: item[campo] || '',
+            id: item.id || '',
             text: item[campo] || ''
           }));
 
@@ -700,6 +719,18 @@ function mostrar_alerta(tipo, titulo, mensaje) {
         
     //}
   }
+
+  function rellenar_select(texto,select) {
+    let textoBuscado = texto;
+    let $select = $('#' + select);
+
+    $select.find('option').filter(function() {
+        return $(this).text().trim() === textoBuscado;
+    }).prop('selected', true);
+
+    $select.trigger('change');
+  }
+
 
   $(document).ready(function () {
     // Escucha cambios en el campo "inp-tipo"

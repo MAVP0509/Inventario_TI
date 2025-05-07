@@ -60,9 +60,58 @@ function editar_datos($valores)
 {
     include("../conexion.php");
     //$zona = 'Base Operativa Región Sur';
-    $sql = "UPDATE inventario_ti_sur SET zona = '$valores->zona', rubro = '$valores->rubro', af = '$valores->af', tipo ='$valores->tipo', marca = '$valores->marca', 
-    num_serie = '$valores->num_serie', ubicacion = '$valores->ubicacion', tag = '$valores->tag', usuario = '$valores->usuario', 
-    posicion = '$valores->posicion', fecha_entrega = '$valores->fecha_entrega' WHERE id = '$valores->id';";
+    $rubro = verificar_nuevos_id($valores->rubro);
+    $val_rubro;
+    if ($rubro === true){
+        $val_rubro = $valores->rubro;
+    }else{
+        $sql_rubro = "INSERT INTO cat_rubro(rubro) VALUES ('$rubro');";
+        mysqli_query($con,$sql_rubro);
+        $sql_ver_id_rubro = "SELECT id FROM cat_rubro WHERE rubro = '$rubro';";
+        $idRub = mysqli_fetch_assoc(mysqli_query($con,$sql_ver_id_rubro));
+        $val_rubro = $idRub['id'];
+    }
+
+    $tipo = verificar_nuevos_id($valores->tipo);
+    $val_tipo;
+    if ($tipo === true){
+        $val_tipo = $valores->tipo;
+    }else{
+        $sql_tipo = "INSERT INTO cat_tipo(rubro) VALUES ('$tipo');";
+        mysqli_query($con,$sql_tipo);
+        $sql_ver_id_tipo = "SELECT id FROM cat_tipo WHERE tipo = '$tipo';";
+        $idTip = mysqli_fetch_assoc(mysqli_query($con,$sql_ver_id_tipo));
+        $val_tipo = $idTip['id'];
+    }
+
+    $marca = verificar_nuevos_id($valores->marca);
+    $val_marca;
+    if ($marca === true){
+        $val_marca = $valores->marca;
+    }else{
+        $sql_marca = "INSERT INTO cat_marca(marca) VALUES ('$marca');";
+        mysqli_query($con,$sql_marca);
+        $sql_ver_id_marca = "SELECT id FROM cat_marca WHERE marca = '$marca';";
+        $idMarca = mysqli_fetch_assoc(mysqli_query($con,$sql_ver_id_marca));
+        $val_marca = $idMarca['id'];
+    }
+
+    /* $usuario = verificar_nuevos_id($valores->usuario);
+    $val_usuario;
+    if ($usuario === true){
+        $val_usuario = $valores->usuario;
+        $sql_update_usu = "UPDATE cat_usuarios SET cargo = '$valores->posicion' WHERE id = '$valores->usuario';";
+        mysqli_query($con,$sql_update_usu);
+    }else{
+        $sql_usuario = "INSERT INTO cat_usuarios(nombre,cargo) VALUES ('$usuario','$valores->posicion');";
+        mysqli_query($con,$sql_usuario);
+        $sql_ver_id_usuario = "SELECT id FROM cat_usuario WHERE usuario = '$usuario';";
+        $idUsu = mysqli_fetch_assoc(mysqli_query($con,$sql_ver_id_usuario));
+        $val_usuario = $idUsu['id'];
+    } */
+
+    $sql = "UPDATE inventario_ti_sur SET zona = '$valores->zona', fk_rubro = '$val_rubro', af = '$valores->af', fk_tipo ='$val_tipo', fk_marca = '$val_marca', 
+    num_serie = '$valores->num_serie', ubicacion = '$valores->ubicacion', tag = '$valores->tag', fk_usuario = '$valores->usuario', fecha_entrega = '$valores->fecha_entrega' WHERE id = '$valores->id';";
     //var_dump($sql);
     return mysqli_query($con, $sql);
 }
@@ -187,17 +236,30 @@ function consultar_distintos($tabla, $campo)
     $tabla = mysqli_real_escape_string($con, $tabla);
     $campo = mysqli_real_escape_string($con, $campo);
 
-    $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE `$campo` IS NOT NULL AND `$campo` <> '' AND '$campo' NOT LIKE 'NA';";
+    $sql = "SELECT DISTINCT id, `$campo` FROM `$tabla` WHERE `$campo` IS NOT NULL AND `$campo` <> '' AND '$campo' NOT LIKE 'NA';";
     $query = mysqli_query($con, $sql);
 
     $datos = [];
     while ($fila = mysqli_fetch_assoc($query)) {
+        $id = $fila['id'];
         $valor = $fila[$campo];
         $datos[] = [
-            'id' => $valor,
+            'id' => $id,
             $campo => $valor
         ];
     }
-
+    //var_dump($datos);
     return $datos;
+}
+
+
+function verificar_nuevos_id($valor) {
+    if (ctype_digit($valor)) {
+        // Es un string de solo dígitos: probablemente un ID existente
+        return true;
+    } else {
+        // No es un número válido: el usuario ingresó una nueva opción
+        $nuevo_rubro = trim($valor);
+        return $nuevo_rubro;
+    }
 }
