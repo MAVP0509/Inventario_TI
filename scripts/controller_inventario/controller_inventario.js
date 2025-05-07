@@ -407,7 +407,6 @@ async function crear_registro() {
         ubicacion: $("#inp-ubicacion").val().trim(),
         tag: $("#inp-tag").val().trim(),
         usuario: $("#inp-usuario").val().trim(),
-        posicion: $("#inp-posicion").val().trim(),
         fecha_entrega: $("#inp-fecha-entrega").val()
     };
 
@@ -423,7 +422,7 @@ async function crear_registro() {
         table.destroy();
         consultar_informacion();
         $("#modal-registro").modal('hide');
-        await generar_historico('Registrar', model.num_serie, JSON.stringify(model));
+        //await generar_historico('Registrar', model.num_serie, JSON.stringify(model));
         mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
     } else if (respuesta.resultado === false) {
         if (respuesta.mensaje === "Número de serie duplicado") {
@@ -651,14 +650,6 @@ function limpiar_campos(){
         tags: true
     });
 
-    general_select2({
-        selectId: 'inp-posicion',
-        tabla: 'cat_usuarios',
-        campo: 'cargo',
-        placeholder: 'Seleccione un cargo',
-        dropdownParent: '#modal-registro',
-        tags: true
-    });
 
     // modal = new bootstrap.Modal(document.getElementById('modal-registro'));
     $("#modal-registro").modal('show');
@@ -779,8 +770,8 @@ function resguardo(){
     
     general_select2({
         selectId: 'select-usu',
-        tabla: 'inventario_ti_sur',
-        campo: 'usuario',
+        tabla: 'cat_usuarios',
+        campo: 'nombre',
         placeholder: 'Selecione un usuario',
         dropdownParent: '#mdl-res',
         tags: false
