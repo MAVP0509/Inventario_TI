@@ -20,8 +20,6 @@ function server_inventario(model) {
             }
         })
     });
-
-
 }
 
 function server_excel(model) {
@@ -44,8 +42,6 @@ function server_excel(model) {
             }
         })
     });
-
-
 }
 
 window.addEventListener('load', function () {
@@ -113,8 +109,17 @@ async function consultar_informacion(params) {
                 {
                     data: "rubro",
                     render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
-                        return control;
+                        if (type === 'display') {
+                            // Mostrar texto estilizado, truncado
+                            return `<label style="font-weight: normal; font-size: 12px;">${
+                                data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"
+                            }</label>`;
+                        } else if (type === 'filter' || type === 'sort') {
+                            // Devolver solo texto plano para búsqueda y ordenamiento
+                            return data || "NA";
+                        }
+                        return data;
+                    
                     }, 
                 },
                 {
@@ -198,7 +203,7 @@ async function consultar_informacion(params) {
                 }
             ],
             dom: `
-                <'row mb-2'<'col-sm-6 text-left'f><'col-sm-6 text-right'<'btn-group'B>>>
+                <'row mb-2'<'col-sm-4 text-left'f><'col-sm-8 text-right'<'btn-group'B>>>
                 <'row'<'col-sm-12 text-center'tr>>
                 <'row mt-2'<'col-sm-3'l><'col-sm-5 text-center'i><'col-sm-4 text-right'p>>
             `,
@@ -251,6 +256,12 @@ async function consultar_informacion(params) {
                             <i class="fa-solid fa-trash-can fa-lg"></i> Eliminar Registro</button>
                         </div>`
                 },
+                {
+                    html: `<div>
+                            <button type="button" class="btn btn-light rounded mr-3 icon" onclick="">
+                            <i class="fa-solid fa-clock-rotate-left"></i> Historial</button>
+                        </div>`
+                },
                 
             ],
             stateSave: true,
@@ -264,20 +275,20 @@ async function consultar_informacion(params) {
         });
 
         // Re-asigna evento de búsqueda global
-$('.dataTables_filter input').off().on('input', function () {
-    const searchValue = this.value.trim();
-    if (searchValue === '') {
-        table.search('').draw();
-        return;
-    }
-
-    const terms = searchValue.split(',').map(term =>
-        term.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    ).filter(term => term !== '');
-
-    const regex = terms.join('|');
-    table.search(regex, true, false).draw();
-});
+        $('.dataTables_filter input').off().on('input', function () {
+            const searchValue = this.value.trim();
+            if (searchValue === '') {
+                table.search('').draw();
+                return;
+            }
+        
+            const terms = searchValue.split(',').map(term =>
+                term.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+            ).filter(term => term !== '');
+        
+            const regex = terms.join('|');
+            table.search(regex, true, false).draw();
+        });
 
         
     } catch (error) {
@@ -412,6 +423,7 @@ async function crear_registro() {
         table.destroy();
         consultar_informacion();
         $("#modal-registro").modal('hide');
+        await generar_historico('Registrar', model.num_serie, JSON.stringify(model));
         mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
     } else if (respuesta.resultado === false) {
         if (respuesta.mensaje === "Número de serie duplicado") {
@@ -457,8 +469,8 @@ async function editar_registro(params) {
 
 
     if (response.resultado === true) {
+        await generar_historico('Editar', model.num_serie, JSON.stringify(model));
         mostrar_alerta('success', '¡Edición exitosa!', 'El registro se ha actualizado correctamente.');
-        
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo editar el registro. Inténtalo nuevamente.');
     }
@@ -471,6 +483,8 @@ async function editar_registro(params) {
 async function desactivar_registro(params) {
     let response = await server_inventario({ accion: 3, id: select });
         if (response.resultado === true) {
+            const dispositivo = datos.find(d => d.id === select[0]);
+            await generar_historico('Desactivar', dispositivo.num_serie);
             mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
 
             let table = $('#tabla1').DataTable();
@@ -874,4 +888,4 @@ $(document).ready(function () {
     });
     $('[data-toggle="popover"]').popover();
 });
-   
+

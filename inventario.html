@@ -106,50 +106,61 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-12">
-                            <div class="card">
+                            <div class="card card-tabs">
                                 <!--Card header-->
                                 <div class="card-header">
+                                    <ul class="nav nav-tabs" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link active" data-toggle="tab" data-target="#inventario.html" type="button" role="tab" aria-controls="historico" aria-selected="true">Inventario</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-toggle="tab" data-target="#historico.html" type="button" role="tab" aria-controls="historico" aria-selected="true">Historial</a>
+                                        </li>
+                                    </ul>
+                                    <br>
                                     <h3 class="card-title"><i class="fa-solid fa-table"></i> Inventario de TI</h3>
-                                    <div class="d-flex justify-content-end mb-3">
-                                        <!-- <button type="button" onclick="resguardo()" class="btn btn-info icon" style="margin-left: 10px;" href="#" >Resguardo <i class="fa-solid fa-file-export fa-lg"></i></button> -->
-                                    </div>
                                 </div>
                                 <!--Card Body-->
                                 <div class="card-body">
-                                    <div class="dataTables_wrapper dt-bootstrap4." id="table-usuario">
-                                        <div class="row">
-                                            <div class="col-sm-12 col-md-6"></div>
-                                            <div class="col-sm-12 col-md-6"></div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-sm-12">
-                                                    <table class="table table-bordered table-hover dataTable dtr-inline table-striped" id="tabla1" aria-describedby="Tabla de usuarios" style="width: 100%;">
-                                                        <thead>
-                                                            <tr>
-                                                                <th></th>
-                                                                <th>ID</th>
-                                                                <th>Zona</th>
-                                                                <th>Rubro</th>
-                                                                <th>AF</th>
-                                                                <th>Tipo</th>
-                                                                <th>Marca</th>
-                                                                <th>Modelo</th>
-                                                                <th>Numero de serie</th>
-                                                                <th>Ubicación</th>
-                                                                <th>TAG</th>
-                                                                <th>Usuario</th>
-                                                                <th>Posición</th>
-                                                                <th>Fecha de entrega</th>
-                                                                <th>Editar</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody id="tbl-body">
-                                                            
-                                                        </tbody>
-                                                    </table>
+                                    <di class="tab-content">
+                                        <div class="tab-pane fade show active" role="tabpanel">
+                                            <div class="dataTables_wrapper dt-bootstrap4." id="table-usuario">
+                                                <div class="row">
+                                                    <div class="col-sm-12 col-md-6"></div>
+                                                    <div class="col-sm-12 col-md-6"></div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <table class="table table-bordered table-hover dataTable dtr-inline table-striped" id="tabla1" aria-describedby="Tabla de usuarios" style="width: 100%;">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th></th>
+                                                                    <th>ID</th>
+                                                                    <th>Zona</th>
+                                                                    <th>Rubro</th>
+                                                                    <th>AF</th>
+                                                                    <th>Tipo</th>
+                                                                    <th>Marca</th>
+                                                                    <th>Modelo</th>
+                                                                    <th>Numero de serie</th>
+                                                                    <th>Ubicación</th>
+                                                                    <th>TAG</th>
+                                                                    <th>Usuario</th>
+                                                                    <th>Posición</th>
+                                                                    <th>Fecha de entrega</th>
+                                                                    <th>Editar</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody id="tbl-body">
+                                                                
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </di>
+
                                 </div>
                             </div>
                         </div>
@@ -482,6 +493,37 @@
             </div>
         </div>
     </div>
+
+<!-- Modal de historial -->
+<div class="modal fade" id="modal-historial" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Historial de Registro</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Formulario para ingresar el número de serie -->
+                <form id="form-historial">
+                    <div class="form-group">
+                        <label for="numSerie">Número de Serie:</label>
+                        <input type="text" class="form-control" id="his-num-serie" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                </form>
+
+                <!-- Resultados del historial -->
+                <div id="result-historico"></div>
+            </div> <!-- modal-body -->
+            <div class="modal-footer">
+                <button type]="button" class="btn btn-danger icon" data-dismiss="modal" id="modal-btn-his">Cancelar <i class="fa-solid fa-arrow-right-from-bracket fa-lg"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 </body>
 
