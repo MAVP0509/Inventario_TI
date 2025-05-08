@@ -371,6 +371,7 @@ async function mostrar_registro(params) {
 }
 
 let ususelect = [];
+const usuario = JSON.parse(sessionStorage.getItem('user'));
 
 async function crear_registro() {
     // Campos requeridos para validación
@@ -411,21 +412,21 @@ async function crear_registro() {
     };
 
     // Enviar datos al servidor
-    let respuesta = await server_inventario(model);
+    let server = await server_inventario(model);
 
     // Validar respuesta del servidor
     const serie = document.getElementById('inp-num-serie');
     serie.classList.remove('is-invalid'); // Remover clase de error si existía
 
-    if (respuesta.resultado === true) {
+    if (server.resultado === true) {
         let table = $('#tabla1').DataTable();
         table.destroy();
         consultar_informacion();
         $("#modal-registro").modal('hide');
-        //await generar_historico('Registrar', model.num_serie, JSON.stringify(model));
+        await registrar_historico(usuario.resultado[0], model.num_serie, 'Nuevo registro');
         mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
-    } else if (respuesta.resultado === false) {
-        if (respuesta.mensaje === "Número de serie duplicado") {
+    } else if (server.resultado === false) {
+        if (server.mensaje === "Número de serie duplicado") {
             serie.classList.add('is-invalid'); // Marcar el campo como inválido si hay un número de serie duplicado
             mostrar_alerta('warning', 'Número de serie duplicado', 'Este número de serie ya está registrado.');
         } else {
@@ -468,7 +469,7 @@ async function editar_registro(params) {
 
 
     if (response.resultado === true) {
-        await generar_historico('Editar', model.num_serie, JSON.stringify(model));
+        await registrar_historico(usuario.resultado[0], model.num_serie, 'Edición de registro');
         mostrar_alerta('success', '¡Edición exitosa!', 'El registro se ha actualizado correctamente.');
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo editar el registro. Inténtalo nuevamente.');
@@ -483,7 +484,7 @@ async function desactivar_registro(params) {
     let response = await server_inventario({ accion: 3, id: select });
         if (response.resultado === true) {
             const dispositivo = datos.find(d => d.id === select[0]);
-            await generar_historico('Desactivar', dispositivo.num_serie);
+            await registrar_historico(usuario.resultado[0], model.num_serie, 'Eliminación de registro');
             mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
 
             let table = $('#tabla1').DataTable();

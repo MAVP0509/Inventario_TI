@@ -8,26 +8,22 @@ $clientejson = json_decode($_POST['trama']);
 $respuesta_servidor = new stdClass();
 
 if ($clientejson->accion == 0) {
-    $respuesta_servidor->resultado = consultar_historico($clientejson);
-} elseif ($clientejson->accion == 1){
-    $respuesta_servidor->resultado = registrar_historico($clientejson);
+    $respuesta_servidor->resultado = consultar_historico($clientejson->$usuario, $num_serie, $evento);
+} elseif ($clientejson->accion == 1) {
+    $respuesta_servidor->resultado = registrar_historico($clientejson->$usuario, $num_serie, $evento);
 }
 
 print(json_encode($respuesta_servidor));
 
-function registrar_historico($valores){
+function registrar_historico($evento, $usuario, $num_serie)
+{
     include("../conexion.php");
-    include("../controller_inventario/controller_inventario.php");
 
     $fecha_evento = date("Y:m:d H:i:s");
-    $sql = "INSERT INTO historico(fecha_evento, usuario, evento, num_serie, tipo) VALUES ('$fecha_evento', '$valores->usuario', '$valores->evento', '$valores->num_serie')";
+    $sql = "INSERT INTO historico(fecha_evento, usuario, evento, num_serie) VALUES ('$fecha_evento', '$usuario', '$evento', '$num_serie')";
     $query = mysqli_query($con, $sql);
-
-    if ($query) {
-        return ["mensaje" => "Evento registrado exitosamente."];
-    } else {
-        return ["mensaje" => "Error al registrar evento: .".mysqli_error($con)];
-    }
+    //var_dump($query);
+    return $query;
 }
 
 /* function consultar_historico($valores){
@@ -44,7 +40,8 @@ function registrar_historico($valores){
     return $datos;
 } */
 
-function consultar_historico($valores){
+function consultar_historico($valores)
+{
     include("../conexion.php");
 
     // $sql = "SELECT * FROM historico ORDER BY fecha_evento DESC";
@@ -54,13 +51,15 @@ function consultar_historico($valores){
             ITS.zona,
             CT.tipo,
             hst.evento,
-            hst.usuario
+            hst.usuario,
+            hst.num_serie
             FROM
                 historico AS hst
                 INNER JOIN inventario_ti_sur AS ITS ON hst.num_serie = ITS.num_serie
                 INNER JOIN cat_tipo AS CT ON CT.id = ITS.fk_tipo";
-            /* WHERE
-                hst.num_serie = 'num_serie'"; */
+           /*  WHERE 
+                hst.num_serie = ITS.num_serie"; */
+
     $query = mysqli_query($con, $sql);
 
     $datos = [];
@@ -70,5 +69,3 @@ function consultar_historico($valores){
 
     return $datos;
 }
-
-?>

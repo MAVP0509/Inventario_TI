@@ -8,8 +8,10 @@ function server_historico(model) {
                 trama: JSON.stringify(model)
             },
             success: function(response){
+                console.log(response);
                 try {
                     resolve(JSON.parse(response))
+                    console.log(resolve(JSON.parse(response)))
                     respuesta = response
                 } catch (error) {
                     reject(error)
@@ -40,16 +42,12 @@ function server_inventario(model) {
     
 }
 
-async function consultar_historico(evento, num_serie, detalles = "") {
-    const usuario = JSON.parse(sessionStorage.getItem('user')); // Obtener usuario en sesión
-    const fecha_evento = new Date().toISOString();
+async function consultar_historico() {
+    //const usuario = JSON.parse(sessionStorage.getItem('user')); // Obtener usuario en sesión
+    //const fecha_evento = new Date().toISOString();
 
     const model = {
-        accion: 0, // Acción para registrar en el historial
-        fecha_evento: fecha_evento,
-        usuario: usuario.resultado[0], // Nombre del usuario
-        evento: evento, // Evento realizado (Registrar, Editar, etc.)
-        num_serie: num_serie, // Número de serie del dispositivo
+        accion: 0,
     };
 
     let datos = await server_historico(model);
@@ -59,31 +57,32 @@ async function consultar_historico(evento, num_serie, detalles = "") {
         columns: [
             {title: "Id", field: "id"},
             {title: "Fecha", field: "fecha_evento"},
-            {title: "Zona", field: "zona"},
-            {title: "Usuario", field: "usuario"},
             {title: "Evento", field: "evento"},
+            {title: "Zona", field: "zona"},
+            {title: "Tipo", field: "tipo"},
+            {title: "Usuario", field: "usuario"},
+            {title: "Numero de serie", field: "num_serie"},
 
         ],
         layout: "fitColumns",
     });
 }
 
-async function generar_historico(num_serie) {
+async function registrar_historico(usuario, num_serie, evento) {
+     // Obtener usuario en sesión
+    //const fecha_evento = new Date().toISOString();
     const model = {
         accion: 1,
-        num_serie: num_serie
+        usuario: usuario, // Nombre del usuario
+        num_serie: num_serie, // Número de serie del dispositivo
+        evento: evento,
     };
 
-    const respuesta = await server_historico(model);
+    let server = await server_historico(model);
 
-    if (respuesta.length > 0) {
-        mostrar_modal_historial(respuesta);
-    } else {
-        mostrar_alerta('info', 'Sin resultados', 'No se encontraron movimientos para este número de serie.');
-    }
 }
 
-function mostrar_modal_historial(historial) {
+/* function mostrar_modal_historial(historial) {
     const contenedor = document.getElementById('contenedor-historial');
     contenedor.innerHTML = ''; // Limpiar contenido previo
 
@@ -142,5 +141,5 @@ async function obtenerDetallesInventario(num_serie) {
     } else {
         return 'No se encontraron detalles de inventario para este número de serie.';
     }
-}
+} */
 
