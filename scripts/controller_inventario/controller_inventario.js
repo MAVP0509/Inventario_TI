@@ -12,7 +12,7 @@ function server_inventario(model) {
                 //console.log(response);
                 try {
                     resolve(JSON.parse(response))
-                    //console.log(resolve(JSON.parse(response)))
+                    console.log(resolve(JSON.parse(response)))
                     respuesta = response
                 } catch (error) {
                     reject(error)
@@ -299,7 +299,6 @@ async function consultar_informacion(params) {
 
 
 let selecreg ="";
-let modalE
 
 async function mostrar_registro(params) {
     for (let i = 0; i < datos.length; i++) {
@@ -366,12 +365,11 @@ async function mostrar_registro(params) {
         //rellenar_select(selecreg.posicion,"edi-posicion")
         document.getElementById("edi-fecha-entrega").value = selecreg.fecha_entrega;
 
-        modalE = new bootstrap.Modal(document.getElementById('modal-editar'));
-        modalE.show();
+        $("#modal-editar").modal("show");
+
 }
 
 let ususelect = [];
-const usuario = JSON.parse(sessionStorage.getItem('user'));
 
 async function crear_registro() {
     // Campos requeridos para validación
@@ -423,7 +421,7 @@ async function crear_registro() {
         table.destroy();
         consultar_informacion();
         $("#modal-registro").modal('hide');
-        await registrar_historico(usuario.resultado[0], model.num_serie, 'Nuevo registro');
+        await registrar_historico(model.num_serie, 'Nuevo registro');
         mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
     } else if (server.resultado === false) {
         if (server.mensaje === "Número de serie duplicado") {
@@ -465,26 +463,26 @@ async function editar_registro(params) {
     }
 
     let server = await server_inventario(model);
-    let response = JSON.parse(respuesta);
+    //let response = JSON.parse(respuesta);
+    console.log(server);
 
 
-    if (response.resultado === true) {
-        await registrar_historico(usuario.resultado[0], model.num_serie, 'Edición de registro');
+    if (server.resultado === true) {
+        await registrar_historico(model.num_serie, 'Edición de registro');
         mostrar_alerta('success', '¡Edición exitosa!', 'El registro se ha actualizado correctamente.');
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo editar el registro. Inténtalo nuevamente.');
     }
 
         consultar_informacion();
-        modalE.hide();
+        $("modal-editar").modal("hide");
     
 }
 
 async function desactivar_registro(params) {
-    let response = await server_inventario({ accion: 3, id: select });
+    let response = await server_inventario({ accion: 3, id: {select, num_serie}});
         if (response.resultado === true) {
-            const dispositivo = datos.find(d => d.id === select[0]);
-            await registrar_historico(usuario.resultado[0], model.num_serie, 'Eliminación de registro');
+            await registrar_historico(model.num_serie, 'Eliminación de registro');
             mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
 
             let table = $('#tabla1').DataTable();
@@ -872,13 +870,6 @@ function mostrar_toast_cargando() {
 }
 
 $(document).ready(function () {
-    
-    $('.select').select2().attr({
-    'data-toggle': 'popover',
-      'data-trigger': 'hover',
-      'data-content': 'Este es un select potenciado con Select2.',
-      'title': 'Información adicional'
-    });
     $('[data-toggle="popover"]').popover();
 });
 

@@ -51,7 +51,7 @@ function insertar_datos($valores){
             return mysqli_query($con, $sql);
         }
     } else {
-        $result = mysqli_query($con, $sql);
+        return mysqli_query($con, $sql);
     }
 }
 

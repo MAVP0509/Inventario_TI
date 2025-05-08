@@ -1,4 +1,4 @@
-let respuesta
+let respuesta_historico
 function server_historico(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -12,7 +12,7 @@ function server_historico(model) {
                 try {
                     resolve(JSON.parse(response))
                     console.log(resolve(JSON.parse(response)))
-                    respuesta = response
+                    respuesta_historico = response
                 } catch (error) {
                     reject(error)
                 }
@@ -25,14 +25,14 @@ function server_inventario(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "database/controller_historico/controller_inventario.php",
+            url: "database/controller_inventario/controller_inventario.php",
             data: {
                 trama: JSON.stringify(model)
             },
             success: function (response) {
                 try {
                     resolve(JSON.parse(response))
-                    respuesta = response
+                    respuesta_historico = response
                 } catch (error) {
                     reject(error)
                 }
@@ -68,17 +68,17 @@ async function consultar_historico() {
     });
 }
 
-async function registrar_historico(usuario, num_serie, evento) {
-     // Obtener usuario en sesión
+async function registrar_historico(num_serie, evento) {
+    const usuario = JSON.parse(sessionStorage.getItem('user')); // Obtener usuario en sesión
     //const fecha_evento = new Date().toISOString();
     const model = {
         accion: 1,
-        usuario: usuario, // Nombre del usuario
+        usuario: usuario.resultado[0], // Nombre del usuario
         num_serie: num_serie, // Número de serie del dispositivo
         evento: evento,
     };
 
-    let server = await server_historico(model);
+    let result = await server_historico(model);
 
 }
 

@@ -8,19 +8,19 @@ $clientejson = json_decode($_POST['trama']);
 $respuesta_servidor = new stdClass();
 
 if ($clientejson->accion == 0) {
-    $respuesta_servidor->resultado = consultar_historico($clientejson->$usuario, $num_serie, $evento);
+    $respuesta_servidor->resultado = consultar_historico($clientejson);
 } elseif ($clientejson->accion == 1) {
-    $respuesta_servidor->resultado = registrar_historico($clientejson->$usuario, $num_serie, $evento);
+    $respuesta_servidor->resultado = registrar_historico($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
 
-function registrar_historico($evento, $usuario, $num_serie)
+function registrar_historico($valores)
 {
     include("../conexion.php");
 
     $fecha_evento = date("Y:m:d H:i:s");
-    $sql = "INSERT INTO historico(fecha_evento, usuario, evento, num_serie) VALUES ('$fecha_evento', '$usuario', '$evento', '$num_serie')";
+    $sql = "INSERT INTO historico(fecha_evento, usuario, evento, num_serie) VALUES ('$fecha_evento', '$valores->usuario', '$valores->evento', '$valores->num_serie')";
     $query = mysqli_query($con, $sql);
     //var_dump($query);
     return $query;
