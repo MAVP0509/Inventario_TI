@@ -804,7 +804,8 @@ async function crear_resguardo(params) {
     let model = {
         accion : 5,
         usuario : $('#select-usu').val().trim(),
-        region : $('#select-region').val().trim(),
+        //region : $('#select-region').val().trim(),
+        region : $("#select-region").select2('data')[0].text,
         comentario : $('#txt-area').val().trim(),
         fecha: $('#fecha-resguardo').val()
     }
