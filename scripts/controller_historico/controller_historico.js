@@ -46,7 +46,6 @@ async function consultar_historico(evento, num_serie, detalles = "") {
 
     const model = {
         accion: 0, // Acción para registrar en el historial
-        id: id,
         fecha_evento: fecha_evento,
         usuario: usuario.resultado[0], // Nombre del usuario
         evento: evento, // Evento realizado (Registrar, Editar, etc.)
@@ -65,6 +64,7 @@ async function consultar_historico(evento, num_serie, detalles = "") {
             {title: "Evento", field: "evento"},
 
         ],
+        layout: "fitColumns",
     });
 }
 

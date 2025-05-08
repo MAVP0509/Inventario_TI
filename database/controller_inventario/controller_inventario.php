@@ -53,7 +53,8 @@ function insertar_datos($valores){
     } else {
         $result = mysqli_query($con, $sql);
         if($result){
-            registrar_historico($valores->num_serie, $valores->tipo, "Nuevo registro");
+            $evento = "Nuevo registro";
+            registrar_historico($valores->num_serie, $evento);
         }
         return $result;
     }
@@ -119,7 +120,8 @@ function editar_datos($valores) {
     $result = mysqli_query($con, $sql);
 
     if($result){
-        registrar_historico($valores->num_serie, "Edición de registro");
+        $evento = "Edición de registro";
+        registrar_historico($valores->num_serie, $evento);
     }
     return $result;
 }
@@ -156,7 +158,8 @@ function desactivar_datos($valores) {
         $result = mysqli_query($con, $sql);
 
         if ($result){
-            registrar_historico($valores->id, "Desactivación de registro");
+            $evento = "Desactivación de registro";
+            registrar_historico($valores->num_serie, $evento);
         }
         return $result;
     }
