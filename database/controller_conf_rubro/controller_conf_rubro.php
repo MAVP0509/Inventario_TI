@@ -14,6 +14,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = editar_rubro($clientejson);
 } elseif ($clientejson->accion == 2) {
     $respuesta_servidor->resultado = consultar_rubro($clientejson);
+} elseif ($clientejson->accion == 3) {
+    $respuesta_servidor->resultado = eliminar_rubro($clientejson);
 }
 
 print(json_encode($respuesta_servidor)); //? envía la respuesta de la base de datos a javascript
@@ -52,4 +54,15 @@ function consultar_rubro(){
     return $array;
 }
 
+function eliminar_rubro($valores){
+    include("../conexion.php");
 
+    if (is_array($valores->id)) { // Verifica si $valores->id es un array
+        $ids = implode(",", array_map('intval', $valores->id)); // Convierte el array de IDs en una lista separada por comas
+        $sql = "DELETE FROM inventario_ti_sur WHERE id IN ($ids);"; // Consulta sql usando IN para eliminar múltiples registros
+        return mysqli_query($con, $sql);
+    } else {
+        $sql = "DELETE FROM inventario_ti_sur where id='$valores->id';";
+        return mysqli_query($con, $sql);
+    }
+}

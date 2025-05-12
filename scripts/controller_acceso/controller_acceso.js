@@ -113,3 +113,17 @@ function mostrar_alert(tipo, mensaje, skip, funcion) {
     }
   })
 }
+
+function mostrar_toast(tipo, titulo, mensaje) {
+    Swal.fire({
+        icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
+        title: titulo,
+        text: mensaje,
+        timer: 2500,
+        timerProgressBar: true,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end',
+        heightAuto : true,
+    });
+}

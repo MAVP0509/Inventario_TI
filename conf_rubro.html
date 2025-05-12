@@ -75,6 +75,10 @@
                             </div><!-- /.card-header -->
 
                             <div class="card-body">
+                                <div class="d-flex justify-content-end mb-2">
+                                  <button type="button" class="btn btn-success mr-3 icon" onclick="mdl_nuevo_rubro()" ><i class="fa-solid fa-plus fa-lg"></i> Nuevo</button>
+                                  <button type="button" class="btn btn-danger mr-3 icon" onclick="mensaje_eliminar()" ><i class="fa-solid fa-trash-can fa-lg"></i> Eliminar</button>
+                                </div><br>
                                 <div id="tbl" ></div>
                             </div><!-- /.card-body -->
                         </div>
@@ -92,6 +96,32 @@
       </div>
   </div>
 
+  <!--Modal resguardo -->
+    <div class="modal" tabindex="-1" aria-hidden="true"  id="mdl-rubro">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mdl-title">title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa-solid fa-computer"></i></span>
+                        </div>
+                        <input type="text" class="form-control" id="rubro" autocomplete="off">  
+                        <div class="invalid-feedback" id="rubro-feedback">Por favor, ingrese un rubro.</div>                      
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cancelar <i class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+                    <button type="button" class="btn btn-success icon" id="mdl-btn-conf" onclick="">Confirmar <i class="fa-solid fa-circle-check fa-lg"></i></button>
+            </div>
+            </div>
+        </div>
+    </div>
 </body>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
