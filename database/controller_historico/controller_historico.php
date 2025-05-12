@@ -26,21 +26,8 @@ function registrar_historico($valores)
     return $query;
 }
 
-/* function consultar_historico($valores){
-    include("../conexion.php");
 
-    $sql = "SELECT * FROM historico ORDER BY fecha_evento DESC"; // Ordenar por fecha más reciente
-    $query = mysqli_query($con, $sql);
-
-    $datos = [];
-    while ($fila = mysqli_fetch_assoc($query)) {
-        $datos[] = $fila;
-    }
-
-    return $datos;
-} */
-
-function consultar_historico($valores)
+function consultar_historico()
 {
     include("../conexion.php");
 

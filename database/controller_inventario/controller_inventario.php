@@ -15,16 +15,11 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_datos($clientejson);
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = desactivar_datos($clientejson);
-} elseif ($clientejson->accion == 4) {
-    $respuesta_servidor->resultado = eliminar_datos($clientejson);
 } elseif ($clientejson->accion == 5) {
     $respuesta_servidor->resultado = consultar_para_resguardo($clientejson);
 } elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = consultar_distintos($clientejson->tabla, $clientejson->campo);
-} elseif ($clientejson->accion == 7) {
-    $respuesta_servidor->resultado = registrar_historico($cliente);
 }
-
 print(json_encode($respuesta_servidor));
 
 
@@ -130,37 +125,36 @@ function consultar_datos() {
 
 function desactivar_datos($valores) {
     include("../conexion.php");
-    
+    //var_dump($valores);
+    $series = [];
     if (is_array($valores->id)) { // Verifica si $valores->id es un array
         $ids = implode(",", array_map('intval', $valores->id)); // Convierte el array de IDs en una lista separada por comas
-        $sql = "UPDATE inventario_ti_sur SET habilitado = 0 WHERE id IN ($ids);"; // Consulta sql usando IN para eliminar múltiples registros
-        //var_dump($sql);
-        $result = mysqli_query($con, $sql);
-
-        if($result){
-            foreach($valores->id as $id){
-                registrar_historico($id);
-            }
+        
+        $sql2 = "SELECT num_serie FROM inventario_ti_sur WHERE id IN ($ids)";
+        $query2 = mysqli_query($con, $sql2);
+        $series = [];
+        while ($fila = mysqli_fetch_assoc($query2)) {
+            $series[] = $fila['num_serie'];
+        
         }
-        return $result;
+        $sql = "UPDATE inventario_ti_sur SET habilitado = 0 WHERE id IN ($ids);"; // Consulta sql usando IN para eliminar múltiples registros
+        //echo $sql;
+        //For con los ids
+        //
+        //var_dump($sql);
+
+        return mysqli_query($con, $sql);
+        
     } else {
+        $sql2 = "SELECT num_serie FROM inventario_ti_sur WHERE id = '$valores->id'";
+        $query2 = mysqli_query($con, $sql2);
+        $series[] = mysqli_fetch_assoc($query2)['num_serie'];
+        
         $sql = "UPDATE inventario_ti_sur SET habilitado = 0 where id='$valores->id';";
-        $result = mysqli_query($con, $sql);
-        return $result;
-    }
-}
-
-function eliminar_datos($valores) {
-    include("../conexion.php");
-
-    if (is_array($valores->id)) { // Verifica si $valores->id es un array
-        $ids = implode(",", array_map('intval', $valores->id)); // Convierte el array de IDs en una lista separada por comas
-        $sql = "DELETE FROM inventario_ti_sur WHERE id IN ($ids);"; // Consulta sql usando IN para eliminar múltiples registros
-        return mysqli_query($con, $sql);
-    } else {
-        $sql = "DELETE FROM inventario_ti_sur where id='$valores->id';";
+        
         return mysqli_query($con, $sql);
     }
+
 }
 
 function consultar_para_resguardo($valores) {

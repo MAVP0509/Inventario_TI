@@ -9,13 +9,14 @@ function server_inventario(model) {
                 trama: JSON.stringify(model)
             },
             success: function(response) {
-                //console.log(response);
+                console.log(response);
                 try {
                     resolve(JSON.parse(response))
                     console.log(resolve(JSON.parse(response)))
                     respuesta = response
                 } catch (error) {
                     reject(error)
+                    console.log(reject);
                 }
             }
         })
@@ -237,7 +238,7 @@ async function consultar_informacion(params) {
                     } else {
                         $(this).removeAttr('style'); // Deselecionar
                     }
-                    selecionar_registro(data.id); // Llama a la función para manejar la selección
+                    selecionar_registro(data.id_equipo); // Llama a la función para manejar la selección
                 });
             },
             buttons: [
@@ -479,12 +480,36 @@ async function editar_registro(params) {
     
 }
 
-async function desactivar_registro(params) {
-    let response = await server_inventario({ accion: 3, id: {select, num_serie}});
-        if (response.resultado === true) {
-            await registrar_historico(model.num_serie, 'Eliminación de registro');
-            mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
+let seleccionar = [];
 
+async function selecionar_registro(params) {
+
+    let index = seleccionar.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
+    if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
+        seleccionar.push(params); // Añade uno o más elementos al final de un array
+    } else {
+        seleccionar.splice(index, 1); 
+    } 
+    //console.log(seleccionar)
+}
+
+async function desactivar_registro(params) {
+    let model = {
+        accion: 3,
+        id: seleccionar,
+        //num_serie_: num_serie
+    }
+   //console.log(model)
+
+    let response = await server_inventario(model);
+    //console.log(response);
+    
+        if (response.resultado === true) {
+            response.series.forEach(async (serie) => {
+                await registrar_historico(serie, 'Eliminación de registro');
+            });
+            mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
+            //seleccionar = []
             let table = $('#tabla1').DataTable();
             table.destroy();
             consultar_informacion();
@@ -507,20 +532,10 @@ async function desactivar_registro(params) {
 
         //TODO: Validación de funciones
 
-let select = [];
 
-async function selecionar_registro(params) {
-
-    let index = select.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
-    if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
-        select.push(params); // Añade uno o más elementos al final de un array
-    } else {
-        select.splice(index, 1); 
-    } 
-}
 
 async function confirmar_eliminacion() {
-    if (select.length === 0) {
+    if (seleccionar.length === 0) {
         mostrar_alerta('error', 'Error', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
     } else {
         Swal.fire({
@@ -541,7 +556,7 @@ async function confirmar_eliminacion() {
 }
 
 /* function deshabilitar_campo(){
-    // Al cambiar la opción en el select, bloqueamos o habilitamos el campo
+    // Al cambiar la opción en el seleccionar, bloqueamos o habilitamos el campo
     $("#edi-rubro").on('change', function() {
         if ($(this).val() !== "") {  // Si el valor no está vacío
             $(this).prop('disabled', true);  // Bloquear el campo select

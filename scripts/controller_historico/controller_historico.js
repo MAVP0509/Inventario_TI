@@ -32,9 +32,11 @@ function server_inventario(model) {
             success: function (response) {
                 try {
                     resolve(JSON.parse(response))
+                    console.log(resolve(JSON.parse(response)))
                     respuesta_historico = response
                 } catch (error) {
                     reject(error)
+                    console.log(error);
                 }
             }
         })
