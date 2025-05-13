@@ -19,14 +19,18 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_para_resguardo($clientejson);
 } elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = consultar_distintos($clientejson->tabla, $clientejson->campo);
+} elseif ($clientejson->accion == 8) {
+    $respuesta_servidor->resultado = consultar_region($clientejson);
 }
+
 print(json_encode($respuesta_servidor));
 
 
 
-function insertar_datos($valores){
+function insertar_datos($valores)
+{
     include("../conexion.php");
-    
+
     $registro = date("Y-m-d H:i:s");
 
     if ($valores->num_serie != "") {
@@ -38,7 +42,7 @@ function insertar_datos($valores){
         VALUES ('$valores->zona', '$valores->rubro','$valores->af','$valores->tipo','$valores->marca','$valores->modelo', '$valores->num_serie', 
         '$valores->ubicacion', '$valores->tag', '$valores->usuario', '$registro',1);";
         //$query = mysqli_query($con, $sql);|
-    
+
         if (mysqli_num_rows($query_num) > 0) {
             echo json_encode(["resultado" => false, "mensaje" => "Número de serie duplicado"]);
             exit;
@@ -50,43 +54,44 @@ function insertar_datos($valores){
     }
 }
 
-function editar_datos($valores) {
+function editar_datos($valores)
+{
     include("../conexion.php");
-    
+
     //$zona = 'Base Operativa Región Sur';
     $rubro = verificar_nuevos_id($valores->rubro);
     $val_rubro;
-    if ($rubro === true){
+    if ($rubro === true) {
         $val_rubro = $valores->rubro;
-    }else{
+    } else {
         $sql_rubro = "INSERT INTO cat_rubro(rubro) VALUES ('$rubro');";
-        mysqli_query($con,$sql_rubro);
+        mysqli_query($con, $sql_rubro);
         $sql_ver_id_rubro = "SELECT id FROM cat_rubro WHERE rubro = '$rubro';";
-        $idRub = mysqli_fetch_assoc(mysqli_query($con,$sql_ver_id_rubro));
+        $idRub = mysqli_fetch_assoc(mysqli_query($con, $sql_ver_id_rubro));
         $val_rubro = $idRub['id'];
     }
 
     $tipo = verificar_nuevos_id($valores->tipo);
     $val_tipo;
-    if ($tipo === true){
+    if ($tipo === true) {
         $val_tipo = $valores->tipo;
-    }else{
+    } else {
         $sql_tipo = "INSERT INTO cat_tipo(rubro) VALUES ('$tipo');";
-        mysqli_query($con,$sql_tipo);
+        mysqli_query($con, $sql_tipo);
         $sql_ver_id_tipo = "SELECT id FROM cat_tipo WHERE tipo = '$tipo';";
-        $idTip = mysqli_fetch_assoc(mysqli_query($con,$sql_ver_id_tipo));
+        $idTip = mysqli_fetch_assoc(mysqli_query($con, $sql_ver_id_tipo));
         $val_tipo = $idTip['id'];
     }
 
     $marca = verificar_nuevos_id($valores->marca);
     $val_marca;
-    if ($marca === true){
+    if ($marca === true) {
         $val_marca = $valores->marca;
-    }else{
+    } else {
         $sql_marca = "INSERT INTO cat_marca(marca) VALUES ('$marca');";
-        mysqli_query($con,$sql_marca);
+        mysqli_query($con, $sql_marca);
         $sql_ver_id_marca = "SELECT id FROM cat_marca WHERE marca = '$marca';";
-        $idMarca = mysqli_fetch_assoc(mysqli_query($con,$sql_ver_id_marca));
+        $idMarca = mysqli_fetch_assoc(mysqli_query($con, $sql_ver_id_marca));
         $val_marca = $idMarca['id'];
     }
 
@@ -111,7 +116,8 @@ function editar_datos($valores) {
     return $result;
 }
 
-function consultar_datos() {
+function consultar_datos()
+{
     include("../conexion.php");
     $sql = "SELECT * FROM  vinventario_ti_sur WHERE habilitado = 1";
     $query = mysqli_query($con, $sql);
@@ -123,7 +129,8 @@ function consultar_datos() {
 }
 
 
-function desactivar_datos($valores) {
+function desactivar_datos($valores)
+{
     include("../conexion.php");
     //var_dump($valores);
     
@@ -161,30 +168,28 @@ function desactivar_datos($valores) {
 }  
 
 
-function consultar_para_resguardo($valores) {
+function consultar_para_resguardo($valores)
+{
     include("../conexion.php");
-    $sql = "SELECT * FROM inventario_ti_sur WHERE habilitado = 1 AND usuario = '$valores->usuario'
-        ORDER BY 
-        CASE 
-        WHEN tipo = 'laptop' THEN 1
-        WHEN tipo = 'desktop' THEN 2
-        ELSE 3
-        END;";
+    $sql = "call sp_info_resguardo('$valores->usuario');";
     $query = mysqli_query($con, $sql);
 
     $datos = [];
     while ($fila = mysqli_fetch_assoc($query)) {
         $datos[] = $fila;
     }
+    mysqli_free_result($query);
+    mysqli_next_result($con);
 
     $datos[0]['comentario'] = $valores->comentario ?? '';
     $datos[0]['fecha'] = $valores->fecha ?? '';
 
-    $sql_supervisor = "SELECT * FROM supervisor WHERE region = '$valores->region' AND  habilitado = 1";
-    $query2 = mysqli_query($con,$sql_supervisor);
+    $sql_supervisor = "SELECT * FROM supervisor WHERE region = '$valores->region' AND  habilitado = 1;";
+    //  var_dump($sql_supervisor);
+    $query2 = mysqli_query($con, $sql_supervisor);
 
     $supervisor = [];
-    while($row = mysqli_fetch_assoc($query2)){
+    while ($row = mysqli_fetch_assoc($query2)) {
         $supervisor[] = $row;
     }
 
@@ -193,14 +198,15 @@ function consultar_para_resguardo($valores) {
     $datos[0]['region'] = $supervisor[0]['region'];
 
     //Actualizando la fecha de entrega de todos los equipos del resguardo
-    $sql_fecha_update = "UPDATE inventario_ti_sur SET fecha_entrega = '$valores->fecha' where usuario = '$valores->usuario'";
-    mysqli_query($con,$sql_fecha_update);
+    $sql_fecha_update = "UPDATE inventario_ti_sur SET fecha_entrega = '$valores->fecha' where fk_usuario = '$valores->usuario'";
+    mysqli_query($con, $sql_fecha_update);
 
 
     return $datos;
 }
 
-function consultar_rubro() {
+function consultar_rubro()
+{
     include("../conexion.php");
     $sql = "SELECT DISTINCT rubro from inventario_ti_sur;";
     $query = mysqli_query($con, $sql);
@@ -215,7 +221,8 @@ function consultar_rubro() {
 
     return $datos;
 }
-function consultar_tipo() {
+function consultar_region()
+{
     include("../conexion.php");
     $sql = "SELECT DISTINCT tipo from inventario_ti_sur;";
     $query = mysqli_query($con, $sql);
@@ -231,30 +238,53 @@ function consultar_tipo() {
     return $datos;
 }
 
-function consultar_distintos($tabla, $campo){
+function consultar_distintos($tabla, $campo)
+{
     include("../conexion.php");
     //Validación para evitar inyecciones
     $tabla = mysqli_real_escape_string($con, $tabla);
     $campo = mysqli_real_escape_string($con, $campo);
 
-    $sql = "SELECT DISTINCT id, `$campo` FROM `$tabla` WHERE `$campo` IS NOT NULL AND `$campo` <> '' AND '$campo' NOT LIKE 'NA';";
-    $query = mysqli_query($con, $sql);
+    if ($campo === "region") {
+        $num = 1;
+        $sql = "SELECT DISTINCT region from supervisor;";
+        $query = mysqli_query($con, $sql);
+        $datos = [];
 
-    $datos = [];
-    while ($fila = mysqli_fetch_assoc($query)) {
-        $id = $fila['id'];
-        $valor = $fila[$campo];
-        $datos[] = [
-            'id' => $id,
-            $campo => $valor
-        ];
+        while ($fila = mysqli_fetch_assoc($query)) {
+            $datos[] = [
+                'id' => $num,
+                'region' => $fila['region']
+            ];
+            $num++;
+        }
+
+        return $datos;
+    } else {
+        //Validación para evitar inyecciones
+        $tabla = mysqli_real_escape_string($con, $tabla);
+        $campo = mysqli_real_escape_string($con, $campo);
+
+        $sql = "SELECT DISTINCT `$campo`,id FROM `$tabla` WHERE  `$campo` <> 'NA';";
+        $query = mysqli_query($con, $sql);
+
+        $datos = [];
+        while ($fila = mysqli_fetch_assoc($query)) {
+            $id = $fila['id'];
+            $valor = $fila[$campo];
+            $datos[] = [
+                'id' => $id,
+                $campo => $valor
+            ];
+        }
+        //var_dump($datos);
+        return $datos;
     }
-    //var_dump($datos);
-    return $datos;
 }
 
 
-function verificar_nuevos_id($valor) {
+function verificar_nuevos_id($valor)
+{
     if (ctype_digit($valor)) {
         // Es un string de solo dígitos: probablemente un ID existente
         return true;
@@ -264,18 +294,3 @@ function verificar_nuevos_id($valor) {
         return $nuevo_rubro;
     }
 }
-function registrar_historico($valores){
-    include("../conexion.php");
-
-    $fecha_evento = date("Y:m:d H:i:s");
-    $sql = "INSERT INTO historico(fecha_evento, usuario, evento, num_serie, tipo) VALUES ('$fecha_evento', '$valores->usuario', '$valores->evento', '$valores->num_serie', '$valores->tipo')";
-    $query = mysqli_query($con, $sql);
-
-    if ($query) {
-        return ["mensaje" => "Evento registrado exitosamente."];
-    } else {
-        return ["mensaje" => "Error al registrar evento: .".mysqli_error($con)];
-    }
-}
-
-?>
