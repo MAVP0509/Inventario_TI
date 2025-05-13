@@ -114,12 +114,12 @@ function mostrar_alert(tipo, mensaje, skip, funcion) {
   })
 }
 
-function mostrar_toast(tipo, titulo, mensaje) {
+function mostrar_toast(tipo, titulo, mensaje, tiempo) {
     Swal.fire({
         icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
         title: titulo,
-        text: mensaje,
-        timer: 2500,
+        html: mensaje,
+        timer: tiempo || 2500 ,
         timerProgressBar: true,
         showConfirmButton: false,
         toast: true,

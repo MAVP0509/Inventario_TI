@@ -32,6 +32,40 @@ async function consultar_informacion() {
     let server = await server_rubro({ accion: 2 })
 
     datos = JSON.parse(respuesta).resultado
+    //* Idioma Español
+    Tabulator.extendModule("localize", "langs", {
+        "es": {
+            "pagination": {
+                "first": "Primera",
+                "first_title": "Primera página",
+                "last": "Última",
+                "last_title": "Última página",
+                "prev": "Anterior",
+                "prev_title": "Página anterior",
+                "next": "Siguiente",
+                "next_title": "Página siguiente",
+                "page_size": "Tamaño",
+
+            },
+            "headerFilters": {
+                "default": "Filtrar columna...",
+                "columns": {}
+            },
+            "groups": {
+                "item": "ítem",
+                "items": "ítems"
+            },
+            "ajax": {
+                "loading": "Cargando...",
+                "error": "Error al cargar datos"
+            },
+            "data": {
+                "loading": "Cargando datos...",
+                "error": "Error al cargar datos"
+            }
+        }
+    });
+
 
     // Inicializar cada fila con "seleccionado: false"
     datos.forEach(d => d.seleccionado = false);
@@ -58,16 +92,35 @@ async function consultar_informacion() {
         } else {
             seleccionados.splice(index, 1);
         }
-        console.log(seleccionados); // para depuración
+        //console.log(seleccionados); // para depuración
     }
 
     table = new Tabulator('#tbl', {
+        locale: "es",
         data: datos,
         layout: "fitColumns",              //fit columns to width of table
         pagination: "local",               //paginate the data
         paginationSize: 10,                //allow 10 rows per page of data
-        paginationCounter: "rows",         //display count of paginated rows in footer
+        paginationSizeSelector: [5, 10, 15, 20],
+        pagination: {
+            Anterior: "<i class='fa fa-arrow-left'></i>", // Ícono de flecha a la izquierda (anterior)
+            Siguiente: "<i class='fa fa-arrow-right'></i>", // Ícono de flecha a la derecha (siguiente)
+            Primera: "<i class='fa fa-fast-backward'></i>", // Ícono de salto al principio
+            Última: "<i class='fa fa-fast-forward'></i>", // Ícono de salto al final
+        },
+        paginationCounter: function (pageSize, currentRowStart, currentRowEnd, totalRows) {
+            return `Mostrando del ${currentRowStart} al ${pageSize} de ${totalRows} registros`;             //display count of paginated rows in footer
+        },
         movableColumns: true,              //allow column order to be changed
+        rowFormatter: function (row) {
+            data = row.getData()
+            if (data.seleccionado === true) {
+                row.getElement().classList.add("bg-primary")
+            } else if (data.seleccionado === false) {
+                row.getElement().classList.remove("bg-primary")
+            }
+        },
+        
         columns: [
             {
                 formatter: squareIcon, width: 70, hozAlign: "center",
@@ -79,8 +132,10 @@ async function consultar_informacion() {
                     seleccionar_rubros(rowData.id)
                 }, headerSort: false, frozen: true
             },
-            //{ title: "ID", field: "id" },
-            { title: "ID", formatter: function (cell) { return cell.getRow().getPosition(true); }, width: 45, hozAlign: "center", headerSort: false },
+
+            {
+                title: "ID", field: "id", width: 45, hozAlign: "center", headerSort: false
+            },
             {
                 title: "Rubro", field: "rubro", cellClick:
                     function (e, cell) {
@@ -149,7 +204,7 @@ function mdl_nuevo_rubro() {
     $("#mdl-rubro").modal('show');
 }
 
-async function nuevo_rubro(){
+async function nuevo_rubro() {
     let validados = ["rubro"]
 
     // Validar campos
@@ -160,12 +215,12 @@ async function nuevo_rubro(){
 
     let model = {
         accion: 0,
-        rubro : $('#rubro').val().trim()
+        rubro: $('#rubro').val().trim()
     }
 
     let server = await server_rubro(model)
     if (JSON.parse(respuesta).resultado) {
-        mostrar_toast('success', 'Rubro editado', 'El rubro ha sido editado exitosamente')
+        mostrar_toast('success', 'Rubro nuevo', 'El rubro ha sido agregado exitosamente')
     } else {
         mostrar_toast('error', 'Inventario TI', 'Error en la consulta')
         return;
@@ -178,30 +233,30 @@ async function nuevo_rubro(){
 async function mensaje_eliminar() {
 
     if (seleccionados.length === 0) {
-        mostrar_toast('warning', 'Inventario TI', 'Por favor, selecciona al menos un usuario para continuar')
-        
-    }else{
-        mostrar_alert('warning', `¿Está seguro de eliminar ${seleccionados.length} usuario(s)?`, false, eliminar_usuario);
+        mostrar_toast('warning', 'Inventario TI', 'Por favor, selecciona al menos un rubro para continuar')
+
+    } else {
+        mostrar_alert('warning', `¿Está seguro de eliminar ${seleccionados.length} rubro(s)?`, false, eliminar_rubro);
     }
 }
 
-async function eliminar_usuario(params) {
-        let model = {
-            accion : 3,
-            id : seleccionados
-        }
+async function eliminar_rubro(params) {
+    let model = {
+        accion: 3,
+        id: seleccionados
+    }
 
-        let response = await server_rubro(model);
-        
-        if (JSON.parse(respuesta).resultado) {
-            mostrar_toast('success', '¡Éxito!', 'Usuario(s) eliminado(s) correctamente')
+    let response = await server_rubro(model);
 
-            seleccionados = [];
-            consultar_informacion();
-        } else {
-            mostrar_toast('error', 'Error', 'Fallo al conectar');
-        }
-        
+    if (typeof JSON.parse(respuesta).resultado === "string") {
+        mostrar_toast('error', 'Error', JSON.parse(respuesta).resultado, 4000)
+    } else if (JSON.parse(respuesta).resultado) {
+        mostrar_toast('success', '¡Éxito!', 'Rubro(s) eliminado(s) correctamente')
+        consultar_informacion();
+    } else {
+        mostrar_toast('error', 'Error', 'Fallo al conectar');
+    }
+    deseleccionar_todos()
 }
 
 function validar_campos(campos) {
@@ -232,4 +287,16 @@ function validar_campos(campos) {
     });
 
     return valido;
+}
+
+
+function deseleccionar_todos() {
+    //  Resetear propiedad "seleccionado"
+    datos.forEach(d => d.seleccionado = false);
+
+    //  Limpiar el array de seleccionados
+    seleccionados = [];
+
+    //  Forzar re-renderizado de todas las filas para reflejar los íconos
+    table.getRows().forEach(row => row.reformat());
 }
