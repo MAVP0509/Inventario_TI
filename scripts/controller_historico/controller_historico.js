@@ -84,7 +84,11 @@ async function registrar_historico(num_serie, evento) {
 
 }
 
-/* function mostrar_modal_historial(historial) {
+async function mostrar_historico(params) {
+    
+}
+
+function mostrar_modal_historial(historial) {
     const contenedor = document.getElementById('contenedor-historial');
     contenedor.innerHTML = ''; // Limpiar contenido previo
 
@@ -130,7 +134,7 @@ async function registrar_historico(num_serie, evento) {
 
 async function obtenerDetallesInventario(num_serie) {
     const modal = {
-        accion: 2,
+        accion: 0,
         num_serie: num_serie
     }
 
@@ -143,5 +147,4 @@ async function obtenerDetallesInventario(num_serie) {
     } else {
         return 'No se encontraron detalles de inventario para este número de serie.';
     }
-} */
-
+} 

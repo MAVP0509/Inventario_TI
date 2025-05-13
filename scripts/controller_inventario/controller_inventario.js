@@ -12,7 +12,7 @@ function server_inventario(model) {
                 console.log(response);
                 try {
                     resolve(JSON.parse(response))
-                    console.log(resolve(JSON.parse(response)))
+                    //console.log(resolve(JSON.parse(response)))
                     respuesta = response
                 } catch (error) {
                     reject(error)
@@ -61,6 +61,10 @@ window.addEventListener('load', function () {
 })
 
 let datos = [];
+let elemento
+let table
+
+let seleccionar = [];
 
 async function consultar_informacion(params) {
     /* let usuarioLog = JSON.parse(sessionStorage.getItem('user'))
@@ -71,12 +75,55 @@ async function consultar_informacion(params) {
         accion: 2
     };
     
-    let datos = await server_inventario(model);
+    let server = await server_inventario(model);
+    datos = server.resultado
+
+    datos.forEach(d => d.seleccionado = false);
+
+    let squareIcon = function (cell, formatterParams, onRendered) {
+        const seleccionado = cell.getRow().getData().seleccionado;
+        const iconClass = seleccionado ? "fa-solid fa-square-check" : "fa-regular fa-square";
+        return `<button type='button' class='btn icon toggle-select'>
+                    <i class='${iconClass} fa-lg'></i>
+                </button>`;
+    }
+
+    let editIcon = function (cell, formatterParams, onRendered) {
+        return `<button type='button' class='btn btn-warning icon' onclick=''><i class='fa-solid fa-pen-to-square fa-lg'></i></button>`;
+    }
+
+    async function selecionar_registro(params) {
+
+        let index = seleccionar.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
+        if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
+            seleccionar.push(params); // Añade uno o más elementos al final de un array
+        } else {
+            seleccionar.splice(index, 1); 
+        } 
+        console.log(seleccionar)
+    }
 
     var table = new Tabulator("#tbl01", {
-        data: datos.resultado,
+        data: datos,
+        rowFormatter: function (row) {
+            data = row.getData()
+            if (data.seleccionado === true) {
+                row.getElement().classList.add("bg-primary")
+            } else if (data.seleccionado === false) {
+                row.getElement().classList.remove("bg-primary")
+            }
+        },
         columns: [
-            {title: "ID", field: "id"},
+            {
+                formatter: squareIcon, width: 70, hozAlign: "center",
+                cellClick: function (e, cell) {
+                    let rowData = cell.getRow().getData();
+                    rowData.seleccionado = !rowData.seleccionado;
+                    cell.getRow().reformat();
+                    selecionar_registro(rowData.id_equipo)
+                }, headerSort: false, frozen: true
+            },
+            {title: "ID", field: "id_equipo"},
             {title: "Zona", field: "zona"},
             {title: "Rubro", field: "rubro"},
             {title: "Activo fijo", field: "af"},
@@ -84,210 +131,28 @@ async function consultar_informacion(params) {
             {title: "Marca", field: "marca"},
             {title: "Modelo", field: "modelo"},
             {title: "Numero de serie", field: "num_serie"},
-            {title: "Ubicación", field: "ubicación"},
+            {title: "Ubicación", field: "ubicacion"},
             {title: "TAG", field: "tag"},
             {title: "Usuario", field: "usuario"},
             {title: "Cargo del usuario", field: "posicion"},
             {title: "Fecha de registro", field: "fecha_entrega"},
-            {title: "Editar"},
+            {title: "Editar",
+                formatter: editIcon, with: 60, hozAlign: "center",
+                cellClick: function (e, cell) {
+                    elemento = cell.getRow().getData();
+                    mostrar_registro(elemento);
+                },
+                headerSort: false, frozen: true
+            },
 
-        ]
+        ],
+        //layout: "fitColumns",
+        pagination: true,
+        paginationSize: 10,
+        paginationSizeSelector: [5, 10, 25, 35],
+        movableColumns: true,              //allow column order to be changed
+        
     });
-    //console.log(response);
-    //datos = response.resultado;
-
-    //let table = $('#tabla1').DataTable();
-    //table.destroy();
-        
-    /* try {
-        $("#tabla1").DataTable({
-            data: datos,
-            columns: [
-                {
-                    data: "id_equipo",
-                    render: function(data, type, row) {
-                        let control = `<div class="form-group form-check">
-                            <input type="checkbox" class="form-check-input form-control-lg"
-                            onclick="selecionar_registro(${data})" value="${data}" id="check${data}">
-                        </div>`
-                        return control;
-                    }
-                },
-                {
-                    data: "id_equipo",
-                    render: function(data, type, row, meta) {
-                        let control = `<label style="font-weight: normal; font-size: 12px; text-align: center;">${meta.row + 1}</label>`;
-                        return control;
-                    }
-                },
-                {
-                    data: "zona",
-                    render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
-                        //data ? data.replace(/_/g, '...') : "NA"
-                        return control;
-                    }
-                },
-                {
-                    data: "rubro",
-                    render: function(data, type, row) {
-                        if (type === 'display') {
-                            // Mostrar texto estilizado, truncado
-                            return `<label style="font-weight: normal; font-size: 12px;">${
-                                data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"
-                            }</label>`;
-                        } else if (type === 'filter' || type === 'sort') {
-                            // Devolver solo texto plano para búsqueda y ordenamiento
-                            return data || "NA";
-                        }
-                        return data;
-                    
-                    }, 
-                },
-                {
-                    data: "af",
-                    render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
-                        return control;
-                    }, 
-                },
-                {
-                    data: "tipo",
-                    render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
-                        return control;
-                    }, 
-                },
-                {
-                    data: "marca",
-                    render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
-                        return control;
-                    }, 
-                },
-                {
-                    data: "modelo",
-                    render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
-                        return control;
-                    }
-                },
-                {
-                    data: "num_serie",
-                    render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
-                        return control;
-                    }, 
-                },
-                {
-                    data: "ubicacion",
-                    render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
-                        return control;
-                    }, 
-                },
-                {
-                    data: "tag",
-                    render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
-                        return control;
-                    }, 
-                },
-                {
-                    data: "usuario",
-                    render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
-                        return control;
-                    }, 
-                },
-                {
-                    data: "posicion",
-                    render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
-                        return control;
-                    }, 
-                },
-                {
-                    data: "fecha_entrega",
-                    render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data ? (data.length > 20 ? data.substring(0, 20) + "..." : data) : "NA"}</label>`
-                        return control;
-                    }, 
-                },
-                {
-                    data: "id_equipo",
-                    render: function(data, type, row) {
-                        let control = `<div class="d-flex justify-content-center align-items-center">
-                                        <button type="button" style="text-align: center" class="btn btn-warning icon" id="${data}" value="${data}" onclick="mostrar_registro(this)">
-                                        <i class="fa-solid fa-pen-to-square fa-lg"></i></button></div>`
-                                        return control;
-                    }, //orderable: false
-                }
-            ],
-            dom: `
-                <'row mb-2'<'col-sm-4 text-left'f><'col-sm-8 text-right'<'btn-group'B>>>
-                <'row'<'col-sm-12 text-center'tr>>
-                <'row mt-2'<'col-sm-3'l><'col-sm-5 text-center'i><'col-sm-4 text-right'p>>
-            `,
-            language: {
-                url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json',
-                paginate: {
-                    first: '<i class="fas fa-angle-double-left"></i>',
-                    previous: '<i class="fas fa-angle-left"></i>',
-                    next: '<i class="fas fa-angle-right"></i>',
-                    last: '<i class="fas fa-angle-double-right"></i>'
-                },
-            },
-            select: {
-                style: 'multi', // Permite selecionar múltiples filas
-                selector: 'td:not(:first-child)' // Evita selecionar al hacer click en el checkbox (opcional)
-            },
-            rowCallback: function (row, data) {
-                $(row).on('click', function() {
-
-                    if ($(event.target).closest('.btn-warning.icon').length > 0) {
-                        return;
-                    }
-                    
-                    const checkbox = $(this).find('input[type="checkbox"]');
-                    const isChecked = checkbox.prop('checked');
-                    
-                    checkbox.prop('checked', !isChecked); // Alterna el estado del checkbox
-                    // Muestra la selección
-                    if (!isChecked) {
-                        $(this).attr('style', 'background-color: #d1ecf1; color: #0c5460;'); // Estilo para seleccionado
-                    } else {
-                        $(this).removeAttr('style'); // Deselecionar
-                    }
-                    selecionar_registro(data.id_equipo); // Llama a la función para manejar la selección
-                });
-            },
-            stateSave: true,
-            resposive: true,
-            //autoWidth: false,
-            scrollX: true,
-        });
-
-        // Re-asigna evento de búsqueda global
-        $('.dataTables_filter input').off().on('input', function () {
-            const searchValue = this.value.trim();
-            if (searchValue === '') {
-                table.search('').draw();
-                return;
-            }
-        
-            const terms = searchValue.split(',').map(term =>
-                term.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-            ).filter(term => term !== '');
-        
-            const regex = terms.join('|');
-            table.search(regex, true, false).draw();
-        });
-
-        
-    } catch (error) {
-        console.log(error)
-    } */
 
 }
 
@@ -473,18 +338,7 @@ async function editar_registro(params) {
     
 }
 
-let seleccionar = [];
 
-async function selecionar_registro(params) {
-
-    let index = seleccionar.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
-    if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
-        seleccionar.push(params); // Añade uno o más elementos al final de un array
-    } else {
-        seleccionar.splice(index, 1); 
-    } 
-    console.log(seleccionar)
-}
 
 /* async function desactivar_registro(params) {
     let model = {
