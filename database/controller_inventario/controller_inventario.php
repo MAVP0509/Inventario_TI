@@ -126,36 +126,40 @@ function consultar_datos() {
 function desactivar_datos($valores) {
     include("../conexion.php");
     //var_dump($valores);
-    $series = [];
+    
     if (is_array($valores->id)) { // Verifica si $valores->id es un array
+        
         $ids = implode(",", array_map('intval', $valores->id)); // Convierte el array de IDs en una lista separada por comas
         
-        $sql2 = "SELECT num_serie FROM inventario_ti_sur WHERE id IN ($ids)";
-        $query2 = mysqli_query($con, $sql2);
-        $series = [];
-        while ($fila = mysqli_fetch_assoc($query2)) {
-            $series[] = $fila['num_serie'];
-        
-        }
-        $sql = "UPDATE inventario_ti_sur SET habilitado = 0 WHERE id IN ($ids);"; // Consulta sql usando IN para eliminar múltiples registros
-        //echo $sql;
-        //For con los ids
-        //
-        //var_dump($sql);
+        $sql_num = "SELECT num_serie FROM inventario_ti_sur WHERE id IN ($ids)";
+        $query_num = mysqli_query($con, $sql_num);
 
-        return mysqli_query($con, $sql);
+        $num_series = [];
+        while ($fila = mysqli_fetch_object($query_num)) {
+             array_push($num_series,$fila->num_serie);
+        }
+
+        $sql = "UPDATE inventario_ti_sur SET habilitado = 0 WHERE id IN ($ids);"; // Consulta sql usando IN para eliminar múltiples registros
+         mysqli_query($con, $sql);
+        return $num_series;
         
     } else {
-        $sql2 = "SELECT num_serie FROM inventario_ti_sur WHERE id = '$valores->id'";
-        $query2 = mysqli_query($con, $sql2);
-        $series[] = mysqli_fetch_assoc($query2)['num_serie'];
         
         $sql = "UPDATE inventario_ti_sur SET habilitado = 0 where id='$valores->id';";
-        
-        return mysqli_query($con, $sql);
+        mysqli_query($con, $sql);
+
+        $sql_num2 = "SELECT num_serie FROM inventario_ti_sur WHERE id = '$valores->id'";
+        $query_num2 = mysqli_query($con, $sql_num2);
+
+        $num_series = [];
+        while ($fila = mysqli_fetch_object($query_num2)) {
+             array_push($num_series,$fila->num_serie);
+        }
+        return $num_series;
     }
 
-}
+}  
+
 
 function consultar_para_resguardo($valores) {
     include("../conexion.php");

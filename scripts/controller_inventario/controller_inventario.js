@@ -71,14 +71,35 @@ async function consultar_informacion(params) {
         accion: 2
     };
     
-    let response = await server_inventario(model);
-    //console.log(response);
-    datos = response.resultado;
+    let datos = await server_inventario(model);
 
-    let table = $('#tabla1').DataTable();
-    table.destroy();
+    var table = new Tabulator("#tbl01", {
+        data: datos.resultado,
+        columns: [
+            {title: "ID", field: "id"},
+            {title: "Zona", field: "zona"},
+            {title: "Rubro", field: "rubro"},
+            {title: "Activo fijo", field: "af"},
+            {title: "Tipo de dispositivo", field: "tipo"},
+            {title: "Marca", field: "marca"},
+            {title: "Modelo", field: "modelo"},
+            {title: "Numero de serie", field: "num_serie"},
+            {title: "Ubicación", field: "ubicación"},
+            {title: "TAG", field: "tag"},
+            {title: "Usuario", field: "usuario"},
+            {title: "Cargo del usuario", field: "posicion"},
+            {title: "Fecha de registro", field: "fecha_entrega"},
+            {title: "Editar"},
+
+        ]
+    });
+    //console.log(response);
+    //datos = response.resultado;
+
+    //let table = $('#tabla1').DataTable();
+    //table.destroy();
         
-    try {
+    /* try {
         $("#tabla1").DataTable({
             data: datos,
             columns: [
@@ -241,38 +262,10 @@ async function consultar_informacion(params) {
                     selecionar_registro(data.id_equipo); // Llama a la función para manejar la selección
                 });
             },
-            buttons: [
-                {
-                    html: `<button type="button" onclick="resguardo()" class="btn btn-info icon rounded mr-3" style="margin-left: 10px;" href="#" ><i class="fa-solid fa-file-export fa-lg"></i> Resguardo</button>`,
-                },
-                {
-                    html: `<div>
-                            <button type="button" class="btn btn-success rounded mr-3 icon" onclick="limpiar_campos()" >
-                            <i class="fa-solid fa-plus fa-lg"></i> Crear Registro</button>
-                        </div>`
-                },
-                {
-                    html: `<div>
-                            <button type="button" style="text-align: center" class="btn btn-danger rounded icon" onclick="confirmar_eliminacion()" >
-                            <i class="fa-solid fa-trash-can fa-lg"></i> Eliminar Registro</button>
-                        </div>`
-                },
-                {
-                    html: `<div>
-                            <button type="button" class="btn btn-light rounded mr-3 icon" onclick="">
-                            <i class="fa-solid fa-clock-rotate-left"></i> Historial</button>
-                        </div>`
-                },
-                
-            ],
             stateSave: true,
             resposive: true,
             //autoWidth: false,
             scrollX: true,
-            //serverSide: false,
-            /* fixedColumns: {
-                right: 1
-            }, */
         });
 
         // Re-asigna evento de búsqueda global
@@ -294,7 +287,7 @@ async function consultar_informacion(params) {
         
     } catch (error) {
         console.log(error)
-    }
+    } */
 
 }
 
@@ -490,14 +483,14 @@ async function selecionar_registro(params) {
     } else {
         seleccionar.splice(index, 1); 
     } 
-    //console.log(seleccionar)
+    console.log(seleccionar)
 }
 
-async function desactivar_registro(params) {
+/* async function desactivar_registro(params) {
     let model = {
         accion: 3,
         id: seleccionar,
-        //num_serie_: num_serie
+        //num_serie_: series
     }
    //console.log(model)
 
@@ -505,9 +498,12 @@ async function desactivar_registro(params) {
     //console.log(response);
     
         if (response.resultado === true) {
-            response.series.forEach(async (serie) => {
-                await registrar_historico(serie, 'Eliminación de registro');
-            });
+            let num_series = response.num_series;
+            for (let num_serie of num_series) {
+                await registrar_historico(num_serie, 'Eliminación de registro');
+            }
+                
+
             mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
             //seleccionar = []
             let table = $('#tabla1').DataTable();
@@ -517,8 +513,25 @@ async function desactivar_registro(params) {
         } else {
             mostrar_alerta('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
         }
-}
+} */
+async function desactivar_registro() {
+    let model = {
+        accion: 3,
+        id: seleccionar, // IDs seleccionados
+    };
 
+    let response = await server_inventario(model);
+    console.log(response)
+    if (Array.isArray(response.resultado)) {
+        await registrar_historico(response.resultado, 'Eliminación de registro');
+        mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
+        let table = $('#tabla1').DataTable();
+        table.destroy();
+        consultar_informacion();
+    } else {
+        mostrar_alerta('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
+    }
+}
 /* async function eliminar_registro(params) {
     let response = await server_inventario({ accion: 4, id: id });
         if (response.resultado === true) {

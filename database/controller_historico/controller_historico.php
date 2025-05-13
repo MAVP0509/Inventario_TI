@@ -20,10 +20,19 @@ function registrar_historico($valores)
     include("../conexion.php");
 
     $fecha_evento = date("Y:m:d H:i:s");
-    $sql = "INSERT INTO historico(fecha_evento, usuario, evento, num_serie) VALUES ('$fecha_evento', '$valores->usuario', '$valores->evento', '$valores->num_serie')";
-    $query = mysqli_query($con, $sql);
-    //var_dump($query);
-    return $query;
+
+    if (is_array($valores->num_serie)) {
+        foreach ($valores->num_serie as $num_serie) {
+            $sql = "INSERT INTO historico(fecha_evento, usuario, evento, num_serie) VALUES ('$fecha_evento', '$valores->usuario', '$valores->evento', '$num_serie')";
+            mysqli_query($con, $sql);
+        }
+        return true;
+    } else {
+        $sql = "INSERT INTO historico(fecha_evento, usuario, evento, num_serie) VALUES ('$fecha_evento', '$valores->usuario', '$valores->evento', '$valores->num_serie')";
+        $query = mysqli_query($con, $sql);
+        //var_dump($query);
+        return $query;
+    }
 }
 
 
@@ -44,7 +53,7 @@ function consultar_historico()
                 historico AS hst
                 INNER JOIN inventario_ti_sur AS ITS ON hst.num_serie = ITS.num_serie
                 INNER JOIN cat_tipo AS CT ON CT.id = ITS.fk_tipo";
-           /*  WHERE 
+    /*  WHERE 
                 hst.num_serie = ITS.num_serie"; */
 
     $query = mysqli_query($con, $sql);

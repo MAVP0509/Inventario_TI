@@ -54,7 +54,7 @@ async function consultar_historico() {
 
     let datos = await server_historico(model);
 
-    var table = new Tabulator("#tbl01", {
+    var table = new Tabulator("#tbl02", {
         data: datos.resultado,
         columns: [
             {title: "Id", field: "id"},
