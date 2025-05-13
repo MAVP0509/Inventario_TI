@@ -36,13 +36,13 @@ async function consultar_informacion(){
     Tabulator.extendModule("localize", "langs", {
         "es": {
             "pagination": {
-                "first": "Primera",
+                "first": '<i class="fa-solid fa-angles-right fa-flip-horizontal"></i>',
                 "first_title": "Primera página",
-                "last": "Última",
+                "last": '<i class="fa-solid fa-angles-right"></i>',
                 "last_title": "Última página",
-                "prev": "Anterior",
+                "prev": '<i class="fa-solid fa-angle-right fa-flip-horizontal"></i>',
                 "prev_title": "Página anterior",
-                "next": "Siguiente",
+                "next": '<i class="fa-solid fa-angle-right"></i>',
                 "next_title": "Página siguiente",
                 "page_size": "Tamaño",
 
@@ -94,7 +94,7 @@ async function consultar_informacion(){
         //console.log(seleccionados); // para depuración
     }
 
-    let table = new Tabulator('#tbl', {
+     table = new Tabulator('#tbl', {
          locale: "es",
         data: datos,
         layout: "fitColumns",              //fit columns to width of table
@@ -113,6 +113,7 @@ async function consultar_informacion(){
                 row.getElement().classList.remove("bg-primary")
             }
         },
+        paginationButtonCount:3,
         columns:[
             {
                 formatter: squareIcon, width: 70, hozAlign: "center",
@@ -136,10 +137,48 @@ async function consultar_informacion(){
                 formatter: editIcon, width: 60, hozAlign: "center",
                 cellClick: function (e, cell) {
                     elemento = cell.getRow().getData();
-                    //mdl_editar_rubro(elemento);
+                    mdl_editar_tipo(elemento);
                 },
                 headerSort: false, frozen: true
             },
         ],
     })
+}
+
+let datoSelected = ""
+function mdl_editar_tipo(params) {
+    for (let i = 0; i < datos.length; i++) {
+        let element = datos[i]
+
+        if (element.id === params.id) {
+            datoSelected = element
+            break;
+        }
+    }
+
+    document.getElementById('mdl-title').textContent = "Editar Tipo"
+    document.getElementById('tipo').value = datoSelected.tipo
+    document.getElementById('mdl-btn-conf').onclick = function () { editar_tipo() }
+
+    $("#mdl-tipo").modal('show');
+}
+
+async function editar_tipo() {
+    let model = {
+        accion: 1,
+        id: datoSelected.id,
+        tipo: $('#tipo').val().trim(),
+    }
+
+    let server = await server_tipo(model)
+
+    if (JSON.parse(respuesta).resultado) {
+        mostrar_toast('success', 'Tipo editado', 'El tipo ha sido editado exitosamente')
+    } else {
+        mostrar_toast('error', 'Inventario TI', 'Error en la consulta')
+        return;
+    }
+    datoSelected = ""
+    table.updateData([{ id: elemento.id, tipo: model.tipo }]);
+    $("#mdl-tipo").modal('hide')
 }

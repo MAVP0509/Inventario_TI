@@ -36,13 +36,13 @@ async function consultar_informacion() {
     Tabulator.extendModule("localize", "langs", {
         "es": {
             "pagination": {
-                "first": "Primera",
+                "first": '<i class="fa-solid fa-angles-right fa-flip-horizontal"></i>',
                 "first_title": "Primera página",
-                "last": "Última",
+                "last": '<i class="fa-solid fa-angles-right"></i>',
                 "last_title": "Última página",
-                "prev": "Anterior",
+                "prev": '<i class="fa-solid fa-angle-right fa-flip-horizontal"></i>',
                 "prev_title": "Página anterior",
-                "next": "Siguiente",
+                "next": '<i class="fa-solid fa-angle-right"></i>',
                 "next_title": "Página siguiente",
                 "page_size": "Tamaño",
 
@@ -99,15 +99,9 @@ async function consultar_informacion() {
         locale: "es",
         data: datos,
         layout: "fitColumns",              //fit columns to width of table
-        pagination: "local",               //paginate the data
+        pagination: true,               //paginate the data
         paginationSize: 10,                //allow 10 rows per page of data
         paginationSizeSelector: [5, 10, 15, 20],
-        pagination: {
-            Anterior: "<i class='fa fa-arrow-left'></i>", // Ícono de flecha a la izquierda (anterior)
-            Siguiente: "<i class='fa fa-arrow-right'></i>", // Ícono de flecha a la derecha (siguiente)
-            Primera: "<i class='fa fa-fast-backward'></i>", // Ícono de salto al principio
-            Última: "<i class='fa fa-fast-forward'></i>", // Ícono de salto al final
-        },
         paginationCounter: function (pageSize, currentRowStart, currentRowEnd, totalRows) {
             return `Mostrando del ${currentRowStart} al ${pageSize} de ${totalRows} registros`;             //display count of paginated rows in footer
         },
@@ -120,7 +114,7 @@ async function consultar_informacion() {
                 row.getElement().classList.remove("bg-primary")
             }
         },
-        
+        paginationButtonCount:3,
         columns: [
             {
                 formatter: squareIcon, width: 70, hozAlign: "center",
