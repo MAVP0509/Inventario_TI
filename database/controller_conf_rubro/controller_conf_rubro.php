@@ -29,7 +29,7 @@ function insertar_rubro($valores)
 
     $sql_val_rubro = "SELECT * FROM cat_rubro WHERE rubro = '$valores->rubro'";
     if (mysqli_query($con, $sql_val_rubro)->num_rows > 0) {
-        return false;
+        return "Este rubro ya existe";
     } else {
         return mysqli_query($con, $sql);
     }

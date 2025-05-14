@@ -14,6 +14,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = editar_tipo($clientejson);
 } elseif ($clientejson->accion == 2) {
     $respuesta_servidor->resultado = consultar_tipo($clientejson);
+} elseif ($clientejson->accion == 3) {
+    $respuesta_servidor->resultado = eliminar_tipo($clientejson);
 }
 
 print(json_encode($respuesta_servidor)); //? envía la respuesta de la base de datos a javascript

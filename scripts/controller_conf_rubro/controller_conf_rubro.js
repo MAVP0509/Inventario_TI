@@ -102,8 +102,10 @@ async function consultar_informacion() {
         pagination: true,               //paginate the data
         paginationSize: 10,                //allow 10 rows per page of data
         paginationSizeSelector: [5, 10, 15, 20],
-        paginationCounter: function (pageSize, currentRowStart, currentRowEnd, totalRows) {
-            return `Mostrando del ${currentRowStart} al ${pageSize} de ${totalRows} registros`;             //display count of paginated rows in footer
+        paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
+            const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
+             const end = Math.min(currentRowStart + pageSize - 1, totalRows);
+            return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
         },
         movableColumns: true,              //allow column order to be changed
         rowFormatter: function (row) {
@@ -114,7 +116,7 @@ async function consultar_informacion() {
                 row.getElement().classList.remove("bg-primary")
             }
         },
-        paginationButtonCount:3,
+        paginationButtonCount: 3,
         columns: [
             {
                 formatter: squareIcon, width: 70, hozAlign: "center",
@@ -152,6 +154,7 @@ async function consultar_informacion() {
 }
 
 let datoSelected = ""
+selected = false
 function mdl_editar_rubro(params) {
     for (let i = 0; i < datos.length; i++) {
         let element = datos[i]
@@ -162,12 +165,32 @@ function mdl_editar_rubro(params) {
         }
     }
 
+    document.getElementById('alert-edit-rubro').style.display = 'block'
     document.getElementById('mdl-title').textContent = "Editar Rubro"
     document.getElementById('rubro').value = datoSelected.rubro
     document.getElementById('mdl-btn-conf').onclick = function () { editar_rubro() }
+    document.getElementById('mdl-btn-conf').disabled = true
+
 
     $("#mdl-rubro").modal('show');
 }
+
+$("#check-editar").on('click', function () {
+    selected = !selected;
+
+    // Cambiar el ícono del checkbox
+    let check = $("#check-editar-icon");
+    if (selected) {
+        check.removeClass("fa-regular fa-square");
+        check.addClass("fa-solid fa-square-check");
+    } else {
+        check.removeClass("fa-solid fa-square-check");
+        check.addClass("fa-regular fa-square ");
+    }
+
+    // Habilitar o deshabilitar el botón dependiendo de "selected"
+    document.getElementById('mdl-btn-conf').disabled = !selected;
+});
 
 async function editar_rubro() {
     let model = {
@@ -188,13 +211,21 @@ async function editar_rubro() {
     table.updateData([{ id: elemento.id, rubro: model.rubro }]);
     $("#mdl-rubro").modal('hide')
 }
+//*Cada que se cierre el modal se reseteará el checkbox
+$('#mdl-rubro').on('hidden.bs.modal', function () {
+    // Limpiar y restaurar el ícono
+    $("#check-editar-icon").removeClass();
+    $("#check-editar-icon").addClass("fa-regular fa-square fa-lg");
+    selected = false
+});
 
 function mdl_nuevo_rubro() {
     document.getElementById('mdl-title').textContent = "Nuevo Rubro"
     document.getElementById('rubro').value = ""
     document.getElementById('rubro').placeholder = "Nuevo rubro"
     document.getElementById('mdl-btn-conf').onclick = function () { nuevo_rubro() }
-
+    document.getElementById('mdl-btn-conf').disabled = false
+    document.getElementById('alert-edit-rubro').setAttribute('style', 'display: none !important;  background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;');
     $("#mdl-rubro").modal('show');
 }
 
@@ -213,11 +244,12 @@ async function nuevo_rubro() {
     }
 
     let server = await server_rubro(model)
-    if (JSON.parse(respuesta).resultado) {
-        mostrar_toast('success', 'Rubro nuevo', 'El rubro ha sido agregado exitosamente')
+    if (typeof server.resultado === "string") {
+        mostrar_toast('warning', 'Advertencia', server.resultado)
+        return
     } else {
-        mostrar_toast('error', 'Inventario TI', 'Error en la consulta')
-        return;
+        mostrar_toast('success', 'Nuevo rubro', 'El rubro ha sido agregado')
+
     }
 
     consultar_informacion()

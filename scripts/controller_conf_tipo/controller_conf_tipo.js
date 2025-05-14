@@ -101,9 +101,11 @@ async function consultar_informacion(){
         pagination: "local",               //paginate the data
         paginationSize: 10,                //allow 10 rows per page of data
         paginationSizeSelector: [5, 10, 15, 20],
-        paginationCounter: function (pageSize, currentRowStart, currentRowEnd, totalRows) {
-            return `Mostrando del ${currentRowStart} al ${pageSize} de ${totalRows} registros`;             //display count of paginated rows in footer
-            },         
+        paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
+            const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
+             const end = Math.min(currentRowStart + pageSize - 1, totalRows);
+            return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
+        },         
         movableColumns: true,              //allow column order to be changed
         rowFormatter: function (row) {
             data = row.getData()
