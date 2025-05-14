@@ -76,7 +76,7 @@ function editar_datos($valores)
     if ($tipo === true) {
         $val_tipo = $valores->tipo;
     } else {
-        $sql_tipo = "INSERT INTO cat_tipo(rubro) VALUES ('$tipo');";
+        $sql_tipo = "INSERT INTO cat_tipo(tipo) VALUES ('$tipo');";
         mysqli_query($con, $sql_tipo);
         $sql_ver_id_tipo = "SELECT id FROM cat_tipo WHERE tipo = '$tipo';";
         $idTip = mysqli_fetch_assoc(mysqli_query($con, $sql_ver_id_tipo));
@@ -110,7 +110,7 @@ function editar_datos($valores)
     } */
 
     $sql = "UPDATE inventario_ti_sur SET zona = '$valores->zona', fk_rubro = '$val_rubro', af = '$valores->af', fk_tipo ='$val_tipo', fk_marca = '$val_marca', 
-    num_serie = '$valores->num_serie', ubicacion = '$valores->ubicacion', tag = '$valores->tag', fk_usuario = '$valores->usuario', fecha_entrega = '$valores->fecha_entrega' WHERE id = '$valores->id';";
+    num_serie = '$valores->num_serie', ubicacion = '$valores->ubicacion', tag = '$valores->tag', fk_usuario = '$valores->usuario', fecha_entrega = '$valores->fecha_entrega' WHERE id = '$valores->id_equipo';";
     //var_dump($sql);
     $result = mysqli_query($con, $sql);
     return $result;
