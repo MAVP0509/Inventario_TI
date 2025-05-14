@@ -21,7 +21,7 @@ function server_historico(model) {
     });
 }
 
-function server_inventario(model) {
+function server_inventario02(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
@@ -93,7 +93,7 @@ async function mostrar_historial() {
 
     const validacion = ["his-num-serie"];
 
-    if (!validar_campos(validacion)) {
+    if (!validar_campo(validacion)) {
         mostrar_alerta('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
         return;
     }
@@ -138,7 +138,7 @@ async function mostrar_historial() {
     }
 }
 
-function validar_campos(campos) {
+function validar_campo(campos) {
     let valido = true;
 
     campos.forEach(id => {

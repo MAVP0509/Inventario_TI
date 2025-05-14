@@ -1,6 +1,6 @@
 <?php
 
-header('Content_Type: text/html; charset=UTF-8');
+header('Content-Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
 
 $clientejson = json_decode($_POST['trama']);
@@ -110,7 +110,7 @@ function editar_datos($valores)
     } */
 
     $sql = "UPDATE inventario_ti_sur SET zona = '$valores->zona', fk_rubro = '$val_rubro', af = '$valores->af', fk_tipo ='$val_tipo', fk_marca = '$val_marca', 
-    num_serie = '$valores->num_serie', ubicacion = '$valores->ubicacion', tag = '$valores->tag', fk_usuario = '$valores->usuario', fecha_entrega = '$valores->fecha_entrega' WHERE id = '$valores->id_equipo';";
+    num_serie = '$valores->num_serie', ubicacion = '$valores->ubicacion', tag = '$valores->tag', fk_usuario = '$valores->usuario', fecha_entrega = '$valores->fecha_entrega' WHERE id = '$valores->id';";
     //var_dump($sql);
     $result = mysqli_query($con, $sql);
     return $result;
@@ -294,3 +294,4 @@ function verificar_nuevos_id($valor)
         return $nuevo_rubro;
     }
 }
+?>

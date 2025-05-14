@@ -8,7 +8,7 @@ function server_inventario(model) {
             data: {
                 trama: JSON.stringify(model)
             },
-            success: function(response) {
+            success: function (response) {
                 console.log(response);
                 try {
                     resolve(JSON.parse(response))
@@ -31,7 +31,7 @@ function server_excel(model) {
             data: {
                 trama: JSON.stringify(model)
             },
-            success: function(response) {
+            success: function (response) {
                 try {
                     resolve(JSON.parse(response))
                     Swal.close()
@@ -48,7 +48,7 @@ function server_excel(model) {
 window.addEventListener('load', function () {
     // Leemos el mensaje del registro desde localStorage
     const mensajeRegistro = sessionStorage.getItem('bienvenido');
-    
+
     if (mensajeRegistro) {
         // Si el mensaje existe, mostramos el toast
         mostrar_alerta('success', 'Bienvenido', mensajeRegistro);
@@ -70,11 +70,11 @@ async function consultar_informacion(params) {
     /* let usuarioLog = JSON.parse(sessionStorage.getItem('user'))
     let user = document.getElementById('user')
     user.textContent = usuarioLog.resultado[0] */
-    
+
     let model = {
         accion: 2
     };
-    
+
     let server = await server_inventario(model);
     datos = server.resultado
 
@@ -98,71 +98,76 @@ async function consultar_informacion(params) {
         if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
             seleccionar.push(params); // Añade uno o más elementos al final de un array
         } else {
-            seleccionar.splice(index, 1); 
-        } 
-        console.log(seleccionar)
+            seleccionar.splice(index, 1);
+        }
+        //console.log(seleccionar)
     }
 
-    var table = new Tabulator("#tbl01", {
-        data: datos,
-        rowFormatter: function (row) {
-            data = row.getData()
-            if (data.seleccionado === true) {
-                row.getElement().classList.add("bg-primary")
-            } else if (data.seleccionado === false) {
-                row.getElement().classList.remove("bg-primary")
-            }
-        },
-        columns: [
-            {
-                formatter: squareIcon, width: 70, hozAlign: "center",
-                cellClick: function (e, cell) {
-                    let rowData = cell.getRow().getData();
-                    rowData.seleccionado = !rowData.seleccionado;
-                    cell.getRow().reformat();
-                    selecionar_registro(rowData.id_equipo)
-                }, headerSort: false, frozen: true
+    try {
+        var table = new Tabulator("#tbl01", {
+            data: datos,
+            rowFormatter: function (row) {
+                data = row.getData()
+                if (data.seleccionado === true) {
+                    row.getElement().classList.add("bg-primary")
+                } else if (data.seleccionado === false) {
+                    row.getElement().classList.remove("bg-primary")
+                }
             },
-            {title: "ID", field: "id_equipo"},
-            {title: "Zona", field: "zona"},
-            {title: "Rubro", field: "rubro"},
-            {title: "Activo fijo", field: "af"},
-            {title: "Tipo de dispositivo", field: "tipo"},
-            {title: "Marca", field: "marca"},
-            {title: "Modelo", field: "modelo"},
-            {title: "Numero de serie", field: "num_serie"},
-            {title: "Ubicación", field: "ubicacion"},
-            {title: "TAG", field: "tag"},
-            {title: "Usuario", field: "usuario"},
-            {title: "Cargo del usuario", field: "posicion"},
-            {title: "Fecha de registro", field: "fecha_entrega"},
-            {title: "Editar",
-                formatter: editIcon, width: 60, hozAlign: "center",
-                cellClick: function (e, cell) {
-                    elemento = cell.getRow().getData();
-                    mostrar_registro(elemento);
+            columns: [
+                {
+                    formatter: squareIcon, width: 70, hozAlign: "center",
+                    cellClick: function (e, cell) {
+                        let rowData = cell.getRow().getData();
+                        rowData.seleccionado = !rowData.seleccionado;
+                        cell.getRow().reformat();
+                        selecionar_registro(rowData.id_equipo)
+                    }, headerSort: false, frozen: true
                 },
-                headerSort: false, frozen: true
-            },
+                { title: "ID", field: "id_equipo" },
+                { title: "Zona", field: "zona" },
+                { title: "Rubro", field: "rubro" },
+                { title: "Activo fijo", field: "af" },
+                { title: "Tipo de dispositivo", field: "tipo" },
+                { title: "Marca", field: "marca" },
+                { title: "Modelo", field: "modelo" },
+                { title: "Numero de serie", field: "num_serie" },
+                { title: "Ubicación", field: "ubicacion" },
+                { title: "TAG", field: "tag" },
+                { title: "Usuario", field: "usuario" },
+                { title: "Cargo del usuario", field: "posicion" },
+                { title: "Fecha de registro", field: "fecha_entrega" },
+                {
+                    title: "Editar",
+                    formatter: editIcon, width: 60, hozAlign: "center",
+                    cellClick: function (e, cell) {
+                        elemento = cell.getRow().getData();
+                        mostrar_registro(elemento);
+                    },
+                    headerSort: false, frozen: true
+                },
 
-        ],
-        //layout: "fitColumns",
-        pagination: true,
-        paginationSize: 10,
-        paginationSizeSelector: [5, 10, 25, 35],
-        movableColumns: true,              //allow column order to be changed
-        
-    });
+            ],
+            //layout: "fitColumns",
+            pagination: true,
+            paginationSize: 10,
+            paginationSizeSelector: [5, 10, 25, 35],
+            movableColumns: true,              //allow column order to be changed
+
+        });
+    } catch (error) {
+        console.log(error)
+    }
 
 }
 
 
-let selecreg ="";
+let selecreg = "";
 
 async function mostrar_registro(params) {
     for (let i = 0; i < datos.length; i++) {
         const element = datos[i];
-        if(element.id_equipo===params.value){
+        if (element.id_equipo === params.value) {
             selecreg = element;
             console.log(selecreg)
             break;
@@ -177,7 +182,7 @@ async function mostrar_registro(params) {
         dropdownParent: '#modal-editar',
         tags: true
     })
-    
+
     await general_select2({
         selectId: 'edi-tipo',
         tabla: 'cat_tipo',
@@ -195,7 +200,7 @@ async function mostrar_registro(params) {
         dropdownParent: '#modal-editar',
         tags: true
     })
-    
+
     await general_select2({
         selectId: 'edi-usuario',
         tabla: 'cat_usuarios',
@@ -211,20 +216,20 @@ async function mostrar_registro(params) {
         dropdownParent: '#modal-editar',
         tags: true,
     }) */
-        document.getElementById("edi-zona").value = selecreg.zona;
-        rellenar_select(selecreg.rubro,"edi-rubro")
-        document.getElementById("edi-af").value = selecreg.af;
-        rellenar_select(selecreg.tipo,"edi-tipo")
-        rellenar_select(selecreg.marca,"edi-marca")
-        document.getElementById("edi-modelo").value = selecreg.modelo;
-        document.getElementById("edi-num-serie").value = selecreg.num_serie;
-        document.getElementById("edi-ubicacion").value = selecreg.ubicacion;
-        document.getElementById("edi-tag").value = selecreg.tag;
-        rellenar_select(selecreg.usuario,"edi-usuario")
-        //rellenar_select(selecreg.posicion,"edi-posicion")
-        document.getElementById("edi-fecha-entrega").value = selecreg.fecha_entrega;
+    document.getElementById("edi-zona").value = selecreg.zona;
+    rellenar_select(selecreg.rubro, "edi-rubro")
+    document.getElementById("edi-af").value = selecreg.af;
+    rellenar_select(selecreg.tipo, "edi-tipo")
+    rellenar_select(selecreg.marca, "edi-marca")
+    document.getElementById("edi-modelo").value = selecreg.modelo;
+    document.getElementById("edi-num-serie").value = selecreg.num_serie;
+    document.getElementById("edi-ubicacion").value = selecreg.ubicacion;
+    document.getElementById("edi-tag").value = selecreg.tag;
+    rellenar_select(selecreg.usuario, "edi-usuario")
+    //rellenar_select(selecreg.posicion,"edi-posicion")
+    document.getElementById("edi-fecha-entrega").value = selecreg.fecha_entrega;
 
-        $("#modal-editar").modal("show");
+    $("#modal-editar").modal("show");
 
 }
 
@@ -292,7 +297,7 @@ async function crear_registro() {
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo crear el registro. Inténtalo nuevamente.');
     }
-    
+
 
 }
 
@@ -333,9 +338,9 @@ async function editar_registro(params) {
         mostrar_alerta('error', 'Error', 'No se pudo editar el registro. Inténtalo nuevamente.');
     }
 
-        consultar_informacion();
-        $("modal-editar").modal("hide");
-    
+    consultar_informacion();
+    $("modal-editar").modal("hide");
+
 }
 
 
@@ -397,7 +402,7 @@ async function desactivar_registro() {
         }
 } */
 
-        //TODO: Validación de funciones
+//TODO: Validación de funciones
 
 
 
@@ -483,13 +488,13 @@ function validar_campos(campos) {
     return valido;
 }
 
-function limpiar_campos(){
+function limpiar_campos() {
     let inputs = document.getElementsByName('mdl-reg');
     for (let i = 0; i < inputs.length; i++) {
         inputs[i].value = ""; // Limpia el valor del input
         inputs[i].classList.remove('is-invalid'); // Elimina la clase de validación
     }
-    
+
     $('.select').each(function () {
         $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
         $(this).removeClass('is-invalid'); // Elimina la clase de validación
@@ -502,8 +507,8 @@ function limpiar_campos(){
         placeholder: 'Seleciona un rubro',
         dropdownParent: '#modal-registro',
         tags: true
-      });
-    
+    });
+
     general_select2({
         selectId: 'inp-tipo',
         tabla: 'cat_tipo',
@@ -511,7 +516,7 @@ function limpiar_campos(){
         placeholder: 'Seleciona un tipo',
         dropdownParent: '#modal-registro',
         tags: true
-      });
+    });
 
     general_select2({
         selectId: 'inp-marca',
@@ -553,72 +558,72 @@ function mostrar_alerta(tipo, titulo, mensaje) {
 }
 
 //TODO: Configuración del select2
- /*  $(document).ready(function() {
-    $(".select").each(function() { //recorre cada <select class="select">
-      const $select = $(this);
-  
-      // Encuentra el modal contenedor más cercano
-      const $modal = $select.closest('.modal'); //
-  
-      $select.select2({
-        theme: 'bootstrap4',
-        placeholder: "Selecciona un rubro",
-        allowClear: true,
-        tags: true,
-        dropdownParent: $modal.length ? $modal : $(document.body) // por si no está en modal
-      });
-    });
-  }); */
-  
-  //TODO Funciones de los Select2
+/*  $(document).ready(function() {
+   $(".select").each(function() { //recorre cada <select class="select">
+     const $select = $(this);
+ 
+     // Encuentra el modal contenedor más cercano
+     const $modal = $select.closest('.modal'); //
+ 
+     $select.select2({
+       theme: 'bootstrap4',
+       placeholder: "Selecciona un rubro",
+       allowClear: true,
+       tags: true,
+       dropdownParent: $modal.length ? $modal : $(document.body) // por si no está en modal
+     });
+   });
+ }); */
 
-  async function general_select2({selectId, tabla, campo, placeholder, dropdownParent, tags}){
+//TODO Funciones de los Select2
+
+async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags }) {
     //try {
-        const response = await server_inventario({
-            accion: 6,
-            tabla: tabla, 
-            campo: campo
-        });
+    const response = await server_inventario({
+        accion: 6,
+        tabla: tabla,
+        campo: campo
+    });
 
-        //console.log('Respuesta del servidor para select2:', response);
+    //console.log('Respuesta del servidor para select2:', response);
 
-        const opciones = response.resultado.map(item => ({
-            id: item.id || '',
-            text: item[campo] || ''
-          }));
+    const opciones = response.resultado.map(item => ({
+        id: item.id || '',
+        text: item[campo] || ''
+    }));
 
-        const $select = $('#' + selectId);
-        $select.empty().append(new Option('', '', false, false));
+    const $select = $('#' + selectId);
+    $select.empty().append(new Option('', '', false, false));
 
-        $select.select2({
-            theme: 'bootstrap4',
-            allowClear: true,
-            placeholder: placeholder,
-            tags: tags,
-            dropdownParent: $(dropdownParent),
-            data: opciones
-        });
+    $select.select2({
+        theme: 'bootstrap4',
+        allowClear: true,
+        placeholder: placeholder,
+        tags: tags,
+        dropdownParent: $(dropdownParent),
+        data: opciones
+    });
 
-        $select.val(null).trigger('change');
+    $select.val(null).trigger('change');
 
     //} catch (error) {
-        
-    //}
-  }
 
-  function rellenar_select(texto,select) {
+    //}
+}
+
+function rellenar_select(texto, select) {
     let textoBuscado = texto;
     let $select = $('#' + select);
 
-    $select.find('option').filter(function() {
+    $select.find('option').filter(function () {
         return $(this).text().trim() === textoBuscado;
     }).prop('selected', true);
 
     $select.trigger('change');
-  }
+}
 
 
-  $(document).ready(function () {
+$(document).ready(function () {
     // Escucha cambios en el campo "inp-tipo"
     $('#inp-tipo').on('change', function () {
         const tipoSeleccionado = $(this).val(); // Obtiene el valor seleccionado
@@ -634,8 +639,8 @@ function mostrar_alerta(tipo, titulo, mensaje) {
 });
 
 
-  //TODO: Funciones para el resguardo
-function resguardo(){
+//TODO: Funciones para el resguardo
+function resguardo() {
     let inputs = document.getElementsByName('resg-inpt')
     for (let i = 0; i < inputs.length; i++) {
         const element = inputs[i].value = "";
@@ -644,11 +649,11 @@ function resguardo(){
     $('#select-supervisor').val(null).trigger('change');
 
 
-    $(document).ready(function() {
+    $(document).ready(function () {
         let hoy = new Date().toISOString().split('T')[0];
         $('#fecha-resguardo').val(hoy);
     });
-    
+
     general_select2({
         selectId: 'select-usu',
         tabla: 'cat_usuarios',
@@ -683,16 +688,16 @@ async function crear_resguardo(params) {
     }
 
     let model = {
-        accion : 5,
-        usuario : $('#select-usu').val().trim(),
+        accion: 5,
+        usuario: $('#select-usu').val().trim(),
         //region : $('#select-region').val().trim(),
-        region : $("#select-region").select2('data')[0].text,
-        comentario : $('#txt-area').val().trim(),
+        region: $("#select-region").select2('data')[0].text,
+        comentario: $('#txt-area').val().trim(),
         fecha: $('#fecha-resguardo').val()
     }
     let server = await server_inventario(model)
 
-    
+
     infoResguardo = server.resultado
     //console.log(infoResguardo)
     let table = $('#tabla1').DataTable();
@@ -708,9 +713,9 @@ async function crear_resguardo(params) {
 
 async function descargar_excel(params) {
     dominio = window.location.hostname,
-    puerto = location.port
+        puerto = location.port
     let model = {
-        accion : 0,
+        accion: 0,
         datos: infoResguardo
     }
     let server = await server_excel(model)
@@ -725,7 +730,7 @@ async function descargar_excel(params) {
     // Cambia la extensión
     ruta.resultado = ruta.resultado.replace(/\.xlsx$/i, '.pdf');
 
-    ruta.resultado = ruta.resultado.replace("C:/xampp/htdocs", "http://"+dominio+":"+puerto)
+    ruta.resultado = ruta.resultado.replace("C:/xampp/htdocs", "http://" + dominio + ":" + puerto)
     console.log(ruta.resultado)
     window.open(ruta.resultado, '_blank');
 }
