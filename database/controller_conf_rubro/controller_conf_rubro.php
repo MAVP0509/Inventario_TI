@@ -21,7 +21,7 @@ if ($clientejson->accion == 0) {
 print(json_encode($respuesta_servidor)); //? envía la respuesta de la base de datos a javascript
 
 
-//* Creación de un nuevo supervisor
+//* Creación de un nuevo rubro
 function insertar_rubro($valores)
 {
     include("../conexion.php");
@@ -29,13 +29,13 @@ function insertar_rubro($valores)
 
     $sql_val_rubro = "SELECT * FROM cat_rubro WHERE rubro = '$valores->rubro'";
     if (mysqli_query($con, $sql_val_rubro)->num_rows > 0) {
-        return false;
+        return "Este rubro ya existe";
     } else {
         return mysqli_query($con, $sql);
     }
 }
 
-//* Edita un supervisor ya existente
+//* Edita un rubro ya existente
 function editar_rubro($valores)
 {
     include("../conexion.php");
@@ -44,7 +44,7 @@ function editar_rubro($valores)
     return mysqli_query($con, $sql);
 }
 
-//* Consulta los supervisores de la tabla supervisor para mostrarlos en el programa
+//* Consulta los rubros de la tabla rubro para mostrarlos en el programa
 function consultar_rubro()
 {
     include("../conexion.php");

@@ -658,3 +658,6 @@ function validar_campos(campos) {
 
     return valido;
 }
+
+
+
