@@ -148,6 +148,7 @@ async function consultar_informacion(){
 }
 
 let datoSelected = ""
+selected = false
 function mdl_editar_tipo(params) {
     for (let i = 0; i < datos.length; i++) {
         let element = datos[i]
@@ -157,13 +158,42 @@ function mdl_editar_tipo(params) {
             break;
         }
     }
+    const serie = document.getElementById('tipo');
+    serie.classList.remove('is-invalid'); // Remover clase de error si existía
 
+    document.getElementById('alert-edit-tipo').style.display = 'block'
     document.getElementById('mdl-title').textContent = "Editar Tipo"
     document.getElementById('tipo').value = datoSelected.tipo
     document.getElementById('mdl-btn-conf').onclick = function () { editar_tipo() }
+    document.getElementById('mdl-btn-conf').disabled = true
 
     $("#mdl-tipo").modal('show');
 }
+
+$("#check-editar").on('click', function () {
+    selected = !selected;
+
+    // Cambiar el ícono del checkbox
+    let check = $("#check-editar-icon");
+    if (selected) {
+        check.removeClass("fa-regular fa-square");
+        check.addClass("fa-solid fa-square-check");
+    } else {
+        check.removeClass("fa-solid fa-square-check");
+        check.addClass("fa-regular fa-square ");
+    }
+
+    // Habilitar o deshabilitar el botón dependiendo de "selected"
+    document.getElementById('mdl-btn-conf').disabled = !selected;
+});
+
+//*Cada que se cierre el modal se reseteará el checkbox
+$('#mdl-tipo').on('hidden.bs.modal', function () {
+    // Limpiar y restaurar el ícono
+    $("#check-editar-icon").removeClass();
+    $("#check-editar-icon").addClass("fa-regular fa-square fa-lg");
+    selected = false
+});
 
 async function editar_tipo() {
     let model = {
@@ -174,8 +204,8 @@ async function editar_tipo() {
 
     let server = await server_tipo(model)
 
-    if (JSON.parse(respuesta).resultado) {
-        mostrar_toast('success', 'Tipo editado', 'El tipo ha sido editado exitosamente')
+    if (server.resultado) {
+        mostrar_toast('success', 'Tipo editado', 'El tipo ha sido editado')
     } else {
         mostrar_toast('error', 'Inventario TI', 'Error en la consulta')
         return;
@@ -183,4 +213,114 @@ async function editar_tipo() {
     datoSelected = ""
     table.updateData([{ id: elemento.id, tipo: model.tipo }]);
     $("#mdl-tipo").modal('hide')
+}
+
+function mdl_nuevo_tipo() {
+    const serie = document.getElementById('tipo');
+    serie.classList.remove('is-invalid'); // Remover clase de error si existía
+
+    document.getElementById('mdl-title').textContent = "Nuevo Tipo"
+    document.getElementById('tipo').value = ""
+    document.getElementById('tipo').placeholder = "Nuevo tipo"
+    document.getElementById('mdl-btn-conf').onclick = function () { nuevo_tipo() }
+    document.getElementById('mdl-btn-conf').disabled = false
+    document.getElementById('alert-edit-tipo').setAttribute('style', 'display: none !important;  background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;');
+    $("#mdl-tipo").modal('show');
+}
+
+async function nuevo_tipo() {
+    let validados = ["tipo"]
+
+    // Validar campos
+    if (!validar_campos(validados)) {
+        mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
+        return;
+    }
+
+    let model = {
+        accion: 0,
+        tipo: $('#tipo').val().trim()
+    }
+
+    let server = await server_tipo(model)
+    if (typeof server.resultado === "string") {
+        mostrar_toast('warning', 'Advertencia', server.resultado)
+        return
+    } else {
+        mostrar_toast('success', 'Nuevo tipo', 'El tipo ha sido agregado')
+
+    }
+
+    consultar_informacion()
+    $('#mdl-tipo').modal('hide')
+}
+
+async function mensaje_eliminar() {
+
+    if (seleccionados.length === 0) {
+        mostrar_toast('warning', 'Inventario TI', 'Por favor, selecciona al menos un tipo para continuar')
+
+    } else {
+        mostrar_alert('warning', `¿Está seguro de eliminar ${seleccionados.length} tipo(s)?`, false, eliminar_tipo);
+    }
+}
+
+async function eliminar_tipo(params) {
+    let model = {
+        accion: 3,
+        id: seleccionados
+    }
+
+    let server = await server_tipo(model);
+
+    if (typeof server.resultado === "string") {
+        mostrar_toast('error', 'Error', JSON.parse(respuesta).resultado, 4000)
+    } else if (server.resultado) {
+        mostrar_toast('success', '¡Éxito!', 'Tipo(s) eliminado(s) correctamente')
+        consultar_informacion();
+    } else {
+        mostrar_toast('error', 'Error', 'Fallo al conectar');
+    }
+    deseleccionar_todos()
+}
+
+function validar_campos(campos) {
+    let valido = true;
+
+    campos.forEach(id => {
+        const campo = document.getElementById(id);
+        if (!campo) {
+            valido = false;
+            return;
+        }
+
+        if ($(campo).hasClass('is-required') && !campo.value.trim()) {
+            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
+            valido = false;
+        } else if (!campo.value.trim()) {
+            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
+            valido = false;
+        } else {
+            campo.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
+        }
+
+        campo.addEventListener('input', function () {
+            if (campo.value.trim()) {
+                campo.classList.remove('is-invalid');
+            }
+        });
+    });
+
+    return valido;
+}
+
+function deseleccionar_todos() {
+    //  Resetear propiedad "seleccionado"
+    datos.forEach(d => d.seleccionado = false);
+
+    //  Limpiar el array de seleccionados
+    seleccionados = [];
+
+    //  Forzar re-renderizado de todas las filas para reflejar los íconos
+    table.getRows().forEach(row => row.reformat());
 }

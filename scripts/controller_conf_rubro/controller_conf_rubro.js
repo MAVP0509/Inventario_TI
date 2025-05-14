@@ -164,6 +164,8 @@ function mdl_editar_rubro(params) {
             break;
         }
     }
+    const serie = document.getElementById('rubro');
+    serie.classList.remove('is-invalid'); // Remover clase de error si existía
 
     document.getElementById('alert-edit-rubro').style.display = 'block'
     document.getElementById('mdl-title').textContent = "Editar Rubro"
@@ -220,6 +222,10 @@ $('#mdl-rubro').on('hidden.bs.modal', function () {
 });
 
 function mdl_nuevo_rubro() {
+
+    const serie = document.getElementById('rubro');
+    serie.classList.remove('is-invalid'); // Remover clase de error si existía
+
     document.getElementById('mdl-title').textContent = "Nuevo Rubro"
     document.getElementById('rubro').value = ""
     document.getElementById('rubro').placeholder = "Nuevo rubro"
