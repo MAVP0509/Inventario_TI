@@ -80,71 +80,97 @@ async function registrar_historico(num_serie, evento) {
         evento: evento,
     };
 
-    let result = await server_historico(model);
+    let resultado = await server_historico(model);
 
 }
 
-async function mostrar_historico(params) {
-    
+function consultar_num_serie(params) {
+
+    $("#modal-historial").modal('show')
 }
 
-function mostrar_modal_historial(historial) {
-    const contenedor = document.getElementById('contenedor-historial');
-    contenedor.innerHTML = ''; // Limpiar contenido previo
+async function mostrar_historial() {
 
-    historial.forEach(async (h) => {
-        // Convertir la fecha del evento a formato legible
-        const fecha = new Date(h.fecha_evento).toLocaleString('es-MX', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
+    const validacion = ["his-num-serie"];
+
+    if (!validar_campos(validacion)) {
+        mostrar_alerta('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
+        return;
+    }
+
+    const model = {
+        accion: 0,
+        num_serie: $('#his-num-serie').val().trim(),
+        fecha_inicio: $('#fecha-inicio').val(),
+        fecha_fin: $('#fecha-fin').val(),
+    };
+
+    let respuesta_historico = await server_historico(model);
+
+    const contenedor = $('#his-versiones');
+    contenedor.empty();
+
+    if (respuesta_historico && respuesta_historico.resultado && respuesta_historico.resultado.length > 0) {
+        respuesta_historico.resultado.forEach(registro => {
+            const fecha = new Date(registro.fecha_evento);
+            const fechaFormateada = fecha.toLocaleString('es-MX', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const item = `
+                <div class="list-group-item">
+                    <strong>${fechaFormateada}</strong><br>
+                    <span>${registro.usuario}</span><br>
+                    <em>${registro.evento}</em>
+                </div>
+            `;
+            contenedor.append(item);
         });
 
-        // Crear los elementos de texto
-        const fechaElem = document.createElement('div');
-        fechaElem.textContent = fecha;
-
-        const usuarioElem = document.createElement('div');
-        usuarioElem.textContent = h.usuario;
-
-        const eventoElem = document.createElement('div');
-        eventoElem.textContent = `realizó una ${h.evento.toLowerCase()} con el número de serie ${h.num_serie}.`;
-
-        // Obtener detalles del inventario para el número de serie
-        const inventarioDetalles = await obtenerDetallesInventario(h.num_serie);
-
-        // Crear un elemento con detalles adicionales del inventario
-        const inventarioElem = document.createElement('div');
-        inventarioElem.textContent = `Detalles del inventario: ${inventarioDetalles}`;
-
-        // Agregar los elementos al contenedor
-        contenedor.appendChild(fechaElem);
-        contenedor.appendChild(usuarioElem);
-        contenedor.appendChild(eventoElem);
-        contenedor.appendChild(inventarioElem);
-        contenedor.appendChild(document.createElement('hr')); // Línea separadora entre eventos
-    });
-
-    // Mostrar el modal
-    $("#modal-historial").modal('show');
+        $('#resultado-historico').removeClass('d-none');
+    } else {
+        contenedor.html('<div class="list-gruop-item">No se encontraron moviemientos para ese número de serie.</div>');
+        $('#resultado-historico').removeClass('d-none');
+    }
 }
 
-async function obtenerDetallesInventario(num_serie) {
-    const modal = {
-        accion: 0,
-        num_serie: num_serie
-    }
+function validar_campos(campos) {
+    let valido = true;
 
-    let respuesta = await server_inventario(model);
+    campos.forEach(id => {
+        const campo = document.getElementById(id);
+        if (!campo) {
+            valido = false;
+            return;
+        }
 
-    if (respuesta && respuesta.length > 0) {
-        // Obtener los detalles relevantes del inventario
-        const inventario = respuesta[0]; 
-        return `Tipo: ${inventario.tipo}, Marca: ${inventario.marca}, Ubicación: ${inventario.ubicacion}`;
-    } else {
-        return 'No se encontraron detalles de inventario para este número de serie.';
-    }
-} 
+        if ($(campo).hasClass('is-required') && !campo.value.trim()) {
+            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
+            valido = false;
+        } else if (!campo.value.trim()) {
+            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
+            valido = false;
+        } else {
+            campo.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
+        }
+
+        /* if (!campo.value.trim()) {
+            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
+            valido = false;
+        } else {
+            campo.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
+        } */
+
+        campo.addEventListener('input', function () {
+            if (campo.value.trim()) {
+                campo.classList.remove('is-invalid');
+            }
+        });
+    });
+
+    return valido;
+}

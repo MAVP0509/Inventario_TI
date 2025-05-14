@@ -137,7 +137,7 @@ async function consultar_informacion(params) {
             {title: "Cargo del usuario", field: "posicion"},
             {title: "Fecha de registro", field: "fecha_entrega"},
             {title: "Editar",
-                formatter: editIcon, with: 60, hozAlign: "center",
+                formatter: editIcon, width: 60, hozAlign: "center",
                 cellClick: function (e, cell) {
                     elemento = cell.getRow().getData();
                     mostrar_registro(elemento);

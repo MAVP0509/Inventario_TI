@@ -36,7 +36,7 @@ function registrar_historico($valores)
 }
 
 
-function consultar_historico()
+function consultar_historico($valores)
 {
     include("../conexion.php");
 
@@ -56,8 +56,25 @@ function consultar_historico()
     /*  WHERE 
                 hst.num_serie = ITS.num_serie"; */
 
-    $query = mysqli_query($con, $sql);
+    if (!empty($valores->num_serie)) {
+        $num_serie = mysqli_real_escape_string($con, $valores->num_serie);
+        $sql .= " WHERE hst.num_serie = '$num_serie'";
+    }
 
+    if (!empty($valores->fecha_inicio) && !empty($valores->fecha_fin)) {
+        $fecha_inicio = mysqli_real_escape_string($con, $$valores->fecha_inicio);
+        $fecha_fin = mysqli_real_escape_string($con, $$valores->fecha_fin);
+        if (strpos($sql, 'WHERE') !== false) {
+             $sql .= " AND hst.fecha_evento BETWEN '$fecha_inicio' AND '$fecha_fin'";
+        } else {
+             $sql .= " WHERE hst.fecha_evento BETWEN '$fecha_inicio' AND '$fecha_fin'";
+        }
+       
+    }
+
+    $sql .= " ORDER BY hst.fecha_evento DESC LIMIT 100";
+    //var_dump($sql);
+    $query = mysqli_query($con, $sql);
     $datos = [];
     while ($fila = mysqli_fetch_assoc($query)) {
         $datos[] = $fila;
