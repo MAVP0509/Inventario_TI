@@ -1,4 +1,4 @@
-let respuesta
+let respuesta_historico
 function server_historico(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -8,9 +8,11 @@ function server_historico(model) {
                 trama: JSON.stringify(model)
             },
             success: function(response){
+                console.log(response);
                 try {
                     resolve(JSON.parse(response))
-                    respuesta = response
+                    console.log(resolve(JSON.parse(response)))
+                    respuesta_historico = response
                 } catch (error) {
                     reject(error)
                 }
@@ -23,16 +25,18 @@ function server_inventario(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "database/controller_historico/controller_inventario.php",
+            url: "database/controller_inventario/controller_inventario.php",
             data: {
                 trama: JSON.stringify(model)
             },
             success: function (response) {
                 try {
                     resolve(JSON.parse(response))
-                    respuesta = response
+                    console.log(resolve(JSON.parse(response)))
+                    respuesta_historico = response
                 } catch (error) {
                     reject(error)
+                    console.log(error);
                 }
             }
         })
@@ -40,96 +44,133 @@ function server_inventario(model) {
     
 }
 
-
-async function generar_historico(evento, num_serie, detalles = "") {
-    const usuario = JSON.parse(sessionStorage.getItem('user')); // Obtener usuario en sesión
-    const fecha_evento = new Date().toISOString();
+async function consultar_historico() {
+    //const usuario = JSON.parse(sessionStorage.getItem('user')); // Obtener usuario en sesión
+    //const fecha_evento = new Date().toISOString();
 
     const model = {
-        accion: 0, // Acción para registrar en el historial
-        fecha_evento: fecha_evento,
-        usuario: usuario.resultado[0].nombre, // Nombre del usuario
-        evento: evento, // Evento realizado (Registrar, Editar, etc.)
-        num_serie: num_serie, // Número de serie del dispositivo
-        tipo: tipo
+        accion: 0,
     };
 
-    await server_historico(model);
+    let datos = await server_historico(model);
+
+    var table = new Tabulator("#tbl02", {
+        data: datos.resultado,
+        columns: [
+            {title: "Id", field: "id"},
+            {title: "Fecha", field: "fecha_evento"},
+            {title: "Evento", field: "evento"},
+            {title: "Zona", field: "zona"},
+            {title: "Tipo", field: "tipo"},
+            {title: "Usuario", field: "usuario"},
+            {title: "Numero de serie", field: "num_serie"},
+
+        ],
+        layout: "fitColumns",
+    });
 }
 
-async function consultar_historico(num_serie) {
+async function registrar_historico(num_serie, evento) {
+    const usuario = JSON.parse(sessionStorage.getItem('user')); // Obtener usuario en sesión
+    //const fecha_evento = new Date().toISOString();
     const model = {
         accion: 1,
-        num_serie: num_serie
+        usuario: usuario.resultado[0], // Nombre del usuario
+        num_serie: num_serie, // Número de serie del dispositivo
+        evento: evento,
     };
 
-    const respuesta = await server_historico(model);
+    let resultado = await server_historico(model);
 
-    if (respuesta.length > 0) {
-        mostrar_modal_historial(respuesta);
-    } else {
-        mostrar_alerta('info', 'Sin resultados', 'No se encontraron movimientos para este número de serie.');
-    }
 }
 
-function mostrar_modal_historial(historial) {
-    const contenedor = document.getElementById('contenedor-historial');
-    contenedor.innerHTML = ''; // Limpiar contenido previo
+function consultar_num_serie(params) {
 
-    historial.forEach(async (h) => {
-        // Convertir la fecha del evento a formato legible
-        const fecha = new Date(h.fecha_evento).toLocaleString('es-MX', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
+    $("#modal-historial").modal('show')
+}
+
+async function mostrar_historial() {
+
+    const validacion = ["his-num-serie"];
+
+    if (!validar_campos(validacion)) {
+        mostrar_alerta('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
+        return;
+    }
+
+    const model = {
+        accion: 0,
+        num_serie: $('#his-num-serie').val().trim(),
+        fecha_inicio: $('#fecha-inicio').val(),
+        fecha_fin: $('#fecha-fin').val(),
+    };
+
+    let respuesta_historico = await server_historico(model);
+
+    const contenedor = $('#his-versiones');
+    contenedor.empty();
+
+    if (respuesta_historico && respuesta_historico.resultado && respuesta_historico.resultado.length > 0) {
+        respuesta_historico.resultado.forEach(registro => {
+            const fecha = new Date(registro.fecha_evento);
+            const fechaFormateada = fecha.toLocaleString('es-MX', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const item = `
+                <div class="list-group-item">
+                    <strong>${fechaFormateada}</strong><br>
+                    <span>${registro.usuario}</span><br>
+                    <em>${registro.evento}</em>
+                </div>
+            `;
+            contenedor.append(item);
         });
 
-        // Crear los elementos de texto
-        const fechaElem = document.createElement('div');
-        fechaElem.textContent = fecha;
+        $('#resultado-historico').removeClass('d-none');
+    } else {
+        contenedor.html('<div class="list-gruop-item">No se encontraron moviemientos para ese número de serie.</div>');
+        $('#resultado-historico').removeClass('d-none');
+    }
+}
 
-        const usuarioElem = document.createElement('div');
-        usuarioElem.textContent = h.usuario;
+function validar_campos(campos) {
+    let valido = true;
 
-        const eventoElem = document.createElement('div');
-        eventoElem.textContent = `realizó una ${h.evento.toLowerCase()} con el número de serie ${h.num_serie}.`;
+    campos.forEach(id => {
+        const campo = document.getElementById(id);
+        if (!campo) {
+            valido = false;
+            return;
+        }
 
-        // Obtener detalles del inventario para el número de serie
-        const inventarioDetalles = await obtenerDetallesInventario(h.num_serie);
+        if ($(campo).hasClass('is-required') && !campo.value.trim()) {
+            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
+            valido = false;
+        } else if (!campo.value.trim()) {
+            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
+            valido = false;
+        } else {
+            campo.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
+        }
 
-        // Crear un elemento con detalles adicionales del inventario
-        const inventarioElem = document.createElement('div');
-        inventarioElem.textContent = `Detalles del inventario: ${inventarioDetalles}`;
+        /* if (!campo.value.trim()) {
+            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
+            valido = false;
+        } else {
+            campo.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
+        } */
 
-        // Agregar los elementos al contenedor
-        contenedor.appendChild(fechaElem);
-        contenedor.appendChild(usuarioElem);
-        contenedor.appendChild(eventoElem);
-        contenedor.appendChild(inventarioElem);
-        contenedor.appendChild(document.createElement('hr')); // Línea separadora entre eventos
+        campo.addEventListener('input', function () {
+            if (campo.value.trim()) {
+                campo.classList.remove('is-invalid');
+            }
+        });
     });
 
-    // Mostrar el modal
-    $("#modal-historial").modal('show');
+    return valido;
 }
-
-async function obtenerDetallesInventario(num_serie) {
-    const modal = {
-        accion: 2,
-        num_serie: num_serie
-    }
-
-    let respuesta = await server_inventario(model);
-
-    if (respuesta && respuesta.length > 0) {
-        // Obtener los detalles relevantes del inventario
-        const inventario = respuesta[0]; 
-        return `Tipo: ${inventario.tipo}, Marca: ${inventario.marca}, Ubicación: ${inventario.ubicacion}`;
-    } else {
-        return 'No se encontraron detalles de inventario para este número de serie.';
-    }
-}
-

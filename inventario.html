@@ -7,16 +7,12 @@
 
     <link rel="stylesheet" href="libraries/bootstrap-4.6.2-dist/css/bootstrap-grid.min.css">
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="libraries/Tabulator/tabulator_bootstrap4.min.css">
     <link rel="stylesheet" href="libraries/fontawesome-free-6.7.2-web/css/all.min.css">
     <link rel="stylesheet" href="libraries/DataTables/datatables.min.css">
     <link rel="stylesheet" href="libraries/select2/css/select2-bootstrap4.min.css">
     <link rel="stylesheet" href="libraries/select2/css/select2.min.css">
-    <link rel="stylesheet" href="libraries/Tabulator/tabulator_bootstrap4.min.css">
-
-<!-- JS -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/fixedcolumns/4.2.2/js/dataTables.fixedColumns.min.js"></script>
+    
 
 </head>
 <body class="hold-transition sidebar-mini layout-fixed" onload="consultar_informacion()">
@@ -107,58 +103,17 @@
                             <div class="card card-tabs">
                                 <!--Card header-->
                                 <div class="card-header">
-                                    <ul class="nav nav-tabs" role="tablist">
-                                        <li class="nav-item" role="presentation">
-                                            <a class="nav-link active" data-toggle="tab" data-target="#inventario.html" type="button" role="tab" aria-controls="historico" aria-selected="true">Inventario</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" data-toggle="tab" data-target="#historico.html" type="button" role="tab" aria-controls="historico" aria-selected="true">Historial</a>
-                                        </li>
-                                    </ul>
-                                    <br>
                                     <h3 class="card-title"><i class="fa-solid fa-table"></i> Inventario de TI</h3>
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" onclick="resguardo()" class="btn btn-info icon rounded mr-3" style="margin-left: 10px;" href="#" ><i class="fa-solid fa-file-export fa-lg"></i> Resguardo</button>
+                                        <button type="button" class="btn btn-success rounded mr-3 icon" onclick="limpiar_campos()" ><i class="fa-solid fa-plus fa-lg"></i> Crear Registro</button>
+                                        <button type="button" style="text-align: center" class="btn btn-danger rounded icon" onclick="confirmar_eliminacion()"><i class="fa-solid fa-trash-can fa-lg"></i> Eliminar Registro</button>
+                                        <button type="button" class="btn btn-light rounded mr-3 icon" onclick="consultar_num_serie()"><i class="fa-solid fa-clock-rotate-left"></i> Historial</button>
+                                    </div>
                                 </div>
                                 <!--Card Body-->
                                 <div class="card-body">
-                                    <di class="tab-content">
-                                        <div class="tab-pane fade show active" role="tabpanel">
-                                            <div class="dataTables_wrapper dt-bootstrap4." id="table-usuario">
-                                                <div class="row">
-                                                    <div class="col-sm-12 col-md-6"></div>
-                                                    <div class="col-sm-12 col-md-6"></div>
-                                                </div>
-                                                <div class="row">
-                                                    <div class="col-sm-12">
-                                                        <table class="table table-bordered table-hover dataTable dtr-inline table-striped" id="tabla1" aria-describedby="Tabla de usuarios" style="width: 100%;">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th></th>
-                                                                    <th>ID</th>
-                                                                    <th>Zona</th>
-                                                                    <th>Rubro</th>
-                                                                    <th>AF</th>
-                                                                    <th>Tipo</th>
-                                                                    <th>Marca</th>
-                                                                    <th>Modelo</th>
-                                                                    <th>Numero de serie</th>
-                                                                    <th>Ubicación</th>
-                                                                    <th>TAG</th>
-                                                                    <th>Usuario</th>
-                                                                    <th>Posición</th>
-                                                                    <th>Fecha de entrega</th>
-                                                                    <th>Editar</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody id="tbl-body">
-                                                                
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </di>
-
+                                    <div id="tbl01"></div>
                                 </div>
                             </div>
                         </div>
@@ -492,47 +447,63 @@
         </div>
     </div>
 
-<!-- Modal de historial -->
-<div class="modal fade" id="modal-historial" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Historial de Registro</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Formulario para ingresar el número de serie -->
-                <form id="form-historial">
-                    <div class="form-group">
-                        <label for="numSerie">Número de Serie:</label>
-                        <input type="text" class="form-control" id="his-num-serie" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Buscar</button>
-                </form>
+    <!--Modal de historial-->
+    <div class="modal fade" id="modal-historial" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+        <div class="modal-dialog modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Historial de Registro</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-historial">
+                        <div class="form-group">
+                            <label for="his-num-serie">Número de Serie</label>
+                            <input type="text" class="form-control" id="his-num-serie">
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha-inicio">Fecha inicial</label>
+                            <input type="date" class="form-control" id="fecha-inicio">
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha-fin">Fecha final</label>
+                            <input type="date" class="form-control" id="fecha-fin">
+                        </div>
+                        <button type="button" class="btn btn-primary" id="btn-buscar" onclick="mostrar_historial()">Buscar</button>
+                    </form>
 
-                <!-- Resultados del historial -->
-                <div id="result-historico"></div>
-            </div> <!-- modal-body -->
-            <div class="modal-footer">
-                <button type]="button" class="btn btn-danger icon" data-dismiss="modal" id="modal-btn-his">Cancelar <i class="fa-solid fa-arrow-right-from-bracket fa-lg"></i></button>
+                    <div class="card mt-3 d-none" id="resultado-historico">
+                        <div class="card-header">
+                            Historial de versiones
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group" id="his-versiones"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="modal-btn-his"><i class="fa-solid fa-arrow-right-from-bracket fa-lg"></i> Salir</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
 </body>
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="libraries/Tabulator/tabulator.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script>
     <script src="scripts/controller_acceso/controller_acceso.js"></script>
     <script src="scripts/controller_inventario/controller_inventario.js"></script>
+    <script src="scripts/controller_historico/controller_historico.js"></script>
     <script src="dist/js/adminlte.min.js"></script>
     <script src="libraries/DataTables/datatables.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="libraries/select2/js/select2.min.js"></script>
-    <script src="libraries/Tabulator/tabulator.min.js"></script>
+    
 </html>

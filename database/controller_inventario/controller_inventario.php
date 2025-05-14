@@ -15,14 +15,10 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_datos($clientejson);
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = desactivar_datos($clientejson);
-} elseif ($clientejson->accion == 4) {
-    $respuesta_servidor->resultado = eliminar_datos($clientejson);
 } elseif ($clientejson->accion == 5) {
     $respuesta_servidor->resultado = consultar_para_resguardo($clientejson);
 } elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = consultar_distintos($clientejson->tabla, $clientejson->campo);
-} elseif ($clientejson->accion == 7) {
-    $respuesta_servidor->resultado = registrar_historico($clientejson);
 } elseif ($clientejson->accion == 8) {
     $respuesta_servidor->resultado = consultar_region($clientejson);
 }
@@ -37,15 +33,6 @@ function insertar_datos($valores)
 
     $registro = date("Y-m-d H:i:s");
 
-    $val_usuario;
-    if (ctype_digit($valores->usuario)) {
-        // Es un string de solo dígitos: probablemente un ID existente
-        $val_usuario = $valores->usuario;
-    } else {
-        // No es un número válido: el usuario ingresó una nueva opción
-        $val_usuario = 5;
-    }
-
     if ($valores->num_serie != "") {
         $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$valores->num_serie'";
         //var_dump($sql_num);
@@ -53,7 +40,7 @@ function insertar_datos($valores)
 
         $sql = "INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, habilitado) 
         VALUES ('$valores->zona', '$valores->rubro','$valores->af','$valores->tipo','$valores->marca','$valores->modelo', '$valores->num_serie', 
-        '$valores->ubicacion', '$valores->tag', '$val_usuario', '$registro',1);";
+        '$valores->ubicacion', '$valores->tag', '$valores->usuario', '$registro',1);";
         //$query = mysqli_query($con, $sql);|
 
         if (mysqli_num_rows($query_num) > 0) {
@@ -63,11 +50,7 @@ function insertar_datos($valores)
             return mysqli_query($con, $sql);
         }
     } else {
-        $result = mysqli_query($con, $sql);
-        if ($result) {
-            registrar_historico($valores->num_serie, $valores->tipo, "Nuevo registro");
-        }
-        return $result;
+        return mysqli_query($con, $sql);
     }
 }
 
@@ -130,10 +113,6 @@ function editar_datos($valores)
     num_serie = '$valores->num_serie', ubicacion = '$valores->ubicacion', tag = '$valores->tag', fk_usuario = '$valores->usuario', fecha_entrega = '$valores->fecha_entrega' WHERE id = '$valores->id';";
     //var_dump($sql);
     $result = mysqli_query($con, $sql);
-
-    if ($result) {
-        registrar_historico($valores->num_serie, "Edición de registro");
-    }
     return $result;
 }
 
@@ -153,43 +132,41 @@ function consultar_datos()
 function desactivar_datos($valores)
 {
     include("../conexion.php");
-
+    //var_dump($valores);
+    
     if (is_array($valores->id)) { // Verifica si $valores->id es un array
+        
         $ids = implode(",", array_map('intval', $valores->id)); // Convierte el array de IDs en una lista separada por comas
+        
+        $sql_num = "SELECT num_serie FROM inventario_ti_sur WHERE id IN ($ids)";
+        $query_num = mysqli_query($con, $sql_num);
+
+        $num_series = [];
+        while ($fila = mysqli_fetch_object($query_num)) {
+             array_push($num_series,$fila->num_serie);
+        }
+
         $sql = "UPDATE inventario_ti_sur SET habilitado = 0 WHERE id IN ($ids);"; // Consulta sql usando IN para eliminar múltiples registros
-        //var_dump($sql);
-        $result = mysqli_query($con, $sql);
-
-        if ($result) {
-            foreach ($valores->id as $id) {
-                registrar_historico($id);
-            }
-        }
-        return $result;
+         mysqli_query($con, $sql);
+        return $num_series;
+        
     } else {
+        
         $sql = "UPDATE inventario_ti_sur SET habilitado = 0 where id='$valores->id';";
-        $result = mysqli_query($con, $sql);
+        mysqli_query($con, $sql);
 
-        if ($result) {
-            registrar_historico($valores->id, "Desactivación de registro");
+        $sql_num2 = "SELECT num_serie FROM inventario_ti_sur WHERE id = '$valores->id'";
+        $query_num2 = mysqli_query($con, $sql_num2);
+
+        $num_series = [];
+        while ($fila = mysqli_fetch_object($query_num2)) {
+             array_push($num_series,$fila->num_serie);
         }
-        return $result;
+        return $num_series;
     }
-}
 
-function eliminar_datos($valores)
-{
-    include("../conexion.php");
+}  
 
-    if (is_array($valores->id)) { // Verifica si $valores->id es un array
-        $ids = implode(",", array_map('intval', $valores->id)); // Convierte el array de IDs en una lista separada por comas
-        $sql = "DELETE FROM inventario_ti_sur WHERE id IN ($ids);"; // Consulta sql usando IN para eliminar múltiples registros
-        return mysqli_query($con, $sql);
-    } else {
-        $sql = "DELETE FROM inventario_ti_sur where id='$valores->id';";
-        return mysqli_query($con, $sql);
-    }
-}
 
 function consultar_para_resguardo($valores)
 {
@@ -247,14 +224,14 @@ function consultar_rubro()
 function consultar_region()
 {
     include("../conexion.php");
-    $sql = "SELECT DISTINCT region from supervisor;";
+    $sql = "SELECT DISTINCT tipo from inventario_ti_sur;";
     $query = mysqli_query($con, $sql);
     $datos = [];
 
     while ($fila = mysqli_fetch_assoc($query)) {
         $datos[] = [
-            'id' => $fila['region'],
-            'tipo' => $fila['region']
+            'id' => $fila['tipo'],
+            'tipo' => $fila['tipo']
         ];
     }
 
@@ -264,6 +241,9 @@ function consultar_region()
 function consultar_distintos($tabla, $campo)
 {
     include("../conexion.php");
+    //Validación para evitar inyecciones
+    $tabla = mysqli_real_escape_string($con, $tabla);
+    $campo = mysqli_real_escape_string($con, $campo);
 
     if ($campo === "region") {
         $num = 1;
