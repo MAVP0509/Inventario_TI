@@ -141,7 +141,23 @@ async function consultar_informacion() {
                         cell.getRow().reformat();
                         seleccionar_usuarios(rowData.id)
                     }
-            },{
+            },
+            {
+                title: "Activo",
+                field: "activo",
+                formatter: function (cell, formatterParams, onRendered) {
+                    let value = cell.getValue();
+                    let icon = value === "on" ? "fa-solid fa-toggle-on fa-2xl" : "fa-solid fa-toggle-off fa-2xl";
+                    let color = value === "on" ? "#5eeb00" : "#ff0000";
+                    return `<span class="custom-toggle"><i class="${icon}" style="color:${color}; font-size: 1.5em;"></i></span>`;
+                },
+                cellClick: function (e, cell) {
+                    let current = cell.getValue();
+                    let newValue = current === "on" ? "off" : "on";
+                    cell.setValue(newValue);
+                }
+            },
+            {
                 formatter: editIcon, width: 60, hozAlign: "center",
                 cellClick: function (e, cell) {
                     elemento = cell.getRow().getData();
@@ -200,7 +216,7 @@ async function editar_usuario() {
         accion: 1,
         id: datoSelected.id,
         nombre: $('#usu').val().trim(),
-        cargo : $("#cargo").val().trim()
+        cargo: $("#cargo").val().trim()
     }
 
     let server = await server_usuarios(model)
@@ -240,7 +256,7 @@ function mdl_nuevo_usuario() {
 }
 
 async function nuevo_usuario() {
-    let validados = ["usu","cargo"]
+    let validados = ["usu", "cargo"]
 
     // Validar campos
     if (!validar_campos(validados)) {
@@ -251,7 +267,7 @@ async function nuevo_usuario() {
     let model = {
         accion: 0,
         nombre: $('#usu').val().trim(),
-        cargo : $('#cargo').val().trim()
+        cargo: $('#cargo').val().trim()
     }
 
     let server = await server_usuarios(model)

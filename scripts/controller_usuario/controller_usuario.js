@@ -1,4 +1,5 @@
- let respuesta
+
+let respuesta
 function server_usuario(model) {
     return new Promise ((resolve,reject)=>{
         $.ajax({
