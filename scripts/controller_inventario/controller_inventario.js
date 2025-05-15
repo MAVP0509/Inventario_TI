@@ -376,8 +376,6 @@ async function desactivar_registro() {
     if (Array.isArray(response.resultado)) {
         await registrar_historico(response.resultado, 'Eliminación de registro');
         mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
-        let table = $('#tabla1').DataTable();
-        table.destroy();
         consultar_informacion();
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
@@ -691,8 +689,6 @@ async function crear_resguardo(params) {
     
     infoResguardo = server.resultado
     //console.log(infoResguardo)
-    let table = $('#tabla1').DataTable();
-    table.destroy();
     consultar_informacion();
 
 

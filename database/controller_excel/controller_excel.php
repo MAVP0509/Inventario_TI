@@ -87,7 +87,7 @@ function resguardo($valores){
 
         $fila++; // Avanzas a la siguiente fila
 
-        if ($item->tag != null){
+        if ($item->tag != null && $item->tag != "NA"){
             $worksheet->insertNewRowBefore($fila, 1);
 
             // Reaplicar las combinaciones de celdas en la nueva fila
