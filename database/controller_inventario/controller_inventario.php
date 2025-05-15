@@ -33,13 +33,49 @@ function insertar_datos($valores)
 
     $registro = date("Y-m-d H:i:s");
 
+    $rubro = verificar_nuevos_id($valores->rubro);
+    $val_rubro;
+    if ($rubro === true) {
+        $val_rubro = $valores->rubro;
+    } else {
+        $sql_rubro = "INSERT INTO cat_rubro(rubro) VALUES ('$rubro');";
+        mysqli_query($con, $sql_rubro);
+        $sql_ver_id_rubro = "SELECT id FROM cat_rubro WHERE rubro = '$rubro';";
+        $idRub = mysqli_fetch_assoc(mysqli_query($con, $sql_ver_id_rubro));
+        $val_rubro = $idRub['id'];
+    }
+
+    $tipo = verificar_nuevos_id($valores->tipo);
+    $val_tipo;
+    if ($tipo === true) {
+        $val_tipo = $valores->tipo;
+    } else {
+        $sql_tipo = "INSERT INTO cat_tipo(tipo) VALUES ('$tipo');";
+        mysqli_query($con, $sql_tipo);
+        $sql_ver_id_tipo = "SELECT id FROM cat_tipo WHERE tipo = '$tipo';";
+        $idTip = mysqli_fetch_assoc(mysqli_query($con, $sql_ver_id_tipo));
+        $val_tipo = $idTip['id'];
+    }
+
+    $marca = verificar_nuevos_id($valores->marca);
+    $val_marca;
+    if ($marca === true) {
+        $val_marca = $valores->marca;
+    } else {
+        $sql_marca = "INSERT INTO cat_marca(marca) VALUES ('$marca');";
+        mysqli_query($con, $sql_marca);
+        $sql_ver_id_marca = "SELECT id FROM cat_marca WHERE marca = '$marca';";
+        $idMarca = mysqli_fetch_assoc(mysqli_query($con, $sql_ver_id_marca));
+        $val_marca = $idMarca['id'];
+    }
+
     if ($valores->num_serie != "") {
         $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$valores->num_serie'";
         //var_dump($sql_num);
         $query_num = mysqli_query($con, $sql_num);
 
         $sql = "INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, habilitado) 
-        VALUES ('$valores->zona', '$valores->rubro','$valores->af','$valores->tipo','$valores->marca','$valores->modelo', '$valores->num_serie', 
+        VALUES ('$valores->zona', '$val_rubro','$valores->af','$val_tipo','$val_marca','$valores->modelo', '$valores->num_serie', 
         '$valores->ubicacion', '$valores->tag', '$valores->usuario', '$registro',1);";
         //$query = mysqli_query($con, $sql);|
 
@@ -95,22 +131,8 @@ function editar_datos($valores)
         $val_marca = $idMarca['id'];
     }
 
-    /* $usuario = verificar_nuevos_id($valores->usuario);
-    $val_usuario;
-    if ($usuario === true){
-        $val_usuario = $valores->usuario;
-        $sql_update_usu = "UPDATE cat_usuarios SET cargo = '$valores->posicion' WHERE id = '$valores->usuario';";
-        mysqli_query($con,$sql_update_usu);
-    }else{
-        $sql_usuario = "INSERT INTO cat_usuarios(nombre,cargo) VALUES ('$usuario','$valores->posicion');";
-        mysqli_query($con,$sql_usuario);
-        $sql_ver_id_usuario = "SELECT id FROM cat_usuario WHERE usuario = '$usuario';";
-        $idUsu = mysqli_fetch_assoc(mysqli_query($con,$sql_ver_id_usuario));
-        $val_usuario = $idUsu['id'];
-    } */
-
-    $sql = "UPDATE inventario_ti_sur SET zona = '$valores->zona', fk_rubro = '$val_rubro', af = '$valores->af', fk_tipo ='$val_tipo', fk_marca = '$val_marca', 
-    num_serie = '$valores->num_serie', ubicacion = '$valores->ubicacion', tag = '$valores->tag', fk_usuario = '$valores->usuario', fecha_entrega = '$valores->fecha_entrega' WHERE id = '$valores->id_equipo';";
+    $sql = "UPDATE inventario_ti_sur SET zona = '$valores->zona', fk_rubro = '$val_rubro', af = '$valores->af', fk_tipo ='$val_tipo', fk_marca = '$val_marca', modelo = '$valores->modelo',
+    num_serie = '$valores->num_serie', ubicacion = '$valores->ubicacion', tag = '$valores->tag', fk_usuario = '$valores->usuario', fecha_entrega = '$valores->fecha_entrega' WHERE id = '$valores->id';";
     //var_dump($sql);
     $result = mysqli_query($con, $sql);
     return $result;
