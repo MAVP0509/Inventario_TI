@@ -57,17 +57,21 @@ function consultar_historico($valores)
                 hst.num_serie = ITS.num_serie"; */
 
     if (!empty($valores->num_serie)) {
+        // var_dump($con);
+
         $num_serie = mysqli_real_escape_string($con, $valores->num_serie);
+        // var_dump($num_serie);
         $sql .= " WHERE hst.num_serie = '$num_serie'";
     }
 
     if (!empty($valores->fecha_inicio) && !empty($valores->fecha_fin)) {
-        $fecha_inicio = mysqli_real_escape_string($con, $$valores->fecha_inicio);
-        $fecha_fin = mysqli_real_escape_string($con, $$valores->fecha_fin);
+        // var_dump($con);
+        $fecha_inicio = mysqli_real_escape_string($con, $valores->fecha_inicio);
+        $fecha_fin = mysqli_real_escape_string($con, $valores->fecha_fin);
         if (strpos($sql, 'WHERE') !== false) {
-             $sql .= " AND hst.fecha_evento BETWEN '$fecha_inicio' AND '$fecha_fin'";
+             $sql .= " AND hst.fecha_evento BETWEEN '$fecha_inicio' AND '$fecha_fin'";
         } else {
-             $sql .= " WHERE hst.fecha_evento BETWEN '$fecha_inicio' AND '$fecha_fin'";
+             $sql .= " WHERE hst.fecha_evento BETWEEN '$fecha_inicio' AND '$fecha_fin'";
         }
        
     }
