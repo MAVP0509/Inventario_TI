@@ -12,7 +12,7 @@ function server_inventario(model) {
                 console.log(response);
                 try {
                     resolve(JSON.parse(response))
-                    //console.log(resolve(JSON.parse(response)))
+                    console.log(resolve(JSON.parse(response)))
                     respuesta = response
                 } catch (error) {
                     reject(error)
@@ -75,8 +75,9 @@ async function consultar_informacion(params) {
         accion: 2
     };
 
-    let server = await server_inventario(model);
-    datos = server.resultado
+    let response = await server_inventario(model);
+    
+    datos = response.resultado
 
     datos.forEach(d => d.seleccionado = false);
 
@@ -114,6 +115,11 @@ async function consultar_informacion(params) {
                     row.getElement().classList.remove("bg-primary")
                 }
             },
+            //layout: "fitColumns",
+            pagination: true,
+            paginationSize: 10,
+            paginationSizeSelector: [5, 10, 25, 35],
+            movableColumns: true,              //allow column order to be changed
             columns: [
                 {
                     formatter: squareIcon, width: 70, hozAlign: "center",
@@ -148,11 +154,6 @@ async function consultar_informacion(params) {
                 },
 
             ],
-            //layout: "fitColumns",
-            pagination: true,
-            paginationSize: 10,
-            paginationSizeSelector: [5, 10, 25, 35],
-            movableColumns: true,              //allow column order to be changed
 
         });
     } catch (error) {
@@ -169,7 +170,7 @@ async function mostrar_registro(params) {
         const element = datos[i];
         if (element.id_equipo === params.value) {
             selecreg = element;
-            console.log(selecreg)
+            //console.log(selecreg)
             break;
         }
     }
@@ -343,36 +344,6 @@ async function editar_registro(params) {
 
 }
 
-
-
-/* async function desactivar_registro(params) {
-    let model = {
-        accion: 3,
-        id: seleccionar,
-        //num_serie_: series
-    }
-   //console.log(model)
-
-    let response = await server_inventario(model);
-    //console.log(response);
-    
-        if (response.resultado === true) {
-            let num_series = response.num_series;
-            for (let num_serie of num_series) {
-                await registrar_historico(num_serie, 'Eliminación de registro');
-            }
-                
-
-            mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
-            //seleccionar = []
-            let table = $('#tabla1').DataTable();
-            table.destroy();
-            consultar_informacion();
-
-        } else {
-            mostrar_alerta('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
-        }
-} */
 async function desactivar_registro() {
     let model = {
         accion: 3,
@@ -391,20 +362,8 @@ async function desactivar_registro() {
         mostrar_alerta('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
     }
 }
-/* async function eliminar_registro(params) {
-    let response = await server_inventario({ accion: 4, id: id });
-        if (response.resultado === true) {
-            mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
-            $('#tabla1').DataTable().ajax.reload(); // Recargar la tabla
-            $('#modal-registro').modal('hide');
-        } else {
-            mostrarAlerta('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
-        }
-} */
 
 //TODO: Validación de funciones
-
-
 
 async function confirmar_eliminacion() {
     if (seleccionar.length === 0) {
@@ -426,30 +385,6 @@ async function confirmar_eliminacion() {
         });
     }
 }
-
-/* function deshabilitar_campo(){
-    // Al cambiar la opción en el seleccionar, bloqueamos o habilitamos el campo
-    $("#edi-rubro").on('change', function() {
-        if ($(this).val() !== "") {  // Si el valor no está vacío
-            $(this).prop('disabled', true);  // Bloquear el campo select
-        } else {
-            $(this).prop('disabled', false);  // Habilitar el campo si no tiene valor
-        }
-    });
-
-    // Verifica si el campo #edi-rubro ya tiene un valor
-    if ($("#edi-rubro").val() !== "") {
-        // Si tiene un valor, deshabilitar el campo
-        $("#edi-rubro").prop('disabled', false);
-    } else {
-        // Si no tiene un valor, habilitar el campo
-        $("#edi-rubro").prop('disabled', true);
-    }
-}
-
-$(document).ready(function() {
-    deshabilitar_campo();  // Llamamos a la función para asegurar que el campo se habilite/deshabilite al cargar
-}); */
 
 function validar_campos(campos) {
     let valido = true;
@@ -556,24 +491,6 @@ function mostrar_alerta(tipo, titulo, mensaje) {
         position: 'top-end'
     });
 }
-
-//TODO: Configuración del select2
-/*  $(document).ready(function() {
-   $(".select").each(function() { //recorre cada <select class="select">
-     const $select = $(this);
- 
-     // Encuentra el modal contenedor más cercano
-     const $modal = $select.closest('.modal'); //
- 
-     $select.select2({
-       theme: 'bootstrap4',
-       placeholder: "Selecciona un rubro",
-       allowClear: true,
-       tags: true,
-       dropdownParent: $modal.length ? $modal : $(document.body) // por si no está en modal
-     });
-   });
- }); */
 
 //TODO Funciones de los Select2
 

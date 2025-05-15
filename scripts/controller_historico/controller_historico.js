@@ -112,18 +112,19 @@ async function mostrar_historial() {
 
     if (respuesta_historico && respuesta_historico.resultado && respuesta_historico.resultado.length > 0) {
         respuesta_historico.resultado.forEach(registro => {
-            const fecha = new Date(registro.fecha_evento);
+            var fecha = moment(registro.fecha_evento).local('es').format('D [de] MMMM [de] YYYY, h:mm:ss a');
+            /* const fecha = new Date(registro.fecha_evento);
             const fechaFormateada = fecha.toLocaleString('es-MX', {
                 day: 'numeric',
                 month: 'long',
                 year: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit'
-            });
+            }); */
 
             const item = `
                 <div class="list-group-item">
-                    <strong>${fechaFormateada}</strong><br>
+                    <strong>${fecha}</strong><br>
                     <span>${registro.usuario}</span><br>
                     <em>${registro.evento}</em>
                 </div>
