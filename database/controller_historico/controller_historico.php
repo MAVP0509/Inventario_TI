@@ -23,12 +23,12 @@ function registrar_historico($valores)
 
     if (is_array($valores->num_serie)) {
         foreach ($valores->num_serie as $num_serie) {
-            $sql = "INSERT INTO historico(fecha_evento, usuario, evento, num_serie) VALUES ('$fecha_evento', '$valores->usuario', '$valores->evento', '$num_serie')";
+            $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie) VALUES ('$fecha_evento', '$valores->usuario_sesion', '$valores->evento', '$num_serie', '$valores->zona', '$valores->ubicacion', '$valores->nombre_usuario')";
             mysqli_query($con, $sql);
         }
         return true;
     } else {
-        $sql = "INSERT INTO historico(fecha_evento, usuario, evento, num_serie) VALUES ('$fecha_evento', '$valores->usuario', '$valores->evento', '$valores->num_serie')";
+        $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie) VALUES ('$fecha_evento', '$valores->usuario_sesion', '$valores->evento', '$valores->num_serie')";
         $query = mysqli_query($con, $sql);
         //var_dump($query);
         return $query;
@@ -41,35 +41,21 @@ function consultar_historico($valores)
     include("../conexion.php");
 
     // $sql = "SELECT * FROM historico ORDER BY fecha_evento DESC";
-    $sql = "SELECT
-            hst.id,
-            hst.fecha_evento,
-            ITS.zona,
-            CT.tipo,
-            hst.evento,
-            hst.usuario,
-            hst.num_serie
-            FROM
-                historico AS hst
-                INNER JOIN inventario_ti_sur AS ITS ON hst.num_serie = ITS.num_serie
-                INNER JOIN cat_tipo AS CT ON CT.id = ITS.fk_tipo";
+    $sql = "SELECT * FROM vhistorico";
+    //var_dump($sql)
     /*  WHERE 
                 hst.num_serie = ITS.num_serie"; */
 
     if (!empty($valores->num_serie)) {
-        $num_serie = mysqli_real_escape_string($con, $valores->num_serie);
-        $sql .= " WHERE hst.num_serie = '$num_serie'";
+        $sql .= " WHERE num_serie = '$valores->num_serie'";
     }
 
     if (!empty($valores->fecha_inicio) && !empty($valores->fecha_fin)) {
-        $fecha_inicio = mysqli_real_escape_string($con, $$valores->fecha_inicio);
-        $fecha_fin = mysqli_real_escape_string($con, $$valores->fecha_fin);
         if (strpos($sql, 'WHERE') !== false) {
-             $sql .= " AND hst.fecha_evento BETWEN '$fecha_inicio' AND '$fecha_fin'";
+            $sql .= " AND fecha_evento BETWEEN '$valores->fecha_inicio' AND '$valores->fecha_fin'";
         } else {
-             $sql .= " WHERE hst.fecha_evento BETWEN '$fecha_inicio' AND '$fecha_fin'";
+            $sql .= " WHERE fecha_evento BETWEEN '$valores->fecha_inicio' AND '$valores->fecha_fin'";
         }
-       
     }
 
     $sql .= " ORDER BY hst.fecha_evento DESC LIMIT 100";

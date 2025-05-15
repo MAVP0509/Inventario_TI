@@ -7,7 +7,7 @@ function server_historico(model) {
             data: {
                 trama: JSON.stringify(model)
             },
-            success: function(response){
+            success: function (response) {
                 console.log(response);
                 try {
                     resolve(JSON.parse(response))
@@ -41,7 +41,7 @@ function server_inventario02(model) {
             }
         })
     });
-    
+
 }
 
 async function consultar_historico() {
@@ -57,40 +57,52 @@ async function consultar_historico() {
     var table = new Tabulator("#tbl02", {
         data: datos.resultado,
         columns: [
-            {title: "Id", field: "id"},
-            {title: "Fecha", field: "fecha_evento"},
-            {title: "Evento", field: "evento"},
-            {title: "Zona", field: "zona"},
-            {title: "Tipo", field: "tipo"},
-            {title: "Usuario", field: "usuario"},
-            {title: "Numero de serie", field: "num_serie"},
-
+            { title: "Id", field: "id" },
+            { title: "Fecha del evento", field: "fecha_evento" },
+            { title: "Usuario del evento", field: "usuario_sesion" },
+            { title: "Evento", field: "evento" },
+            { title: "Zona", field: "zona" },
+            { title: "Nombre del usuario", field: "nombre" },
+            { title: "Cargo del usaurio ", field: "cargo" },
+            { title: "Numero de serie", field: "num_serie" },
+            { title: "Rubro", field: "rubro" },
+            { title: "Tipo de dispositivo", field: "tipo" },
+            { title: "Modelo del dispositivo", field: "modelo" },
         ],
-        layout: "fitColumns",
+        //layout: "fitColumns",
     });
 }
 
-async function registrar_historico(num_serie, evento) {
+async function registrar_historico(num_serie, evento,) {
     const usuario = JSON.parse(sessionStorage.getItem('user')); // Obtener usuario en sesión
     //const fecha_evento = new Date().toISOString();
     const model = {
         accion: 1,
-        usuario: usuario.resultado[0], // Nombre del usuario
+        usuario_sesion: usuario.resultado[0], // Nombre del usuario
         num_serie: num_serie, // Número de serie del dispositivo
         evento: evento,
+        zona: zona,
+        ubicacion: ubicacion,
+        nombre_usuario: nombre_usuario
+
     };
 
     let resultado = await server_historico(model);
 
 }
 
-function consultar_num_serie(params) {
+function consultar_num_serie() {
+    let input = document.getElementsByName('mdl-hst')
+    for (let i = 0; i < input.length; i++) {
+        input[i].value = "";
+        input[i].classList.remove('is-invalid');
+
+    }
 
     $("#modal-historial").modal('show')
 }
 
 async function mostrar_historial() {
-
     const validacion = ["his-num-serie"];
 
     if (!validar_campo(validacion)) {
@@ -113,20 +125,12 @@ async function mostrar_historial() {
     if (respuesta_historico && respuesta_historico.resultado && respuesta_historico.resultado.length > 0) {
         respuesta_historico.resultado.forEach(registro => {
             var fecha = moment(registro.fecha_evento).local('es').format('D [de] MMMM [de] YYYY, h:mm:ss a');
-            /* const fecha = new Date(registro.fecha_evento);
-            const fechaFormateada = fecha.toLocaleString('es-MX', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            }); */
 
             const item = `
                 <div class="list-group-item">
                     <strong>${fecha}</strong><br>
-                    <span>${registro.usuario}</span><br>
-                    <em>${registro.evento}</em>
+                    <span>${registro.usuario_sesion}</span><br>
+                    <em>${registro.evento} en los campos ${registro.zona}, ${registro.ubicacion}, ${registro.nombre_usuario}</em>
                 </div>
             `;
             contenedor.append(item);
