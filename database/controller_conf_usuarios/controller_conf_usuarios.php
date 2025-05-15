@@ -14,6 +14,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = editar_usuarios($clientejson);
 } elseif ($clientejson->accion == 2) {
     $respuesta_servidor->resultado = consultar_usuarios($clientejson);
+} elseif ($clientejson->accion == 3) {
+    $respuesta_servidor->resultado = eliminar_usuarios($clientejson);
 }
 
 print(json_encode($respuesta_servidor)); //? envía la respuesta de la base de datos a javascript
@@ -22,11 +24,11 @@ print(json_encode($respuesta_servidor)); //? envía la respuesta de la base de d
 //* Creación de un nuevo usuario
 function insertar_usuarios($valores){
     include("../conexion.php");
-    $sql = "INSERT INTO cat_usuarios(nombre,cargo) VALUES ('$valores->usuario','$valores->cargo');";
+    $sql = "INSERT INTO cat_usuarios(nombre,cargo) VALUES ('$valores->nombre','$valores->cargo');";
 
-    $sql_val_usuario = "SELECT * FROM cat_usuarios WHERE nombre = '$valores->usuario'";
+    $sql_val_usuario = "SELECT * FROM cat_usuarios WHERE nombre = '$valores->nombre'";
     if (mysqli_query($con, $sql_val_usuario)->num_rows > 0) {
-        return false;
+        return "Este usuario ya existe";
     } else {
         return mysqli_query($con, $sql);
     }
@@ -35,7 +37,7 @@ function insertar_usuarios($valores){
 //* Edita un usuario ya existente
 function editar_usuarios($valores){
     include("../conexion.php");
-    $sql = "UPDATE cat_usuarios SET cargo='$valores->cargo' WHERE id='$valores->id';";
+    $sql = "UPDATE cat_usuarios SET nombre = '$valores->nombre',cargo='$valores->cargo' WHERE id='$valores->id';";
     //var_dump($sql);
     return mysqli_query($con, $sql);
 }
@@ -43,7 +45,7 @@ function editar_usuarios($valores){
 //* Consulta los usuarios  para mostrarlos en el programa
 function consultar_usuarios(){
     include("../conexion.php");
-    $sql = "SELECT * FROM  cat_usuarios WHERE nombre <> 'NA'";
+    $sql = "SELECT * FROM  cat_usuarios WHERE nombre <> 'NA' AND habilitado = 1";
     $query = mysqli_query($con, $sql);
     $array = array();
     while ($fila = mysqli_fetch_object($query)) {
@@ -52,4 +54,24 @@ function consultar_usuarios(){
     return $array;
 }
 
+function eliminar_usuarios($valores)
+{
+    include("../conexion.php");
+
+
+    foreach ($valores->id as $id) {
+        $id = intval($id); // Seguridad: asegura que sea número
+        $sql_val = "SELECT * FROM inventario_ti_sur WHERE fk_usuario = '$id'";
+        $res = mysqli_query($con, $sql_val);
+
+        if ($res && $res->num_rows > 0) {
+            return "Uno o más usuarios no pueden ser eliminados. Uno o más equipos lo tienen asignado";
+        }
+    }
+
+    //return $array;
+    $ids = implode(",", array_map('intval', $valores->id)); // Convierte el array de IDs en una lista separada por comas
+    $sql = "UPDATE cat_usuarios SET habilitado = 0 WHERE id IN ($ids);"; // Consulta sql usando IN para eliminar múltiples registros
+    return mysqli_query($con, $sql);
+}
 

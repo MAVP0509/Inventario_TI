@@ -67,10 +67,6 @@ let table
 let seleccionar = [];
 
 async function consultar_informacion(params) {
-    /* let usuarioLog = JSON.parse(sessionStorage.getItem('user'))
-    let user = document.getElementById('user')
-    user.textContent = usuarioLog.resultado[0] */
-
     let model = {
         accion: 2
     };
@@ -105,7 +101,7 @@ async function consultar_informacion(params) {
     }
 
     try {
-        var table = new Tabulator("#tbl01", {
+        table = new Tabulator("#tbl01", {
             data: datos,
             rowFormatter: function (row) {
                 data = row.getData()
@@ -168,7 +164,7 @@ let selecreg = "";
 async function mostrar_registro(params) {
     for (let i = 0; i < datos.length; i++) {
         const element = datos[i];
-        if (element.id_equipo === params.value) {
+        if(element.id_equipo===params.id_equipo){
             selecreg = element;
             //console.log(selecreg)
             break;
@@ -209,26 +205,18 @@ async function mostrar_registro(params) {
         placeholder: 'Seleccione un usuario',
         dropdownParent: '#modal-editar',
     })
-    /* await general_select2({
-        selectId: 'edi-posicion',
-        tabla: 'cat_usuarios',
-        campo: 'cargo',
-        placeholder: 'Seleccione un cargo',
-        dropdownParent: '#modal-editar',
-        tags: true,
-    }) */
-    document.getElementById("edi-zona").value = selecreg.zona;
-    rellenar_select(selecreg.rubro, "edi-rubro")
-    document.getElementById("edi-af").value = selecreg.af;
-    rellenar_select(selecreg.tipo, "edi-tipo")
-    rellenar_select(selecreg.marca, "edi-marca")
-    document.getElementById("edi-modelo").value = selecreg.modelo;
-    document.getElementById("edi-num-serie").value = selecreg.num_serie;
-    document.getElementById("edi-ubicacion").value = selecreg.ubicacion;
-    document.getElementById("edi-tag").value = selecreg.tag;
-    rellenar_select(selecreg.usuario, "edi-usuario")
-    //rellenar_select(selecreg.posicion,"edi-posicion")
-    document.getElementById("edi-fecha-entrega").value = selecreg.fecha_entrega;
+
+        document.getElementById("edi-zona").value = selecreg.zona;
+        rellenar_select(selecreg.rubro,"edi-rubro")
+        document.getElementById("edi-af").value = selecreg.af;
+        rellenar_select(selecreg.tipo,"edi-tipo")
+        rellenar_select(selecreg.marca,"edi-marca")
+        document.getElementById("edi-modelo").value = selecreg.modelo;
+        document.getElementById("edi-num-serie").value = selecreg.num_serie;
+        document.getElementById("edi-ubicacion").value = selecreg.ubicacion;
+        document.getElementById("edi-tag").value = selecreg.tag;
+        rellenar_select(selecreg.usuario,"edi-usuario")
+        document.getElementById("edi-fecha-entrega").value = selecreg.fecha_entrega;
 
     $("#modal-editar").modal("show");
 
@@ -258,6 +246,10 @@ async function crear_registro() {
         return;
     }
 
+    let user = $("#inp-usuario").val().trim()
+    if (user === ""){
+        user = "5"
+    } 
     // Crear el modelo con los datos del formulario
     let model = {
         accion: 0,
@@ -270,7 +262,7 @@ async function crear_registro() {
         num_serie: $("#inp-num-serie").val().trim().toUpperCase(),
         ubicacion: $("#inp-ubicacion").val().trim(),
         tag: $("#inp-tag").val().trim(),
-        usuario: $("#inp-usuario").val().trim(),
+        usuario: user,
         fecha_entrega: $("#inp-fecha-entrega").val()
     };
 
@@ -282,8 +274,6 @@ async function crear_registro() {
     serie.classList.remove('is-invalid'); // Remover clase de error si existía
 
     if (server.resultado === true) {
-        let table = $('#tabla1').DataTable();
-        table.destroy();
         consultar_informacion();
         $("#modal-registro").modal('hide');
         await registrar_historico(model.num_serie, 'Nuevo registro');
@@ -310,6 +300,12 @@ async function editar_registro(params) {
         "inp-tipo",
         "inp-ubicacion",
     ];
+
+    let user = $("#edi-usuario").val().trim()
+    if (user === ""){
+        user = "5"
+    }
+
     let model = {
         accion: 1,
         id: selecreg.id_equipo,
@@ -322,7 +318,7 @@ async function editar_registro(params) {
         num_serie: $("#edi-num-serie").val().trim().toUpperCase(),
         ubicacion: $("#edi-ubicacion").val().trim(),
         tag: $("#edi-tag").val().trim(),
-        usuario: $("#edi-usuario").val().trim(),
+        usuario: user,
         //posicion: $("#edi-posicion").select2('data')[0].text,
         fecha_entrega: $("#edi-fecha-entrega").val()
     }
@@ -337,11 +333,12 @@ async function editar_registro(params) {
         mostrar_alerta('success', '¡Edición exitosa!', 'El registro se ha actualizado correctamente.');
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo editar el registro. Inténtalo nuevamente.');
+        return
     }
 
     consultar_informacion();
-    $("modal-editar").modal("hide");
-
+    $("#modal-editar").modal("hide");
+    
 }
 
 async function desactivar_registro() {
@@ -355,8 +352,6 @@ async function desactivar_registro() {
     if (Array.isArray(response.resultado)) {
         await registrar_historico(response.resultado, 'Eliminación de registro');
         mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
-        let table = $('#tabla1').DataTable();
-        table.destroy();
         consultar_informacion();
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
@@ -468,7 +463,6 @@ function limpiar_campos() {
         campo: 'nombre',
         placeholder: 'Seleccione un usuario',
         dropdownParent: '#modal-registro',
-        tags: true
     });
 
 
@@ -617,8 +611,6 @@ async function crear_resguardo(params) {
 
     infoResguardo = server.resultado
     //console.log(infoResguardo)
-    let table = $('#tabla1').DataTable();
-    table.destroy();
     consultar_informacion();
 
 
