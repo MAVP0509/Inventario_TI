@@ -77,8 +77,8 @@ async function consultar_informacion(params) {
         data: datos,
         layout: "fitColumns",              //fit columns to width of table
         pagination: true,               //paginate the data
-        paginationSize: 10,                //allow 10 rows per page of data
-        paginationSizeSelector: [5, 10, 15, 20],
+        paginationSize: 12,                //allow 10 rows per page of data
+        paginationSizeSelector: [12, 15, 20],
         paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
             const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
             const end = Math.min(currentRowStart + pageSize - 1, totalRows);
@@ -113,17 +113,22 @@ async function consultar_informacion(params) {
         },
         groupBy: "region",
         columns: [
-            { title: "ID", field: "id", width: 45, hozAlign: "center", headerSort: false },
+            { title: "ID", field: "id", width: 45, hozAlign: "center", headerSort: false, headerHozAlign: "center", },
             {
-                title: "Nombre", field: "nombre"
+                title: "Nombre", field: "nombre", headerHozAlign: "center", headerFilter: "input", headerSort: false
             },
             {
-                title: "Cargo", field: "cargo"
+                title: "Cargo", field: "cargo", headerHozAlign: "center", headerFilter: "input", headerSort: false
             },
-            { title: "Región", field: "region" },
+            {
+                title: "Región", field: "region", headerHozAlign: "center", headerSort: false, width: 100, hozAlign: "center", headerFilter: "list",
+                headerFilterParams: {
+                    valuesLookup:true, clearable:true // se auto genera a partir de los valores únicos de la columna
+                },
+            },
             {
                 title: "Habilitado",
-                field: "habilitado",
+                field: "habilitado", headerHozAlign: "center", editor : "list", editorParams: {values:{"1":"Activo","0":"Inactivo"}}, headerFilter:true, headerFilterParams:{values:{"1":"Activo", "0":"Inactivo"}, clearable:true},
                 formatter: function (cell, formatterParams, onRendered) {
                     let value = cell.getValue();
                     console.log(value)
@@ -131,11 +136,6 @@ async function consultar_informacion(params) {
                     let color = value === "0" ? "#dc3545" : "#28a745";
                     return `<span class="custom-toggle"><i class="${icon}" style="color:${color}; font-size: 1.5em;"></i></span>`;
                 },
-                /* cellClick: function (e, cell) {
-                    let current = cell.getValue();
-                    let newValue = current === "1" ? "0" : "1";
-                    cell.setValue(newValue);
-                } */
                 cellClick: function (e, cell) {
                     const tableData = table.getData();
                     const rowData = cell.getRow().getData();
@@ -228,7 +228,7 @@ async function consultar_informacion(params) {
                             editBtn.removeAttribute("data-content");
                         }
                     }
-                }
+                }, width: 90, hozAlign: "center", headerSort: false, 
 
             },
             {
@@ -242,111 +242,6 @@ async function consultar_informacion(params) {
         ],
 
     })
-
-    /* try {
-        $("#tabla1").DataTable({
-            data: datos,
-            columns: [
-                {
-                    data: "id",
-                    render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
-                        return control;
-                    }
-                },
-                {
-                    data: "nombre",
-                    render: function(data, type, row, meta) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
-                        return control
-                    }
-                },
-                {
-                    data: "cargo",
-                    render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
-                        return control;
-                    }
-                },
-                {
-                    data: "region",
-                    render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
-                        return control;
-                    }
-                },
-                {
-                    data: "habilitado",
-                    render: function(data, type, row) {
-                        let switchId = `switch-${row.id}`; // Usa ID único
-                        let checked = (parseInt(data) === 1) ? 'checked' : ''; // Asegura que 1 = habilitado
-                        let control =   `<div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success text-center">
-                                            <input type="checkbox" class="custom-control-input switch-toggle" id="${switchId}"  data-id="${row.id}" ${checked}>
-                                            <label class="custom-control-label" for="${switchId}"></label>
-                                        </div>`
-                        return control;
-                    }
-                },
-                {
-                    data: "id",
-                    render: function(data, type, row) {
-                        let control = `<div class="d-flex justify-content-center align-items-center">
-                                        <button type="button" style="text-align: center" class="btn btn-warning icon" id="${data}" value="${data}" onclick="mostrar_registro(this)">
-                                        <i class="fa-solid fa-pen-to-square fa-lg"></i></button></div>`
-                        return control;
-                    }
-                },
-            ],
-            dom: `
-                <'row mb-2'<'col-sm-6 text-left'f><'col-sm-6 text-right'<'btn-group'B>>>
-                <'row'<'col-sm-12 text-center'tr>>
-                <'row mt-2'<'col-sm-3'l><'col-sm-5 text-center'i><'col-sm-4 text-right'p>>
-            `,
-            language: {
-                url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json',
-                paginate: {
-                    first: '<i class="fas fa-angle-double-left"></i>',
-                    previous: '<i class="fas fa-angle-left"></i>',
-                    next: '<i class="fas fa-angle-right"></i>',
-                    last: '<i class="fas fa-angle-double-right"></i>'
-                },
-            },
-            buttons: [
-                {
-                    html: `<div>
-                            <button type="button" onclick="nuevo_supervisor()" class="btn btn-success icon"><i class="fa-solid fa-plus fa-lg"></i> Nuevo Supervisor</button>
-                        </div>`,
-                },
-                
-            ],
-            stateSave: true,
-            responsive: true,
-            
-            initComplete: function () {
-                $('#tabla1 tbody tr').each(function () {
-                    const row = $(this);
-                    const switchElement = row.find('.switch-toggle');
-                    const isChecked = switchElement.is(':checked');
-        
-                    if (isChecked) {
-                        const editButton = row.find('button');
-                        editButton.prop('disabled', true);
-                        editButton.attr({
-                            'data-toggle': 'popover',
-                            'data-trigger': 'hover',
-                            'data-html': 'true',
-                            'data-placement': 'top',
-                            'data-content': '<div class="bg-warning text-dark p-1 rounded">Deshabilite para editar</div>',
-                        });
-                        editButton.popover(); // Inicializa el popover
-                    }
-                }
-            )}
-        });
-        
-    } catch (error) {
-        console.log(error)
-    } */
 
 }
 

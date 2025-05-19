@@ -94,6 +94,7 @@ async function consultar_informacion(){
     }
 
      table = new Tabulator('#tbl', {
+        theme:"dark",
         locale: "es",
         data: datos,
         layout: "fitColumns",              //fit columns to width of table

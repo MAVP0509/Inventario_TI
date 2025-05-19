@@ -13,6 +13,12 @@ $(".icon").on('mouseout', function (e) {
   $(this).find('i').removeClass("fa-bounce");
 })
 
+$(document).on('mouseover', '.icon', function () {
+  $(this).find('i').addClass('fa-bounce');
+}).on('mouseout', '.icon', function () {
+  $(this).find('i').removeClass('fa-bounce');
+});
+
 //TODO Animando icono de salir
 $("#log-out").on('mouseover', function () {
   $(this).find('i').removeClass('fa-solid fa-door-closed fa-lg').addClass('fa-solid fa-door-open fa-xl');
@@ -20,14 +26,6 @@ $("#log-out").on('mouseover', function () {
 $("#log-out").on('mouseout', function () {
   $(this).find('i').removeClass('fa-solid fa-door-open fa-lg').addClass('fa-solid fa-door-closed fa-xl')
 })
-
-
-$(document).on('mouseover', '.icon', function () {
-  $(this).find('i').addClass('fa-bounce');
-}).on('mouseout', '.icon', function () {
-  $(this).find('i').removeClass('fa-bounce');
-});
-
 
 async function cerrar_sesionmsg() {
   mostrar_alert('warning', `¿Seguro que quieres salir?`, false, cerrar_sesion)
@@ -72,14 +70,14 @@ fetch('sidebar.html')
       if (href === currentPage) {
         link.classList.add('active', 'bg-lightblue');
 
-        
+
         let parent = link.closest('.nav-item');
         while (parent) {
-           if (parent.classList.contains('nav-item')) {
+          if (parent.classList.contains('nav-item')) {
             parent.classList.add('menu-open');
-          } 
+          }
 
-          
+
           parent = parent.parentElement.closest('.nav-item');
         }
 
@@ -115,15 +113,15 @@ function mostrar_alert(tipo, mensaje, skip, funcion) {
 }
 
 function mostrar_toast(tipo, titulo, mensaje, tiempo) {
-    Swal.fire({
-        icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
-        title: titulo,
-        html: mensaje,
-        timer: tiempo || 2500 ,
-        timerProgressBar: true,
-        showConfirmButton: false,
-        toast: true,
-        position: 'top-end',
-        heightAuto : true,
-    });
+  Swal.fire({
+    icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
+    title: titulo,
+    html: mensaje,
+    timer: tiempo || 2500,
+    timerProgressBar: true,
+    showConfirmButton: false,
+    toast: true,
+    position: 'top-end',
+    heightAuto: true,
+  });
 }

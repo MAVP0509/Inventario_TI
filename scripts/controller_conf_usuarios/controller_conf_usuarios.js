@@ -143,21 +143,6 @@ async function consultar_informacion() {
                     }
             },
             {
-                title: "Activo",
-                field: "activo",
-                formatter: function (cell, formatterParams, onRendered) {
-                    let value = cell.getValue();
-                    let icon = value === "on" ? "fa-solid fa-toggle-on fa-2xl" : "fa-solid fa-toggle-off fa-2xl";
-                    let color = value === "on" ? "#28a745" : "#dc3545";
-                    return `<span class="custom-toggle"><i class="${icon}" style="color:${color}; font-size: 1.5em;"></i></span>`;
-                },
-                cellClick: function (e, cell) {
-                    let current = cell.getValue();
-                    let newValue = current === "on" ? "off" : "on";
-                    cell.setValue(newValue);
-                }
-            },
-            {
                 formatter: editIcon, width: 60, hozAlign: "center",
                 cellClick: function (e, cell) {
                     elemento = cell.getRow().getData();
