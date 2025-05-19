@@ -125,7 +125,7 @@ async function consultar_informacion() {
             },
             { title: "ID", field: "id", width: 45, hozAlign: "center", headerSort: false },
             {
-                title: "Nombre", field: "nombre", cellClick:
+                title: "Nombre", field: "nombre", headerFilter: "input", headerSort: false, cellClick:
                     function (e, cell) {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
@@ -134,7 +134,7 @@ async function consultar_informacion() {
                     }
             },
             {
-                title: "Cargo", field: "cargo", cellClick:
+                title: "Cargo", field: "cargo", headerFilter: "input", headerSort: false, cellClick:
                     function (e, cell) {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado

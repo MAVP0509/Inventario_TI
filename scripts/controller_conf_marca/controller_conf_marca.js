@@ -94,7 +94,6 @@ async function consultar_informacion(){
     }
 
      table = new Tabulator('#tbl', {
-        theme:"dark",
         locale: "es",
         data: datos,
         layout: "fitColumns",              //fit columns to width of table
@@ -128,7 +127,7 @@ async function consultar_informacion(){
                 }, headerSort: false, frozen: true
             },
             {title:"ID", field:"id", width: 45, hozAlign: "center", headerSort: false},
-            {title:"Marca", field:"marca", cellClick:
+            {title:"Marca", field:"marca", headerFilter: "input", headerSort: false, cellClick:
                     function (e, cell) {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
