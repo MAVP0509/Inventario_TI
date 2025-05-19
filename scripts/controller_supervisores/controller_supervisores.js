@@ -128,10 +128,9 @@ async function consultar_informacion(params) {
             },
             {
                 title: "Habilitado",
-                field: "habilitado", headerHozAlign: "center", editor : "list", editorParams: {values:{"1":"Activo","0":"Inactivo"}}, headerFilter:true, headerFilterParams:{values:{"1":"Activo", "0":"Inactivo"}, clearable:true},
+                field: "habilitado", headerHozAlign: "center", headerFilter:"list", headerFilterParams:{values:{"1":"Activo", "0":"Inactivo"}, clearable:true},
                 formatter: function (cell, formatterParams, onRendered) {
                     let value = cell.getValue();
-                    console.log(value)
                     let icon = value === "1" ? "fa-solid fa-toggle-on fa-2xl" : "fa-solid fa-toggle-off fa-2xl";
                     let color = value === "0" ? "#dc3545" : "#28a745";
                     return `<span class="custom-toggle"><i class="${icon}" style="color:${color}; font-size: 1.5em;"></i></span>`;

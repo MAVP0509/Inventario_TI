@@ -133,7 +133,7 @@ async function consultar_informacion() {
                 title: "ID", field: "id", width: 45, hozAlign: "center", headerSort: false
             },
             {
-                title: "Rubro", field: "rubro",headerHozAlign: "center", headerFilter: "input", headerSort: false, cellClick:
+                title: "Rubro", field: "rubro", headerFilter: "input", headerSort: false, cellClick:
                     function (e, cell) {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
