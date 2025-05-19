@@ -148,7 +148,7 @@ async function consultar_informacion() {
                 formatter: function (cell, formatterParams, onRendered) {
                     let value = cell.getValue();
                     let icon = value === "on" ? "fa-solid fa-toggle-on fa-2xl" : "fa-solid fa-toggle-off fa-2xl";
-                    let color = value === "on" ? "#5eeb00" : "#ff0000";
+                    let color = value === "on" ? "#28a745" : "#dc3545";
                     return `<span class="custom-toggle"><i class="${icon}" style="color:${color}; font-size: 1.5em;"></i></span>`;
                 },
                 cellClick: function (e, cell) {

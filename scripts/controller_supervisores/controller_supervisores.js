@@ -8,7 +8,7 @@ function server_supervisor(model) {
             data: {
                 trama: JSON.stringify(model)
             },
-            success: function(response) {
+            success: function (response) {
                 //console.log(response);
                 try {
                     resolve(JSON.parse(response))
@@ -22,21 +22,228 @@ function server_supervisor(model) {
     });
 }
 
-let datos = [];
+let datos = []
+let elemento
+let table
+let seleccionados = []
 
 async function consultar_informacion(params) {
     let model = {
         accion: 2
     };
-    
-    let response = await server_supervisor(model);
 
-    datos = response.resultado;
+    let server = await server_supervisor(model);
 
-    let table = $('#tabla1').DataTable();
-    table.destroy();
-        
-    try {
+    datos = server.resultado;
+    Tabulator.extendModule("localize", "langs", {
+        "es": {
+            "pagination": {
+                "first": '<i class="fa-solid fa-angles-right fa-flip-horizontal"></i>',
+                "first_title": "Primera página",
+                "last": '<i class="fa-solid fa-angles-right"></i>',
+                "last_title": "Última página",
+                "prev": '<i class="fa-solid fa-angle-right fa-flip-horizontal"></i>',
+                "prev_title": "Página anterior",
+                "next": '<i class="fa-solid fa-angle-right"></i>',
+                "next_title": "Página siguiente",
+                "page_size": "Tamaño",
+
+            },
+            "headerFilters": {
+                "default": "Filtrar columna...",
+                "columns": {}
+            },
+            "groups": {
+                "item": "ítem",
+                "items": "ítems"
+            },
+            "ajax": {
+                "loading": "Cargando...",
+                "error": "Error al cargar datos"
+            },
+            "data": {
+                "loading": "Cargando datos...",
+                "error": "Error al cargar datos"
+            }
+        }
+    });
+
+    let editIcon = function (cell, formatterParams, onRendered) { //plain text value
+        return "<button type='button' class='btn btn-warning icon' onclick=''><i class='fa-solid fa-pen-to-square fa-lg'></i></button>";
+    };
+
+    table = new Tabulator('#tbl', {
+        locale: "es",
+        data: datos,
+        layout: "fitColumns",              //fit columns to width of table
+        pagination: true,               //paginate the data
+        paginationSize: 10,                //allow 10 rows per page of data
+        paginationSizeSelector: [5, 10, 15, 20],
+        paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
+            const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
+            const end = Math.min(currentRowStart + pageSize - 1, totalRows);
+            return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
+        },
+        movableColumns: true,              //allow column order to be changed
+        paginationButtonCount: 3,
+        rowFormatter: function (row) {
+            const data = row.getData();
+            const rowElement = row.getElement();
+            const editBtn = rowElement.querySelector("button");
+
+            if (editBtn) {
+                if (data.habilitado === "1") {
+                    editBtn.disabled = true;
+                    editBtn.setAttribute("data-toggle", "popover");
+                    editBtn.setAttribute("data-trigger", "hover");
+                    editBtn.setAttribute("data-html", "true");
+                    editBtn.setAttribute("data-placement", "top");
+                    editBtn.setAttribute("data-content", '<div class="bg-warning text-dark p-1 rounded">Deshabilite para editar</div>');
+                    $(editBtn).popover();
+                } else {
+                    editBtn.disabled = false;
+                    $(editBtn).popover('dispose');
+                    editBtn.removeAttribute("data-toggle");
+                    editBtn.removeAttribute("data-trigger");
+                    editBtn.removeAttribute("data-html");
+                    editBtn.removeAttribute("data-placement");
+                    editBtn.removeAttribute("data-content");
+                }
+            }
+        },
+        groupBy: "region",
+        columns: [
+            { title: "ID", field: "id", width: 45, hozAlign: "center", headerSort: false },
+            {
+                title: "Nombre", field: "nombre"
+            },
+            {
+                title: "Cargo", field: "cargo"
+            },
+            { title: "Región", field: "region" },
+            {
+                title: "Habilitado",
+                field: "habilitado",
+                formatter: function (cell, formatterParams, onRendered) {
+                    let value = cell.getValue();
+                    console.log(value)
+                    let icon = value === "1" ? "fa-solid fa-toggle-on fa-2xl" : "fa-solid fa-toggle-off fa-2xl";
+                    let color = value === "0" ? "#dc3545" : "#28a745";
+                    return `<span class="custom-toggle"><i class="${icon}" style="color:${color}; font-size: 1.5em;"></i></span>`;
+                },
+                /* cellClick: function (e, cell) {
+                    let current = cell.getValue();
+                    let newValue = current === "1" ? "0" : "1";
+                    cell.setValue(newValue);
+                } */
+                cellClick: function (e, cell) {
+                    const tableData = table.getData();
+                    const rowData = cell.getRow().getData();
+                    const id = rowData.id;
+                    const region = rowData.region;
+                    const current = rowData.habilitado;
+                    const isChecked = current === "1";
+
+                    let habilitadosEnRegion = tableData.filter(row =>
+                        row.region === region && row.habilitado === "1"
+                    );
+
+                    if (!isChecked) {
+                        // Habilitar este y deshabilitar el resto
+                        if (habilitadosEnRegion.length >= 1) {
+                            habilitadosEnRegion.forEach(sup => {
+                                if (sup.id !== id) {
+                                    const otherRow = table.getRow(sup.id);
+                                    if (otherRow) {
+                                        otherRow.update({ habilitado: "0" });
+
+                                        // Habilitar botón editar
+                                        const otherRowEl = otherRow.getElement();
+                                        const otherBtn = otherRowEl.querySelector("button");
+                                        if (otherBtn) {
+                                            otherBtn.disabled = false;
+                                            $(otherBtn).popover('dispose');
+                                            otherBtn.removeAttribute("data-toggle");
+                                            otherBtn.removeAttribute("data-trigger");
+                                            otherBtn.removeAttribute("data-html");
+                                            otherBtn.removeAttribute("data-placement");
+                                            otherBtn.removeAttribute("data-content");
+                                        }
+
+                                        supervisor_habilitado({
+                                            accion: 3,
+                                            id: sup.id,
+                                            habilitado: 0
+                                        });
+                                    }
+                                }
+                            });
+                        }
+
+                        // Activar actual
+                        cell.setValue("1");
+                        rowData.habilitado = "1";
+
+                        supervisor_habilitado({
+                            accion: 3,
+                            id: id,
+                            habilitado: 1
+                        });
+
+                        const editBtn = cell.getRow().getElement().querySelector("button");
+                        if (editBtn) {
+                            editBtn.disabled = true;
+                            editBtn.setAttribute("data-toggle", "popover");
+                            editBtn.setAttribute("data-trigger", "hover");
+                            editBtn.setAttribute("data-html", "true");
+                            editBtn.setAttribute("data-placement", "top");
+                            editBtn.setAttribute("data-content", '<div class="bg-warning text-dark p-1 rounded">Deshabilite para editar</div>');
+                            $(editBtn).popover();
+                        }
+
+                    } else {
+                        // Intentamos desactivar
+                        if (habilitadosEnRegion.length <= 1) {
+                            mostrar_toast('warning', 'Advertencia', 'Debe haber un supervisor habilitado por región.');
+                            return;
+                        }
+
+                        cell.setValue("0");
+                        rowData.habilitado = "0";
+
+                        supervisor_habilitado({
+                            accion: 3,
+                            id: id,
+                            habilitado: 0
+                        });
+
+                        const editBtn = cell.getRow().getElement().querySelector("button");
+                        if (editBtn) {
+                            editBtn.disabled = false;
+                            $(editBtn).popover('dispose');
+                            editBtn.removeAttribute("data-toggle");
+                            editBtn.removeAttribute("data-trigger");
+                            editBtn.removeAttribute("data-html");
+                            editBtn.removeAttribute("data-placement");
+                            editBtn.removeAttribute("data-content");
+                        }
+                    }
+                }
+
+            },
+            {
+                formatter: editIcon, width: 60, hozAlign: "center",
+                cellClick: function (e, cell) {
+                    elemento = cell.getRow().getData();
+                    mdl_editar_supervisor(elemento);
+                },
+                headerSort: false, frozen: true
+            },
+        ],
+
+    })
+
+    /* try {
         $("#tabla1").DataTable({
             data: datos,
             columns: [
@@ -139,14 +346,14 @@ async function consultar_informacion(params) {
         
     } catch (error) {
         console.log(error)
-    }
+    } */
 
 }
 
 
 //*TODO Controlar el switch de la tabla para activar o desactivar supervisores
 
-$('#tabla1 tbody').on('change', '.switch-toggle', function () {
+/* $('#tabla1 tbody').on('change', '.switch-toggle', function () {
 
     const switchElement = $(this);
     const id = switchElement.data('id');
@@ -251,13 +458,14 @@ $('#tabla1 tbody').on('change', '.switch-toggle', function () {
 
     }
 });
+ */
 
 async function supervisor_habilitado(model) {
     await server_supervisor(model)
 }
 
 //TODO Funciones para un nuevo supervisor
-function nuevo_supervisor(){
+function nuevo_supervisor() {
     limpiar_campos_nuevo_supervisor()
 
     $("#modalInsertar").modal('show');
@@ -276,22 +484,22 @@ async function insertar_supervisor() {
     }
 
     let model = {
-        accion : 0,
-        nombre : $('#inp-nombre').val().trim(),
-        cargo  : $('#inp-cargo').val().trim(),
-        region : $('#inp-region').val().trim(),
+        accion: 0,
+        nombre: $('#inp-nombre').val().trim(),
+        cargo: $('#inp-cargo').val().trim(),
+        region: $('#inp-region').val().trim(),
     }
 
     let server = await server_supervisor(model)
 
     let resultado = JSON.parse(respuesta)
 
-    if(resultado.resultado === true){
+    if (resultado.resultado === true) {
         mostrar_toast("success", "Supervisor registrado", "El supervisor ha sido registrado exitosamente")
-        consultar_informacion()   
+        consultar_informacion()
         $("#modalInsertar").modal('hide');
 
-    }else{
+    } else {
         mostrar_toast("error", "Error", "Supervisor ya existente")
         return
     }
@@ -327,13 +535,13 @@ function validar_campos(campos) {
     return valido;
 }
 
-function limpiar_campos_nuevo_supervisor(){
+function limpiar_campos_nuevo_supervisor() {
     /* let inputs = document.getElementsByName('insertMdl');
     for (let i = 0; i < inputs.length; i++) {
         inputs[i].value = ""; // Limpia el valor del input
         inputs[i].classList.remove('is-invalid'); // Elimina la clase de validación
     } */
-    
+
     $('.select').each(function () {
         $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
         $(this).removeClass('is-invalid'); // Elimina la clase de validación
@@ -341,21 +549,21 @@ function limpiar_campos_nuevo_supervisor(){
 
     general_select2({
         selectId: 'inp-nombre',
-        tabla: 'inventario_ti_sur',
-        campo: 'usuario',
-        placeholder: 'Seleciona un usuario',
+        tabla: 'cat_usuarios',
+        campo: 'nombre',
+        placeholder: 'Seleciona un supervisor',
         dropdownParent: '#modalInsertar',
         tags: true
-      });
-    
+    });
+
     general_select2({
         selectId: 'inp-cargo',
-        tabla: 'inventario_ti_sur',
-        campo: 'posicion',
+        tabla: 'cat_usuarios',
+        campo: 'cargo',
         placeholder: 'Seleciona un cargo',
         dropdownParent: '#modalInsertar',
         tags: true
-      });
+    });
 
     general_select2({
         selectId: 'inp-region',
@@ -368,12 +576,12 @@ function limpiar_campos_nuevo_supervisor(){
 }
 
 //TODO Funciones para editar los supervisores
-let selecreg =""
+let selecreg = ""
 
-async function mostrar_registro(params) {
+async function mdl_editar_supervisor(params) {
     for (let i = 0; i < datos.length; i++) {
         const element = datos[i];
-        if(element.id===params.value){
+        if (element.id === params.id) {
             selecreg = element;
             break;
         }
@@ -381,35 +589,34 @@ async function mostrar_registro(params) {
     // Limpia y carga los select
     await general_select2({
         selectId: 'edi-nombre',
-        tabla: 'inventario_ti_sur',
-        campo: 'usuario',
+        tabla: 'cat_usuarios',
+        campo: 'nombre',
         placeholder: 'Selecione un nombre',
         dropdownParent: '#modalEditar',
-        tags: true
     })
-    
+
     await general_select2({
         selectId: 'edi-cargo',
-        tabla: 'inventario_ti_sur',
-        campo: 'posicion',
+        tabla: 'cat_usuarios',
+        campo: 'cargo',
         placeholder: 'Selecione un cargo',
         dropdownParent: '#modalEditar',
-        tags: true
     })
-    
+
     await general_select2({
         selectId: 'edi-region',
         tabla: 'supervisor',
         campo: 'region',
         placeholder: 'Seleccione una region',
         dropdownParent: '#modalEditar',
+        tags: true,
     })
-    
-        $('#edi-nombre').val(selecreg.nombre).trigger('change');
-        $('#edi-cargo').val(selecreg.cargo).trigger('change');
-        $('#edi-region').val(selecreg.region).trigger('change');
 
-        $("#modalEditar").modal('show');
+    $('#edi-nombre').val(selecreg.nombre).trigger('change');
+    $('#edi-cargo').val(selecreg.cargo).trigger('change');
+    $('#edi-region').val(selecreg.region).trigger('change');
+
+    $("#modalEditar").modal('show');
 }
 
 async function editar_supervisor(params) {
@@ -425,60 +632,60 @@ async function editar_supervisor(params) {
     }
 
     let model = {
-        accion : 1,
-        id : selecreg.id,
-        nombre : $('#edi-nombre').val().trim(),
-        cargo  : $('#edi-cargo').val().trim(),
-        region : $('#edi-region').val().trim(),
+        accion: 1,
+        id: selecreg.id,
+        nombre: $('#edi-nombre').val().trim(),
+        cargo: $('#edi-cargo').val().trim(),
+        region: $('#edi-region').val().trim(),
     }
-    
+
     let server = await server_supervisor(model)
     let resultado = JSON.parse(respuesta)
 
-    if (typeof resultado.resultado === 'string'){
+    if (typeof resultado.resultado === 'string') {
         mostrar_toast("error", "Error", resultado.resultado); // Muestra el mensaje que venga en el string
         return;
-    }else if(resultado.resultado === true){    
+    } else if (resultado.resultado === true) {
         mostrar_toast("success", "Éxito", "Supervisor editado exitosamente")
         consultar_informacion()
         $("#modalEditar").modal('hide')
-    }else{
+    } else {
         mostrar_toast("error", "Error", "Supervisor no pudo editarse")
         return
     }
 }
 
-async function general_select2({selectId, tabla, campo, placeholder, dropdownParent, tags}){
+async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags }) {
     //try {
-        const response = await server_supervisor({
-            accion: 4,
-            tabla: tabla, 
-            campo: campo
-        });
+    const response = await server_supervisor({
+        accion: 4,
+        tabla: tabla,
+        campo: campo
+    });
 
-        //console.log('Respuesta del servidor para select2:', response);
+    //console.log('Respuesta del servidor para select2:', response);
 
-        const opciones = response.resultado.map(item => ({
-            id: item[campo] || '',
-            text: item[campo] || ''
-          }));
+    const opciones = response.resultado.map(item => ({
+        id: item[campo] || '',
+        text: item[campo] || ''
+    }));
 
-        const $select = $('#' + selectId);
-        $select.empty().append(new Option('', '', false, false));
+    const $select = $('#' + selectId);
+    $select.empty().append(new Option('', '', false, false));
 
-        $select.select2({
-            theme: 'bootstrap4',
-            allowClear: true,
-            placeholder: placeholder,
-            tags: tags,
-            dropdownParent: $(dropdownParent),
-            data: opciones
-        });
+    $select.select2({
+        theme: 'bootstrap4',
+        allowClear: true,
+        placeholder: placeholder,
+        tags: tags,
+        dropdownParent: $(dropdownParent),
+        data: opciones
+    });
 
-        $select.val(null).trigger('change');
+    $select.val(null).trigger('change');
 
     //} catch (error) {
-        
+
     //}
 }
 
