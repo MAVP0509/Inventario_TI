@@ -128,7 +128,7 @@ async function consultar_informacion(){
                 }, headerSort: false, frozen: true
             },
             {title:"ID", field:"id", width: 45, hozAlign: "center", headerSort: false},
-            {title:"Tipo", field:"tipo", cellClick:
+            {title:"Tipo", field:"tipo", headerHozAlign: "center", headerFilter: "input", headerSort: false, cellClick:
                     function (e, cell) {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
