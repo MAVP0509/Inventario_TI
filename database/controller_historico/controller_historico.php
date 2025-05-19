@@ -23,15 +23,18 @@ function registrar_historico($valores)
 
     if (is_array($valores->num_serie)) {
         foreach ($valores->num_serie as $num_serie) {
-            $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie) VALUES ('$fecha_evento', '$valores->usuario_sesion', '$valores->evento', '$num_serie', '$valores->zona', '$valores->ubicacion', '$valores->nombre_usuario')";
-            mysqli_query($con, $sql);
+            $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, cargo, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro) 
+            VALUES ('$fecha_evento', '$valores->usuario_sesion', '$valores->evento', '$num_serie', '$valores->usuario', '$valores->cargo', '$valores->zona', '$valores->ubicacion', '$valores->af', '$valores->rubro', '$valores->tipo', '$valores->marca', '$valores->modelo', '$valores->tag', '$valores->fecha_registro')";
+            var_dump($query);
+            $query = mysqli_query($con, $sql);
         }
-        return true;
-    } else {
-        $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie) VALUES ('$fecha_evento', '$valores->usuario_sesion', '$valores->evento', '$valores->num_serie')";
-        $query = mysqli_query($con, $sql);
-        //var_dump($query);
         return $query;
+    } else {
+        $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, cargo, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro) 
+        VALUES ('$fecha_evento', '$valores->usuario_sesion', '$valores->evento', '$valores->num_serie', '$valores->usuario', '$valores->cargo', '$valores->zona', '$valores->ubicacion', '$valores->af', '$valores->rubro', '$valores->tipo', '$valores->marca', '$valores->modelo', '$valores->tag', '$valores->fecha_registro')";
+        //var_dump($query2);
+        $query2 = mysqli_query($con, $sql);
+        return $query2;
     }
 }
 
@@ -42,6 +45,7 @@ function consultar_historico($valores)
 
     // $sql = "SELECT * FROM historico ORDER BY fecha_evento DESC";
     $sql = "SELECT * FROM vhistorico";
+    //$sql = "SELECT * FROM historico";
     //var_dump($sql)
     /*  WHERE 
                 hst.num_serie = ITS.num_serie"; */
@@ -58,7 +62,7 @@ function consultar_historico($valores)
         }
     }
 
-    $sql .= " ORDER BY hst.fecha_evento DESC LIMIT 100";
+    $sql .= " ORDER BY fecha_evento DESC LIMIT 100";
     //var_dump($sql);
     $query = mysqli_query($con, $sql);
     $datos = [];

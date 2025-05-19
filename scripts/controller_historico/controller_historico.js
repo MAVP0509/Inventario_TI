@@ -62,33 +62,48 @@ async function consultar_historico() {
             { title: "Usuario del evento", field: "usuario_sesion" },
             { title: "Evento", field: "evento" },
             { title: "Zona", field: "zona" },
-            { title: "Nombre del usuario", field: "nombre" },
+            { title: "Ubicación del dispositivo", field: "ubicacion" },
+            { title: "Nombre del usuario", field: "usuario" },
             { title: "Cargo del usaurio ", field: "cargo" },
             { title: "Numero de serie", field: "num_serie" },
             { title: "Rubro", field: "rubro" },
             { title: "Tipo de dispositivo", field: "tipo" },
             { title: "Modelo del dispositivo", field: "modelo" },
+            { title: "Marca del dispositivo", field: "marca" },
+            { title: "Activo fijo", field: "af" },
+            { title: "TAG", field: "tag" },
+            { title: "Fecha de registro", field: "fecha_registro" },
         ],
         //layout: "fitColumns",
     });
 }
 
-async function registrar_historico(num_serie, evento,) {
+async function registrar_historico(num_serie, evento, params) {
     const usuario = JSON.parse(sessionStorage.getItem('user')); // Obtener usuario en sesión
+    //console.log(params);
     //const fecha_evento = new Date().toISOString();
     const model = {
         accion: 1,
-        usuario_sesion: usuario.resultado[0], // Nombre del usuario
-        num_serie: num_serie, // Número de serie del dispositivo
-        evento: evento,
-        zona: zona,
-        ubicacion: ubicacion,
-        nombre_usuario: nombre_usuario
+        usuario_sesion: usuario.resultado[0] || '', // Nombre del usuario
+        num_serie: num_serie || '',
+        evento: evento || '',
+        zona: params.zona || '',
+        ubicacion: params.ubicacion || '',
+        usuario: params.usuario || '',
+        cargo: params.cargo || '',
+        af: params.af || '',
+        rubro: params.rubro || '',
+        tipo: params.tipo || '',
+        marca: params.marca || '',
+        modelo: params.modelo || '',
+        tag: params.tag || '',
+        // Si no hay fecha_registro, manda null para que el backend lo maneje
+        fecha_registro: params.fecha_registro || params.fecha_entrega || null
 
     };
 
     let resultado = await server_historico(model);
-
+    console.log(model);
 }
 
 function consultar_num_serie() {
@@ -130,7 +145,7 @@ async function mostrar_historial() {
                 <div class="list-group-item">
                     <strong>${fecha}</strong><br>
                     <span>${registro.usuario_sesion}</span><br>
-                    <em>${registro.evento} en los campos ${registro.zona}, ${registro.ubicacion}, ${registro.nombre_usuario}</em>
+                    <em>${registro.evento} en los campos ${registro.zona}, ${registro.ubicacion}, ${registro.usuario}</em>
                 </div>
             `;
             contenedor.append(item);
