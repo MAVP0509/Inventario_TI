@@ -315,7 +315,7 @@ async function crear_registro() {
     if (server.resultado === true) {
         consultar_informacion();
         $("#modal-registro").modal('hide');
-        await registrar_historico(model.num_serie, 'Nuevo registro', selecreg);
+        await registrar_historico('Nuevo registro', model);
         mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
     } else if (server.resultado === false) {
         if (server.mensaje === "Número de serie duplicado") {
@@ -367,8 +367,6 @@ async function editar_registro(params) {
     let server = await server_inventario(model);
     //let response = JSON.parse(respuesta);
     //console.log(server);
-
-
     if (server.resultado === true) {
         
         await registrar_historico(model.num_serie, 'Edición de registro', model);
@@ -392,7 +390,7 @@ async function desactivar_registro() {
     let response = await server_inventario(model);
     //console.log(response)
     if (Array.isArray(response.resultado)) {
-        await registrar_historico(null, 'Eliminación de registro', response.resultado);
+        await registrar_historico('Eliminación de registro', response.resultado);
         mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
         consultar_informacion();
     } else {

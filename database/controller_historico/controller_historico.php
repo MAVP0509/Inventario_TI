@@ -20,25 +20,47 @@ function registrar_historico($valores)
     include("../conexion.php");
 
     $fecha_evento = date("Y:m:d H:i:s");
+    //$datos = [];
 
-    $datos = [];
-
-    if (is_array($valores)) {
-        for ($i=0; $i < count($valores); $i++) { 
-            $datos = $valores[$i];
-            $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, cargo, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro) 
-            VALUES ('$fecha_evento', '$datos->usuario_sesion', '$datos->evento', '$datos->num_serie', '$datos->usuario', '$datos->cargo', '$datos->zona', '$datos->ubicacion', '$datos->af', '$datos->rubro', '$datos->tipo', '$datos->marca', '$datos->modelo', '$datos->tag', '$datos->fecha_registro')";
-            //var_dump($query);
+    if (isset($valores->datos) && is_array($valores->datos)) {
+         for ($i=0; $i < count($valores->datos); $i++) { 
+            $datos = $valores->datos[$i];
+            $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro) 
+            VALUES ('$fecha_evento',
+                    '$valores->usuario_sesion', 
+                    '$valores->evento', 
+                    '$datos->num_serie', 
+                    '$datos->fk_usuario', 
+                    '$datos->zona', 
+                    '$datos->ubicacion', 
+                    '$datos->af', 
+                    '$datos->fk_rubro', 
+                    '$datos->fk_tipo', 
+                    '$datos->fk_marca', 
+                    '$datos->modelo', 
+                    '$datos->tag', 
+                    '$datos->fecha_entrega')";
+            // var_dump($sql);
             $query = mysqli_query($con, $sql);
-            return $query;
+            $resultados[] = $query;
         }
-        
+            var_dump($sql);
+        return $resultados; 
+        // !No descomentar hasta hacer pruebas con los inserts xd
+        // foreach ($valores->datos as $datos) {
+        //     $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, cargo, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro) 
+        //     VALUES ('$fecha_evento', '$valores->usuario_sesion', '$valores->evento', '$datos->num_serie', '$datos->usuario', '$datos->cargo', '$datos->zona', '$datos->ubicacion', '$datos->af', '$datos->rubro', '$datos->tipo', '$datos->marca', '$datos->modelo', '$datos->tag', '$datos->fecha_registro')";
+        //     $query = mysqli_query($con, $sql);
+        //     $resultados[] = $query ? true : false;
+        // }
+        // return $resultados;
+
     } else {
-        $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, cargo, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro) 
-        VALUES ('$fecha_evento', '$valores->usuario_sesion', '$valores->evento', '$valores->num_serie', '$valores->usuario', '$valores->cargo', '$valores->zona', '$valores->ubicacion', '$valores->af', '$valores->rubro', '$valores->tipo', '$valores->marca', '$valores->modelo', '$valores->tag', '$valores->fecha_registro')";
-        //var_dump($query2);
+        $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro) 
+        VALUES ('$fecha_evento', '$valores->usuario_sesion', '$valores->evento', '$valores->num_serie', '$valores->fk_usuario', '$valores->zona', '$valores->ubicacion', '$valores->af', '$valores->fk_rubro', '$valores->fk_tipo', '$valores->fk_marca', '$valores->modelo', '$valores->tag', '$valores->fecha_entrega')";
+        var_dump($sql);
         $query2 = mysqli_query($con, $sql);
-        return $query2;
+        return $query2 ? true : false;
     }
 }
 

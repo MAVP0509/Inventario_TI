@@ -64,7 +64,7 @@ async function consultar_historico() {
             { title: "Zona", field: "zona" },
             { title: "Ubicación del dispositivo", field: "ubicacion" },
             { title: "Nombre del usuario", field: "usuario" },
-            { title: "Cargo del usaurio ", field: "cargo" },
+            //{ title: "Cargo del usaurio ", field: "cargo" },
             { title: "Numero de serie", field: "num_serie" },
             { title: "Rubro", field: "rubro" },
             { title: "Tipo de dispositivo", field: "tipo" },
@@ -78,15 +78,17 @@ async function consultar_historico() {
     });
 }
 
-async function registrar_historico(num_serie, evento, params) {
+async function registrar_historico(evento, params) {
     const usuario = JSON.parse(sessionStorage.getItem('user')); // Obtener usuario en sesión
     //console.log(params);
     //const fecha_evento = new Date().toISOString();
     const model = {
         accion: 1,
         usuario_sesion: usuario.resultado[0] || '', // Nombre del usuario
-        num_serie: num_serie || '',
-        evento: evento || '',
+        evento: evento,
+        datos: params
+        /* num_serie: params.num_serie || '',
+        
         zona: params.zona || '',
         ubicacion: params.ubicacion || '',
         usuario: params.usuario || '',
@@ -98,7 +100,7 @@ async function registrar_historico(num_serie, evento, params) {
         modelo: params.modelo || '',
         tag: params.tag || '',
         // Si no hay fecha_registro, manda null para que el backend lo maneje
-        fecha_registro: params.fecha_registro || params.fecha_entrega || null
+        fecha_registro: params.fecha_registro || params.fecha_entrega || null */
 
     };
 
@@ -153,7 +155,7 @@ async function mostrar_historial() {
 
         $('#resultado-historico').removeClass('d-none');
     } else {
-        contenedor.html('<div class="list-gruop-item">No se encontraron moviemientos para ese número de serie.</div>');
+        contenedor.html('<div class="list-group-item">No se encontraron moviemientos para ese número de serie.</div>');
         $('#resultado-historico').removeClass('d-none');
     }
 }
