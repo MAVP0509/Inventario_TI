@@ -160,7 +160,7 @@ function desactivar_datos($valores)
         
         $ids = implode(",", array_map('intval', $valores->id)); // Convierte el array de IDs en una lista separada por comas
         
-        $sql_num = "SELECT num_serie FROM inventario_ti_sur WHERE id IN ($ids)";
+        $sql_num = "SELECT zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega FROM inventario_ti_sur WHERE id IN ($ids)";
         $query_num = mysqli_query($con, $sql_num);
 
         $num_series = [];
@@ -177,7 +177,7 @@ function desactivar_datos($valores)
         $sql = "UPDATE inventario_ti_sur SET habilitado = 0 where id='$valores->id';";
         mysqli_query($con, $sql);
 
-        $sql_num2 = "SELECT num_serie FROM inventario_ti_sur WHERE id = '$valores->id'";
+        $sql_num2 = "SELECT zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega FROM inventario_ti_sur WHERE id = '$valores->id'";
         $query_num2 = mysqli_query($con, $sql_num2);
 
         $num_series = [];

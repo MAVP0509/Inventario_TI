@@ -72,8 +72,41 @@ async function consultar_informacion(params) {
     };
 
     let response = await server_inventario(model);
-    
+
     datos = response.resultado
+
+        Tabulator.extendModule("localize", "langs", {
+        "es": {
+            "pagination": {
+                "first": '<i class="fa-solid fa-angles-right fa-flip-horizontal"></i>',
+                "first_title": "Primera página",
+                "last": '<i class="fa-solid fa-angles-right"></i>',
+                "last_title": "Última página",
+                "prev": '<i class="fa-solid fa-angle-right fa-flip-horizontal"></i>',
+                "prev_title": "Página anterior",
+                "next": '<i class="fa-solid fa-angle-right"></i>',
+                "next_title": "Página siguiente",
+                "page_size": "Tamaño",
+
+            },
+            "headerFilters": {
+                "default": "Filtrar columna...",
+                "columns": {}
+            },
+            "groups": {
+                "item": "ítem",
+                "items": "ítems"
+            },
+            "ajax": {
+                "loading": "Cargando...",
+                "error": "Error al cargar datos"
+            },
+            "data": {
+                "loading": "Cargando datos...",
+                "error": "Error al cargar datos"
+            }
+        }
+    });
 
     datos.forEach(d => d.seleccionado = false);
 
@@ -102,7 +135,18 @@ async function consultar_informacion(params) {
 
     try {
         table = new Tabulator("#tbl01", {
+            //layout: "fitColumns",
+            locale: "es",
             data: datos,
+            pagination: true,
+            paginationSize: 10,
+            paginationSizeSelector: [5, 10, 25, 35],
+            movableColumns: true,              //allow column order to be changed
+            paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
+                const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
+                const end = Math.min(currentRowStart + pageSize - 1, totalRows);
+                return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
+            },
             rowFormatter: function (row) {
                 data = row.getData()
                 if (data.seleccionado === true) {
@@ -111,11 +155,6 @@ async function consultar_informacion(params) {
                     row.getElement().classList.remove("bg-primary")
                 }
             },
-            //layout: "fitColumns",
-            pagination: true,
-            paginationSize: 10,
-            paginationSizeSelector: [5, 10, 25, 35],
-            movableColumns: true,              //allow column order to be changed
             columns: [
                 {
                     formatter: squareIcon, width: 70, hozAlign: "center",
@@ -159,12 +198,12 @@ async function consultar_informacion(params) {
 }
 
 
-let selecreg = "";
+let selecreg = ""; // No limpiar la variable
 
 async function mostrar_registro(params) {
     for (let i = 0; i < datos.length; i++) {
         const element = datos[i];
-        if(element.id_equipo===params.id_equipo){
+        if (element.id_equipo === params.id_equipo) {
             selecreg = element;
             //console.log(selecreg)
             break;
@@ -206,20 +245,20 @@ async function mostrar_registro(params) {
         dropdownParent: '#modal-editar',
     })
 
-        document.getElementById("edi-zona").value = selecreg.zona;
-        rellenar_select(selecreg.rubro,"edi-rubro")
-        document.getElementById("edi-af").value = selecreg.af;
-        rellenar_select(selecreg.tipo,"edi-tipo")
-        rellenar_select(selecreg.marca,"edi-marca")
-        document.getElementById("edi-modelo").value = selecreg.modelo;
-        document.getElementById("edi-num-serie").value = selecreg.num_serie;
-        document.getElementById("edi-ubicacion").value = selecreg.ubicacion;
-        document.getElementById("edi-tag").value = selecreg.tag;
-        rellenar_select(selecreg.usuario,"edi-usuario")
-        document.getElementById("edi-fecha-entrega").value = selecreg.fecha_entrega;
+    document.getElementById("edi-zona").value = selecreg.zona;
+    rellenar_select(selecreg.rubro, "edi-rubro")
+    document.getElementById("edi-af").value = selecreg.af;
+    rellenar_select(selecreg.tipo, "edi-tipo")
+    rellenar_select(selecreg.marca, "edi-marca")
+    document.getElementById("edi-modelo").value = selecreg.modelo;
+    document.getElementById("edi-num-serie").value = selecreg.num_serie;
+    document.getElementById("edi-ubicacion").value = selecreg.ubicacion;
+    document.getElementById("edi-tag").value = selecreg.tag;
+    rellenar_select(selecreg.usuario, "edi-usuario")
+    document.getElementById("edi-fecha-entrega").value = selecreg.fecha_entrega;
 
     $("#modal-editar").modal("show");
-
+    console.log(selecreg)
 }
 
 let ususelect = [];
@@ -247,9 +286,9 @@ async function crear_registro() {
     }
 
     let user = $("#inp-usuario").val().trim()
-    if (user === ""){
+    if (user === "") {
         user = "5"
-    } 
+    }
     // Crear el modelo con los datos del formulario
     let model = {
         accion: 0,
@@ -276,7 +315,7 @@ async function crear_registro() {
     if (server.resultado === true) {
         consultar_informacion();
         $("#modal-registro").modal('hide');
-        await registrar_historico(model.num_serie, 'Nuevo registro');
+        await registrar_historico(model.num_serie, 'Nuevo registro', selecreg);
         mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
     } else if (server.resultado === false) {
         if (server.mensaje === "Número de serie duplicado") {
@@ -302,7 +341,7 @@ async function editar_registro(params) {
     ];
 
     let user = $("#edi-usuario").val().trim()
-    if (user === ""){
+    if (user === "") {
         user = "5"
     }
 
@@ -323,13 +362,16 @@ async function editar_registro(params) {
         fecha_entrega: $("#edi-fecha-entrega").val()
     }
 
+    await registrar_historico(model.num_serie, 'Anterior edición de registro', selecreg);
+
     let server = await server_inventario(model);
     //let response = JSON.parse(respuesta);
-    console.log(server);
+    //console.log(server);
 
 
     if (server.resultado === true) {
-        await registrar_historico(model.num_serie, 'Edición de registro');
+        
+        await registrar_historico(model.num_serie, 'Edición de registro', model);
         mostrar_alerta('success', '¡Edición exitosa!', 'El registro se ha actualizado correctamente.');
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo editar el registro. Inténtalo nuevamente.');
@@ -338,7 +380,7 @@ async function editar_registro(params) {
 
     consultar_informacion();
     $("#modal-editar").modal("hide");
-    
+
 }
 
 async function desactivar_registro() {
@@ -350,7 +392,7 @@ async function desactivar_registro() {
     let response = await server_inventario(model);
     console.log(response)
     if (Array.isArray(response.resultado)) {
-        await registrar_historico(response.resultado, 'Eliminación de registro');
+        await registrar_historico(response.resultado, 'Eliminación de registro', seleccionar);
         mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
         consultar_informacion();
     } else {
@@ -465,10 +507,8 @@ function limpiar_campos() {
         dropdownParent: '#modal-registro',
     });
 
-
-    // modal = new bootstrap.Modal(document.getElementById('modal-registro'));
     $("#modal-registro").modal('show');
-    //modal.show();
+
 }
 
 //TODO: Alertas, confirmaciones

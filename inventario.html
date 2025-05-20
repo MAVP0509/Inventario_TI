@@ -289,7 +289,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <input type="date" class="form-control" id="inp-fecha-entrega" name="mdl-reg">
+                                    <input type="datetime" class="form-control" id="inp-fecha-entrega" name="mdl-reg">
                                 </div>
                             </div><!--Col12-->
                         </div><!--row-->
@@ -426,7 +426,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <input type="date" class="form-control" id="edi-fecha-entrega">
+                                    <input type="datetime" class="form-control" id="edi-fecha-entrega">
                                 </div>
                             </div>
                         </div><!--row-->
@@ -516,15 +516,15 @@
                     <form id="form-historial">
                         <div class="form-group">
                             <label for="his-num-serie">Número de Serie</label>
-                            <input type="text" class="form-control" id="his-num-serie">
+                            <input type="text" class="form-control" id="his-num-serie" name="mdl-hst">
                         </div>
                         <div class="form-group">
                             <label for="fecha-inicio">Fecha inicial</label>
-                            <input type="date" class="form-control" id="fecha-inicio">
+                            <input type="date" class="form-control" id="fecha-inicio" name="mdl-hst">
                         </div>
                         <div class="form-group">
                             <label for="fecha-fin">Fecha final</label>
-                            <input type="date" class="form-control" id="fecha-fin">
+                            <input type="date" class="form-control" id="fecha-fin" name="mdl-hst">
                         </div>
                         <button type="button" class="btn btn-primary" id="btn-buscar"
                             onclick="mostrar_historial()">Buscar</button>
