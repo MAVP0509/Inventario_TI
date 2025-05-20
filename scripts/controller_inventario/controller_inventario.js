@@ -130,7 +130,7 @@ async function consultar_informacion(params) {
         } else {
             seleccionar.splice(index, 1);
         }
-        //console.log(seleccionar)
+        console.log(seleccionar)
     }
 
     try {
@@ -390,9 +390,9 @@ async function desactivar_registro() {
     };
 
     let response = await server_inventario(model);
-    console.log(response)
+    //console.log(response)
     if (Array.isArray(response.resultado)) {
-        await registrar_historico(response.resultado, 'Eliminación de registro', seleccionar);
+        await registrar_historico(null, 'Eliminación de registro', response.resultado);
         mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
         consultar_informacion();
     } else {
