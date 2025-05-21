@@ -130,7 +130,7 @@ async function consultar_informacion(params) {
         } else {
             seleccionar.splice(index, 1);
         }
-        //console.log(seleccionar)
+        console.log(seleccionar)
     }
 
     try {
@@ -314,7 +314,7 @@ async function crear_registro() {
     if (server.resultado === true) {
         consultar_informacion();
         $("#modal-registro").modal('hide');
-        await registrar_historico(model.num_serie, 'Nuevo registro', selecreg);
+        await registrar_historico('Nuevo registro', model);
         mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
     } else if (server.resultado === false) {
         if (server.mensaje === "Número de serie duplicado") {
@@ -361,16 +361,14 @@ async function editar_registro(params) {
         fecha_entrega: $("#edi-fecha-entrega").val()
     }
 
-    await registrar_historico(model.num_serie, 'Anterior edición de registro', selecreg);
+    await registrar_historico('Anterior edición de registro', selecreg);
 
     let server = await server_inventario(model);
     //let response = JSON.parse(respuesta);
     //console.log(server);
-
-
     if (server.resultado === true) {
         
-        await registrar_historico(model.num_serie, 'Edición de registro', model);
+        await registrar_historico('Edición de registro', model);
         mostrar_alerta('success', '¡Edición exitosa!', 'El registro se ha actualizado correctamente.');
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo editar el registro. Inténtalo nuevamente.');
@@ -389,9 +387,9 @@ async function desactivar_registro() {
     };
 
     let response = await server_inventario(model);
-    console.log(response)
+    //console.log(response)
     if (Array.isArray(response.resultado)) {
-        await registrar_historico(response.resultado, 'Eliminación de registro', seleccionar);
+        await registrar_historico('Eliminación de registro', response.resultado);
         mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
         consultar_informacion();
     } else {

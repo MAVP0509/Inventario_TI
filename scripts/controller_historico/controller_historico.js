@@ -63,8 +63,7 @@ async function consultar_historico() {
             { title: "Evento", field: "evento" },
             { title: "Zona", field: "zona" },
             { title: "Ubicación del dispositivo", field: "ubicacion" },
-            { title: "Nombre del usuario", field: "usuario" },
-            { title: "Cargo del usaurio ", field: "cargo" },
+            { title: "Nombre del usuario", field: "nombre" },
             { title: "Numero de serie", field: "num_serie" },
             { title: "Rubro", field: "rubro" },
             { title: "Tipo de dispositivo", field: "tipo" },
@@ -78,32 +77,20 @@ async function consultar_historico() {
     });
 }
 
-async function registrar_historico(num_serie, evento, params) {
+async function registrar_historico(evento, params) {
     const usuario = JSON.parse(sessionStorage.getItem('user')); // Obtener usuario en sesión
     //console.log(params);
     //const fecha_evento = new Date().toISOString();
     const model = {
         accion: 1,
         usuario_sesion: usuario.resultado[0] || '', // Nombre del usuario
-        num_serie: num_serie || '',
-        evento: evento || '',
-        zona: params.zona || '',
-        ubicacion: params.ubicacion || '',
-        usuario: params.usuario || '',
-        cargo: params.cargo || '',
-        af: params.af || '',
-        rubro: params.rubro || '',
-        tipo: params.tipo || '',
-        marca: params.marca || '',
-        modelo: params.modelo || '',
-        tag: params.tag || '',
-        // Si no hay fecha_registro, manda null para que el backend lo maneje
-        fecha_registro: params.fecha_registro || params.fecha_entrega || null
+        evento: evento,
+        datos: params
 
     };
 
     let resultado = await server_historico(model);
-    console.log(model);
+    //console.log(model);
 }
 
 function consultar_num_serie() {
@@ -140,12 +127,45 @@ async function mostrar_historial() {
     if (respuesta_historico && respuesta_historico.resultado && respuesta_historico.resultado.length > 0) {
         respuesta_historico.resultado.forEach(registro => {
             var fecha = moment(registro.fecha_evento).local('es').format('D [de] MMMM [de] YYYY, h:mm:ss a');
+            //console.log("Datos crudos:", registro.datos);
+            //console.log("Tipo de datos:", typeof registro);
+            const camposExcluir = ['id', 'fecha_evento', 'usuario_sesion', 'evento'];
+            const clavesAmigables = {
+                fecha_registro: 'Fecha de registro',
+                zona: 'Zona',
+                ubicacion: 'Ubicación',
+                nombre: 'Nombre del usuario',
+                num_serie: 'Número de serie',
+                rubro: 'Rubro',
+                tipo: 'Tipo',
+                marca: 'Marca',
+                modelo: 'Modelo',
+                af: 'AF',
+                tag: 'TAG'
+            };
 
+            let datosTexto = '';
+            for (var key in registro) {
+            if (!camposExcluir.includes(key)) {  // Si el campo no está en la lista de campos a excluir
+                const claveAmigable = clavesAmigables[key] || key; // Usar la clave amigable o la original si no está definida
+                datosTexto += `<li>${claveAmigable}: ${registro[key]}</li>`;
+            }
+        }
+            
             const item = `
                 <div class="list-group-item">
                     <strong>${fecha}</strong><br>
                     <span>${registro.usuario_sesion}</span><br>
-                    <em>${registro.evento} en los campos ${registro.zona}, ${registro.ubicacion}, ${registro.usuario}</em>
+                    <em>${registro.evento}</em><br>
+                    <button class="btn btn-sm btn-link p-0 mt-2" data-toggle="collapse" data-target="#collapseId">
+                        Más información
+                    </button>
+
+                    <div class="collapse mt-2" id="collapseId">
+                        <ul class="mb-0">
+                            ${datosTexto}
+                        </ul>
+                    </div>
                 </div>
             `;
             contenedor.append(item);
@@ -153,7 +173,7 @@ async function mostrar_historial() {
 
         $('#resultado-historico').removeClass('d-none');
     } else {
-        contenedor.html('<div class="list-gruop-item">No se encontraron moviemientos para ese número de serie.</div>');
+        contenedor.html('<div class="list-group-item">No se encontraron moviemientos para ese número de serie.</div>');
         $('#resultado-historico').removeClass('d-none');
     }
 }
