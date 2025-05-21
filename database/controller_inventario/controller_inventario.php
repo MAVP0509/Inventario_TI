@@ -78,7 +78,7 @@ function insertar_datos($valores)
         VALUES ('$valores->zona', '$val_rubro','$valores->af','$val_tipo','$val_marca','$valores->modelo', '$valores->num_serie', 
         '$valores->ubicacion', '$valores->tag', '$valores->usuario', '$registro',1);";
         //$query = mysqli_query($con, $sql);|
-
+        //var_dump($sql);
         if (mysqli_num_rows($query_num) > 0) {
             echo json_encode(["resultado" => false, "mensaje" => "Número de serie duplicado"]);
             exit;

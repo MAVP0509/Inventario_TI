@@ -362,14 +362,14 @@ async function editar_registro(params) {
         fecha_entrega: $("#edi-fecha-entrega").val()
     }
 
-    await registrar_historico(model.num_serie, 'Anterior edición de registro', selecreg);
+    await registrar_historico('Anterior edición de registro', selecreg);
 
     let server = await server_inventario(model);
     //let response = JSON.parse(respuesta);
     //console.log(server);
     if (server.resultado === true) {
         
-        await registrar_historico(model.num_serie, 'Edición de registro', model);
+        await registrar_historico('Edición de registro', model);
         mostrar_alerta('success', '¡Edición exitosa!', 'El registro se ha actualizado correctamente.');
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo editar el registro. Inténtalo nuevamente.');

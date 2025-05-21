@@ -21,7 +21,7 @@ function registrar_historico($valores)
 
     $fecha_evento = date("Y:m:d H:i:s");
     //$datos = [];
-
+    //var_dump($valores);
     if (isset($valores->datos) && is_array($valores->datos)) {
          for ($i=0; $i < count($valores->datos); $i++) { 
             $datos = $valores->datos[$i];
@@ -40,11 +40,11 @@ function registrar_historico($valores)
                     '$datos->modelo', 
                     '$datos->tag', 
                     '$datos->fecha_entrega')";
-            // var_dump($sql);
+            //var_dump($sql);
             $query = mysqli_query($con, $sql);
             $resultados[] = $query;
         }
-            var_dump($sql);
+            //var_dump($sql);
         return $resultados; 
         // !No descomentar hasta hacer pruebas con los inserts xd
         // foreach ($valores->datos as $datos) {
@@ -55,10 +55,25 @@ function registrar_historico($valores)
         // }
         // return $resultados;
 
-    } else {
+    } elseif (isset($valores->datos) && is_object($valores->datos)){
+        $datos = $valores->datos;
+        $fecha_entrega = !empty($datos->fecha_entrega) ? date("Y-m-d H:i:s", strtotime($datos->fecha_entrega)) : date("Y-m-d H:i:s");
         $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro) 
-        VALUES ('$fecha_evento', '$valores->usuario_sesion', '$valores->evento', '$valores->num_serie', '$valores->fk_usuario', '$valores->zona', '$valores->ubicacion', '$valores->af', '$valores->fk_rubro', '$valores->fk_tipo', '$valores->fk_marca', '$valores->modelo', '$valores->tag', '$valores->fecha_entrega')";
-        var_dump($sql);
+        VALUES ('$fecha_evento',
+        '$valores->usuario_sesion', 
+        '$valores->evento', 
+        '$datos->num_serie', 
+        '$datos->usuario', 
+        '$datos->zona', 
+        '$datos->ubicacion', 
+        '$datos->af', 
+        '$datos->rubro', 
+        '$datos->tipo', 
+        '$datos->marca', 
+        '$datos->modelo', 
+        '$datos->tag', 
+        '$fecha_entrega')";
+        //var_dump($sql);
         $query2 = mysqli_query($con, $sql);
         return $query2 ? true : false;
     }
@@ -73,8 +88,6 @@ function consultar_historico($valores)
     $sql = "SELECT * FROM vhistorico";
     //$sql = "SELECT * FROM historico";
     //var_dump($sql)
-    /*  WHERE 
-                hst.num_serie = ITS.num_serie"; */
 
     if (!empty($valores->num_serie)) {
         $sql .= " WHERE num_serie = '$valores->num_serie'";
