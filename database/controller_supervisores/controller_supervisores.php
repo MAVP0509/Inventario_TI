@@ -29,7 +29,7 @@ function insertar_supervisor($valores){
 
     $sql_val_name = "SELECT * FROM supervisor WHERE nombre = '$valores->nombre'";
     if (mysqli_query($con,$sql_val_name)-> num_rows > 0){
-        return false;
+        return "El supervisor ya existe";
     }else{
         return mysqli_query($con,$sql);    
     }
@@ -40,17 +40,12 @@ function insertar_supervisor($valores){
 function editar_supervisor($valores){
     include("../conexion.php");
 
-    $msgError = "Primero deshabilite el supervisor antes de editarlo";
+    $msgError = "El supervisor ya existe";
 
-    $sql_region ="SELECT habilitado FROM supervisor WHERE nombre = '$valores->nombre'";
-    $query = mysqli_query($con,$sql_region);
-    $array = array();
-    while ($fila = mysqli_fetch_object($query)){
-        array_push($array, $fila);  //* Se guardan los registros en un array
-    }
+    $sql_valid ="SELECT nombre FROM supervisor WHERE nombre = '$valores->nombre'";
+    mysqli_query($con,$sql_valid);
 
-    $habilitado = $array[0]->habilitado;
-    if($habilitado == 1){
+    if(mysqli_query($con,$sql_valid) -> num_rows > 0){
         return $msgError;
     }else{
         $sql = "UPDATE supervisor SET nombre='$valores->nombre', cargo='$valores->cargo', region='$valores->region', habilitado = 0 WHERE id='$valores->id';";
@@ -86,7 +81,7 @@ function consultar_distintos($tabla, $campo)
     $tabla = mysqli_real_escape_string($con, $tabla);
     $campo = mysqli_real_escape_string($con, $campo);
 
-    $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE `$campo` IS NOT NULL AND `$campo` <> '' AND '$campo' NOT LIKE 'NA';";
+    $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE  `$campo` <> 'NA'";
     $query = mysqli_query($con, $sql);
 
     $datos = [];

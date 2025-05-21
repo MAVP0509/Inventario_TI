@@ -16,6 +16,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_usuarios($clientejson);
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = eliminar_usuarios($clientejson);
+} elseif($clientejson->accion==4){
+    $respuesta_servidor->resultado=consultar_distintos($clientejson->tabla, $clientejson->campo);
 }
 
 print(json_encode($respuesta_servidor)); //? envía la respuesta de la base de datos a javascript
@@ -75,3 +77,23 @@ function eliminar_usuarios($valores)
     return mysqli_query($con, $sql);
 }
 
+function consultar_distintos($tabla, $campo){
+    include("../conexion.php");
+    //Validación para evitar inyecciones
+    $tabla = mysqli_real_escape_string($con, $tabla);
+    $campo = mysqli_real_escape_string($con, $campo);
+
+    $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE  `$campo` <> 'NA'";
+    $query = mysqli_query($con, $sql);
+
+    $datos = [];
+    while ($fila = mysqli_fetch_assoc($query)) {
+        $valor = $fila[$campo];
+        $datos[] = [
+            'id' => $valor,
+            $campo => $valor
+        ];
+    }
+
+    return $datos;
+}
