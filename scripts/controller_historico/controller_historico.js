@@ -44,6 +44,8 @@ function server_inventario02(model) {
 
 }
 
+let datos = [];
+let table;
 async function consultar_historico() {
     //const usuario = JSON.parse(sessionStorage.getItem('user')); // Obtener usuario en sesión
     //const fecha_evento = new Date().toISOString();
@@ -52,19 +54,131 @@ async function consultar_historico() {
         accion: 0,
     };
 
-    let datos = await server_historico(model);
+    let response = await server_historico(model);
+    datos = response.resultado
 
-    var table = new Tabulator("#tbl02", {
-        data: datos.resultado,
+    Tabulator.extendModule("localize", "langs", {
+        "es": {
+            "pagination": {
+                "first": '<i class="fa-solid fa-angles-right fa-flip-horizontal"></i>',
+                "first_title": "Primera página",
+                "last": '<i class="fa-solid fa-angles-right"></i>',
+                "last_title": "Última página",
+                "prev": '<i class="fa-solid fa-angle-right fa-flip-horizontal"></i>',
+                "prev_title": "Página anterior",
+                "next": '<i class="fa-solid fa-angle-right"></i>',
+                "next_title": "Página siguiente",
+                "page_size": "Tamaño",
+
+            },
+            "headerFilters": {
+                "default": "Filtrar columna...",
+                "columns": {}
+            },
+            "groups": {
+                "item": "ítem",
+                "items": "ítems"
+            },
+            "ajax": {
+                "loading": "Cargando...",
+                "error": "Error al cargar datos"
+            },
+            "data": {
+                "loading": "Cargando datos...",
+                "error": "Error al cargar datos"
+            }
+        }
+    });
+
+    table = new Tabulator("#tbl02", {
+        locale: "es",
+        data: datos,
+        pagination: true,
+        paginationSize: 10,
+        paginationSizeSelector: [5, 10, 15, 25, 35],
+        movableColumns: true,
+        paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
+                const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
+                const end = Math.min(currentRowStart + pageSize - 1, totalRows);
+                return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
+            },
+        rowFormatter: function (row) {
+            data = row.getData()
+            if (data.seleccionado === true) {
+                row.getElement().classList.add("bg-primary")
+            } else if (data.seleccionado === false) {
+                row.getElement().classList.remove("bg-primary")
+            }
+        },
         columns: [
-            { title: "Id", field: "id" },
-            { title: "Fecha del evento", field: "fecha_evento" },
-            { title: "Usuario del evento", field: "usuario_sesion" },
-            { title: "Evento", field: "evento" },
+            { title: "ID", field: "id" },
+            { title: "Fecha del evento", field: "fecha_evento", headerMenu:[
+                {
+                    label:"Fijar columna",
+                    action:function(e, column){
+                        column.updateDefinition({frozen:true});
+                        table.redraw(true);
+                    }
+                },
+                {
+                    label:"Desfijar columna",
+                    action:function(e, column){
+                        column.updateDefinition({frozen:false});
+                        table.redraw(true);
+                    }
+                }
+            ]},
+            { title: "Usuario del evento", field: "usuario_sesion", headerMenu:[
+                {
+                    label:"Fijar columna",
+                    action:function(e, column){
+                        column.updateDefinition({frozen:true});
+                        table.redraw(true);
+                    }
+                },
+                {
+                    label:"Desfijar columna",
+                    action:function(e, column){
+                        column.updateDefinition({frozen:false});
+                        table.redraw(true);
+                    }
+                }
+            ]},
+            { title: "Evento", field: "evento", headerMenu:[
+                {
+                    label:"Fijar columna",
+                    action:function(e, column){
+                        column.updateDefinition({frozen:true});
+                        table.redraw(true);
+                    }
+                },
+                {
+                    label:"Desfijar columna",
+                    action:function(e, column){
+                        column.updateDefinition({frozen:false});
+                        table.redraw(true);
+                    }
+                }
+            ]},
             { title: "Zona", field: "zona" },
             { title: "Ubicación del dispositivo", field: "ubicacion" },
             { title: "Nombre del usuario", field: "nombre" },
-            { title: "Numero de serie", field: "num_serie" },
+            { title: "Numero de serie", field: "num_serie", headerMenu:[
+                {
+                    label:"Fijar columna",
+                    action:function(e, column){
+                        column.updateDefinition({frozen:true});
+                        table.redraw(true);
+                    }
+                },
+                {
+                    label:"Desfijar columna",
+                    action:function(e, column){
+                        column.updateDefinition({frozen:false});
+                        table.redraw(true);
+                    }
+                }
+            ]},
             { title: "Rubro", field: "rubro" },
             { title: "Tipo de dispositivo", field: "tipo" },
             { title: "Modelo del dispositivo", field: "modelo" },
