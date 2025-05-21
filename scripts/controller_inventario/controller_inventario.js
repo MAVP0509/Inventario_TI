@@ -197,7 +197,6 @@ async function consultar_informacion(params) {
 
 }
 
-
 let selecreg = ""; // No limpiar la variable
 
 async function mostrar_registro(params) {

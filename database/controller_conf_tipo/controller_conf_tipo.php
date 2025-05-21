@@ -1,5 +1,5 @@
 <?php
-//* Consultas a la bd realizadas en la pestaña de tipo
+//TODO Consultas a la bd realizadas en la pestaña de tipo
 
 header('Content-Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
@@ -27,14 +27,14 @@ function insertar_tipo($valores){
     $sql = "INSERT INTO cat_tipo(tipo) VALUES ('$valores->tipo');";
 
     $sql_val_tipo = "SELECT * FROM cat_tipo WHERE tipo = '$valores->tipo'";
-    if (mysqli_query($con, $sql_val_tipo)->num_rows > 0) {
+    if (mysqli_query($con, $sql_val_tipo)->num_rows > 0) {   //*Validamos si ya existe el tipo
         return "Este tipo ya existe";
     } else {
         return mysqli_query($con, $sql);
     }
 }
 
-//* Edita un tipo ya existente
+//* Edita un tipo 
 function editar_tipo($valores){
     include("../conexion.php");
     $sql = "UPDATE cat_tipo SET tipo='$valores->tipo' WHERE id='$valores->id';";
@@ -54,22 +54,22 @@ function consultar_tipo(){
     return $array;
 }
 
+//* "Eliminar" tipos
 function eliminar_tipo($valores)
 {
     include("../conexion.php");
 
     foreach ($valores->id as $id) {
-        $id = intval($id); // Seguridad: asegura que sea número
+        $id = intval($id); //* Asegura que $id sea un número
         $sql_val = "SELECT * FROM inventario_ti_sur WHERE fk_tipo = '$id'";
-        $res = mysqli_query($con, $sql_val);
+        $res = mysqli_query($con, $sql_val);  //*Consultamos si el rubro está en uso, si lo está, no puede ser "eliminado"
 
-        if ($res && $res->num_rows > 0) {
+        if ($res && $res->num_rows > 0) {  
             return "Uno o más rubros no pueden ser eliminados. Uno o más equipos lo tienen asignado";
         }
     }
 
-    //return $array;
-    $ids = implode(",", array_map('intval', $valores->id)); // Convierte el array de IDs en una lista separada por comas
-    $sql = "UPDATE cat_tipo SET habilitado = 0 WHERE id IN ($ids);"; // Consulta sql usando IN para eliminar múltiples registros
+    $ids = implode(",", array_map('intval', $valores->id)); //* Convierte el array de IDs en una lista separada por comas
+    $sql = "UPDATE cat_tipo SET habilitado = 0 WHERE id IN ($ids);"; //* Consulta sql usando IN para eliminar múltiples registros
     return mysqli_query($con, $sql);
 }

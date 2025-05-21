@@ -57,14 +57,6 @@ async function consultar_informacion(params) {
                 "item": "ítem",
                 "items": "ítems"
             },
-            "ajax": {
-                "loading": "Cargando...",
-                "error": "Error al cargar datos"
-            },
-            "data": {
-                "loading": "Cargando datos...",
-                "error": "Error al cargar datos"
-            }
         }
     });
 
