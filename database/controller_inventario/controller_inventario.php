@@ -71,15 +71,36 @@ function insertar_datos($valores)
         $val_marca = $idMarca['id'];
     }
 
+    $estatus = "";
+    if($valores->usuario == "5"){
+        $estatus = "Bodega";
+    }else{
+        $estatus = "Asignado";
+    }
+    
+    $tag = "";
+    if($valores->tag == ""){
+        $tag = "NA";
+    }else{
+        $tag = $valores->tag;
+    }
+    
+    $af = "";
+    if($valores->af == ""){
+        $af = "NA";
+    }else{
+        $af = $valores->af;
+    }
+
     if ($valores->num_serie != "") {
         $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$valores->num_serie'";
         //var_dump($sql_num);
         $query_num = mysqli_query($con, $sql_num);
 
-        $sql = "INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, habilitado) 
-        VALUES ('$valores->zona', '$val_rubro','$valores->af','$val_tipo','$val_marca','$valores->modelo', '$valores->num_serie', 
-        '$valores->ubicacion', '$valores->tag', '$valores->usuario', '$registro',1);";
-        //$query = mysqli_query($con, $sql);|
+        $sql = "INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, estatus, imei) 
+        VALUES ('$valores->zona', '$val_rubro','$af','$val_tipo','$val_marca','$valores->modelo', '$valores->num_serie', 
+        '$valores->ubicacion', '$tag', '$valores->usuario', '$registro','$estatus', 'NA');";
+        
         //var_dump($sql);
         if (mysqli_num_rows($query_num) > 0) {
             echo json_encode(["resultado" => false, "mensaje" => "Número de serie duplicado"]);

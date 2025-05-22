@@ -534,7 +534,7 @@ function mostrar_alerta(tipo, titulo, mensaje) {
 async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags }) {
     //try {
     const response = await server_inventario({
-        accion: 6,
+        accion: 5,
         tabla: tabla,
         campo: campo
     });
@@ -732,7 +732,7 @@ $(document).ready(function () {
     }, /* function (start, end) {
         $('#rango-fecha').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
     } */);
-}).val(start + " - " + end);
+})//.val(start + " - " + end);
 
 function myCallback(start, end) {
     $("#rango-fecha span").html(start.format("MMMM D, YYYY") + " - " + end.format("MMMM D, YYYY"))
