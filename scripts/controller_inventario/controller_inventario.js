@@ -586,7 +586,7 @@ $(document).ready(function () {
     $('#inp-tipo').on('change', function () {
         const tipoSeleccionado = $(this).val(); // Obtiene el valor seleccionado
 
-        if (tipoSeleccionado === 'Laptop' || tipoSeleccionado === 'Desktop') {
+        if (tipoSeleccionado === '58' || tipoSeleccionado === '40') {
             // Habilita el campo TAG y lo hace obligatorio
             $('#inp-tag').prop('disabled', false).addClass('is-required');
         } else {
