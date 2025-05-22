@@ -216,6 +216,8 @@ function consultar_num_serie() {
 
     }
 
+    $('#his-versiones').empty();
+    $('#resultado-historico').addClass('d-none');
     $("#modal-historial").modal('show')
 }
 
@@ -226,12 +228,13 @@ async function mostrar_historial() {
         mostrar_alerta('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
         return;
     }
-
+    const rango_fecha = $('#rango-fecha').val();
+    const [fecha_inicio, fecha_fin] = rango_fecha.split(' - ')
     const model = {
         accion: 0,
         num_serie: $('#his-num-serie').val().trim(),
-        fecha_inicio: $('#fecha-inicio').val(),
-        fecha_fin: $('#fecha-fin').val(),
+        fecha_inicio: fecha_inicio,
+        fecha_fin: fecha_fin,
     };
 
     let respuesta_historico = await server_historico(model);

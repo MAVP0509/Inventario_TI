@@ -386,6 +386,10 @@ async function editar_registro(params) {
 
 }
 
+async function traspasos() {
+    
+}
+
 async function desactivar_registro() {
     let model = {
         accion: 3,
@@ -534,7 +538,7 @@ function mostrar_alerta(tipo, titulo, mensaje) {
 async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags }) {
     //try {
     const response = await server_inventario({
-        accion: 6,
+        accion: 5,
         tabla: tabla,
         campo: campo
     });
@@ -642,7 +646,7 @@ async function crear_resguardo(params) {
     }
 
     let model = {
-        accion: 5,
+        accion: 4,
         usuario: $('#select-usu').val().trim(),
         //region : $('#select-region').val().trim(),
         region: $("#select-region").select2('data')[0].text,
@@ -713,25 +717,24 @@ $(document).ready(function () {
 });
 
 $(function () {
-    
     $('#rango-fecha').daterangepicker({
-        startDate: moment(),
-        endDate: moment(),
-        locale: {
-            format: 'YYYY/MM/DD',
-            applyLabel: 'Aplicar',
-            cancelLabel: 'Cancelar',
-            fromLabel: "Desde",
-            toLabel: "Hasta",
-            customRangeLabel: 'Personalizado',
-            daysOfWeek: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
-            monthNames: ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"],
-            firstDay: 1
-        },
-    }, /* function (start, end) {
-        $('#rango-fecha').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
-    } */);
-    
+    locale: {
+        format: 'YYYY/MM/DD',
+        applyLabel: 'Aplicar',
+        cancelLabel: 'Cancelar',
+        fromLabel: "Desde",
+        toLabel: "Hasta",
+        customRangeLabel: 'Personalizado',
+        daysOfWeek: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+        monthNames: [
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+        ],
+        firstDay: 1
+    }
+
+    });
+
 });
 
 

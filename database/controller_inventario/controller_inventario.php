@@ -15,12 +15,14 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_datos($clientejson);
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = desactivar_datos($clientejson);
-} elseif ($clientejson->accion == 5) {
+} elseif ($clientejson->accion == 4) {
     $respuesta_servidor->resultado = consultar_para_resguardo($clientejson);
-} elseif ($clientejson->accion == 6) {
+} elseif ($clientejson->accion == 5) {
     $respuesta_servidor->resultado = consultar_distintos($clientejson->tabla, $clientejson->campo);
-} elseif ($clientejson->accion == 8) {
+} elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = consultar_region($clientejson);
+} elseif ($clientejson->accion == 7) {
+    $respuesta_servidor->resultado = traspaso($clientejson);
 }
 
 print(json_encode($respuesta_servidor));

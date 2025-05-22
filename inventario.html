@@ -13,8 +13,8 @@
     <link rel="stylesheet" href="libraries/DataTables/datatables.min.css">
     <link rel="stylesheet" href="libraries/select2/css/select2-bootstrap4.min.css">
     <link rel="stylesheet" href="libraries/select2/css/select2.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/css/tempusdominus-bootstrap-4.min.css" integrity="sha512-3JRrEUwaCkFUBLK1N8HehwQgu8e23jTH4np5NHOmQOobuC4ROQxFwFgBLTnhcnQRMs84muMh0PnnwXlPq5MGjg==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/css/tempusdominus-bootstrap-4.min.css" integrity="sha512-3JRrEUwaCkFUBLK1N8HehwQgu8e23jTH4np5NHOmQOobuC4ROQxFwFgBLTnhcnQRMs84muMh0PnnwXlPq5MGjg==" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
 
 </head>
 
@@ -518,30 +518,30 @@
                 <div class="modal-body">
                     <div class="container-fluid">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <form id="form-historial">
                                     <div class="form-group">
                                         <label for="his-num-serie">Número de serie</label>
                                         <input type="text" class="form-control" id="his-num-serie" name="mdl-hst" placeholder="Ingrese un número de serie">
                                     </div>               
                                     <div class="form-group">
-                                        <label>Rango de fecha</label>
+                                        <label for="rango-fecha">Rango de fecha</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend"><span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span></div>
-                                            <input type="text" id="rango-fecha" class="form-control"name="mdl-hst" autocomplete="off">
+                                            <input type="text" id="rango-fecha" class="form-control"name="mdl-hst" autocomplete="off" placeholder="Seleccione un rango de fecha">
                                         </div>
                                         
                                     </div>
                                     <button type="button" class="btn btn-primary" id="btn-buscar" onclick="mostrar_historial()">Buscar</button>
                                 </form>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-8">
                                 <div class="card mt-3">
                                     <div class="card-header">
                                         Historial de movimientos
                                     </div>
                                     <div class="card-body d-none" style="height: 300px; overflow-y: auto;" name="mdl-hst" id="resultado-historico">
-                                        <div class="list-group" id="his-versiones"></div>
+                                        <div class="list-group" id="his-versiones" name="mdl-hst"></div>
                                     </div>
                                 </div>
                             </div>
@@ -571,8 +571,8 @@
 <script src="scripts/controller_inventario/controller_inventario.js"></script>
 <script src="scripts/controller_historico/controller_historico.js"></script>
 <script src="dist/js/adminlte.min.js"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="libraries/select2/js/select2.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/js/tempusdominus-bootstrap-4.min.js" integrity="sha512-k6/Bkb8Fxf/c1Tkyl39yJwcOZ1P4cRrJu77p83zJjN2Z55prbFHxPs9vN7q3l3+tSMGPDdoH51AEU8Vgo1cgAA==" crossorigin="anonymous"></script>
