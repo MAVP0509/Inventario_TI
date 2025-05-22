@@ -1,4 +1,5 @@
 let respuesta_historico
+
 function server_historico(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -44,8 +45,8 @@ function server_inventario02(model) {
 
 }
 
-let datos = [];
-let table;
+let dato = [];
+let tabla;
 async function consultar_historico() {
     //const usuario = JSON.parse(sessionStorage.getItem('user')); // Obtener usuario en sesión
     //const fecha_evento = new Date().toISOString();
@@ -55,7 +56,7 @@ async function consultar_historico() {
     };
 
     let response = await server_historico(model);
-    datos = response.resultado
+    dato = response.resultado
 
     Tabulator.extendModule("localize", "langs", {
         "es": {
@@ -90,15 +91,15 @@ async function consultar_historico() {
         }
     });
 
-    table = new Tabulator("#tbl02", {
+    tabla = new Tabulator("#tbl02", {
         locale: "es",
-        data: datos,
+        data: dato,
         pagination: true,
         paginationSize: 10,
         paginationSizeSelector: [5, 10, 15, 25, 35],
         movableColumns: true,
         paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
-                const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
+                const totalRows = tabla.getDataCount(); // Asegúrate que 'tabla' esté accesible
                 const end = Math.min(currentRowStart + pageSize - 1, totalRows);
                 return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
             },
@@ -117,14 +118,14 @@ async function consultar_historico() {
                     label:"Fijar columna",
                     action:function(e, column){
                         column.updateDefinition({frozen:true});
-                        table.redraw(true);
+                        tabla.redraw(true);
                     }
                 },
                 {
                     label:"Desfijar columna",
                     action:function(e, column){
                         column.updateDefinition({frozen:false});
-                        table.redraw(true);
+                        tabla.redraw(true);
                     }
                 }
             ]},
@@ -133,14 +134,14 @@ async function consultar_historico() {
                     label:"Fijar columna",
                     action:function(e, column){
                         column.updateDefinition({frozen:true});
-                        table.redraw(true);
+                        tabla.redraw(true);
                     }
                 },
                 {
                     label:"Desfijar columna",
                     action:function(e, column){
                         column.updateDefinition({frozen:false});
-                        table.redraw(true);
+                        tabla.redraw(true);
                     }
                 }
             ]},
@@ -149,14 +150,14 @@ async function consultar_historico() {
                     label:"Fijar columna",
                     action:function(e, column){
                         column.updateDefinition({frozen:true});
-                        table.redraw(true);
+                        tabla.redraw(true);
                     }
                 },
                 {
                     label:"Desfijar columna",
                     action:function(e, column){
                         column.updateDefinition({frozen:false});
-                        table.redraw(true);
+                        tabla.redraw(true);
                     }
                 }
             ]},
@@ -168,14 +169,14 @@ async function consultar_historico() {
                     label:"Fijar columna",
                     action:function(e, column){
                         column.updateDefinition({frozen:true});
-                        table.redraw(true);
+                        tabla.redraw(true);
                     }
                 },
                 {
                     label:"Desfijar columna",
                     action:function(e, column){
                         column.updateDefinition({frozen:false});
-                        table.redraw(true);
+                        tabla.redraw(true);
                     }
                 }
             ]},
