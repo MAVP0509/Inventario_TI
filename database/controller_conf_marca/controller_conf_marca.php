@@ -1,5 +1,5 @@
 <?php
-//* Consultas a la bd realizadas en la pestaña de marca
+//TODO Consultas a la bd realizadas en la pestaña de marca
 
 header('Content-Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
@@ -21,13 +21,14 @@ if ($clientejson->accion == 0) {
 print(json_encode($respuesta_servidor)); //? envía la respuesta de la base de datos a javascript
 
 
-//* Creación de un nuevo marca
-function insertar_marca($valores){
+//* Creación de una nueva marca
+function insertar_marca($valores)
+{
     include("../conexion.php");
     $sql = "INSERT INTO cat_marca(marca) VALUES ('$valores->marca');";
 
     $sql_val_marca = "SELECT * FROM cat_marca WHERE marca = '$valores->marca'";
-    if (mysqli_query($con, $sql_val_marca)->num_rows > 0) {
+    if (mysqli_query($con, $sql_val_marca)->num_rows > 0) {   //Validación si la marca ya existe
         return "Esta marca ya existe";
     } else {
         return mysqli_query($con, $sql);
@@ -35,7 +36,8 @@ function insertar_marca($valores){
 }
 
 //* Edita un marca ya existente
-function editar_marca($valores){
+function editar_marca($valores)
+{
     include("../conexion.php");
     $sql = "UPDATE cat_marca SET marca='$valores->marca' WHERE id='$valores->id';";
     //var_dump($sql);
@@ -43,7 +45,8 @@ function editar_marca($valores){
 }
 
 //* Consulta los marca de la tabla marca para mostrarlos en el programa
-function consultar_marca(){
+function consultar_marca()
+{
     include("../conexion.php");
     $sql = "SELECT * FROM  cat_marca WHERE habilitado = 1 AND marca <> 'NA'";
     $query = mysqli_query($con, $sql);
@@ -54,23 +57,23 @@ function consultar_marca(){
     return $array;
 }
 
+//* "Eliminando" una marca 
 function eliminar_marca($valores)
 {
     include("../conexion.php");
 
 
     foreach ($valores->id as $id) {
-        $id = intval($id); // Seguridad: asegura que sea número
+        $id = intval($id); //* Validamos que el id sea un número, al ser un arreglo, se valida cada uno
         $sql_val = "SELECT * FROM inventario_ti_sur WHERE fk_marca = '$id'";
-        $res = mysqli_query($con, $sql_val);
+        $res = mysqli_query($con, $sql_val);  //* Consultamos si esa marca esta en uso, si es así, no puede "eliminarse"
 
         if ($res && $res->num_rows > 0) {
             return "Una o más marcas no pueden ser eliminadas. Uno o más equipos la tienen asignada";
         }
     }
 
-    //return $array;
-    $ids = implode(",", array_map('intval', $valores->id)); // Convierte el array de IDs en una lista separada por comas
-    $sql = "UPDATE cat_marca SET habilitado = 0 WHERE id IN ($ids);"; // Consulta sql usando IN para eliminar múltiples registros
+    $ids = implode(",", array_map('intval', $valores->id)); //* Convierte el array de IDs en una lista separada por comas
+    $sql = "UPDATE cat_marca SET habilitado = 0 WHERE id IN ($ids);"; //* Consulta sql usando IN para "eliminar" múltiples registros
     return mysqli_query($con, $sql);
 }

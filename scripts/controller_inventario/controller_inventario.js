@@ -163,11 +163,16 @@ async function consultar_informacion(params) {
                         rowData.seleccionado = !rowData.seleccionado;
                         cell.getRow().reformat();
                         selecionar_registro(rowData.id_equipo)
-                    }, headerSort: false, frozen: true
+                    }, headerSort: false, frozen: true, width: 70, hozAlign: "center",
                 },
-                { title: "ID", field: "id_equipo" },
-                { title: "Zona", field: "zona" },
-                { title: "Rubro", field: "rubro" },
+                { title: "ID", field: "id_equipo", width: 45, hozAlign: "center", headerSort: false, headerHozAlign: "center", },
+                {
+                    title: "Zona", field: "zona", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "list",
+                    headerFilterParams: {
+                        valuesLookup: true, clearable: true // se auto genera a partir de los valores únicos de la columna
+                    },
+                },
+                { title: "Rubro", field: "rubro", headerHozAlign: "center", headerFilter: "input", headerSort: false },
                 { title: "Activo fijo", field: "af" },
                 { title: "Tipo de dispositivo", field: "tipo" },
                 { title: "Marca", field: "marca" },
@@ -175,9 +180,11 @@ async function consultar_informacion(params) {
                 { title: "Numero de serie", field: "num_serie" },
                 { title: "Ubicación", field: "ubicacion" },
                 { title: "TAG", field: "tag" },
+                { title: "IMEI", field: "imei" },
                 { title: "Usuario", field: "usuario" },
                 { title: "Cargo del usuario", field: "posicion" },
                 { title: "Fecha de registro", field: "fecha_entrega" },
+                { title: "Estatus", field: "estatus", frozen: true },
                 {
                     title: "Editar",
                     formatter: editIcon, width: 60, hozAlign: "center",
@@ -196,7 +203,6 @@ async function consultar_informacion(params) {
     }
 
 }
-
 
 let selecreg = ""; // No limpiar la variable
 

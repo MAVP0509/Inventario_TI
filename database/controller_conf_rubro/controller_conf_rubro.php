@@ -1,5 +1,5 @@
 <?php
-//* Consultas a la bd realizadas en la pestaña de rubro
+//TODO Consultas a la bd realizadas en la pestaña de rubro
 
 header('Content-Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
@@ -28,19 +28,18 @@ function insertar_rubro($valores)
     $sql = "INSERT INTO cat_rubro(rubro) VALUES ('$valores->rubro');";
 
     $sql_val_rubro = "SELECT * FROM cat_rubro WHERE rubro = '$valores->rubro'";
-    if (mysqli_query($con, $sql_val_rubro)->num_rows > 0) {
+    if (mysqli_query($con, $sql_val_rubro)->num_rows > 0) {  //*Consultamos su ya existe el rubro
         return "Este rubro ya existe";
     } else {
         return mysqli_query($con, $sql);
     }
 }
 
-//* Edita un rubro ya existente
+//* Edita un rubro 
 function editar_rubro($valores)
 {
     include("../conexion.php");
     $sql = "UPDATE cat_rubro SET rubro='$valores->rubro' WHERE id='$valores->id';";
-    //var_dump($sql);
     return mysqli_query($con, $sql);
 }
 
@@ -57,23 +56,23 @@ function consultar_rubro()
     return $array;
 }
 
+//* "Elimina" rubros
 function eliminar_rubro($valores)
 {
     include("../conexion.php");
 
 
     foreach ($valores->id as $id) {
-        $id = intval($id); // Seguridad: asegura que sea número
+        $id = intval($id); //* Asegura que $id sea un número
         $sql_val = "SELECT * FROM inventario_ti_sur WHERE fk_rubro = '$id'";
-        $res = mysqli_query($con, $sql_val);
+        $res = mysqli_query($con, $sql_val);  //* Consultamos si el rubro está en uso en la tabla inventario
 
         if ($res && $res->num_rows > 0) {
             return "Uno o más rubros no pueden ser eliminados. Uno o más equipos lo tienen asignado";
         }
     }
 
-    //return $array;
-    $ids = implode(",", array_map('intval', $valores->id)); // Convierte el array de IDs en una lista separada por comas
-    $sql = "UPDATE cat_rubro SET habilitado = 0 WHERE id IN ($ids);"; // Consulta sql usando IN para eliminar múltiples registros
+    $ids = implode(",", array_map('intval', $valores->id)); //* Convierte el array de IDs en una lista separada por comas
+    $sql = "UPDATE cat_rubro SET habilitado = 0 WHERE id IN ($ids);"; //* Consulta sql usando IN para eliminar múltiples registros
     return mysqli_query($con, $sql);
 }
