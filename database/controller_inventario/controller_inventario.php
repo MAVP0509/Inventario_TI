@@ -141,7 +141,7 @@ function editar_datos($valores)
 function consultar_datos()
 {
     include("../conexion.php");
-    $sql = "SELECT * FROM  vinventario_ti_sur WHERE habilitado = 1";
+    $sql = "SELECT * FROM  vinventario_ti_sur";
     $query = mysqli_query($con, $sql);
     $array = array();
     while ($fila = mysqli_fetch_object($query)) {
