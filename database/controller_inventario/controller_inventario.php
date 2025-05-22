@@ -317,3 +317,14 @@ function verificar_nuevos_id($valor)
         return $nuevo_rubro;
     }
 }
+
+function traspaso($valores){
+    include("../conexion.php");
+
+    $sql = 
+
+    $datos = [];
+    while ($fila = mysqli_fetch_assoc($query)) {
+        # code...
+    }
+}
