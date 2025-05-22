@@ -9,7 +9,7 @@ function server_inventario(model) {
                 trama: JSON.stringify(model)
             },
             success: function (response) {
-                console.log(response);
+                //console.log(response);
                 try {
                     resolve(JSON.parse(response))
                     console.log(resolve(JSON.parse(response)))
@@ -711,4 +711,27 @@ function mostrar_toast_cargando() {
 $(document).ready(function () {
     $('[data-toggle="popover"]').popover();
 });
+
+$(function () {
+    
+    $('#rango-fecha').daterangepicker({
+        startDate: moment(),
+        endDate: moment(),
+        locale: {
+            format: 'YYYY/MM/DD',
+            applyLabel: 'Aplicar',
+            cancelLabel: 'Cancelar',
+            fromLabel: "Desde",
+            toLabel: "Hasta",
+            customRangeLabel: 'Personalizado',
+            daysOfWeek: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+            monthNames: ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"],
+            firstDay: 1
+        },
+    }, /* function (start, end) {
+        $('#rango-fecha').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
+    } */);
+    
+});
+
 
