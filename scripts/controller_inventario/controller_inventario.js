@@ -165,7 +165,7 @@ async function consultar_informacion(params) {
                         selecionar_registro(rowData.id_equipo)
                     }, headerSort: false, frozen: true, width: 70, hozAlign: "center",
                 },
-                { title: "ID", field: "id_equipo", width: 45, hozAlign: "center", headerSort: false, headerHozAlign: "center", },
+                { title: "ID", field: "id_equipo", width: 70, hozAlign: "center", headerSort: false, headerHozAlign: "center", },
                 {
                     title: "Zona", field: "zona", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "list",
                     headerFilterParams: {
@@ -173,20 +173,19 @@ async function consultar_informacion(params) {
                     },
                 },
                 { title: "Rubro", field: "rubro", headerHozAlign: "center", headerFilter: "input", headerSort: false },
-                { title: "Activo fijo", field: "af" },
-                { title: "Tipo de dispositivo", field: "tipo" },
-                { title: "Marca", field: "marca" },
-                { title: "Modelo", field: "modelo" },
-                { title: "Numero de serie", field: "num_serie" },
-                { title: "Ubicación", field: "ubicacion" },
-                { title: "TAG", field: "tag" },
-                { title: "IMEI", field: "imei" },
-                { title: "Usuario", field: "usuario" },
-                { title: "Cargo del usuario", field: "posicion" },
-                { title: "Fecha de registro", field: "fecha_entrega" },
-                { title: "Estatus", field: "estatus", frozen: true },
+                { title: "Activo fijo", field: "af",headerSort: false, headerHozAlign: "center", hozAlign: "center", headerFilter: "input" },
+                { title: "Tipo de dispositivo", field: "tipo", headerHozAlign: "center", headerFilter: "input", headerSort: false ,hozAlign: "center"},
+                { title: "Marca", field: "marca", headerHozAlign: "center", headerFilter: "input", headerSort: false ,hozAlign: "center" },
+                { title: "Modelo", field: "modelo", headerHozAlign: "center", headerFilter: "input", headerSort: false ,hozAlign: "center" },
+                { title: "Numero de serie", field: "num_serie", headerHozAlign: "center", headerFilter: "input", headerSort: false ,hozAlign: "center" },
+                { title: "Ubicación", field: "ubicacion" , headerHozAlign: "center", headerFilter: "input", headerSort: false ,hozAlign: "center"},
+                { title: "TAG", field: "tag", headerHozAlign: "center", headerFilter: "input", headerSort: false ,hozAlign: "center", width: 170 },
+                { title: "IMEI", field: "imei", headerHozAlign: "center", headerFilter: "input", headerSort: false ,hozAlign: "center", width: 170 },
+                { title: "Usuario", field: "usuario", headerHozAlign: "center", headerFilter: "input", headerSort: false ,hozAlign: "center" },
+                { title: "Cargo del usuario", field: "posicion", headerHozAlign: "center", headerFilter: "input", headerSort: false ,hozAlign: "center" },
+                { title: "Fecha de registro", field: "fecha_entrega", sorter:"date", headerFilter:"input",headerSort:false },
+                { title: "Estatus", field: "estatus", width: 120,frozen: true,headerHozAlign: "center", headerFilter:"list", headerFilterParams:{values:{"Asignado":"Asignado", "Bodega":"Bodega"}, clearable:true} , headerSort: false},
                 {
-                    title: "Editar",
                     formatter: editIcon, width: 60, hozAlign: "center",
                     cellClick: function (e, cell) {
                         elemento = cell.getRow().getData();
