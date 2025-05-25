@@ -20,18 +20,62 @@ function registrar_historico($valores)
     include("../conexion.php");
 
     $fecha_evento = date("Y:m:d H:i:s");
-
-    if (is_array($valores->num_serie)) {
-        foreach ($valores->num_serie as $num_serie) {
-            $sql = "INSERT INTO historico(fecha_evento, usuario, evento, num_serie) VALUES ('$fecha_evento', '$valores->usuario', '$valores->evento', '$num_serie')";
-            mysqli_query($con, $sql);
+    //$datos = [];
+    //var_dump($valores);
+    if (isset($valores->datos) && is_array($valores->datos)) {
+         for ($i=0; $i < count($valores->datos); $i++) { 
+            $datos = $valores->datos[$i];
+            $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro) 
+            VALUES ('$fecha_evento',
+                    '$valores->usuario_sesion', 
+                    '$valores->evento', 
+                    '$datos->num_serie', 
+                    '$datos->fk_usuario', 
+                    '$datos->zona', 
+                    '$datos->ubicacion', 
+                    '$datos->af', 
+                    '$datos->fk_rubro', 
+                    '$datos->fk_tipo', 
+                    '$datos->fk_marca', 
+                    '$datos->modelo', 
+                    '$datos->tag', 
+                    '$datos->fecha_entrega')";
+            //var_dump($sql);
+            $query = mysqli_query($con, $sql);
+            $resultados[] = $query;
         }
-        return true;
-    } else {
-        $sql = "INSERT INTO historico(fecha_evento, usuario, evento, num_serie) VALUES ('$fecha_evento', '$valores->usuario', '$valores->evento', '$valores->num_serie')";
-        $query = mysqli_query($con, $sql);
-        //var_dump($query);
-        return $query;
+            //var_dump($sql);
+        return $resultados; 
+        // !No descomentar hasta hacer pruebas con los inserts xd
+        // foreach ($valores->datos as $datos) {
+        //     $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, cargo, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro) 
+        //     VALUES ('$fecha_evento', '$valores->usuario_sesion', '$valores->evento', '$datos->num_serie', '$datos->usuario', '$datos->cargo', '$datos->zona', '$datos->ubicacion', '$datos->af', '$datos->rubro', '$datos->tipo', '$datos->marca', '$datos->modelo', '$datos->tag', '$datos->fecha_registro')";
+        //     $query = mysqli_query($con, $sql);
+        //     $resultados[] = $query ? true : false;
+        // }
+        // return $resultados;
+
+    } elseif (isset($valores->datos) && is_object($valores->datos)){
+        $datos = $valores->datos;
+        $fecha_entrega = !empty($datos->fecha_entrega) ? date("Y-m-d H:i:s", strtotime($datos->fecha_entrega)) : date("Y-m-d H:i:s");
+        $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro) 
+        VALUES ('$fecha_evento',
+        '$valores->usuario_sesion', 
+        '$valores->evento', 
+        '$datos->num_serie', 
+        '$datos->usuario', 
+        '$datos->zona', 
+        '$datos->ubicacion', 
+        '$datos->af', 
+        '$datos->rubro', 
+        '$datos->tipo', 
+        '$datos->marca', 
+        '$datos->modelo', 
+        '$datos->tag', 
+        '$fecha_entrega')";
+        //var_dump($sql);
+        $query2 = mysqli_query($con, $sql);
+        return $query2 ? true : false;
     }
 }
 
@@ -41,43 +85,24 @@ function consultar_historico($valores)
     include("../conexion.php");
 
     // $sql = "SELECT * FROM historico ORDER BY fecha_evento DESC";
-    $sql = "SELECT
-            hst.id,
-            hst.fecha_evento,
-            ITS.zona,
-            CT.tipo,
-            hst.evento,
-            hst.usuario,
-            hst.num_serie
-            FROM
-                historico AS hst
-                INNER JOIN inventario_ti_sur AS ITS ON hst.num_serie = ITS.num_serie
-                INNER JOIN cat_tipo AS CT ON CT.id = ITS.fk_tipo";
-    /*  WHERE 
-                hst.num_serie = ITS.num_serie"; */
+    $sql = "SELECT * FROM vhistorico";
+    //$sql = "SELECT * FROM historico";
+    //var_dump($sql)
 
     if (!empty($valores->num_serie)) {
-        // var_dump($con);
-
-        $num_serie = mysqli_real_escape_string($con, $valores->num_serie);
-        // var_dump($num_serie);
-        $sql .= " WHERE hst.num_serie = '$num_serie'";
+        $sql .= " WHERE num_serie = '$valores->num_serie'";
     }
 
     if (!empty($valores->fecha_inicio) && !empty($valores->fecha_fin)) {
-        // var_dump($con);
-        $fecha_inicio = mysqli_real_escape_string($con, $valores->fecha_inicio);
-        $fecha_fin = mysqli_real_escape_string($con, $valores->fecha_fin);
         if (strpos($sql, 'WHERE') !== false) {
-             $sql .= " AND hst.fecha_evento BETWEEN '$fecha_inicio' AND '$fecha_fin'";
+            $sql .= " AND DATE(fecha_evento) BETWEEN '$valores->fecha_inicio' AND '$valores->fecha_fin'";
         } else {
-             $sql .= " WHERE hst.fecha_evento BETWEEN '$fecha_inicio' AND '$fecha_fin'";
+            $sql .= " WHERE DATE(fecha_evento) BETWEEN '$valores->fecha_inicio' AND '$valores->fecha_fin'";
         }
-       
     }
 
-    $sql .= " ORDER BY hst.fecha_evento DESC LIMIT 100";
-    //var_dump($sql);
+    $sql .= " ORDER BY fecha_evento DESC LIMIT 100";
+    var_dump($sql);
     $query = mysqli_query($con, $sql);
     $datos = [];
     while ($fila = mysqli_fetch_assoc($query)) {

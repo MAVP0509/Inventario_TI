@@ -1,5 +1,5 @@
 <?php
-//* Consultas a la bd realizadas en la pestaña de supervisores
+//TODO Consultas a la bd realizadas en la pestaña de supervisores
 
 header('Content-Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
@@ -19,8 +19,7 @@ if($clientejson->accion==0){
 }elseif($clientejson->accion==4){
     $respuesta_servidor->resultado=consultar_distintos($clientejson->tabla, $clientejson->campo);
 }
-print(json_encode($respuesta_servidor));//? envía la respuesta de la base de datos a javascript
-
+print(json_encode($respuesta_servidor));
 
 //* Creación de un nuevo supervisor
 function insertar_supervisor($valores){
@@ -28,33 +27,30 @@ function insertar_supervisor($valores){
     $sql = "INSERT INTO supervisor(nombre,cargo,region,habilitado) VALUES ('$valores->nombre','$valores->cargo','$valores->region',0);";
 
     $sql_val_name = "SELECT * FROM supervisor WHERE nombre = '$valores->nombre'";
-    if (mysqli_query($con,$sql_val_name)-> num_rows > 0){
-        return false;
+    
+    //* Validamos si el supervisor ya existe
+    if (mysqli_query($con,$sql_val_name)-> num_rows > 0){                           
+        return "El supervisor ya existe";
     }else{
         return mysqli_query($con,$sql);    
     }
     
 }
 
-//* Edita un supervisor ya existente
+//* Edita un supervisor 
 function editar_supervisor($valores){
     include("../conexion.php");
 
-    $msgError = "Primero deshabilite el supervisor antes de editarlo";
+    $msgError = "El supervisor ya existe";
 
-    $sql_region ="SELECT habilitado FROM supervisor WHERE nombre = '$valores->nombre'";
-    $query = mysqli_query($con,$sql_region);
-    $array = array();
-    while ($fila = mysqli_fetch_object($query)){
-        array_push($array, $fila);  //* Se guardan los registros en un array
-    }
+    $sql_valid ="SELECT nombre FROM supervisor WHERE nombre = '$valores->nombre'";
+    mysqli_query($con,$sql_valid);
 
-    $habilitado = $array[0]->habilitado;
-    if($habilitado == 1){
+    if(mysqli_query($con,$sql_valid) -> num_rows > 0){//*Valida que si a la hora de editar, si se editó el nombre, no sea uno ya existente
         return $msgError;
     }else{
         $sql = "UPDATE supervisor SET nombre='$valores->nombre', cargo='$valores->cargo', region='$valores->region', habilitado = 0 WHERE id='$valores->id';";
-        //var_dump($sql);
+       
         return mysqli_query($con,$sql);
     }
 
@@ -72,13 +68,14 @@ function consultar_supervisor(){
     return $array;
 }
 
-//* Desactiva los supervisores
+//* Desactivar supervisores
 function desactivar_supervisor($valores){
     include("../conexion.php");
     $sql="UPDATE supervisor SET habilitado = '$valores->habilitado' where id='$valores->id';";
     return mysqli_query($con,$sql);
 }
 
+//* Función para rellenar selects2 en la pestaña supervisores
 function consultar_distintos($tabla, $campo)
 {
     include("../conexion.php");
@@ -86,7 +83,7 @@ function consultar_distintos($tabla, $campo)
     $tabla = mysqli_real_escape_string($con, $tabla);
     $campo = mysqli_real_escape_string($con, $campo);
 
-    $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE `$campo` IS NOT NULL AND `$campo` <> '' AND '$campo' NOT LIKE 'NA';";
+    $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE  `$campo` <> 'NA'";
     $query = mysqli_query($con, $sql);
 
     $datos = [];

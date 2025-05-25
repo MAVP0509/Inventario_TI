@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
   <link rel="stylesheet" href="libraries/fontawesome-free-6.7.2-web/css/all.min.css">
   <link rel="stylesheet" href="libraries/Tabulator/tabulator_bootstrap4.min.css">
+  <link rel="stylesheet" href="libraries/select2/css/select2-bootstrap4.min.css">
+  <link rel="stylesheet" href="libraries/select2/css/select2.min.css">
 
   <title>Inventario TI</title>
 </head>
@@ -97,7 +99,7 @@
     </div>
   </div>
 
-     <!--Modal usuario -->
+  <!--Modal usuario -->
   <div class="modal" tabindex="-1" aria-hidden="true" id="mdl-usu">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -119,23 +121,24 @@
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="fa-solid fa-briefcase"></i></span>
             </div>
-            <input type="text" class="form-control" id="cargo" autocomplete="off">
-            <div class="invalid-feedback" id="cargo-feedback">Por favor, ingrese un cargo.</div>
+            <select class="form-control select" id="select-cargo"></select>
+            <div class="invalid-feedback" id="cargo-feedback">Por favor, seleccione un cargo.</div>
           </div>
           <div class="alert alert-danger position-relative d-flex align-items-start " role="alert"
-            style="display:none !important; background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;" id="alert-edit-usu">
+            style="display:none !important; background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;"
+            id="alert-edit-usu">
             <button type='button' class='btn icon toggle-select me-2' id="check-editar">
-            <i class='fa-regular fa-square fa-lg' id="check-editar-icon"></i>
+              <i class='fa-regular fa-square fa-lg' id="check-editar-icon"></i>
             </button>
-              Estos cambios afectarán cada registro del inventario que tenga a este usuario asignado.
-            
+            Estos cambios afectarán cada registro del inventario que tenga a este usuario asignado.
+
           </div>
-          
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cancelar <i
               class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
-          <button type="button" class="btn btn-success icon" id="mdl-btn-conf" onclick="" >Confirmar <i
+          <button type="button" class="btn btn-success icon" id="mdl-btn-conf" onclick="">Confirmar <i
               class="fa-solid fa-circle-check fa-lg"></i></button>
         </div>
       </div>
@@ -153,5 +156,7 @@
 <script src="scripts/controller_conf_usuarios/controller_conf_usuarios.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="libraries/Tabulator/tabulator.min.js"></script>
+<script src="libraries/select2/js/select2.min.js"></script>
+
 
 </html>

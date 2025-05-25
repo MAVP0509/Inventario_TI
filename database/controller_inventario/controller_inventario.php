@@ -15,12 +15,14 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_datos($clientejson);
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = desactivar_datos($clientejson);
-} elseif ($clientejson->accion == 5) {
+} elseif ($clientejson->accion == 4) {
     $respuesta_servidor->resultado = consultar_para_resguardo($clientejson);
-} elseif ($clientejson->accion == 6) {
+} elseif ($clientejson->accion == 5) {
     $respuesta_servidor->resultado = consultar_distintos($clientejson->tabla, $clientejson->campo);
-} elseif ($clientejson->accion == 8) {
+} elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = consultar_region($clientejson);
+} elseif ($clientejson->accion == 7) {
+    $respuesta_servidor->resultado = traspaso($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -69,16 +71,37 @@ function insertar_datos($valores)
         $val_marca = $idMarca['id'];
     }
 
+    $estatus = "";
+    if($valores->usuario == "5"){
+        $estatus = "Bodega";
+    }else{
+        $estatus = "Asignado";
+    }
+    
+    $tag = "";
+    if($valores->tag == ""){
+        $tag = "NA";
+    }else{
+        $tag = $valores->tag;
+    }
+    
+    $af = "";
+    if($valores->af == ""){
+        $af = "NA";
+    }else{
+        $af = $valores->af;
+    }
+
     if ($valores->num_serie != "") {
         $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$valores->num_serie'";
         //var_dump($sql_num);
         $query_num = mysqli_query($con, $sql_num);
 
-        $sql = "INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, habilitado) 
-        VALUES ('$valores->zona', '$val_rubro','$valores->af','$val_tipo','$val_marca','$valores->modelo', '$valores->num_serie', 
-        '$valores->ubicacion', '$valores->tag', '$valores->usuario', '$registro',1);";
-        //$query = mysqli_query($con, $sql);|
-
+        $sql = "INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, estatus, imei) 
+        VALUES ('$valores->zona', '$val_rubro','$af','$val_tipo','$val_marca','$valores->modelo', '$valores->num_serie', 
+        '$valores->ubicacion', '$tag', '$valores->usuario', '$registro','$estatus', 'NA');";
+        
+        //var_dump($sql);
         if (mysqli_num_rows($query_num) > 0) {
             echo json_encode(["resultado" => false, "mensaje" => "Número de serie duplicado"]);
             exit;
@@ -141,7 +164,7 @@ function editar_datos($valores)
 function consultar_datos()
 {
     include("../conexion.php");
-    $sql = "SELECT * FROM  vinventario_ti_sur WHERE habilitado = 1";
+    $sql = "SELECT * FROM  vinventario_ti_sur";
     $query = mysqli_query($con, $sql);
     $array = array();
     while ($fila = mysqli_fetch_object($query)) {
@@ -155,39 +178,38 @@ function desactivar_datos($valores)
 {
     include("../conexion.php");
     //var_dump($valores);
-    
-    if (is_array($valores->id)) { // Verifica si $valores->id es un array
-        
-        $ids = implode(",", array_map('intval', $valores->id)); // Convierte el array de IDs en una lista separada por comas
-        
-        $sql_num = "SELECT num_serie FROM inventario_ti_sur WHERE id IN ($ids)";
-        $query_num = mysqli_query($con, $sql_num);
 
-        $num_series = [];
-        while ($fila = mysqli_fetch_object($query_num)) {
-             array_push($num_series,$fila->num_serie);
+    if (is_array($valores->id)) { // Verifica si $valores->id es un array
+
+        $ids = implode(",", array_map('intval', $valores->id)); // Convierte el array de IDs en una lista separada por comas
+
+        $sql_datos = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, modelo, tag, fecha_entrega FROM inventario_ti_sur WHERE id IN ($ids)";
+        
+        $query = mysqli_query($con, $sql_datos);
+
+        $datos = [];
+        while ($fila = mysqli_fetch_object($query)) {
+            array_push($datos, $fila);
         }
 
-        $sql = "UPDATE inventario_ti_sur SET habilitado = 0 WHERE id IN ($ids);"; // Consulta sql usando IN para eliminar múltiples registros
-         mysqli_query($con, $sql);
-        return $num_series;
-        
+        $sql_datos = "UPDATE inventario_ti_sur SET habilitado = 0 WHERE id IN ($ids);"; // Consulta sql_datos usando IN para eliminar múltiples registros
+        mysqli_query($con, $sql_datos);
+        return $datos;
     } else {
-        
+
         $sql = "UPDATE inventario_ti_sur SET habilitado = 0 where id='$valores->id';";
         mysqli_query($con, $sql);
 
-        $sql_num2 = "SELECT num_serie FROM inventario_ti_sur WHERE id = '$valores->id'";
+        $sql_num2 = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, modelo, tag, fecha_entrega FROM inventario_ti_sur WHERE id = '$valores->id'";
         $query_num2 = mysqli_query($con, $sql_num2);
 
-        $num_series = [];
+        $datos = [];
         while ($fila = mysqli_fetch_object($query_num2)) {
-             array_push($num_series,$fila->num_serie);
+            array_push($datos, $fila);
         }
-        return $num_series;
+        return $datos;
     }
-
-}  
+}
 
 
 function consultar_para_resguardo($valores)
@@ -316,4 +338,3 @@ function verificar_nuevos_id($valor)
         return $nuevo_rubro;
     }
 }
-?>

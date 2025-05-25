@@ -1,5 +1,5 @@
 <?php
-//* Consultas a la bd realizadas en la pestaña de usuarios
+//TODO Consultas a la bd realizadas en la tabla catálogo de usuarios de la empresa
 
 header('Content-Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
@@ -16,6 +16,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_usuarios($clientejson);
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = eliminar_usuarios($clientejson);
+} elseif($clientejson->accion==4){
+    $respuesta_servidor->resultado=consultar_distintos($clientejson->tabla, $clientejson->campo);
 }
 
 print(json_encode($respuesta_servidor)); //? envía la respuesta de la base de datos a javascript
@@ -34,11 +36,10 @@ function insertar_usuarios($valores){
     }
 }
 
-//* Edita un usuario ya existente
+//* Edita un usuario 
 function editar_usuarios($valores){
     include("../conexion.php");
     $sql = "UPDATE cat_usuarios SET nombre = '$valores->nombre',cargo='$valores->cargo' WHERE id='$valores->id';";
-    //var_dump($sql);
     return mysqli_query($con, $sql);
 }
 
@@ -54,24 +55,45 @@ function consultar_usuarios(){
     return $array;
 }
 
+//* "Eliminación" de usuarios
 function eliminar_usuarios($valores)
 {
     include("../conexion.php");
 
 
     foreach ($valores->id as $id) {
-        $id = intval($id); // Seguridad: asegura que sea número
+        $id = intval($id); //* Asegura que $id sea número
         $sql_val = "SELECT * FROM inventario_ti_sur WHERE fk_usuario = '$id'";
         $res = mysqli_query($con, $sql_val);
 
-        if ($res && $res->num_rows > 0) {
+        if ($res && $res->num_rows > 0) {   //* Valida si alguno tiene un equipo asignado
             return "Uno o más usuarios no pueden ser eliminados. Uno o más equipos lo tienen asignado";
         }
     }
 
-    //return $array;
-    $ids = implode(",", array_map('intval', $valores->id)); // Convierte el array de IDs en una lista separada por comas
-    $sql = "UPDATE cat_usuarios SET habilitado = 0 WHERE id IN ($ids);"; // Consulta sql usando IN para eliminar múltiples registros
+    $ids = implode(",", array_map('intval', $valores->id)); //* Convierte el array de IDs en una lista separada por comas
+    $sql = "UPDATE cat_usuarios SET habilitado = 0 WHERE id IN ($ids);"; //* Consulta sql usando IN para eliminar múltiples registros
     return mysqli_query($con, $sql);
 }
 
+//* Consulta utilizada para llenar selects2 en los formularios
+function consultar_distintos($tabla, $campo){
+    include("../conexion.php");
+    //Validación para evitar inyecciones
+    $tabla = mysqli_real_escape_string($con, $tabla);
+    $campo = mysqli_real_escape_string($con, $campo);
+
+    $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE  `$campo` <> 'NA'";
+    $query = mysqli_query($con, $sql);
+
+    $datos = [];
+    while ($fila = mysqli_fetch_assoc($query)) {
+        $valor = $fila[$campo];
+        $datos[] = [
+            'id' => $valor,
+            $campo => $valor
+        ];
+    }
+
+    return $datos;
+}

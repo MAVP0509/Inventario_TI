@@ -1,4 +1,5 @@
 <?php
+  
 
     header('Content-Type: text/html; charset=UTF-8');
     date_default_timezone_set('America/Mexico_City');
@@ -12,9 +13,9 @@
         $respuesta_servidor->resultado = restablecer_contraseña($clientejson);
     }
 
-    print(json_encode($respuesta_servidor)); //si lo quitas truena la app
+    print(json_encode($respuesta_servidor)); 
 
-
+  
     function validarToken($token){
         include("../conexion.php");
         $sql ="SELECT * FROM usuario WHERE token = '$token' AND token_expiracion > NOW()";

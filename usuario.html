@@ -1,52 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="libraries/fontawesome-free-6.7.2-web/css/all.min.css">
-    <link rel= "stylesheet" href="libraries/bootstrap-4.6.2-dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="dist/css/adminlte.min.css">
-    <link rel="stylesheet" href="libraries/DataTables/datatables.min.css">
-    <link rel="stylesheet" href="libraries/Tabulator/tabulator_bootstrap4.min.css">
-    
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="libraries/fontawesome-free-6.7.2-web/css/all.min.css">
+  <link rel="stylesheet" href="libraries/bootstrap-4.6.2-dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="libraries/DataTables/datatables.min.css">
+  <link rel="stylesheet" href="libraries/Tabulator/tabulator_bootstrap4.min.css">
 
-    
-    <link rel="stylesheet" href="dist/css/adminlte.min.css">
-    
-    <title>Inventario TI</title>
+
+
+  <link rel="stylesheet" href="dist/css/adminlte.min.css">
+
+  <title>Inventario TI</title>
 </head>
+
 <body class="hold-transition sidebar-mini layout-fixed" onload="consultar_usuarios()">
-  
+
   <div class="wrapper">
-      <!-- Preloader -->
-      <div class="preloader flex-column justify-content-center align-items-center">
-        <img src="diavaz.png" alt="DiavazLogo" height="60" width="60">
-      </div>
-      <nav class="main-header navbar navbar-expand navbar-white navbar-light fixed-top">
-            <!-- Left navbar links -->
-            <ul class="navbar-nav">
-              <li class="nav-item">
-                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-              </li>
-            </ul>
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#" role="button" onclick="cerrar_sesionmsg()" id="log-out"><i class="fa-solid fa-door-closed fa-xl"></i></a>
-                </li>
+    <!-- Preloader -->
+    <div class="preloader flex-column justify-content-center align-items-center">
+      <img src="diavaz.png" alt="DiavazLogo" height="60" width="60">
+    </div>
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light fixed-top">
+      <!-- Left navbar links -->
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+      </ul>
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="#" role="button" onclick="cerrar_sesionmsg()" id="log-out"><i
+              class="fa-solid fa-door-closed fa-xl"></i></a>
+        </li>
 
-            </ul>   
+      </ul>
 
 
-      </nav>
-    
-      <aside class="main-sidebar sidebar-dark-primary elevation-4">
-        <a href="#" class="brand-link">
-          <img src="diavaz.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-          <span class="brand-text font-weight-light">Inventario TI</span>
-        </a>
-      
-        <!-- Sidebar -->
-       <!--  <div class="sidebar">
+    </nav>
+
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+      <a href="#" class="brand-link">
+        <img src="diavaz.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+        <span class="brand-text font-weight-light">Inventario TI</span>
+      </a>
+
+      <!-- Sidebar -->
+      <!--  <div class="sidebar">
           <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
               <img src="user2.png" class="img-circle elevation-2" alt="User Image">
@@ -79,44 +82,44 @@
           </nav>
         </div> -->
 
-        <div id="sidebar-container"></div>
-      </aside>
+      <div id="sidebar-container"></div>
+    </aside>
 
-      <div class="content-wrapper">
-            <!-- Content Header (Page header) -->
-            <div class="content-header">
-              <div class="container-fluid">
-                <div class="row mb-2">
-                  <div class="col-sm-6">
-                    <h1 class="m-0">Inventario TI</h1>
-                  </div><!-- /.col -->
-                </div><!-- /.row -->
-              </div><!-- /.container-fluid -->
-            </div>
-            <!-- /.content-header -->
-        
-            <!-- Main content -->
-            <section class="content">
-              <div class="container-fluid">
-                <!-- Small boxes (Stat box) -->
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-header">
-                              <h3 class="card-title">
-                                <i class="fa-solid fa-table"></i>
-                                Usuarios
-                              </h3>
-                              <div class="d-flex justify-content-end mb-3">
-                                <button type="button" class="btn btn-success mr-3 icon" onclick="mdl_nuevo_usuario()"><i
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <div class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1 class="m-0">Inventario TI</h1>
+            </div><!-- /.col -->
+          </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+      </div>
+      <!-- /.content-header -->
+
+      <!-- Main content -->
+      <section class="content">
+        <div class="container-fluid">
+          <!-- Small boxes (Stat box) -->
+          <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <i class="fa-solid fa-table"></i>
+                    Usuarios
+                  </h3>
+                  <div class="d-flex justify-content-end mb-3">
+                    <button type="button" class="btn btn-success mr-3 icon" onclick="mdl_nuevo_usuario()"><i
                         class="fa-solid fa-plus fa-lg"></i> Nuevo</button>
                     <button type="button" class="btn btn-danger mr-3 icon" onclick="mensaje_eliminar()"><i
                         class="fa-solid fa-trash-can fa-lg"></i> Eliminar</button>
-                              </div>
-                            </div><!-- /.card-header -->
+                  </div>
+                </div><!-- /.card-header -->
 
-                            <div class="card-body">
-                                <!-- <div id="tbl" class="dataTables_wrapper dt-bootstrap4">
+                <div class="card-body">
+                  <!-- <div id="tbl" class="dataTables_wrapper dt-bootstrap4">
                                       <div class="row">
                                           <div class="col-sm-12 col-md-6"></div>
                                           <div class="col-sm-12 col-md-6"></div>
@@ -162,177 +165,188 @@
                                       </div>
                                   
                                 </div> -->
-                                <div id="tbl" class="table  table-striped table-bordered table-sm"></div>
-                              </div><!-- /.card-body -->
-                        </div>
-                    </div>
-                  
-                  <!-- ./col -->
-                </div>
-                <!-- /.row -->
-                <!-- Main row -->
-            
-                <!-- /.row (main row) -->
-              </div><!-- /.container-fluid -->
-            </section>
-            <!-- /.content -->
-      </div>
+                  <div id="tbl" class="table  table-striped table-bordered table-sm"></div>
+                </div><!-- /.card-body -->
+              </div>
+            </div>
+
+            <!-- ./col -->
+          </div>
+          <!-- /.row -->
+          <!-- Main row -->
+
+          <!-- /.row (main row) -->
+        </div><!-- /.container-fluid -->
+      </section>
+      <!-- /.content -->
+    </div>
   </div>
 
-    <!-- Modal Editar-->
-  <div class="modal fade" id="modalEditar" style="display : none;" aria-hidden="true" >
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Editar</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                        <label for="nombre" style = "display: block;">Nombre</label>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
-                            </div>
-                            <input type="text" class="form-control" id="nombre" autocomplete="off">
-                        </div>
-                        <label for="correo">Correo</label>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
-                            </div>
-                            
-                            <input type="email" class="form-control" id="correo" autocomplete="off">
-                        </div>
-                        <label for="telefono" class="form-label">Telefono</label>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
-                            </div>
-                            
-                            <input type="tel" class="form-control" id="telefono" maxlength="10" autocomplete="off">
-                        </div>
-                        <label for="fechanac" class="form-label">Fecha de nacimiento</label>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
-                            </div>
-                            <input type="date" class="form-control" id="fechanac" >
-                        </div>
-                        <label for="edad" class="form-label">Edad</label>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fa-solid fa-image-portrait"></i></span>         
-                            </div>       
-                            <input type="number" class="form-control" id="edad" disabled>
-                        </div>
-                        <label for="fecha_reg" class="form-label">Fecha de registro</label>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
-                            </div>
-                            <input type="datetime" class="form-control" id="fecha_reg" disabled>
-                        </div>
-                        <label for="contraseña" class="form-label">Contraseña</label>
-                        <div class="input-group mb-3 ">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i id="ver-passEdit" class="fa-solid fa-eye-slash" style="cursor: pointer;"></i></span>
-                            </div>
-                            <input type="password" class="form-control" id="contraseña" disabled>
-                            <!-- <span class="input-group-append">
+  <!-- Modal Editar-->
+  <div class="modal fade" id="modalEditar" style="display : none;" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Editar</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <label for="nombre" style="display: block;">Nombre</label>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+            </div>
+            <input type="text" class="form-control" id="nombre" autocomplete="off">
+          </div>
+          <label for="correo">Correo</label>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
+            </div>
+
+            <input type="email" class="form-control" id="correo" autocomplete="off">
+          </div>
+          <label for="telefono" class="form-label">Telefono</label>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+            </div>
+
+            <input type="tel" class="form-control" id="telefono" maxlength="10" autocomplete="off">
+          </div>
+          <label for="fechanac" class="form-label">Fecha de nacimiento</label>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
+            </div>
+            <input type="date" class="form-control" id="fechanac">
+          </div>
+          <label for="edad" class="form-label">Edad</label>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa-solid fa-image-portrait"></i></span>
+            </div>
+            <input type="number" class="form-control" id="edad" disabled>
+          </div>
+          <label for="fecha_reg" class="form-label">Fecha de registro</label>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
+            </div>
+            <input type="datetime" class="form-control" id="fecha_reg" disabled>
+          </div>
+          <label for="contraseña" class="form-label">Contraseña</label>
+          <div class="input-group mb-3 ">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i id="ver-passEdit" class="fa-solid fa-eye-slash"
+                  style="cursor: pointer;"></i></span>
+            </div>
+            <input type="password" class="form-control" id="contraseña" disabled>
+            <!-- <span class="input-group-append">
                               <button type="button" class="btn btn-info btn-flat">Resetear</button>
                             </span> -->
-                            <div class="input-group-append dropdown">
-                              <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="drop-menu">
-                                Resetear
-                              </button>
-                              <div class="dropdown-menu dropdown-menu-right icon" aria-labelledby="drop-menu">
-                                <a class="dropdown-item " href="#" onclick="recuperar_contraseña(), mostrar_toast_cargando()"><i class="fa-solid fa-envelope fa-lg"></i> Enviar correo</a>
-                              </div>
-                            </div>
-                        </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger icon" data-dismiss="modal">Cancelar <i class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
-                    <button type="button" class="btn btn-success icon" onclick="editar_usuario()">Guardar <i class="fa-solid fa-floppy-disk fa-lg"></i></button>
-                </div>
+            <div class="input-group-append dropdown">
+              <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false" id="drop-menu">
+                Resetear
+              </button>
+              <div class="dropdown-menu dropdown-menu-right icon" aria-labelledby="drop-menu">
+                <a class="dropdown-item " href="#" onclick="recuperar_contraseña(), mostrar_toast_cargando()"><i
+                    class="fa-solid fa-envelope fa-lg"></i> Enviar correo</a>
+              </div>
             </div>
+          </div>
         </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger icon" data-dismiss="modal">Cancelar <i
+              class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+          <button type="button" class="btn btn-success icon" onclick="editar_usuario()">Guardar <i
+              class="fa-solid fa-floppy-disk fa-lg"></i></button>
+        </div>
+      </div>
+    </div>
   </div>
 
-    <!-- Modal Insertar usuario-->
-  <div class="modal fade " id="modalInsertar" aria-modal="true" >
-      <div class="modal-dialog ">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h4 class="modal-title">Nuevo Usuario</h4>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                  </button>
-              </div>
-              <div class="modal-body">
-                <span id="error-mensajeNombre" style="display: none; color:red;">Ingresa un nombre válido</span>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
-                    </div>
-                    <input type="text" class="form-control" id="nombreReg" placeholder="Nombre completo" name="insertMdl" autocomplete="off">
-                </div>
-                <span id="error-mensajeEmail" style="display: none; color:red;">Ingresa un correo válido</span>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
-                    </div>
-                    <input type="email" class="form-control" id="correoReg" placeholder="Correo eléctronico" name="insertMdl" autocomplete="off">
-                </div>
-                <span id="error-mensageTel" style="display: none; color:red;">Ingresa un número válido</span> 
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
-                    </div>
-                    <input type="tel" class="form-control" id="telefonoReg" maxlength="10" placeholder="Número de teléfono" name="insertMdl" autocomplete="off">
-                </div>
-                <label for="fechanacReg">Fecha de nacimiento</label>
-                <span id="error-mensageFecha" style="display: none; color:red;">Ingresa una fecha válida</span>
-                <div class="input-group mb-3">
-                        <input type="date" class="form-control" id="fechanacReg" placeholder="Fecha de nacimiento" name="insertMdl">
-                </div>
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text"><i class="fa-solid fa-image-portrait"></i></span>
-                  </div>
-                  <input type="number" class="form-control" id="edadReg" placeholder="Edad" disabled name="insertMdl">
-                </div>
-                <span id="error-mensagePass" style="display: none; color:red;">Ingresa una contraseña</span>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i id="ver-passReg" class="fa-solid fa-eye-slash" style="cursor: pointer;"></i></span>
-                    </div>
-                    <input type="password" class="form-control" id="contraseñaReg" placeholder="Contraseña" name="insertMdl">
-                </div>
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-danger icon" data-dismiss="modal">Cancelar <i class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
-                  <button type="button" class="btn btn-success icon" onclick="insertar_usuario()">Guardar <i class="fa-solid fa-floppy-disk fa-lg"></i></button>
-              </div>
+  <!-- Modal Insertar usuario-->
+  <div class="modal fade " id="modalInsertar" aria-modal="true">
+    <div class="modal-dialog ">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Nuevo Usuario</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <span id="error-mensajeNombre" style="display: none; color:red;">Ingresa un nombre válido</span>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+            </div>
+            <input type="text" class="form-control" id="nombreReg" placeholder="Nombre completo" name="insertMdl"
+              autocomplete="off">
           </div>
+          <span id="error-mensajeEmail" style="display: none; color:red;">Ingresa un correo válido</span>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
+            </div>
+            <input type="email" class="form-control" id="correoReg" placeholder="Correo eléctronico" name="insertMdl"
+              autocomplete="off">
+          </div>
+          <span id="error-mensageTel" style="display: none; color:red;">Ingresa un número válido</span>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+            </div>
+            <input type="tel" class="form-control" id="telefonoReg" maxlength="10" placeholder="Número de teléfono"
+              name="insertMdl" autocomplete="off">
+          </div>
+          <label for="fechanacReg">Fecha de nacimiento</label>
+          <span id="error-mensageFecha" style="display: none; color:red;">Ingresa una fecha válida</span>
+          <div class="input-group mb-3">
+            <input type="date" class="form-control" id="fechanacReg" placeholder="Fecha de nacimiento" name="insertMdl">
+          </div>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa-solid fa-image-portrait"></i></span>
+            </div>
+            <input type="number" class="form-control" id="edadReg" placeholder="Edad" disabled name="insertMdl">
+          </div>
+          <span id="error-mensagePass" style="display: none; color:red;">Ingresa una contraseña</span>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i id="ver-passReg" class="fa-solid fa-eye-slash"
+                  style="cursor: pointer;"></i></span>
+            </div>
+            <input type="password" class="form-control" id="contraseñaReg" placeholder="Contraseña" name="insertMdl">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger icon" data-dismiss="modal">Cancelar <i
+              class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+          <button type="button" class="btn btn-success icon" onclick="insertar_usuario()">Guardar <i
+              class="fa-solid fa-floppy-disk fa-lg"></i></button>
+        </div>
       </div>
+    </div>
   </div>
 
 </body>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="scripts/controller_acceso/controller_acceso.js"></script>
-    <script src="scripts/controller_usuario/controller_usuario.js"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="scripts/controller_acceso/controller_acceso.js"></script>
+<script src="scripts/controller_usuario/controller_usuario.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-    <script src="dist/js/adminlte.min.js"></script>
-    <script src="libraries/DataTables/datatables.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="libraries/Tabulator/tabulator.min.js"></script>,
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script src="dist/js/adminlte.min.js"></script>
+<script src="libraries/DataTables/datatables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="libraries/Tabulator/tabulator.min.js"></script>,
 
 
-    
+
 </html>

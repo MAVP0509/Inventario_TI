@@ -125,7 +125,7 @@ async function consultar_informacion() {
             },
             { title: "ID", field: "id", width: 45, hozAlign: "center", headerSort: false },
             {
-                title: "Nombre", field: "nombre", cellClick:
+                title: "Nombre", field: "nombre", headerFilter: "input", headerSort: false, cellClick:
                     function (e, cell) {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
@@ -134,28 +134,13 @@ async function consultar_informacion() {
                     }
             },
             {
-                title: "Cargo", field: "cargo", cellClick:
+                title: "Cargo", field: "cargo", headerFilter: "input", headerSort: false, cellClick:
                     function (e, cell) {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
                         cell.getRow().reformat();
                         seleccionar_usuarios(rowData.id)
                     }
-            },
-            {
-                title: "Activo",
-                field: "activo",
-                formatter: function (cell, formatterParams, onRendered) {
-                    let value = cell.getValue();
-                    let icon = value === "on" ? "fa-solid fa-toggle-on fa-2xl" : "fa-solid fa-toggle-off fa-2xl";
-                    let color = value === "on" ? "#5eeb00" : "#ff0000";
-                    return `<span class="custom-toggle"><i class="${icon}" style="color:${color}; font-size: 1.5em;"></i></span>`;
-                },
-                cellClick: function (e, cell) {
-                    let current = cell.getValue();
-                    let newValue = current === "on" ? "off" : "on";
-                    cell.setValue(newValue);
-                }
             },
             {
                 formatter: editIcon, width: 60, hozAlign: "center",
@@ -171,7 +156,7 @@ async function consultar_informacion() {
 
 let datoSelected = ""
 selected = false
-function mdl_editar_usuarios(params) {
+async function mdl_editar_usuarios(params) {
     for (let i = 0; i < datos.length; i++) {
         let element = datos[i]
 
@@ -183,10 +168,26 @@ function mdl_editar_usuarios(params) {
     const serie = document.getElementById('usu');
     serie.classList.remove('is-invalid'); // Remover clase de error si existía
 
+    $('.select').each(function () {
+        $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
+        $(this).removeClass('is-invalid'); // Elimina la clase de validación
+    });
+
+    // Limpia y carga los select
+    await general_select2({
+        selectId: 'select-cargo',
+        tabla: 'cat_usuarios',
+        campo: 'cargo',
+        placeholder: 'Seleccione un cargo',
+        dropdownParent: '#mdl-usu',
+        tags:true,
+    })
+
     document.getElementById('alert-edit-usu').style.display = 'block'
     document.getElementById('mdl-title').textContent = "Editar Usuario"
     document.getElementById('usu').value = datoSelected.nombre
-    document.getElementById('cargo').value = datoSelected.cargo
+    //document.getElementById('cargo').value = datoSelected.cargo
+    $('#select-cargo').val(datoSelected.cargo).trigger('change');
     document.getElementById('mdl-btn-conf').onclick = function () { editar_usuario() }
     document.getElementById('mdl-btn-conf').disabled = true
 
@@ -216,7 +217,7 @@ async function editar_usuario() {
         accion: 1,
         id: datoSelected.id,
         nombre: $('#usu').val().trim(),
-        cargo: $("#cargo").val().trim()
+        cargo: $("#select-cargo").val().trim()
     }
 
     let server = await server_usuarios(model)
@@ -239,7 +240,21 @@ $('#mdl-usu').on('hidden.bs.modal', function () {
     selected = false
 });
 
-function mdl_nuevo_usuario() {
+async function mdl_nuevo_usuario() {
+    $('.select').each(function () {
+        $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
+        $(this).removeClass('is-invalid'); // Elimina la clase de validación
+    });
+
+    // Limpia y carga los select
+    await general_select2({
+        selectId: 'select-cargo',
+        tabla: 'cat_usuarios',
+        campo: 'cargo',
+        placeholder: 'Seleccione un cargo',
+        dropdownParent: '#mdl-usu',
+        tags:true,
+    })
 
     const serie = document.getElementById('usu');
     serie.classList.remove('is-invalid'); // Remover clase de error si existía
@@ -247,8 +262,8 @@ function mdl_nuevo_usuario() {
     document.getElementById('mdl-title').textContent = "Nuevo Usuario"
     document.getElementById('usu').value = ""
     document.getElementById('usu').placeholder = "Nuevo usuario"
-    document.getElementById('cargo').value = ""
-    document.getElementById('cargo').placeholder = "Cargo"
+    //document.getElementById('cargo').value = ""
+    //document.getElementById('cargo').placeholder = "Cargo"
     document.getElementById('mdl-btn-conf').onclick = function () { nuevo_usuario() }
     document.getElementById('mdl-btn-conf').disabled = false
     document.getElementById('alert-edit-usu').setAttribute('style', 'display: none !important;  background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;');
@@ -256,7 +271,7 @@ function mdl_nuevo_usuario() {
 }
 
 async function nuevo_usuario() {
-    let validados = ["usu", "cargo"]
+    let validados = ["usu", "select-cargo"]
 
     // Validar campos
     if (!validar_campos(validados)) {
@@ -267,7 +282,7 @@ async function nuevo_usuario() {
     let model = {
         accion: 0,
         nombre: $('#usu').val().trim(),
-        cargo: $('#cargo').val().trim()
+        cargo: $('#select-cargo').val().trim()
     }
 
     let server = await server_usuarios(model)
@@ -312,6 +327,40 @@ async function eliminar_usuario(params) {
     deseleccionar_todos()
 }
 
+
+async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags }) {
+    //try {
+    const response = await server_usuarios({
+        accion: 4,
+        tabla: tabla,
+        campo: campo
+    });
+
+    //console.log('Respuesta del servidor para select2:', response);
+
+    const opciones = response.resultado.map(item => ({
+        id: item[campo] || '',
+        text: item[campo] || ''
+    }));
+
+    const $select = $('#' + selectId);
+    $select.empty().append(new Option('', '', false, false));
+
+    $select.select2({
+        theme: 'bootstrap4',
+        allowClear: true,
+        placeholder: placeholder,
+        tags: tags,
+        dropdownParent: $(dropdownParent),
+        data: opciones
+    });
+
+    $select.val(null).trigger('change');
+
+    //} catch (error) {
+
+    //}
+}
 function validar_campos(campos) {
     let valido = true;
 
