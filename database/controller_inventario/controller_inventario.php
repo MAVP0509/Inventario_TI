@@ -192,12 +192,12 @@ function desactivar_datos($valores)
             array_push($datos, $fila);
         }
 
-        $sql_datos = "UPDATE inventario_ti_sur SET habilitado = 0 WHERE id IN ($ids);"; // Consulta sql_datos usando IN para eliminar múltiples registros
+        $sql_datos = "UPDATE inventario_ti_sur SET estatus = Baja WHERE id IN ($ids);"; // Consulta sql_datos usando IN para eliminar múltiples registros
         mysqli_query($con, $sql_datos);
         return $datos;
     } else {
 
-        $sql = "UPDATE inventario_ti_sur SET habilitado = 0 where id='$valores->id';";
+        $sql = "UPDATE inventario_ti_sur SET estatus = Baja where id='$valores->id';";
         mysqli_query($con, $sql);
 
         $sql_num2 = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, modelo, tag, fecha_entrega FROM inventario_ti_sur WHERE id = '$valores->id'";
@@ -336,5 +336,16 @@ function verificar_nuevos_id($valor)
         // No es un número válido: el usuario ingresó una nueva opción
         $nuevo_rubro = trim($valor);
         return $nuevo_rubro;
+    }
+}
+
+function traspaso($valores){
+    include("../conexion.php");
+
+    $sql = "UPDATE";
+
+    $datos = [];
+    while ($fila = mysqli_fetch_assoc($query)) {
+        # code...
     }
 }
