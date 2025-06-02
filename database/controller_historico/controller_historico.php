@@ -102,7 +102,7 @@ function consultar_historico($valores)
     }
 
     $sql .= " ORDER BY fecha_evento DESC LIMIT 100";
-    var_dump($sql);
+    /* var_dump($sql); */
     $query = mysqli_query($con, $sql);
     $datos = [];
     while ($fila = mysqli_fetch_assoc($query)) {
