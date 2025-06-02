@@ -8,7 +8,7 @@ function server_marca(model) {
             data: {
                 trama: JSON.stringify(model)
             },
-            success: function(response) {
+            success: function (response) {
                 //console.log(response);
                 try {
                     resolve(JSON.parse(response))
@@ -27,9 +27,9 @@ let elemento
 let table
 let seleccionados = []
 
-async function consultar_informacion(){
-    let server = await server_marca({accion : 2})
-    datos =server.resultado
+async function consultar_informacion() {
+    let server = await server_marca({ accion: 2 })
+    datos = server.resultado
 
     //* Idioma Español
     Tabulator.extendModule("localize", "langs", {
@@ -93,7 +93,7 @@ async function consultar_informacion(){
         //console.log(seleccionados); // para depuración
     }
 
-     table = new Tabulator('#tbl', {
+    table = new Tabulator('#tbl', {
         locale: "es",
         data: datos,
         layout: "fitColumns",              //fit columns to width of table
@@ -102,7 +102,7 @@ async function consultar_informacion(){
         paginationSizeSelector: [5, 10, 15, 20],
         paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
             const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
-             const end = Math.min(currentRowStart + pageSize - 1, totalRows);
+            const end = Math.min(currentRowStart + pageSize - 1, totalRows);
             return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
         },
         movableColumns: true,              //allow column order to be changed
@@ -115,7 +115,7 @@ async function consultar_informacion(){
             }
         },
         paginationButtonCount: 3,
-        columns:[
+        columns: [
             {
                 formatter: squareIcon, width: 70, hozAlign: "center",
                 cellClick: function (e, cell) {
@@ -126,13 +126,15 @@ async function consultar_informacion(){
                     seleccionar_marcas(rowData.id)
                 }, headerSort: false, frozen: true
             },
-            {title:"ID", field:"id", width: 45, hozAlign: "center", headerSort: false},
-            {title:"Marca", field:"marca", headerFilter: "input", headerSort: false, cellClick:
+            { title: "ID", field: "id", width: 45, hozAlign: "center", headerSort: false },
+            {
+                title: "Marca", field: "marca", headerFilter: "input", headerSort: false, cellClick:
                     function (e, cell) {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
                         cell.getRow().reformat();
-                        seleccionar_marcas(rowData.id)}
+                        seleccionar_marcas(rowData.id)
+                    }
             },
             {
                 formatter: editIcon, width: 60, hozAlign: "center",
@@ -326,3 +328,41 @@ function deseleccionar_todos() {
     //  Forzar re-renderizado de todas las filas para reflejar los íconos
     table.getRows().forEach(row => row.reformat());
 }
+
+/* $(document).ready(function () {
+    const modal = $('#mdl-marca');
+    const dialog = modal.find('.modal-dialog');
+
+    let isClosing = false;
+
+    // Animación de entrada
+    modal.on('show.bs.modal', function () {
+        isClosing = false;
+        dialog
+            .removeClass('animate__fadeOutUp')
+            .addClass('animate__animated animate__fadeInDown');
+    });
+
+    // Animación de salida controlada
+    modal.on('hide.bs.modal', function (e) {
+        if (!isClosing) {
+            e.preventDefault(); // Pausa el cierre normal
+            isClosing = true;
+
+            dialog
+                .removeClass('animate__fadeInDown')
+                .addClass('animate__fadeOutUp');
+
+            // Espera que termine la animación antes de cerrar
+            setTimeout(() => {
+                modal.modal('hide'); // Ahora sí se cierra, se ejecuta hidden.bs.modal
+            }, 500); // Coincide con duración de la animación
+        }
+    });
+
+    // Limpieza después del cierre
+    modal.on('hidden.bs.modal', function () {
+        dialog.removeClass('animate__animated animate__fadeOutUp');
+    });
+}); */
+
