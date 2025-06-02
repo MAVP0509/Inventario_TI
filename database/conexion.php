@@ -4,7 +4,7 @@
     //$user="root";
     $pass="janny789";
     //$pass = "78910";
-    $server="10.11.134.194";
+    $server="10.11.134.211";
     //$pass = "root";
     //$server="localhost";
     $db="inventario_ti";
