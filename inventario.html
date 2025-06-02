@@ -54,40 +54,8 @@
                 <span class="brand-text font-weight-light">Inventario TI</span>
             </a>
 
-            <!-- <div class="sidebar">
-            
-                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                    <div class="image">
-                        <img src="user2.png" class="imagen-circle elevation-2" alt="User Image">
-                    </div>
-                    <div class="info">
-                        <a href="#" class="d-block" id="user">Name user</a>
-                    </div>
-                </div>
-                <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column"  data-widget="treeview" role="menu" data-accordion="false">
-                        <li class="nav-item">
-                            <a href="#" class="nav-link active">
-                                <i class="nav-icon fa-solid fa-cubes"></i>
-                                <p>
-                                  Inventario
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="usuario.html" class="nav-link">
-                                <i class="nav-icon fa-solid fa-users"></i>
-                                <p>
-                                  Usuarios
-                                </p>
-                            </a>
-                          </li>
-                    </ul>
-                </nav>
-            </div> -->
             <div id="sidebar-container"></div>
         </aside>
-
 
         <!--Contenedor Wrapper. Contenidos de la pagina-->
         <div class="content-wrapper">
@@ -112,20 +80,17 @@
                                 <div class="card-header">
                                     <h3 class="card-title"><i class="fa-solid fa-table"></i> Inventario</h3>
                                     <div class="d-flex justify-content-end">
-                                                <button type="button" class="btn btn-warning icon mr-3" onclick=""> Traspaso</button>
+                                                <button type="button" class="btn btn-warning rounded icon mr-3" onclick="mostrar()"><i class="fa-solid fa-boxes-packing"></i> Traspaso</button>
                                                 <button type="button" onclick="resguardo()"
                                                     class="btn btn-info icon rounded mr-3" style="margin-left: 10px;"
                                                     href="#"><i class="fa-solid fa-file-export fa-lg"></i>
                                                     Resguardo</button>
                                                 <button type="button" class="btn btn-success rounded mr-3 icon"
-                                                    onclick="limpiar_campos()"><i class="fa-solid fa-plus fa-lg"></i>
-                                                    Crear
-                                                    Registro</button>
+                                                    onclick="limpiar_campos()"><i class="fa-solid fa-plus fa-lg"></i> Nuevo</button>
                                                 <button type="button" style="text-align: center"
                                                     class="btn btn-danger rounded icon mr-3"
                                                     onclick="confirmar_eliminacion()"><i
-                                                        class="fa-solid fa-trash-can fa-lg"></i> Eliminar
-                                                    Registro</button>
+                                                        class="fa-solid fa-trash-can fa-lg"></i> Eliminar</button>
                                                 <button type="button" class="btn btn-light rounded mr-3 icon" onclick="consultar_num_serie()"><i class="fa-solid fa-clock-rotate-left"></i> Historial</button>
                                             </div><br>
                                 </div>
@@ -147,7 +112,7 @@
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Registro</h4>
+                    <h4 class="modal-title">Registro de activo</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -319,7 +284,7 @@
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Registro</h4>
+                    <h4 class="modal-title">Edición de activo</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="close">
                         <span aria-hidden="false">&times;</span>
                     </button>
@@ -434,7 +399,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <input type="datetime" class="form-control" id="edi-fecha-entrega">
+                                    <input type="datetime-local" class="form-control" id="edi-fecha-entrega">
                                 </div>
                             </div>
                         </div><!--row-->
@@ -565,7 +530,34 @@
             </div>
         </div>
     </div>
-
+    <!-- Modal traspaso -->
+    <div class="modal fade" id="mdl-traspaso" tabindex="-1">
+        <div class="modal-dialog" role="dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Traspaso de activo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="close"></button>
+                    <span aria-label="true">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <label for="mdl-estado">Estado del activo</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend"><span class="input-group-text"><i class="fa-solid fa-circle-info"></i></span></div>
+                        <select class="form-control select" id="mdl-estado"></select>
+                    </div>
+                    <label for="mdl-usuario">Usuario a traspasar</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend"><span class="input-group-text"><i class="fa-solid fa-user"></i></span></div>
+                        <select class="form-control select" id="mdl-usuario"></select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal">
+                        <i class="fa-solid fa-arrow-right-from-bracket fa-lg"></i> Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div> 
 
 </body>
 

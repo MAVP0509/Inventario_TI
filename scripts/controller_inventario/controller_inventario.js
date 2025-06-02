@@ -333,7 +333,6 @@ async function crear_registro() {
         mostrar_alerta('error', 'Error', 'No se pudo crear el registro. Inténtalo nuevamente.');
     }
 
-
 }
 
 async function editar_registro(params) {
@@ -384,6 +383,31 @@ async function editar_registro(params) {
     consultar_informacion();
     $("#modal-editar").modal("hide");
 
+}
+
+async function traspasos() {
+    
+    
+}
+
+async function mostrar(params) {
+    await general_select2({
+        selectId: 'mdl-estado',
+        tabla: 'inventario_ti_sur',
+        campo: 'estatus',
+        placeholder: 'Selecione un estatus',
+        dropdownParent: '#mdl-traspaso',
+        tags: false,
+    })
+    await general_select2({
+        selectId: 'mdl-usuario',
+        tabla: 'cat_usuarios',
+        campo: 'nombre',
+        placeholder: 'Selecciones un usuario',
+        dropdownParent: '#mdl-traspaso',
+        tags: false,
+    })
+    $("#mdl-traspaso").modal("show");
 }
 
 async function desactivar_registro() {
@@ -474,6 +498,19 @@ function limpiar_campos() {
     $('.select').each(function () {
         $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
         $(this).removeClass('is-invalid'); // Elimina la clase de validación
+    });
+
+    $(document).ready(function () {
+        let hoy = new Date();
+        let año = hoy.getFullYear();
+        let mes = String(hoy.getMonth() + 1).padStart(2, '0');
+        let dia = String(hoy.getDate()).padStart(2, '0');
+        let hora = String(hoy.getHours()).padStart(2, '0');
+        let minutos = String(hoy.getMinutes()).padStart(2, '0');
+        let segundos = String(hoy.getSeconds()).padStart(2, '0');
+
+        let fecha = `${hora}:${minutos}`;
+        $('#inp-fecha-entrega').val(fecha);
     });
 
     general_select2({

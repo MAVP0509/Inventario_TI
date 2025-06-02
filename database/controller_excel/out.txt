@@ -120,7 +120,7 @@ convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Abraha
 Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Abraham_Palayot_Sanchez.pdf
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alejandro_Cancino_Arguello.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alejandro_Cancino_Arguello.pdf using filter : calc_pdf_Export
 Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alejandro_Cancino_Arguello.pdf
-convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Rednar_García_Harcía.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Rednar_García_Harcía.pdf using filter : calc_pdf_Export
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Rednar_Garcï¿½a_Harcï¿½a.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Rednar_Garcï¿½a_Harcï¿½a.pdf using filter : calc_pdf_Export
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Oswaldo_Salmeron_Almeida.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Oswaldo_Salmeron_Almeida.pdf using filter : calc_pdf_Export
 Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Oswaldo_Salmeron_Almeida.pdf
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_.pdf using filter : calc_pdf_Export
@@ -158,12 +158,12 @@ convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Darwin
 Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Darwin_Ruiz_Aguilar.pdf
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Oswaldo_Salmeron_Almeida.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Oswaldo_Salmeron_Almeida.pdf using filter : calc_pdf_Export
 Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Oswaldo_Salmeron_Almeida.pdf
-convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Rednar_García_Harcía.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Rednar_García_Harcía.pdf using filter : calc_pdf_Export
-Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Rednar_García_Harcía.pdf
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Rednar_Garcï¿½a_Harcï¿½a.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Rednar_Garcï¿½a_Harcï¿½a.pdf using filter : calc_pdf_Export
+Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Rednar_Garcï¿½a_Harcï¿½a.pdf
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristell_Hernandez_Contreras.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristell_Hernandez_Contreras.pdf using filter : calc_pdf_Export
 Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristell_Hernandez_Contreras.pdf
-convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Rednar_García_Harcía.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Rednar_García_Harcía.pdf using filter : calc_pdf_Export
-Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Rednar_García_Harcía.pdf
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Rednar_Garcï¿½a_Harcï¿½a.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Rednar_Garcï¿½a_Harcï¿½a.pdf using filter : calc_pdf_Export
+Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Rednar_Garcï¿½a_Harcï¿½a.pdf
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_Bauza_Valdez.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_Bauza_Valdez.pdf using filter : calc_pdf_Export
 Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_Bauza_Valdez.pdf
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Abraham_Palayot_Sanchez.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Abraham_Palayot_Sanchez.pdf using filter : calc_pdf_Export
@@ -171,9 +171,11 @@ Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_A
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristell_Hernandez_Contreras.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristell_Hernandez_Contreras.pdf using filter : calc_pdf_Export
 Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristell_Hernandez_Contreras.pdf
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Freddy_Arturo_Flores.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Freddy_Arturo_Flores.pdf using filter : calc_pdf_Export
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristell_Hernandez_Contreras.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristell_Hernandez_Contreras.pdf using filter : calc_pdf_Export
+Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristell_Hernandez_Contreras.pdf
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristell_Hernandez_Contreras.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristell_Hernandez_Contreras.pdf using filter : calc_pdf_Export
+Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristell_Hernandez_Contreras.pdf
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_Bauza_Valdez.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_Bauza_Valdez.pdf using filter : calc_pdf_Export
 Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_Bauza_Valdez.pdf
-convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristobal_Soto_Escalante.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristobal_Soto_Escalante.pdf using filter : calc_pdf_Export
-Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristobal_Soto_Escalante.pdf
-convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Freddy_Arturo_Flores.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Freddy_Arturo_Flores.pdf using filter : calc_pdf_Export
-Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Freddy_Arturo_Flores.pdf
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Darwin_Ruiz_Aguilar.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Darwin_Ruiz_Aguilar.pdf using filter : calc_pdf_Export
+Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Darwin_Ruiz_Aguilar.pdf

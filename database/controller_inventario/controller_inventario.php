@@ -19,9 +19,7 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_para_resguardo($clientejson);
 } elseif ($clientejson->accion == 5) {
     $respuesta_servidor->resultado = consultar_distintos($clientejson->tabla, $clientejson->campo);
-} elseif ($clientejson->accion == 6) {
-    $respuesta_servidor->resultado = consultar_region($clientejson);
-} elseif ($clientejson->accion == 7) {
+}  elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = traspaso($clientejson);
 }
 
@@ -33,7 +31,7 @@ function insertar_datos($valores)
 {
     include("../conexion.php");
 
-    $registro = date("Y-m-d H:i:s");
+    // $registro = date("Y-m-d H:i:s");
 
     $rubro = verificar_nuevos_id($valores->rubro);
     $val_rubro;
@@ -97,10 +95,10 @@ function insertar_datos($valores)
         //var_dump($sql_num);
         $query_num = mysqli_query($con, $sql_num);
 
-        $sql = "INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, estatus, imei) 
-        VALUES ('$valores->zona', '$val_rubro','$af','$val_tipo','$val_marca','$valores->modelo', '$valores->num_serie', 
-        '$valores->ubicacion', '$tag', '$valores->usuario', '$registro','$estatus', 'NA');";
-        
+        $sql = "INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, habilitado) 
+        VALUES ('$valores->zona', '$val_rubro','$valores->af','$val_tipo','$val_marca','$valores->modelo', '$valores->num_serie', 
+        '$valores->ubicacion', '$valores->tag', '$valores->usuario', '$valores->fecha_entrega',1);";
+        //$query = mysqli_query($con, $sql);|
         //var_dump($sql);
         if (mysqli_num_rows($query_num) > 0) {
             echo json_encode(["resultado" => false, "mensaje" => "Número de serie duplicado"]);
@@ -250,37 +248,9 @@ function consultar_para_resguardo($valores)
     return $datos;
 }
 
-function consultar_rubro()
-{
+function consultar_status(){
     include("../conexion.php");
-    $sql = "SELECT DISTINCT rubro from inventario_ti_sur;";
-    $query = mysqli_query($con, $sql);
-    $datos = [];
 
-    while ($fila = mysqli_fetch_assoc($query)) {
-        $datos[] = [
-            'id' => $fila['rubro'],
-            'rubro' => $fila['rubro']
-        ];
-    }
-
-    return $datos;
-}
-function consultar_region()
-{
-    include("../conexion.php");
-    $sql = "SELECT DISTINCT tipo from inventario_ti_sur;";
-    $query = mysqli_query($con, $sql);
-    $datos = [];
-
-    while ($fila = mysqli_fetch_assoc($query)) {
-        $datos[] = [
-            'id' => $fila['tipo'],
-            'tipo' => $fila['tipo']
-        ];
-    }
-
-    return $datos;
 }
 
 function consultar_distintos($tabla, $campo)
@@ -290,16 +260,17 @@ function consultar_distintos($tabla, $campo)
     $tabla = mysqli_real_escape_string($con, $tabla);
     $campo = mysqli_real_escape_string($con, $campo);
 
-    if ($campo === "region") {
+    if ($campo === "region" || $campo === "estatus") {
         $num = 1;
-        $sql = "SELECT DISTINCT region from supervisor;";
+        $sql = "SELECT DISTINCT `$campo` from `$tabla` WHERE `$campo` <> 'Baja';";
         $query = mysqli_query($con, $sql);
+        //var_dump($sql);
         $datos = [];
 
         while ($fila = mysqli_fetch_assoc($query)) {
             $datos[] = [
                 'id' => $num,
-                'region' => $fila['region']
+                $campo => $fila[$campo]
             ];
             $num++;
         }
@@ -342,11 +313,16 @@ function verificar_nuevos_id($valor)
 
 function traspaso($valores){
     include("../conexion.php");
-
-    $sql = "UPDATE";
+    $ids = implode(",", array_map('intval', $valores->id));
+    $sql = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, modelo, tag, fecha_entrega FROM inventario_ti_sur WHERE id IN ($ids)";
+    $query = mysqli_query($con, $sql);
 
     $datos = [];
     while ($fila = mysqli_fetch_assoc($query)) {
-        # code...
+        $datos[] = $fila;
     }
+
+    $sql_datos = "UPDATE inventario_ti_sur SET estatus";
+
+    return $datos;
 }
