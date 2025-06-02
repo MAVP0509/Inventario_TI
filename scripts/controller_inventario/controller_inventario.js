@@ -642,7 +642,7 @@ async function crear_resguardo(params) {
     }
 
     let model = {
-        accion: 5,
+        accion: 4,
         usuario: $('#select-usu').val().trim(),
         //region : $('#select-region').val().trim(),
         region: $("#select-region").select2('data')[0].text,
