@@ -409,7 +409,7 @@ async function confirmar_eliminacion() {
     if (seleccionar.length === 0) {
         mostrar_alerta('error', 'Error', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
     } else {
-        Swal.fire({
+        /* Swal.fire({
             title: '¿Está seguro de eliminarlo?',
             text: "Esta acción no se puede deshacer.",
             icon: 'warning',
@@ -422,7 +422,8 @@ async function confirmar_eliminacion() {
             if (result.isConfirmed) {
                 desactivar_registro(); // Llama a la función para eliminar el registro
             }
-        });
+        }); */
+        mostrar_alert('warning', `¿Está seguro de eliminar ${seleccionar.length} activos(s)?`, false, desactivar_registro)
     }
 }
 
