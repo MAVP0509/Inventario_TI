@@ -216,7 +216,7 @@ async function mdl_editar(params) {
         $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
         $(this).removeClass('is-invalid'); // Elimina la clase de validación
     });
-    
+
     for (let i = 0; i < datos.length; i++) {
         const element = datos[i];
         if (element.id_equipo === params.id_equipo) {
@@ -241,7 +241,9 @@ async function mdl_editar(params) {
         campo: 'rubro',
         placeholder: 'Selecione un rubro',
         dropdownParent: '#mdl-inventario',
-        tags: true
+        tags: true,
+        popoverTitle: "Descripción",
+        popoverContent: "Categoría general del activo. Agrupa dispositivos por su tipo funcional, como computadoras, dispositivos móviles, etc."
     })
 
     await general_select2({
@@ -250,7 +252,9 @@ async function mdl_editar(params) {
         campo: 'tipo',
         placeholder: 'Selecione un tipo',
         dropdownParent: '#mdl-inventario',
-        tags: true
+        tags: true,
+        popoverTitle: "Descripción",
+        popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
     })
 
     await general_select2({
@@ -259,7 +263,9 @@ async function mdl_editar(params) {
         campo: 'marca',
         placeholder: 'Seleccione una marca',
         dropdownParent: '#mdl-inventario',
-        tags: true
+        tags: true,
+        popoverTitle: "Descripción",
+        popoverContent: "Es la marca del activo."
     })
 
     await general_select2({
@@ -361,8 +367,8 @@ function mdl_nvo_registro() {
         placeholder: 'Seleciona un rubro',
         dropdownParent: '#mdl-inventario',
         tags: true,
-        popoverTitle: "Rubro",
-        popoverContent: "Categoría general del activo. Agrupa dispositivos por su tipo funcional, como computadoras, dispositivos móviles, cámaras o infraestructura de red."
+        popoverTitle: "Descripción",
+        popoverContent: "Categoría general del activo. Agrupa dispositivos por su tipo funcional, como computadoras, dispositivos móviles, etc."
     });
 
     general_select2({
@@ -372,8 +378,8 @@ function mdl_nvo_registro() {
         placeholder: 'Seleciona un tipo',
         dropdownParent: '#mdl-inventario',
         tags: true,
-        popoverTitle: "Tipo",
-        popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado. Por ejemplo, dentro de “PC/Laptop” puedes tener “Laptop”, “Docking Station” o “Cargador de Laptop”."
+        popoverTitle: "Descripción",
+        popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
     });
 
     general_select2({
@@ -382,7 +388,9 @@ function mdl_nvo_registro() {
         campo: 'marca',
         placeholder: 'Seleccione una marca',
         dropdownParent: '#mdl-inventario',
-        tags: true
+        tags: true,
+        popoverTitle: "Descripción",
+        popoverContent: "Es la marca del activo."
     })
 
     general_select2({
@@ -480,14 +488,14 @@ async function traspasos() {
     let server = await server_inventario(model);
     console.log(model)
     if (Array.isArray(server.resultado)) {
-            seleccionar = []
-            consultar_informacion();
-            $('#mdl-traspaso').modal('hide')
-            await registrar_historico('Generarción de traspaso', server.resultado);
-            mostrar_alerta('success', '¡Traspaso exitoso!', 'El traspaso se ha realizado correctamente');
-        } else {
-            mostrar_alerta('error', 'Error', 'No se pudo realizar el traspaso. Inténtalo nuevamente.');
-        }
+        seleccionar = []
+        consultar_informacion();
+        $('#mdl-traspaso').modal('hide')
+        await registrar_historico('Generarción de traspaso', server.resultado);
+        mostrar_alerta('success', '¡Traspaso exitoso!', 'El traspaso se ha realizado correctamente');
+    } else {
+        mostrar_alerta('error', 'Error', 'No se pudo realizar el traspaso. Inténtalo nuevamente.');
+    }
 
 }
 
@@ -497,24 +505,24 @@ async function mostrar_traspaso() {
         mostrar_alerta('error', 'Error', 'Selecione al menos un usuario. Inténtalo nuevamente.')
     } else {
         await general_select2({
-        selectId: 'mdl-estado',
-        tabla: 'inventario_ti_sur',
-        campo: 'estatus',
-        placeholder: 'Selecione un estatus',
-        dropdownParent: '#mdl-traspaso',
-        tags: false,
-    })
-    await general_select2({
-        selectId: 'mdl-usuario',
-        tabla: 'cat_usuarios',
-        campo: 'nombre',
-        placeholder: 'Selecciones un usuario',
-        dropdownParent: '#mdl-traspaso',
-        tags: false,
-    })
-    $("#mdl-traspaso").modal("show");
+            selectId: 'mdl-estado',
+            tabla: 'inventario_ti_sur',
+            campo: 'estatus',
+            placeholder: 'Selecione un estatus',
+            dropdownParent: '#mdl-traspaso',
+            tags: false,
+        })
+        await general_select2({
+            selectId: 'mdl-usuario',
+            tabla: 'cat_usuarios',
+            campo: 'nombre',
+            placeholder: 'Selecciones un usuario',
+            dropdownParent: '#mdl-traspaso',
+            tags: false,
+        })
+        $("#mdl-traspaso").modal("show");
     }
-    
+
 }
 
 async function desactivar_registro() {
@@ -614,7 +622,7 @@ function mostrar_alerta(tipo, titulo, mensaje) {
 
 //TODO Funciones de los Select2
 
-async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags,popoverTitle, popoverContent }) {
+async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags, popoverTitle, popoverContent }) {
     //try {
     const response = await server_inventario({
         accion: 5,
@@ -657,7 +665,7 @@ async function general_select2({ selectId, tabla, campo, placeholder, dropdownPa
 
         $select2Container.popover();
     }
-    
+
 }
 
 function rellenar_select(texto, select) {
@@ -706,7 +714,7 @@ function resguardo() {
     for (let i = 0; i < inputs.length; i++) {
         inputs[i].classList.remove('is-invalid')
         inputs[i].value = "";
-        
+
     }
 
     $('#select-usu').val(null).trigger('change');
