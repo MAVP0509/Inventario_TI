@@ -386,11 +386,15 @@ async function editar_registro(params) {
 }
 
 async function traspasos() {
-    
+    let model = {
+        accion: 6,
+        estatus: $('#mdl-estado'),
+        usuario: $('mdl-usuario')
+    }
     
 }
 
-async function mostrar(params) {
+async function mostrar_traspaso(params) {
     await general_select2({
         selectId: 'mdl-estado',
         tabla: 'inventario_ti_sur',

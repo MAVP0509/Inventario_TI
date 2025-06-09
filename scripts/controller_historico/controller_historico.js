@@ -196,7 +196,7 @@ async function registrar_historico(evento, params) {
     const usuario = JSON.parse(sessionStorage.getItem('user')); // Obtener usuario en sesión
     //console.log(params);
     //const fecha_evento = new Date().toISOString();
-    const model = {
+    let model = {
         accion: 1,
         usuario_sesion: usuario.resultado[0] || '', // Nombre del usuario
         evento: evento,

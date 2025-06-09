@@ -77,7 +77,7 @@
                                 <div class="card-header">
                                     <h3 class="card-title"><i class="fa-solid fa-table"></i> Inventario</h3>
                                     <div class="d-flex justify-content-end">
-                                                <button type="button" class="btn btn-warning rounded icon mr-3" onclick="mostrar()"><i class="fa-solid fa-boxes-packing"></i> Traspaso</button>
+                                                <button type="button" class="btn btn-warning rounded icon mr-3" onclick="mostrar_traspaso()"><i class="fa-solid fa-boxes-packing"></i> Traspaso</button>
                                                 <button type="button" onclick="resguardo()"
                                                     class="btn btn-info icon rounded mr-3" style="margin-left: 10px;"
                                                     href="#"><i class="fa-solid fa-file-export fa-lg"></i>
@@ -245,14 +245,6 @@
                                         data-html="true" title="Descripción"
                                         data-content="Es el modelo específico del dispositivo."></select>
                                 </div>
-                                <!-- <h6>Cargo del usuario</h6>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fa-solid fa-id-card"></i></span>
-                                    </div>
-                                    <select class="form-control select" id="inp-posicion" name="mdl-reg" placeholder="Cargo del usuario"
-                                    data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción" data-content="Es el modelo específico del dispositivo."></select>
-                                </div> -->
                                 <h6>Fecha de registro</h6>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
@@ -544,7 +536,11 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger icon" data-dismiss="modal">
-                        <i class="fa-solid fa-arrow-right-from-bracket fa-lg"></i> Cerrar</button>
+                        Cerrar <i class="fa-solid fa-arrow-right-from-bracket fa-lg"></i>
+                    </button>
+                    <button type="button" class="btn btn-success icon">
+                        Guardar <i class="fa-solid fa-floppy-disk fa-lg"></i>
+                    </button>
                 </div>
             </div>
         </div>
