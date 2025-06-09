@@ -388,14 +388,31 @@ async function editar_registro(params) {
 async function traspasos() {
     let model = {
         accion: 6,
-        estatus: $('#mdl-estado'),
-        usuario: $('mdl-usuario'),
+        id: seleccionar,
+        estatus: $('#mdl-estado').val(),
+        usuario: $('#mdl-usuario').val(),
     }
-    
+
+    let server = await server_inventario(model);
+    console.log(model)
+    if (Array.isArray(server.resultado)) {
+            seleccionar = []
+            consultar_informacion();
+            $('#mdl-traspaso').modal('hide')
+            await registrar_historico('Generarción de traspaso', server.resultado);
+            mostrar_alerta('success', '¡Traspaso exitoso!', 'El traspaso se ha realizado correctamente');
+        } else {
+            mostrar_alerta('error', 'Error', 'No se pudo realizar el traspaso. Inténtalo nuevamente.');
+        }
+
 }
 
-async function mostrar_traspaso(params) {
-    await general_select2({
+async function mostrar_traspaso() {
+
+    if (seleccionar.length == 0) {
+        mostrar_alerta('error', 'Error', 'Selecione al menos un usuario. Inténtalo nuevamente.')
+    } else {
+        await general_select2({
         selectId: 'mdl-estado',
         tabla: 'inventario_ti_sur',
         campo: 'estatus',
@@ -412,6 +429,8 @@ async function mostrar_traspaso(params) {
         tags: false,
     })
     $("#mdl-traspaso").modal("show");
+    }
+    
 }
 
 async function desactivar_registro() {
@@ -633,6 +652,18 @@ $(document).ready(function () {
         }
     });
 });
+
+$(document).ready(function () {
+    $('#mdl-estado').on('change', function () {
+        const seleccionado = $(this).val();
+
+        if (seleccionado === 'Asignado') {
+            $('#mdl-usuario').prop('disabled', false).addClass('is-requerid');
+        } else {
+            $('#mdl-usuario').prop('disabled', true).removeClass('is-requerid').val('')
+        }
+    })
+})
 
 
 //TODO: Funciones para el resguardo
