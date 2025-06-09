@@ -59,7 +59,7 @@ function editar_supervisor($valores){
 //* Consulta los supervisores de la tabla supervisor para mostrarlos en el programa
 function consultar_supervisor(){
     include("../conexion.php");
-    $sql = "SELECT * FROM  supervisor";
+    $sql = "SELECT * FROM  supervisor WHERE habilitado <> 2";
     $query = mysqli_query($con, $sql);
     $array = array();
     while ($fila = mysqli_fetch_object($query)){
@@ -96,4 +96,10 @@ function consultar_distintos($tabla, $campo)
     }
 
     return $datos;
+}
+
+function eliminar_supervisor($valores){
+    include("../conexion.php");
+    $sql="UPDATE supervisor SET habilitado = 2 where id='$valores->id';";
+    return mysqli_query($con,$sql);
 }
