@@ -813,10 +813,5 @@ function myCallback(start, end) {
 
 }
 
-$(function () {
-
-
-
-});
 
 

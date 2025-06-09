@@ -323,8 +323,15 @@ function traspaso($valores)
         while ($fila = mysqli_fetch_assoc($query)) {
             $datos[] = $fila;
         }
-
-        $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$valores->usuario' WHERE id IN ($ids)";
+        
+        if ($valores->estatus == 'Bodega'){
+            $usuario = '5';
+            $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$usuario' WHERE id IN ($ids)";
+        } else {
+            $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$valores->usuario' WHERE id IN ($ids)";
+        }
+        
+        // var_dump($sql_datos);
         mysqli_query($con, $sql_datos);
         return $datos;
     } else {
