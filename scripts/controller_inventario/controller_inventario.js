@@ -360,7 +360,9 @@ function mdl_nvo_registro() {
         campo: 'rubro',
         placeholder: 'Seleciona un rubro',
         dropdownParent: '#mdl-inventario',
-        tags: true
+        tags: true,
+        popoverTitle: "Rubro",
+        popoverContent: "Categoría general del activo. Agrupa dispositivos por su tipo funcional, como computadoras, dispositivos móviles, cámaras o infraestructura de red."
     });
 
     general_select2({
@@ -369,7 +371,9 @@ function mdl_nvo_registro() {
         campo: 'tipo',
         placeholder: 'Seleciona un tipo',
         dropdownParent: '#mdl-inventario',
-        tags: true
+        tags: true,
+        popoverTitle: "Tipo",
+        popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado. Por ejemplo, dentro de “PC/Laptop” puedes tener “Laptop”, “Docking Station” o “Cargador de Laptop”."
     });
 
     general_select2({
@@ -591,7 +595,7 @@ function mostrar_alerta(tipo, titulo, mensaje) {
 
 //TODO Funciones de los Select2
 
-async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags }) {
+async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags,popoverTitle, popoverContent }) {
     //try {
     const response = await server_inventario({
         accion: 5,
@@ -620,9 +624,21 @@ async function general_select2({ selectId, tabla, campo, placeholder, dropdownPa
 
     $select.val(null).trigger('change');
 
-    //} catch (error) {
+    //  Si se pasan datos de popover, aplicarlo
+    if (popoverTitle && popoverContent) {
+        const $select2Container = $select.next('.select2-container');
 
-    //}
+        $select2Container.attr({
+            'data-toggle': 'popover',
+            'data-trigger': 'hover',
+            'data-html': 'true',
+            'title': popoverTitle,
+            'data-content': popoverContent
+        });
+
+        $select2Container.popover();
+    }
+    
 }
 
 function rellenar_select(texto, select) {
