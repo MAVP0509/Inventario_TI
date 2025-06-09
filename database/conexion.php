@@ -3,7 +3,7 @@
     //$user="janny";
      $user="root";
     //$pass="janny789";
-    $pass = "78910";
+    $pass = "root";
     //$server="10.11.134.194";
     //$pass = "root";
     $server="localhost";
