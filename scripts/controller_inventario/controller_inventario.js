@@ -130,7 +130,7 @@ async function consultar_informacion(params) {
         } else {
             seleccionar.splice(index, 1);
         }
-        console.log(seleccionar)
+        //console.log(seleccionar)
     }
 
     try {
@@ -263,7 +263,7 @@ async function mostrar_registro(params) {
     document.getElementById("edi-fecha-entrega").value = selecreg.fecha_entrega;
 
     $("#modal-editar").modal("show");
-    console.log(selecreg)
+    // console.log(selecreg)
 }
 
 let ususelect = [];
@@ -393,8 +393,10 @@ async function traspasos() {
         usuario: $('#mdl-usuario').val(),
     }
 
+    await registrar_historico('Anterior traspaso', server.resultado);
+
     let server = await server_inventario(model);
-    console.log(model)
+
     if (Array.isArray(server.resultado)) {
             seleccionar = []
             consultar_informacion();
@@ -756,7 +758,7 @@ async function descargar_excel(params) {
     ruta.resultado = ruta.resultado.replace(/\.xlsx$/i, '.pdf');
 
     ruta.resultado = ruta.resultado.replace("C:/xampp/htdocs", "http://" + dominio + ":" + puerto)
-    console.log(ruta.resultado)
+    // console.log(ruta.resultado)
     window.open(ruta.resultado, '_blank');
 }
 

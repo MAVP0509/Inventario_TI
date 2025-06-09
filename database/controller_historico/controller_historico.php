@@ -40,7 +40,7 @@ function registrar_historico($valores)
                     '$datos->modelo', 
                     '$datos->tag', 
                     '$datos->fecha_entrega')";
-            //var_dump($sql);
+            // var_dump($sql);
             $query = mysqli_query($con, $sql);
             $resultados[] = $query;
         }

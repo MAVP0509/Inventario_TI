@@ -314,6 +314,7 @@ function verificar_nuevos_id($valor)
 function traspaso($valores)
 {
     include("../conexion.php");
+    $fecha = date('Y-m-d H:i:s');
     if (is_array($valores->id)) {
         $ids = implode(",", array_map('intval', $valores->id));
         $sql = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, modelo, tag, fecha_entrega FROM inventario_ti_sur WHERE id IN ($ids)";
@@ -326,9 +327,9 @@ function traspaso($valores)
         
         if ($valores->estatus == 'Bodega'){
             $usuario = '5';
-            $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$usuario' WHERE id IN ($ids)";
+            $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$usuario', fecha_entrega = '$fecha' WHERE id IN ($ids)";
         } else {
-            $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$valores->usuario' WHERE id IN ($ids)";
+            $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$valores->usuario', fecha_entrega = '$fecha' WHERE id IN ($ids)";
         }
         
         // var_dump($sql_datos);
@@ -341,6 +342,7 @@ function traspaso($valores)
         while ($fila = mysqli_fetch_assoc($query)) {
             $datos[] = $fila;
         }
+
         return $datos;
     }
 }
