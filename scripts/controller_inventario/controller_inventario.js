@@ -655,12 +655,15 @@ $(document).ready(function () {
 
 //TODO: Funciones para el resguardo
 function resguardo() {
-    let inputs = document.getElementsByName('resg-inpt')
+    let inputs = document.getElementsByName('inp-resg')
     for (let i = 0; i < inputs.length; i++) {
-        const element = inputs[i].value = "";
+        inputs[i].classList.remove('is-invalid')
+        inputs[i].value = "";
+        
     }
+
     $('#select-usu').val(null).trigger('change');
-    $('#select-supervisor').val(null).trigger('change');
+    $('#select-region').val(null).trigger('change');
 
 
     $(document).ready(function () {
