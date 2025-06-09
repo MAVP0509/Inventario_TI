@@ -282,7 +282,7 @@ function consultar_distintos($tabla, $campo)
         $tabla = mysqli_real_escape_string($con, $tabla);
         $campo = mysqli_real_escape_string($con, $campo);
 
-        $sql = "SELECT DISTINCT `$campo`,id FROM `$tabla` WHERE  `$campo` <> 'NA';";
+        $sql = "SELECT DISTINCT `$campo`,id FROM `$tabla` WHERE  `$campo` <> 'NA' AND habilitado <> 0;";
         $query = mysqli_query($con, $sql);
 
         $datos = [];
