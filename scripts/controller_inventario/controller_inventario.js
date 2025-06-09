@@ -389,7 +389,7 @@ async function traspasos() {
     let model = {
         accion: 6,
         estatus: $('#mdl-estado'),
-        usuario: $('mdl-usuario')
+        usuario: $('mdl-usuario'),
     }
     
 }
