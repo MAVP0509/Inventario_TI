@@ -95,14 +95,14 @@ function consultar_historico($valores)
 
     if (!empty($valores->fecha_inicio) && !empty($valores->fecha_fin)) {
         if (strpos($sql, 'WHERE') !== false) {
-            $sql .= " AND fecha_evento BETWEEN '$valores->fecha_inicio' AND '$valores->fecha_fin'";
+            $sql .= " AND DATE(fecha_evento) BETWEEN '$valores->fecha_inicio' AND '$valores->fecha_fin'";
         } else {
-            $sql .= " WHERE fecha_evento BETWEEN '$valores->fecha_inicio' AND '$valores->fecha_fin'";
+            $sql .= " WHERE DATE(fecha_evento) BETWEEN '$valores->fecha_inicio' AND '$valores->fecha_fin'";
         }
     }
 
     $sql .= " ORDER BY fecha_evento DESC LIMIT 100";
-    //var_dump($sql);
+    /* var_dump($sql); */
     $query = mysqli_query($con, $sql);
     $datos = [];
     while ($fila = mysqli_fetch_assoc($query)) {

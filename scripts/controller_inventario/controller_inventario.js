@@ -173,18 +173,18 @@ async function consultar_informacion(params) {
                     },
                 },
                 { title: "Rubro", field: "rubro", headerHozAlign: "center", headerFilter: "input", headerSort: false },
-                { title: "Activo fijo", field: "af",headerSort: false, headerHozAlign: "center", hozAlign: "center", headerFilter: "input" },
-                { title: "Tipo de dispositivo", field: "tipo", headerHozAlign: "center", headerFilter: "input", headerSort: false ,hozAlign: "center"},
-                { title: "Marca", field: "marca", headerHozAlign: "center", headerFilter: "input", headerSort: false ,hozAlign: "center" },
-                { title: "Modelo", field: "modelo", headerHozAlign: "center", headerFilter: "input", headerSort: false ,hozAlign: "center" },
-                { title: "Numero de serie", field: "num_serie", headerHozAlign: "center", headerFilter: "input", headerSort: false ,hozAlign: "center" },
-                { title: "Ubicación", field: "ubicacion" , headerHozAlign: "center", headerFilter: "input", headerSort: false ,hozAlign: "center"},
-                { title: "TAG", field: "tag", headerHozAlign: "center", headerFilter: "input", headerSort: false ,hozAlign: "center", width: 170 },
-                { title: "IMEI", field: "imei", headerHozAlign: "center", headerFilter: "input", headerSort: false ,hozAlign: "center", width: 170 },
-                { title: "Usuario", field: "usuario", headerHozAlign: "center", headerFilter: "input", headerSort: false ,hozAlign: "center" },
-                { title: "Cargo del usuario", field: "posicion", headerHozAlign: "center", headerFilter: "input", headerSort: false ,hozAlign: "center" },
-                { title: "Fecha de registro", field: "fecha_entrega", sorter:"date", headerFilter:"input",headerSort:false },
-                { title: "Estatus", field: "estatus", width: 120,frozen: true,headerHozAlign: "center", headerFilter:"list", headerFilterParams:{values:{"Asignado":"Asignado", "Bodega":"Bodega"}, clearable:true} , headerSort: false},
+                { title: "Activo fijo", field: "af", headerSort: false, headerHozAlign: "center", hozAlign: "center", headerFilter: "input" },
+                { title: "Tipo de dispositivo", field: "tipo", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
+                { title: "Marca", field: "marca", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
+                { title: "Modelo", field: "modelo", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
+                { title: "Numero de serie", field: "num_serie", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
+                { title: "Ubicación", field: "ubicacion", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
+                { title: "TAG", field: "tag", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", width: 170 },
+                { title: "IMEI", field: "imei", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", width: 170 },
+                { title: "Usuario", field: "usuario", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
+                { title: "Cargo del usuario", field: "posicion", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
+                { title: "Fecha de registro", field: "fecha_entrega", sorter: "date", headerFilter: "input", headerSort: false },
+                { title: "Estatus", field: "estatus", width: 120, frozen: true, headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "Asignado": "Asignado", "Bodega": "Bodega" }, clearable: true }, headerSort: false },
                 {
                     formatter: editIcon, width: 60, hozAlign: "center",
                     cellClick: function (e, cell) {
@@ -437,7 +437,7 @@ async function confirmar_eliminacion() {
     if (seleccionar.length === 0) {
         mostrar_alerta('error', 'Error', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
     } else {
-        Swal.fire({
+        /* Swal.fire({
             title: '¿Está seguro de eliminarlo?',
             text: "Esta acción no se puede deshacer.",
             icon: 'warning',
@@ -450,7 +450,8 @@ async function confirmar_eliminacion() {
             if (result.isConfirmed) {
                 desactivar_registro(); // Llama a la función para eliminar el registro
             }
-        });
+        }); */
+        mostrar_alert('warning', `¿Está seguro de eliminar ${seleccionar.length} activos(s)?`, false, desactivar_registro)
     }
 }
 
@@ -751,26 +752,39 @@ function mostrar_toast_cargando() {
 
 $(document).ready(function () {
     $('[data-toggle="popover"]').popover();
-});
+
+    var start = moment().subtract(10, 'days');
+    var end = moment();
+    $('#rango-fecha').daterangepicker({
+        startDate: start,
+        endDate: end,
+        locale: {
+            format: 'YYYY/MM/DD',
+            applyLabel: 'Aplicar',
+            cancelLabel: 'Cancelar',
+            fromLabel: "Desde",
+            toLabel: "Hasta",
+            customRangeLabel: 'Personalizado',
+            daysOfWeek: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+            monthNames: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+        },
+        firstDay: 1,
+        myCallback
+
+    }, /* function (start, end) {
+        $('#rango-fecha').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
+    } */);
+})//.val(start + " - " + end);
+
+function myCallback(start, end) {
+    $("#rango-fecha span").html(start.format("MMMM D, YYYY") + " - " + end.format("MMMM D, YYYY"))
+
+
+}
 
 $(function () {
-    $('#rango-fecha').daterangepicker({
-    locale: {
-        format: 'YYYY/MM/DD',
-        applyLabel: 'Aplicar',
-        cancelLabel: 'Cancelar',
-        fromLabel: "Desde",
-        toLabel: "Hasta",
-        customRangeLabel: 'Personalizado',
-        daysOfWeek: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
-        monthNames: [
-        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-        ],
-        firstDay: 1
-    }
 
-    });
+
 
 });
 

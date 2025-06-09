@@ -69,6 +69,27 @@ function insertar_datos($valores)
         $val_marca = $idMarca['id'];
     }
 
+    $estatus = "";
+    if($valores->usuario == "5"){
+        $estatus = "Bodega";
+    }else{
+        $estatus = "Asignado";
+    }
+    
+    $tag = "";
+    if($valores->tag == ""){
+        $tag = "NA";
+    }else{
+        $tag = $valores->tag;
+    }
+    
+    $af = "";
+    if($valores->af == ""){
+        $af = "NA";
+    }else{
+        $af = $valores->af;
+    }
+
     if ($valores->num_serie != "") {
         $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$valores->num_serie'";
         //var_dump($sql_num);
@@ -141,7 +162,7 @@ function editar_datos($valores)
 function consultar_datos()
 {
     include("../conexion.php");
-    $sql = "SELECT * FROM  vinventario_ti_sur";
+    $sql = "SELECT * FROM  vinventario_ti_sur;";
     $query = mysqli_query($con, $sql);
     $array = array();
     while ($fila = mysqli_fetch_object($query)) {
@@ -155,6 +176,7 @@ function desactivar_datos($valores)
 {
     include("../conexion.php");
     //var_dump($valores);
+    $registro = date("Y-m-d H:i:s");
 
     if (is_array($valores->id)) { // Verifica si $valores->id es un array
 
@@ -169,12 +191,12 @@ function desactivar_datos($valores)
             array_push($datos, $fila);
         }
 
-        $sql_datos = "UPDATE inventario_ti_sur SET estatus = Baja WHERE id IN ($ids);"; // Consulta sql_datos usando IN para eliminar múltiples registros
+        $sql_datos = "UPDATE inventario_ti_sur SET estatus = 'Baja', fecha_entrega = '$registro' WHERE id IN ($ids);"; // Consulta sql_datos usando IN para eliminar múltiples registros
         mysqli_query($con, $sql_datos);
         return $datos;
     } else {
 
-        $sql = "UPDATE inventario_ti_sur SET estatus = Baja where id='$valores->id';";
+        $sql = "UPDATE inventario_ti_sur SET estatus = 'Baja', fecha_entrega = '$registro' where id='$valores->id';";
         mysqli_query($con, $sql);
 
         $sql_num2 = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, modelo, tag, fecha_entrega FROM inventario_ti_sur WHERE id = '$valores->id'";

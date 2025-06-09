@@ -99,10 +99,10 @@ async function consultar_historico() {
         paginationSizeSelector: [5, 10, 15, 25, 35],
         movableColumns: true,
         paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
-                const totalRows = tabla.getDataCount(); // Asegúrate que 'tabla' esté accesible
-                const end = Math.min(currentRowStart + pageSize - 1, totalRows);
-                return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
-            },
+            const totalRows = tabla.getDataCount(); // Asegúrate que 'tabla' esté accesible
+            const end = Math.min(currentRowStart + pageSize - 1, totalRows);
+            return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
+        },
         rowFormatter: function (row) {
             data = row.getData()
             if (data.seleccionado === true) {
@@ -113,73 +113,81 @@ async function consultar_historico() {
         },
         columns: [
             { title: "ID", field: "id" },
-            { title: "Fecha del evento", field: "fecha_evento", headerMenu:[
-                {
-                    label:"Fijar columna",
-                    action:function(e, column){
-                        column.updateDefinition({frozen:true});
-                        tabla.redraw(true);
+            {
+                title: "Fecha del evento", field: "fecha_evento", headerMenu: [
+                    {
+                        label: "Fijar columna",
+                        action: function (e, column) {
+                            column.updateDefinition({ frozen: true });
+                            tabla.redraw(true);
+                        }
+                    },
+                    {
+                        label: "Desfijar columna",
+                        action: function (e, column) {
+                            column.updateDefinition({ frozen: false });
+                            tabla.redraw(true);
+                        }
                     }
-                },
-                {
-                    label:"Desfijar columna",
-                    action:function(e, column){
-                        column.updateDefinition({frozen:false});
-                        tabla.redraw(true);
+                ]
+            },
+            {
+                title: "Usuario del evento", field: "usuario_sesion", headerMenu: [
+                    {
+                        label: "Fijar columna",
+                        action: function (e, column) {
+                            column.updateDefinition({ frozen: true });
+                            tabla.redraw(true);
+                        }
+                    },
+                    {
+                        label: "Desfijar columna",
+                        action: function (e, column) {
+                            column.updateDefinition({ frozen: false });
+                            tabla.redraw(true);
+                        }
                     }
-                }
-            ]},
-            { title: "Usuario del evento", field: "usuario_sesion", headerMenu:[
-                {
-                    label:"Fijar columna",
-                    action:function(e, column){
-                        column.updateDefinition({frozen:true});
-                        tabla.redraw(true);
+                ]
+            },
+            {
+                title: "Evento", field: "evento", headerMenu: [
+                    {
+                        label: "Fijar columna",
+                        action: function (e, column) {
+                            column.updateDefinition({ frozen: true });
+                            tabla.redraw(true);
+                        }
+                    },
+                    {
+                        label: "Desfijar columna",
+                        action: function (e, column) {
+                            column.updateDefinition({ frozen: false });
+                            tabla.redraw(true);
+                        }
                     }
-                },
-                {
-                    label:"Desfijar columna",
-                    action:function(e, column){
-                        column.updateDefinition({frozen:false});
-                        tabla.redraw(true);
-                    }
-                }
-            ]},
-            { title: "Evento", field: "evento", headerMenu:[
-                {
-                    label:"Fijar columna",
-                    action:function(e, column){
-                        column.updateDefinition({frozen:true});
-                        tabla.redraw(true);
-                    }
-                },
-                {
-                    label:"Desfijar columna",
-                    action:function(e, column){
-                        column.updateDefinition({frozen:false});
-                        tabla.redraw(true);
-                    }
-                }
-            ]},
+                ]
+            },
             { title: "Zona", field: "zona" },
             { title: "Ubicación del dispositivo", field: "ubicacion" },
             { title: "Nombre del usuario", field: "nombre" },
-            { title: "Numero de serie", field: "num_serie", headerMenu:[
-                {
-                    label:"Fijar columna",
-                    action:function(e, column){
-                        column.updateDefinition({frozen:true});
-                        tabla.redraw(true);
+            {
+                title: "Numero de serie", field: "num_serie", headerMenu: [
+                    {
+                        label: "Fijar columna",
+                        action: function (e, column) {
+                            column.updateDefinition({ frozen: true });
+                            tabla.redraw(true);
+                        }
+                    },
+                    {
+                        label: "Desfijar columna",
+                        action: function (e, column) {
+                            column.updateDefinition({ frozen: false });
+                            tabla.redraw(true);
+                        }
                     }
-                },
-                {
-                    label:"Desfijar columna",
-                    action:function(e, column){
-                        column.updateDefinition({frozen:false});
-                        tabla.redraw(true);
-                    }
-                }
-            ]},
+                ]
+            },
             { title: "Rubro", field: "rubro" },
             { title: "Tipo de dispositivo", field: "tipo" },
             { title: "Modelo del dispositivo", field: "modelo" },
@@ -211,9 +219,10 @@ async function registrar_historico(evento, params) {
 function consultar_num_serie() {
     let input = document.getElementsByName('mdl-hst')
     for (let i = 0; i < input.length; i++) {
-        input[i].value = "";
-        input[i].classList.remove('is-invalid');
-
+        if (input[i].id != "rango-fecha") {
+            input[i].value = "";
+            input[i].classList.remove('is-invalid');
+        }
     }
 
     $('#his-versiones').empty();
@@ -264,12 +273,12 @@ async function mostrar_historial() {
 
             let datosTexto = '';
             for (var key in registro) {
-            if (!camposExcluir.includes(key)) {  // Si el campo no está en la lista de campos a excluir
-                const claveAmigable = clavesAmigables[key] || key; // Usar la clave amigable o la original si no está definida
-                datosTexto += `<li>${claveAmigable}: ${registro[key]}</li>`;
+                if (!camposExcluir.includes(key)) {  // Si el campo no está en la lista de campos a excluir
+                    const claveAmigable = clavesAmigables[key] || key; // Usar la clave amigable o la original si no está definida
+                    datosTexto += `<li>${claveAmigable}: ${registro[key]}</li>`;
+                }
             }
-        }
-            
+
             const item = `
                 <div class="list-group-item">
                     <strong>${fecha}</strong><br>
