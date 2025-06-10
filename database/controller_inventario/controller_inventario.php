@@ -31,7 +31,7 @@ function insertar_datos($valores)
 {
     include("../conexion.php");
 
-    // $registro = date("Y-m-d H:i:s");
+    $registro = date("Y-m-d H:i:s");
 
     $rubro = verificar_nuevos_id($valores->rubro);
     $val_rubro;
@@ -69,35 +69,36 @@ function insertar_datos($valores)
         $val_marca = $idMarca['id'];
     }
 
-    $estatus = "";
-    if ($valores->usuario == "5") {
-        $estatus = "Bodega";
-    } else {
-        $estatus = "Asignado";
+    $val_estatus = "";
+    if($valores->usuario == "5"){
+        $val_estatus = "Bodega";
+    }else{
+        $val_estatus = "Asignado";
+    }
+    
+    $val_tag = "";
+    if($valores->tag == ""){
+        $val_tag = "NA";
+    }else{
+        $val_tag = $valores->tag;
+    }
+    
+    $val_af = "";
+    if($valores->af == ""){
+        $val_af = "NA";
+    }else{
+        $val_af = $valores->af;
     }
 
-    $tag = "";
-    if ($valores->tag == "") {
-        $tag = "NA";
-    } else {
-        $tag = $valores->tag;
-    }
-
-    $af = "";
-    if ($valores->af == "") {
-        $af = "NA";
-    } else {
-        $af = $valores->af;
-    }
 
     if ($valores->num_serie != "") {
         $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$valores->num_serie'";
         //var_dump($sql_num);
         $query_num = mysqli_query($con, $sql_num);
 
-        $sql = "INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, habilitado) 
-        VALUES ('$valores->zona', '$val_rubro','$valores->af','$val_tipo','$val_marca','$valores->modelo', '$valores->num_serie', 
-        '$valores->ubicacion', '$valores->tag', '$valores->usuario', '$valores->fecha_entrega',1);";
+        $sql = "INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, imei,estatus) 
+        VALUES ('$valores->zona', '$val_rubro','$val_af','$val_tipo','$val_marca','$valores->modelo', '$valores->num_serie', 
+        '$valores->ubicacion', '$val_tag', '$valores->usuario', '$registro', 'NA', '$val_estatus');";
         //$query = mysqli_query($con, $sql);|
         //var_dump($sql);
         if (mysqli_num_rows($query_num) > 0) {
@@ -153,7 +154,7 @@ function editar_datos($valores)
     }
 
     $sql = "UPDATE inventario_ti_sur SET zona = '$valores->zona', fk_rubro = '$val_rubro', af = '$valores->af', fk_tipo ='$val_tipo', fk_marca = '$val_marca', modelo = '$valores->modelo',
-    num_serie = '$valores->num_serie', ubicacion = '$valores->ubicacion', tag = '$valores->tag', fk_usuario = '$valores->usuario', fecha_entrega = '$valores->fecha_entrega' WHERE id = '$valores->id';";
+    num_serie = '$valores->num_serie', ubicacion = '$valores->ubicacion', tag = '$valores->tag', fk_usuario = '$valores->usuario' WHERE id = '$valores->id';";
     //var_dump($sql);
     $result = mysqli_query($con, $sql);
     return $result;
@@ -281,7 +282,7 @@ function consultar_distintos($tabla, $campo)
         $tabla = mysqli_real_escape_string($con, $tabla);
         $campo = mysqli_real_escape_string($con, $campo);
 
-        $sql = "SELECT DISTINCT `$campo`,id FROM `$tabla` WHERE  `$campo` <> 'NA';";
+        $sql = "SELECT DISTINCT `$campo`,id FROM `$tabla` WHERE  `$campo` <> 'NA' AND habilitado <> 0;";
         $query = mysqli_query($con, $sql);
 
         $datos = [];

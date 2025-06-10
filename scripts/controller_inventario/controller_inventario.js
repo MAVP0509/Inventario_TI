@@ -189,7 +189,7 @@ async function consultar_informacion(params) {
                     formatter: editIcon, width: 60, hozAlign: "center",
                     cellClick: function (e, cell) {
                         elemento = cell.getRow().getData();
-                        mostrar_registro(elemento);
+                        mdl_editar(elemento);
                     },
                     headerSort: false, frozen: true
                 },
@@ -205,7 +205,18 @@ async function consultar_informacion(params) {
 
 let selecreg = ""; // No limpiar la variable
 
-async function mostrar_registro(params) {
+async function mdl_editar(params) {
+    let inputs = document.getElementsByName('mdl-reg');
+    for (let i = 0; i < inputs.length; i++) {
+        //inputs[i].value = ""; // Limpia el valor del input
+        inputs[i].classList.remove('is-invalid'); // Elimina la clase de validación
+    }
+
+    $('.select').each(function () {
+        $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
+        $(this).removeClass('is-invalid'); // Elimina la clase de validación
+    });
+
     for (let i = 0; i < datos.length; i++) {
         const element = datos[i];
         if (element.id_equipo === params.id_equipo) {
@@ -214,57 +225,189 @@ async function mostrar_registro(params) {
             break;
         }
     }
+    //*Mostrar la fecha
+    $('#lbl-fecha-reg').show()
+    $('#inp-fecha-reg').show()
+
+    //* Deshabilitando los input de usuario y fecha
+    $('#inp-usuario').prop('disabled', true)
+    $('#inp-fecha-entrega').prop('disabled', true)
+
+
     // Limpia y carga los select
     await general_select2({
-        selectId: 'edi-rubro',
+        selectId: 'inp-rubro',
         tabla: 'cat_rubro',
         campo: 'rubro',
         placeholder: 'Selecione un rubro',
-        dropdownParent: '#modal-editar',
-        tags: true
+        dropdownParent: '#mdl-inventario',
+        tags: true,
+        popoverTitle: "Descripción",
+        popoverContent: "Categoría general del activo. Agrupa dispositivos por su tipo funcional, como computadoras, dispositivos móviles, etc."
     })
 
     await general_select2({
-        selectId: 'edi-tipo',
+        selectId: 'inp-tipo',
         tabla: 'cat_tipo',
         campo: 'tipo',
         placeholder: 'Selecione un tipo',
-        dropdownParent: '#modal-editar',
-        tags: true
+        dropdownParent: '#mdl-inventario',
+        tags: true,
+        popoverTitle: "Descripción",
+        popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
     })
 
     await general_select2({
-        selectId: 'edi-marca',
+        selectId: 'inp-marca',
         tabla: 'cat_marca',
         campo: 'marca',
         placeholder: 'Seleccione una marca',
-        dropdownParent: '#modal-editar',
-        tags: true
+        dropdownParent: '#mdl-inventario',
+        tags: true,
+        popoverTitle: "Descripción",
+        popoverContent: "Es la marca del activo."
     })
 
     await general_select2({
-        selectId: 'edi-usuario',
+        selectId: 'inp-usuario',
+        tabla: 'cat_usuarios',
+        campo: 'nombre',
+        placeholder: 'NA',
+        dropdownParent: '#mdl-inventario',
+    })
+
+    document.getElementById("inp-zona").value = selecreg.zona;
+    rellenar_select(selecreg.rubro, "inp-rubro")
+    document.getElementById("inp-af").value = selecreg.af;
+    rellenar_select(selecreg.tipo, "inp-tipo")
+    rellenar_select(selecreg.marca, "inp-marca")
+    document.getElementById("inp-modelo").value = selecreg.modelo;
+    document.getElementById("inp-num-serie").value = selecreg.num_serie;
+    document.getElementById("inp-ubicacion").value = selecreg.ubicacion;
+    document.getElementById("inp-tag").value = selecreg.tag;
+    rellenar_select(selecreg.usuario, "inp-usuario")
+    document.getElementById("inp-fecha-entrega").value = selecreg.fecha_entrega;
+
+    document.getElementById('title-mdl-inventario').textContent = "Edición de Activo"
+    document.getElementById('btn-mdl-inventario').onclick = function () { editar_registro() }
+
+    $("#mdl-inventario").modal("show");
+    //console.log(selecreg)
+}
+async function editar_registro(params) {
+    //deshabilitar_campo();
+    const validacion = [
+        "inp-zona",
+        "inp-rubro",
+        "inp-tipo",
+        "inp-ubicacion",
+    ];
+
+    let model = {
+        accion: 1,
+        id: selecreg.id_equipo,
+        zona: $("#inp-zona").val().trim(),
+        rubro: $("#inp-rubro").val().trim(),
+        af: $("#inp-af").val().trim(),
+        tipo: $("#inp-tipo").val().trim(),
+        marca: $("#inp-marca").val().trim(),
+        modelo: $("#inp-modelo").val().trim(),
+        num_serie: $("#inp-num-serie").val().trim().toUpperCase(),
+        ubicacion: $("#inp-ubicacion").val().trim(),
+        tag: $("#inp-tag").val().trim(),
+        usuario: $("#inp-usuario").val().trim(),
+        //posicion: $("#edi-posicion").select2('data')[0].text,
+        fecha_entrega: $("#inp-fecha-entrega").val()
+    }
+
+    await registrar_historico('Anterior edición de registro', selecreg);
+
+    let server = await server_inventario(model);
+    //let response = JSON.parse(respuesta);
+    //console.log(server);
+    if (server.resultado === true) {
+
+        await registrar_historico('Edición de registro', model);
+        mostrar_alerta('success', '¡Edición exitosa!', 'El registro se ha actualizado correctamente.');
+    } else {
+        mostrar_alerta('error', 'Error', 'No se pudo editar el registro. Inténtalo nuevamente.');
+        return
+    }
+
+    consultar_informacion();
+    $("#mdl-inventario").modal("hide");
+
+}
+
+let ususelect = [];
+function mdl_nvo_registro() {
+    let inputs = document.getElementsByName('mdl-reg');
+    for (let i = 0; i < inputs.length; i++) {
+        inputs[i].value = ""; // Limpia el valor del input
+        inputs[i].classList.remove('is-invalid'); // Elimina la clase de validación
+    }
+
+    $('.select').each(function () {
+        $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
+        $(this).removeClass('is-invalid'); // Elimina la clase de validación
+    });
+
+    //* Habilitando los inputs de usuario y fecha
+    $('#inp-usuario').prop('disabled', false)
+    $('#inp-fecha-entrega').prop('disabled', false)
+
+    //*Escondiendo la fecha
+    $('#lbl-fecha-reg').hide()
+    $('#inp-fecha-reg').hide()
+
+    general_select2({
+        selectId: 'inp-rubro',
+        tabla: 'cat_rubro',
+        campo: 'rubro',
+        placeholder: 'Seleciona un rubro',
+        dropdownParent: '#mdl-inventario',
+        tags: true,
+        popoverTitle: "Descripción",
+        popoverContent: "Categoría general del activo. Agrupa dispositivos por su tipo funcional, como computadoras, dispositivos móviles, etc."
+    });
+
+    general_select2({
+        selectId: 'inp-tipo',
+        tabla: 'cat_tipo',
+        campo: 'tipo',
+        placeholder: 'Seleciona un tipo',
+        dropdownParent: '#mdl-inventario',
+        tags: true,
+        popoverTitle: "Descripción",
+        popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
+    });
+
+    general_select2({
+        selectId: 'inp-marca',
+        tabla: 'cat_marca',
+        campo: 'marca',
+        placeholder: 'Seleccione una marca',
+        dropdownParent: '#mdl-inventario',
+        tags: true,
+        popoverTitle: "Descripción",
+        popoverContent: "Es la marca del activo."
+    })
+
+    general_select2({
+        selectId: 'inp-usuario',
         tabla: 'cat_usuarios',
         campo: 'nombre',
         placeholder: 'Seleccione un usuario',
-        dropdownParent: '#modal-editar',
-    })
+        dropdownParent: '#mdl-inventario',
+    });
 
-    document.getElementById("edi-zona").value = selecreg.zona;
-    rellenar_select(selecreg.rubro, "edi-rubro")
-    document.getElementById("edi-af").value = selecreg.af;
-    rellenar_select(selecreg.tipo, "edi-tipo")
-    rellenar_select(selecreg.marca, "edi-marca")
-    document.getElementById("edi-modelo").value = selecreg.modelo;
-    document.getElementById("edi-num-serie").value = selecreg.num_serie;
-    document.getElementById("edi-ubicacion").value = selecreg.ubicacion;
-    document.getElementById("edi-tag").value = selecreg.tag;
-    rellenar_select(selecreg.usuario, "edi-usuario")
-    document.getElementById("edi-fecha-entrega").value = selecreg.fecha_entrega;
+    document.getElementById('title-mdl-inventario').textContent = "Registro de Activo"
+    document.getElementById('btn-mdl-inventario').onclick = function () { crear_registro() }
 
-    $("#modal-editar").modal("show");
-    // console.log(selecreg)
+    $("#mdl-inventario").modal('show');
+
 }
+
 async function crear_registro() {
     // Campos requeridos para validación
     const validacion = [
@@ -316,7 +459,7 @@ async function crear_registro() {
 
     if (server.resultado === true) {
         consultar_informacion();
-        $("#modal-registro").modal('hide');
+        $("#mdl-inventario").modal('hide');
         await registrar_historico('Nuevo registro', model);
         mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
     } else if (server.resultado === false) {
@@ -332,55 +475,7 @@ async function crear_registro() {
 
 }
 
-async function editar_registro(params) {
-    //deshabilitar_campo();
-    const validacion = [
-        "inp-zona",
-        "inp-rubro",
-        "inp-tipo",
-        "inp-ubicacion",
-    ];
 
-    let user = $("#edi-usuario").val().trim()
-    if (user === "") {
-        user = "5"
-    }
-
-    let model = {
-        accion: 1,
-        id: selecreg.id_equipo,
-        zona: $("#edi-zona").val().trim(),
-        rubro: $("#edi-rubro").val().trim(),
-        af: $("#edi-af").val().trim(),
-        tipo: $("#edi-tipo").val().trim(),
-        marca: $("#edi-marca").val().trim(),
-        modelo: $("#edi-modelo").val().trim(),
-        num_serie: $("#edi-num-serie").val().trim().toUpperCase(),
-        ubicacion: $("#edi-ubicacion").val().trim(),
-        tag: $("#edi-tag").val().trim(),
-        usuario: user,
-        //posicion: $("#edi-posicion").select2('data')[0].text,
-        fecha_entrega: $("#edi-fecha-entrega").val()
-    }
-
-    await registrar_historico('Anterior edición de registro', selecreg);
-
-    let server = await server_inventario(model);
-    //let response = JSON.parse(respuesta);
-    //console.log(server);
-    if (server.resultado === true) {
-
-        await registrar_historico('Edición de registro', model);
-        mostrar_alerta('success', '¡Edición exitosa!', 'El registro se ha actualizado correctamente.');
-    } else {
-        mostrar_alerta('error', 'Error', 'No se pudo editar el registro. Inténtalo nuevamente.');
-        return
-    }
-
-    consultar_informacion();
-    $("#modal-editar").modal("hide");
-
-}
 
 async function traspasos() {
     let model = {
@@ -510,69 +605,7 @@ function validar_campos(campos) {
     return valido;
 }
 
-function limpiar_campos() {
-    let inputs = document.getElementsByName('mdl-reg');
-    for (let i = 0; i < inputs.length; i++) {
-        inputs[i].value = ""; // Limpia el valor del input
-        inputs[i].classList.remove('is-invalid'); // Elimina la clase de validación
-    }
 
-    $('.select').each(function () {
-        $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
-        $(this).removeClass('is-invalid'); // Elimina la clase de validación
-    });
-
-    $(document).ready(function () {
-        let hoy = new Date();
-        let año = hoy.getFullYear();
-        let mes = String(hoy.getMonth() + 1).padStart(2, '0');
-        let dia = String(hoy.getDate()).padStart(2, '0');
-        let hora = String(hoy.getHours()).padStart(2, '0');
-        let minutos = String(hoy.getMinutes()).padStart(2, '0');
-        let segundos = String(hoy.getSeconds()).padStart(2, '0');
-
-        let fecha = `${hora}:${minutos}`;
-        $('#inp-fecha-entrega').val(fecha);
-    });
-
-    general_select2({
-        selectId: 'inp-rubro',
-        tabla: 'cat_rubro',
-        campo: 'rubro',
-        placeholder: 'Seleciona un rubro',
-        dropdownParent: '#modal-registro',
-        tags: true
-    });
-
-    general_select2({
-        selectId: 'inp-tipo',
-        tabla: 'cat_tipo',
-        campo: 'tipo',
-        placeholder: 'Seleciona un tipo',
-        dropdownParent: '#modal-registro',
-        tags: true
-    });
-
-    general_select2({
-        selectId: 'inp-marca',
-        tabla: 'cat_marca',
-        campo: 'marca',
-        placeholder: 'Seleccione una marca',
-        dropdownParent: '#modal-registro',
-        tags: true
-    })
-
-    general_select2({
-        selectId: 'inp-usuario',
-        tabla: 'cat_usuarios',
-        campo: 'nombre',
-        placeholder: 'Seleccione un usuario',
-        dropdownParent: '#modal-registro',
-    });
-
-    $("#modal-registro").modal('show');
-
-}
 
 //TODO: Alertas, confirmaciones
 
@@ -591,7 +624,7 @@ function mostrar_alerta(tipo, titulo, mensaje) {
 
 //TODO Funciones de los Select2
 
-async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags }) {
+async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags, popoverTitle, popoverContent }) {
     //try {
     const response = await server_inventario({
         accion: 5,
@@ -620,9 +653,21 @@ async function general_select2({ selectId, tabla, campo, placeholder, dropdownPa
 
     $select.val(null).trigger('change');
 
-    //} catch (error) {
+    //  Si se pasan datos de popover, aplicarlo
+    if (popoverTitle && popoverContent) {
+        const $select2Container = $select.next('.select2-container');
 
-    //}
+        $select2Container.attr({
+            'data-toggle': 'popover',
+            'data-trigger': 'hover',
+            'data-html': 'true',
+            'title': popoverTitle,
+            'data-content': popoverContent
+        });
+
+        $select2Container.popover();
+    }
+
 }
 
 function rellenar_select(texto, select) {
@@ -636,7 +681,7 @@ function rellenar_select(texto, select) {
     $select.trigger('change');
 }
 
-
+//* Deshabilitando el input TAG del registro
 $(document).ready(function () {
     // Escucha cambios en el campo "inp-tipo"
     $('#inp-tipo').on('change', function () {
@@ -667,12 +712,15 @@ $(document).ready(function () {
 
 //TODO: Funciones para el resguardo
 function resguardo() {
-    let inputs = document.getElementsByName('resg-inpt')
+    let inputs = document.getElementsByName('inp-resg')
     for (let i = 0; i < inputs.length; i++) {
-        const element = inputs[i].value = "";
+        inputs[i].classList.remove('is-invalid')
+        inputs[i].value = "";
+
     }
+
     $('#select-usu').val(null).trigger('change');
-    $('#select-supervisor').val(null).trigger('change');
+    $('#select-region').val(null).trigger('change');
 
 
     $(document).ready(function () {

@@ -60,6 +60,7 @@ async function consultar_informacion(params) {
         }
     });
 
+
     let editIcon = function (cell, formatterParams, onRendered) { //plain text value
         return "<button type='button' class='btn btn-warning icon' onclick=''><i class='fa-solid fa-pen-to-square fa-lg'></i></button>";
     };
@@ -115,12 +116,12 @@ async function consultar_informacion(params) {
             {
                 title: "Región", field: "region", headerHozAlign: "center", headerSort: false, width: 100, hozAlign: "center", headerFilter: "list",
                 headerFilterParams: {
-                    valuesLookup:true, clearable:true // se auto genera a partir de los valores únicos de la columna
+                    valuesLookup: true, clearable: true // se auto genera a partir de los valores únicos de la columna
                 },
             },
             {
                 title: "Habilitado",
-                field: "habilitado", headerHozAlign: "center", headerFilter:"list", headerFilterParams:{values:{"1":"Activo", "0":"Inactivo"}, clearable:true},
+                field: "habilitado", headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "1": "Activo", "0": "Inactivo" }, clearable: true },
                 formatter: function (cell, formatterParams, onRendered) {
                     let value = cell.getValue();
                     let icon = value === "1" ? "fa-solid fa-toggle-on fa-2xl" : "fa-solid fa-toggle-off fa-2xl";
@@ -219,7 +220,7 @@ async function consultar_informacion(params) {
                             editBtn.removeAttribute("data-content");
                         }
                     }
-                }, width: 90, hozAlign: "center", headerSort: false, 
+                }, width: 90, hozAlign: "center", headerSort: false,
 
             },
             {
