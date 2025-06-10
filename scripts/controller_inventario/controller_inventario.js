@@ -265,9 +265,6 @@ async function mostrar_registro(params) {
     $("#modal-editar").modal("show");
     // console.log(selecreg)
 }
-
-let ususelect = [];
-
 async function crear_registro() {
     // Campos requeridos para validación
     const validacion = [
