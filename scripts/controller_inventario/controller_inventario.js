@@ -412,7 +412,7 @@ function mdl_nvo_registro() {
         campo: 'zona',
         placeholder: 'Selecciona una zona',
         dropdownParent: '#mdl-inventario',
-        //tags: true,
+        tags: true,
         popoverTitle: "Descripción",
         popoverContent: "Zona operativa donde se ubica el activo."
     });
