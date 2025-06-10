@@ -485,17 +485,19 @@ async function traspasos() {
         usuario: $('#mdl-usuario').val(),
     }
 
+    await registrar_historico('Anterior traspaso', server.resultado);
+
     let server = await server_inventario(model);
     console.log(model)
     if (Array.isArray(server.resultado)) {
-        seleccionar = []
-        consultar_informacion();
-        $('#mdl-traspaso').modal('hide')
-        await registrar_historico('Generarción de traspaso', server.resultado);
-        mostrar_alerta('success', '¡Traspaso exitoso!', 'El traspaso se ha realizado correctamente');
-    } else {
-        mostrar_alerta('error', 'Error', 'No se pudo realizar el traspaso. Inténtalo nuevamente.');
-    }
+            seleccionar = []
+            consultar_informacion();
+            $('#mdl-traspaso').modal('hide')
+            await registrar_historico('Generarción de traspaso', server.resultado);
+            mostrar_alerta('success', '¡Traspaso exitoso!', 'El traspaso se ha realizado correctamente');
+        } else {
+            mostrar_alerta('error', 'Error', 'No se pudo realizar el traspaso. Inténtalo nuevamente.');
+        }
 
 }
 
@@ -505,24 +507,24 @@ async function mostrar_traspaso() {
         mostrar_alerta('error', 'Error', 'Selecione al menos un usuario. Inténtalo nuevamente.')
     } else {
         await general_select2({
-            selectId: 'mdl-estado',
-            tabla: 'inventario_ti_sur',
-            campo: 'estatus',
-            placeholder: 'Selecione un estatus',
-            dropdownParent: '#mdl-traspaso',
-            tags: false,
-        })
-        await general_select2({
-            selectId: 'mdl-usuario',
-            tabla: 'cat_usuarios',
-            campo: 'nombre',
-            placeholder: 'Selecciones un usuario',
-            dropdownParent: '#mdl-traspaso',
-            tags: false,
-        })
-        $("#mdl-traspaso").modal("show");
+        selectId: 'mdl-estado',
+        tabla: 'inventario_ti_sur',
+        campo: 'estatus',
+        placeholder: 'Selecione un estatus',
+        dropdownParent: '#mdl-traspaso',
+        tags: false,
+    })
+    await general_select2({
+        selectId: 'mdl-usuario',
+        tabla: 'cat_usuarios',
+        campo: 'nombre',
+        placeholder: 'Selecciones un usuario',
+        dropdownParent: '#mdl-traspaso',
+        tags: false,
+    })
+    $("#mdl-traspaso").modal("show");
     }
-
+    
 }
 
 async function desactivar_registro() {
