@@ -574,20 +574,6 @@ async function confirmar_eliminacion() {
     if (seleccionar.length === 0) {
         mostrar_alerta('error', 'Error', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
     } else {
-        /* Swal.fire({
-            title: '¿Está seguro de eliminarlo?',
-            text: "Esta acción no se puede deshacer.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                desactivar_registro(); // Llama a la función para eliminar el registro
-            }
-        }); */
         mostrar_alert('warning', `¿Está seguro de eliminar ${seleccionar.length} activos(s)?`, false, desactivar_registro)
     }
 }
@@ -746,6 +732,13 @@ function resguardo() {
     $('#select-usu').val(null).trigger('change');
     $('#select-region').val(null).trigger('change');
 
+    $collapse = $('#collapse-resguardo');
+    $collapse.slideUp();
+    $collapse.closest('.card').addClass('collapsed-card');
+     $collapse.closest('.card')
+        .find('[data-card-widget="collapse"] i')
+        .removeClass('fa-minus')
+        .addClass('fa-plus');
 
     $(document).ready(function () {
         let hoy = new Date().toISOString().split('T')[0];
