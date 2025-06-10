@@ -70,23 +70,23 @@ function insertar_datos($valores)
     }
 
     $val_estatus = "";
-    if($valores->usuario == "5"){
+    if ($valores->usuario == "5") {
         $val_estatus = "Bodega";
-    }else{
+    } else {
         $val_estatus = "Asignado";
     }
-    
+
     $val_tag = "";
-    if($valores->tag == ""){
+    if ($valores->tag == "") {
         $val_tag = "NA";
-    }else{
+    } else {
         $val_tag = $valores->tag;
     }
-    
+
     $val_af = "";
-    if($valores->af == ""){
+    if ($valores->af == "") {
         $val_af = "NA";
-    }else{
+    } else {
         $val_af = $valores->af;
     }
 
@@ -261,7 +261,7 @@ function consultar_distintos($tabla, $campo)
     $tabla = mysqli_real_escape_string($con, $tabla);
     $campo = mysqli_real_escape_string($con, $campo);
 
-    if ($campo === "region" || $campo === "estatus") {
+    /* if ($campo === "region" || $campo === "estatus") {
         $num = 1;
         $sql = "SELECT DISTINCT `$campo` from `$tabla` WHERE `$campo` <> 'Baja';";
         $query = mysqli_query($con, $sql);
@@ -296,7 +296,37 @@ function consultar_distintos($tabla, $campo)
         }
         //var_dump($datos);
         return $datos;
+    } */
+
+    switch ($campo) {
+        case "region":
+        case "estatus":
+            $sql = "SELECT DISTINCT `$campo` from `$tabla` WHERE `$campo` <> 'Baja';";
+            break;
+        case "zona":
+            $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE  `$campo` <> 'NA'";
+            break;
+        default:
+            $sql = "SELECT DISTINCT `$campo`,id FROM `$tabla` WHERE  `$campo` <> 'NA' AND habilitado <> 0;";
+            break;
     }
+
+    $query = mysqli_query($con, $sql);
+    if (!$query) {
+        throw new Exception("Error en la consulta: " . mysqli_error($con));
+    }
+
+    $datos = [];
+    while ($fila = mysqli_fetch_assoc($query)) {
+        $id = $fila['id'] ?? $fila[$campo]; // fallback por si no hay 'id'
+        $valor = $fila[$campo];
+        $datos[] = [
+            'id' => $id,
+            $campo => $valor
+        ];
+    }
+
+    return $datos;
 }
 
 
@@ -324,14 +354,14 @@ function traspaso($valores)
         while ($fila = mysqli_fetch_assoc($query)) {
             $datos[] = $fila;
         }
-        
-        if ($valores->estatus == 'Bodega'){
+
+        if ($valores->estatus == 'Bodega') {
             $usuario = '5';
             $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$usuario' WHERE id IN ($ids)";
         } else {
             $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$valores->usuario' WHERE id IN ($ids)";
         }
-        
+
         // var_dump($sql_datos);
         mysqli_query($con, $sql_datos);
         return $datos;

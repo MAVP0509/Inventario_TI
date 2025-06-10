@@ -221,7 +221,7 @@ async function mdl_editar(params) {
         const element = datos[i];
         if (element.id_equipo === params.id_equipo) {
             selecreg = element;
-            //console.log(selecreg)
+            console.log(selecreg)
             break;
         }
     }
@@ -269,6 +269,17 @@ async function mdl_editar(params) {
     })
 
     await general_select2({
+        selectId: 'inp-zona',
+        tabla: 'inventario_ti_sur',
+        campo: 'zona',
+        placeholder: 'Selecciona una zona',
+        dropdownParent: '#mdl-inventario',
+        tags: true,
+        popoverTitle: "Descripción",
+        popoverContent: "Zona operativa donde se ubica el activo."
+    });
+
+    await general_select2({
         selectId: 'inp-usuario',
         tabla: 'cat_usuarios',
         campo: 'nombre',
@@ -276,7 +287,8 @@ async function mdl_editar(params) {
         dropdownParent: '#mdl-inventario',
     })
 
-    document.getElementById("inp-zona").value = selecreg.zona;
+    rellenar_select(selecreg.zona, "inp-zona")
+    //document.getElementById("inp-zona").value = selecreg.zona;
     rellenar_select(selecreg.rubro, "inp-rubro")
     document.getElementById("inp-af").value = selecreg.af;
     rellenar_select(selecreg.tipo, "inp-tipo")
@@ -306,7 +318,8 @@ async function editar_registro(params) {
     let model = {
         accion: 1,
         id: selecreg.id_equipo,
-        zona: $("#inp-zona").val().trim(),
+        zona: $("#inp-zona").select2('data')[0].text,
+        //zona: $("#inp-zona").val().trim(),
         rubro: $("#inp-rubro").val().trim(),
         af: $("#inp-af").val().trim(),
         tipo: $("#inp-tipo").val().trim(),
@@ -394,6 +407,17 @@ function mdl_nvo_registro() {
     })
 
     general_select2({
+        selectId: 'inp-zona',
+        tabla: 'inventario_ti_sur',
+        campo: 'zona',
+        placeholder: 'Selecciona una zona',
+        dropdownParent: '#mdl-inventario',
+        //tags: true,
+        popoverTitle: "Descripción",
+        popoverContent: "Zona operativa donde se ubica el activo."
+    });
+
+    general_select2({
         selectId: 'inp-usuario',
         tabla: 'cat_usuarios',
         campo: 'nombre',
@@ -437,7 +461,7 @@ async function crear_registro() {
     // Crear el modelo con los datos del formulario
     let model = {
         accion: 0,
-        zona: $("#inp-zona").val().trim(),
+        zona: $("#inp-zona").select2('data')[0].text,
         rubro: $("#inp-rubro").val().trim(),
         af: $("#inp-af").val().trim(),
         tipo: $("#inp-tipo").val().trim(),
@@ -490,14 +514,14 @@ async function traspasos() {
     let server = await server_inventario(model);
     console.log(model)
     if (Array.isArray(server.resultado)) {
-            seleccionar = []
-            consultar_informacion();
-            $('#mdl-traspaso').modal('hide')
-            await registrar_historico('Generarción de traspaso', server.resultado);
-            mostrar_alerta('success', '¡Traspaso exitoso!', 'El traspaso se ha realizado correctamente');
-        } else {
-            mostrar_alerta('error', 'Error', 'No se pudo realizar el traspaso. Inténtalo nuevamente.');
-        }
+        seleccionar = []
+        consultar_informacion();
+        $('#mdl-traspaso').modal('hide')
+        await registrar_historico('Generarción de traspaso', server.resultado);
+        mostrar_alerta('success', '¡Traspaso exitoso!', 'El traspaso se ha realizado correctamente');
+    } else {
+        mostrar_alerta('error', 'Error', 'No se pudo realizar el traspaso. Inténtalo nuevamente.');
+    }
 
 }
 
@@ -507,24 +531,24 @@ async function mostrar_traspaso() {
         mostrar_alerta('error', 'Error', 'Selecione al menos un usuario. Inténtalo nuevamente.')
     } else {
         await general_select2({
-        selectId: 'mdl-estado',
-        tabla: 'inventario_ti_sur',
-        campo: 'estatus',
-        placeholder: 'Selecione un estatus',
-        dropdownParent: '#mdl-traspaso',
-        tags: false,
-    })
-    await general_select2({
-        selectId: 'mdl-usuario',
-        tabla: 'cat_usuarios',
-        campo: 'nombre',
-        placeholder: 'Selecciones un usuario',
-        dropdownParent: '#mdl-traspaso',
-        tags: false,
-    })
-    $("#mdl-traspaso").modal("show");
+            selectId: 'mdl-estado',
+            tabla: 'inventario_ti_sur',
+            campo: 'estatus',
+            placeholder: 'Selecione un estatus',
+            dropdownParent: '#mdl-traspaso',
+            tags: false,
+        })
+        await general_select2({
+            selectId: 'mdl-usuario',
+            tabla: 'cat_usuarios',
+            campo: 'nombre',
+            placeholder: 'Selecciones un usuario',
+            dropdownParent: '#mdl-traspaso',
+            tags: false,
+        })
+        $("#mdl-traspaso").modal("show");
     }
-    
+
 }
 
 async function desactivar_registro() {
