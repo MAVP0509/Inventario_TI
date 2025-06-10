@@ -60,10 +60,34 @@ async function consultar_informacion(params) {
         }
     });
 
+    // Inicializar cada fila con "seleccionado: false"
+    datos.forEach(d => d.seleccionado = false);
+
+    // Formatter del ícono tipo checkbox
+    let squareIcon = function (cell, formatterParams, onRendered) {
+        const seleccionado = cell.getRow().getData().seleccionado;
+        const iconClass = seleccionado ? "fa-solid fa-square-check" : "fa-regular fa-square";
+        return `<button type='button' class='btn icon    toggle-select'>
+                    <i class='${iconClass} fa-lg'></i>
+                </button>`;
+    };
+
 
     let editIcon = function (cell, formatterParams, onRendered) { //plain text value
         return "<button type='button' class='btn btn-warning icon' onclick=''><i class='fa-solid fa-pen-to-square fa-lg'></i></button>";
     };
+
+    // Función para alternar selección y actualizar array
+    function seleccionar_supervisor(params) {
+        let index = seleccionados.indexOf(params);
+
+        if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
+            seleccionados.push(params); // Añade uno o más elementos al final de un array
+        } else {
+            seleccionados.splice(index, 1);
+        }
+        console.log(seleccionados); // para depuración
+    }
 
     table = new Tabulator('#tbl', {
         locale: "es",
@@ -82,7 +106,7 @@ async function consultar_informacion(params) {
         rowFormatter: function (row) {
             const data = row.getData();
             const rowElement = row.getElement();
-            const editBtn = rowElement.querySelector("button");
+            const editBtn = rowElement.querySelector("button.btn-warning");
 
             if (editBtn) {
                 if (data.habilitado === "1") {
@@ -103,21 +127,55 @@ async function consultar_informacion(params) {
                     editBtn.removeAttribute("data-content");
                 }
             }
+            //data = row.getData()
+            if (data.seleccionado === true) {
+                row.getElement().classList.add("bg-primary")
+            } else if (data.seleccionado === false) {
+                row.getElement().classList.remove("bg-primary")
+            }
         },
         groupBy: "region",
         columns: [
-            { title: "ID", field: "id", width: 45, hozAlign: "center", headerSort: false, headerHozAlign: "center", },
             {
-                title: "Nombre", field: "nombre", headerHozAlign: "center", headerFilter: "input", headerSort: false
+                formatter: squareIcon, width: 70, hozAlign: "center",
+                cellClick: function (e, cell) {
+                    // Alternar estado de seleccionado
+                    let rowData = cell.getRow().getData();
+                    rowData.seleccionado = !rowData.seleccionado;
+                    cell.getRow().reformat();
+                    seleccionar_supervisor(rowData.id)
+                }, headerSort: false, frozen: true
+            },
+            { title: "ID", field: "id", width: 45, hozAlign: "center", headerSort: false, headerHozAlign: "center",   },
+            {
+                title: "Nombre", field: "nombre", headerHozAlign: "center", headerFilter: "input", headerSort: false, cellClick: function (e, cell) {
+                    // Alternar estado de seleccionado
+                    let rowData = cell.getRow().getData();
+                    rowData.seleccionado = !rowData.seleccionado;
+                    cell.getRow().reformat();
+                    seleccionar_supervisor(rowData.id)
+                }
             },
             {
-                title: "Cargo", field: "cargo", headerHozAlign: "center", headerFilter: "input", headerSort: false
+                title: "Cargo", field: "cargo", headerHozAlign: "center", headerFilter: "input", headerSort: false,  cellClick: function (e, cell) {
+                    // Alternar estado de seleccionado
+                    let rowData = cell.getRow().getData();
+                    rowData.seleccionado = !rowData.seleccionado;
+                    cell.getRow().reformat();
+                    seleccionar_supervisor(rowData.id)
+                }
             },
             {
                 title: "Región", field: "region", headerHozAlign: "center", headerSort: false, width: 100, hozAlign: "center", headerFilter: "list",
                 headerFilterParams: {
                     valuesLookup: true, clearable: true // se auto genera a partir de los valores únicos de la columna
-                },
+                }, cellClick: function (e, cell) {
+                    // Alternar estado de seleccionado
+                    let rowData = cell.getRow().getData();
+                    rowData.seleccionado = !rowData.seleccionado;
+                    cell.getRow().reformat();
+                    seleccionar_supervisor(rowData.id)
+                }
             },
             {
                 title: "Habilitado",
@@ -151,7 +209,7 @@ async function consultar_informacion(params) {
 
                                         // Habilitar botón editar
                                         const otherRowEl = otherRow.getElement();
-                                        const otherBtn = otherRowEl.querySelector("button");
+                                        const otherBtn = otherRowEl.querySelector("button.btn-warning");
                                         if (otherBtn) {
                                             otherBtn.disabled = false;
                                             $(otherBtn).popover('dispose');
@@ -182,7 +240,7 @@ async function consultar_informacion(params) {
                             habilitado: 1
                         });
 
-                        const editBtn = cell.getRow().getElement().querySelector("button");
+                        const editBtn = cell.getRow().getElement().querySelector("button.btn-warning");
                         if (editBtn) {
                             editBtn.disabled = true;
                             editBtn.setAttribute("data-toggle", "popover");
@@ -587,4 +645,44 @@ function mostrar_toast(tipo, titulo, mensaje) {
         toast: true,
         position: 'top-end',
     });
+}
+
+async function mensaje_eliminar() {
+
+    if (seleccionados.length === 0) {
+        mostrar_toast('warning', 'Inventario TI', 'Por favor, selecciona al menos un supervisor para continuar')
+
+    } else {
+        mostrar_alert('warning', `¿Está seguro de eliminar ${seleccionados.length} supervisor(es)?`, false, eliminar_supervisor);
+    }
+}
+
+async function eliminar_supervisor() {
+    let model = {
+        accion: 5,
+        id: seleccionados
+    }
+
+    let server = await server_supervisor(model);
+
+    if (typeof server.resultado === "string") {
+        mostrar_toast('error', 'Error', server.resultado, 4000)
+    } else if (server.resultado) {
+        mostrar_toast('success', '¡Éxito!', 'Supervisor(es) eliminado(s) correctamente')
+        consultar_informacion();
+    } else {
+        mostrar_toast('error', 'Error', 'Fallo al conectar');
+    }
+    deseleccionar_todos()
+}
+
+function deseleccionar_todos() {
+    //  Resetear propiedad "seleccionado"
+    datos.forEach(d => d.seleccionado = false);
+
+    //  Limpiar el array de seleccionados
+    seleccionados = [];
+
+    //  Forzar re-renderizado de todas las filas para reflejar los íconos
+    table.getRows().forEach(row => row.reformat());
 }
