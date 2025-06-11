@@ -25,7 +25,7 @@ function registrar_historico($valores)
     if (isset($valores->datos) && is_array($valores->datos)) {
         for ($i = 0; $i < count($valores->datos); $i++) {
             $datos = $valores->datos[$i];
-            $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro) 
+            $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro, estatus) 
             VALUES ('$fecha_evento',
                     '$valores->usuario_sesion', 
                     '$valores->evento', 
@@ -39,7 +39,8 @@ function registrar_historico($valores)
                     '$datos->fk_marca', 
                     '$datos->modelo', 
                     '$datos->tag', 
-                    '$datos->fecha_entrega')";
+                    '$datos->fecha_entrega',
+                    '$datos->estatus')";
             $query = mysqli_query($con, $sql);
             $resultados[] = $query;
             
@@ -50,7 +51,7 @@ function registrar_historico($valores)
     } elseif (isset($valores->datos) && is_object($valores->datos)) {
         $datos = $valores->datos;
         $fecha_entrega = !empty($datos->fecha_entrega) ? date("Y-m-d H:i:s", strtotime($datos->fecha_entrega)) : date("Y-m-d H:i:s");
-        $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro) 
+        $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro, estatus) 
         VALUES ('$fecha_evento',
         '$valores->usuario_sesion', 
         '$valores->evento', 
@@ -64,7 +65,8 @@ function registrar_historico($valores)
         '$datos->marca', 
         '$datos->modelo', 
         '$datos->tag', 
-        '$fecha_entrega')";
+        '$datos->fecha_entrega'),
+        '$datos->estatus'";
         //var_dump($sql);
         $query2 = mysqli_query($con, $sql);
         return $query2 ? true : false;

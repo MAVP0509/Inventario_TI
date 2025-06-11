@@ -328,7 +328,8 @@ function traspaso($valores)
                     fk_marca, 
                     modelo,
                     tag, 
-                    fecha_entrega 
+                    fecha_entrega,
+                    estatus 
                 FROM inventario_ti_sur 
                 WHERE 
                     id IN ($ids)";
@@ -353,7 +354,7 @@ function traspaso($valores)
         return ['anterior' => $datos, 
                 'nuevo' => $nuevo];
     } else {
-        $sql = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, modelo, tag, fecha_entrega FROM inventario_ti_sur WHERE id = '$valores->id'";
+        $sql = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, modelo, tag, fecha_entrega, estatus FROM inventario_ti_sur WHERE id = '$valores->id'";
         $query = mysqli_query($con, $sql);
         $datos = [];
         while ($fila = mysqli_fetch_assoc($query)) {
