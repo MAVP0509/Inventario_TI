@@ -753,7 +753,7 @@ function resguardo() {
         selectId: 'select-usu',
         tabla: 'cat_usuarios',
         campo: 'nombre',
-        placeholder: 'Selecione un usuario',
+        placeholder: 'Seleccione un usuario',
         dropdownParent: '#mdl-res',
         tags: false
     });
@@ -762,7 +762,7 @@ function resguardo() {
         selectId: 'select-region',
         tabla: 'supervisor',
         campo: 'region',
-        placeholder: 'Selecione una región',
+        placeholder: 'Seleccione una región',
         dropdownParent: '#mdl-res',
         tags: false
     });
