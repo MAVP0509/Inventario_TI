@@ -474,7 +474,6 @@ async function crear_registro() {
 
 }
 
-let select_traspaso = "";
 async function traspasos() {
     let model = {
         accion: 6,
@@ -483,20 +482,18 @@ async function traspasos() {
         usuario: $('#mdl-usuario').val(),
     }
 
-    // await registrar_historico('Anterior traspaso', response.anterior);
-
     let server = await server_inventario(model);
 
-    if (Array.isArray(server.resultado)) {
+    if (server.resultado) {
         seleccionar = []
         consultar_informacion();
         $('#mdl-traspaso').modal('hide')
-        await registrar_historico('Generarción de traspaso', server.resultado.datos);
+        await registrar_historico('Anterior traspaso', server.resultado.anterior);
+        await registrar_historico('Generarción de traspaso', server.resultado.nuevo);
         mostrar_alerta('success', '¡Traspaso exitoso!', 'El traspaso se ha realizado correctamente');
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo realizar el traspaso. Inténtalo nuevamente.');
     }
-
 }
 
 async function mostrar_traspaso() {

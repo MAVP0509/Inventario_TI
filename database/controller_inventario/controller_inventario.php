@@ -1,6 +1,4 @@
 <?php
-ini_set('display_errors', 0); // Opcional para ocultar en producción
-error_reporting(E_ERROR);
 header('Content-Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
 
@@ -315,10 +313,12 @@ function verificar_nuevos_id($valor)
 
 function traspaso($valores)
 {
+    
     include("../conexion.php");
     $fecha = date('Y-m-d H:i:s');
     $usuario = '5';
     $datos = [];
+    $nuevo = [];
     if (is_array($valores->id)) {
         $ids = implode(",", array_map('intval', $valores->id));
         $sql = "SELECT num_serie, 
@@ -332,42 +332,26 @@ function traspaso($valores)
                 FROM inventario_ti_sur 
                 WHERE 
                     id IN ($ids)";
-        /* $sql = "SELECT num_serie, 
-        usuario.nombre as usuario, 
-        usuario.id as fk_usuario,
-		zona, ubicacion, af,
-        cat_rubro.rubro,
-        cat_tipo.tipo, 
-        cat_marca.marca, 
-        modelo,
-        tag, 
-        fecha_entrega 
-        FROM inventario_ti_sur 
-		LEFT JOIN cat_rubro on cat_rubro.id = inventario_ti_sur.fk_rubro
-		LEFT JOIN cat_tipo on cat_tipo.id = inventario_ti_sur.fk_tipo
-		LEFT JOIN cat_marca on cat_marca.id = inventario_ti_sur.fk_marca
-		LEFT JOIN usuario on usuario.id = inventario_ti_sur.fk_usuario
-		where inventario_ti_sur.id IN ($ids)"; */
+        
         $query = mysqli_query($con, $sql);
 
-        
         while ($fila = mysqli_fetch_assoc($query)) {
             array_push($datos, $fila);
         }
-/*         $Usuarios_Old = [];
-        for ($i = 0; $i < count($datos); $i++) {
-            array_push($Usuarios_Old,$datos[$i]);
-        } */
+
         if ($valores->estatus == 'Bodega') {
             $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$usuario', fecha_entrega = '$fecha' WHERE id IN ($ids)";
         } else {
             $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$valores->usuario', fecha_entrega = '$fecha' WHERE id IN ($ids)";
         }
-
-        // var_dump($sql_datos);
         mysqli_query($con, $sql_datos);
-        return ['datos' => $datos, 
-                'anterior' => $query];
+        $query_nuevo = mysqli_query($con, $sql);
+        while ($fila = mysqli_fetch_assoc($query_nuevo)) {
+            array_push($nuevo, $fila);
+        }
+        // var_dump($sql_datos);
+        return ['anterior' => $datos, 
+                'nuevo' => $nuevo];
     } else {
         $sql = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, modelo, tag, fecha_entrega FROM inventario_ti_sur WHERE id = '$valores->id'";
         $query = mysqli_query($con, $sql);
