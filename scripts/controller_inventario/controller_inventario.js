@@ -220,7 +220,7 @@ async function mdl_editar(params) {
         const element = datos[i];
         if (element.id_equipo === params.id_equipo) {
             selecreg = element;
-            //console.log(selecreg)
+            console.log(selecreg)
             break;
         }
     }
@@ -268,6 +268,17 @@ async function mdl_editar(params) {
     })
 
     await general_select2({
+        selectId: 'inp-zona',
+        tabla: 'inventario_ti_sur',
+        campo: 'zona',
+        placeholder: 'Selecciona una zona',
+        dropdownParent: '#mdl-inventario',
+        tags: true,
+        popoverTitle: "Descripción",
+        popoverContent: "Zona operativa donde se ubica el activo."
+    });
+
+    await general_select2({
         selectId: 'inp-usuario',
         tabla: 'cat_usuarios',
         campo: 'nombre',
@@ -275,7 +286,8 @@ async function mdl_editar(params) {
         dropdownParent: '#mdl-inventario',
     })
 
-    document.getElementById("inp-zona").value = selecreg.zona;
+    rellenar_select(selecreg.zona, "inp-zona")
+    //document.getElementById("inp-zona").value = selecreg.zona;
     rellenar_select(selecreg.rubro, "inp-rubro")
     document.getElementById("inp-af").value = selecreg.af;
     rellenar_select(selecreg.tipo, "inp-tipo")
@@ -301,11 +313,16 @@ async function editar_registro(params) {
         "inp-tipo",
         "inp-ubicacion",
     ];
+    let user = $("#inp-usuario").val().trim()
+    if (user === "") {
+        user = "5"
+    }
 
     let model = {
         accion: 1,
         id: selecreg.id_equipo,
-        zona: $("#inp-zona").val().trim(),
+        zona: $("#inp-zona").select2('data')[0].text,
+        //zona: $("#inp-zona").val().trim(),
         rubro: $("#inp-rubro").val().trim(),
         af: $("#inp-af").val().trim(),
         tipo: $("#inp-tipo").val().trim(),
@@ -314,7 +331,7 @@ async function editar_registro(params) {
         num_serie: $("#inp-num-serie").val().trim().toUpperCase(),
         ubicacion: $("#inp-ubicacion").val().trim(),
         tag: $("#inp-tag").val().trim(),
-        usuario: $("#inp-usuario").val().trim(),
+        usuario: user,
         //posicion: $("#edi-posicion").select2('data')[0].text,
         fecha_entrega: $("#inp-fecha-entrega").val()
     }
@@ -393,6 +410,17 @@ function mdl_nvo_registro() {
     })
 
     general_select2({
+        selectId: 'inp-zona',
+        tabla: 'inventario_ti_sur',
+        campo: 'zona',
+        placeholder: 'Selecciona una zona',
+        dropdownParent: '#mdl-inventario',
+        tags: true,
+        popoverTitle: "Descripción",
+        popoverContent: "Zona operativa donde se ubica el activo."
+    });
+
+    general_select2({
         selectId: 'inp-usuario',
         tabla: 'cat_usuarios',
         campo: 'nombre',
@@ -436,7 +464,7 @@ async function crear_registro() {
     // Crear el modelo con los datos del formulario
     let model = {
         accion: 0,
-        zona: $("#inp-zona").val().trim(),
+        zona: $("#inp-zona").select2('data')[0].text,
         rubro: $("#inp-rubro").val().trim(),
         af: $("#inp-af").val().trim(),
         tipo: $("#inp-tipo").val().trim(),
@@ -545,20 +573,6 @@ async function confirmar_eliminacion() {
     if (seleccionar.length === 0) {
         mostrar_alerta('error', 'Error', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
     } else {
-        /* Swal.fire({
-            title: '¿Está seguro de eliminarlo?',
-            text: "Esta acción no se puede deshacer.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                desactivar_registro(); // Llama a la función para eliminar el registro
-            }
-        }); */
         mostrar_alert('warning', `¿Está seguro de eliminar ${seleccionar.length} activos(s)?`, false, desactivar_registro)
     }
 }
@@ -717,6 +731,13 @@ function resguardo() {
     $('#select-usu').val(null).trigger('change');
     $('#select-region').val(null).trigger('change');
 
+    $collapse = $('#collapse-resguardo');
+    $collapse.slideUp();
+    $collapse.closest('.card').addClass('collapsed-card');
+     $collapse.closest('.card')
+        .find('[data-card-widget="collapse"] i')
+        .removeClass('fa-minus')
+        .addClass('fa-plus');
 
     $(document).ready(function () {
         let hoy = new Date().toISOString().split('T')[0];
@@ -727,7 +748,7 @@ function resguardo() {
         selectId: 'select-usu',
         tabla: 'cat_usuarios',
         campo: 'nombre',
-        placeholder: 'Selecione un usuario',
+        placeholder: 'Seleccione un usuario',
         dropdownParent: '#mdl-res',
         tags: false
     });
@@ -736,7 +757,7 @@ function resguardo() {
         selectId: 'select-region',
         tabla: 'supervisor',
         campo: 'region',
-        placeholder: 'Selecione una región',
+        placeholder: 'Seleccione una región',
         dropdownParent: '#mdl-res',
         tags: false
     });

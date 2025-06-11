@@ -25,13 +25,14 @@ print(json_encode($respuesta_servidor)); //? envía la respuesta de la base de d
 function insertar_marca($valores)
 {
     include("../conexion.php");
-    $sql = "INSERT INTO cat_marca(marca) VALUES ('$valores->marca');";
+    $sql = 'INSERT INTO cat_marca(marca) VALUES ("' . $valores->marca . '")';
+    $SQLStatement = "CALL pInsertarCatalogo('$sql','CAT_Marca')";
 
     $sql_val_marca = "SELECT * FROM cat_marca WHERE marca = '$valores->marca'";
     if (mysqli_query($con, $sql_val_marca)->num_rows > 0) {   //Validación si la marca ya existe
         return "Esta marca ya existe";
     } else {
-        return mysqli_query($con, $sql);
+        return mysqli_query($con, $SQLStatement);
     }
 }
 
