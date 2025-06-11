@@ -37,7 +37,7 @@ function server_inventario02(model) {
                     respuesta_historico = response
                 } catch (error) {
                     reject(error)
-                    console.log(error);
+                    //console.log(error);
                 }
             }
         })

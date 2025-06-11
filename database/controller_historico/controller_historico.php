@@ -23,7 +23,7 @@ function registrar_historico($valores)
     //$datos = [];
     //var_dump($valores);
     if (isset($valores->datos) && is_array($valores->datos)) {
-         for ($i=0; $i < count($valores->datos); $i++) { 
+        for ($i = 0; $i < count($valores->datos); $i++) {
             $datos = $valores->datos[$i];
             $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro) 
             VALUES ('$fecha_evento',
@@ -40,22 +40,14 @@ function registrar_historico($valores)
                     '$datos->modelo', 
                     '$datos->tag', 
                     '$datos->fecha_entrega')";
-            //var_dump($sql);
             $query = mysqli_query($con, $sql);
             $resultados[] = $query;
+            
         }
-            //var_dump($sql);
-        return $resultados; 
-        // !No descomentar hasta hacer pruebas con los inserts xd
-        // foreach ($valores->datos as $datos) {
-        //     $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, cargo, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro) 
-        //     VALUES ('$fecha_evento', '$valores->usuario_sesion', '$valores->evento', '$datos->num_serie', '$datos->usuario', '$datos->cargo', '$datos->zona', '$datos->ubicacion', '$datos->af', '$datos->rubro', '$datos->tipo', '$datos->marca', '$datos->modelo', '$datos->tag', '$datos->fecha_registro')";
-        //     $query = mysqli_query($con, $sql);
-        //     $resultados[] = $query ? true : false;
-        // }
-        // return $resultados;
+        //var_dump($sql);
+        return $resultados;
 
-    } elseif (isset($valores->datos) && is_object($valores->datos)){
+    } elseif (isset($valores->datos) && is_object($valores->datos)) {
         $datos = $valores->datos;
         $fecha_entrega = !empty($datos->fecha_entrega) ? date("Y-m-d H:i:s", strtotime($datos->fecha_entrega)) : date("Y-m-d H:i:s");
         $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro) 

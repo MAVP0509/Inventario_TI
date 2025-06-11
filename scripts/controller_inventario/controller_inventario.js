@@ -16,7 +16,7 @@ function server_inventario(model) {
                     respuesta = response
                 } catch (error) {
                     reject(error)
-                    console.log(reject);
+                    //console.log(reject);
                 }
             }
         })
@@ -66,7 +66,7 @@ let table
 
 let seleccionar = [];
 
-async function consultar_informacion(params) {
+async function consultar_informacion() {
     let model = {
         accion: 2
     };
@@ -123,14 +123,13 @@ async function consultar_informacion(params) {
     }
 
     async function selecionar_registro(params) {
-
         let index = seleccionar.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
         if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
             seleccionar.push(params); // Añade uno o más elementos al final de un array
         } else {
             seleccionar.splice(index, 1);
         }
-        console.log(seleccionar)
+        // console.log(seleccionar)
     }
 
     try {
@@ -503,8 +502,7 @@ async function crear_registro() {
 
 }
 
-
-
+let select_traspaso = "";
 async function traspasos() {
     let model = {
         accion: 6,
@@ -513,15 +511,15 @@ async function traspasos() {
         usuario: $('#mdl-usuario').val(),
     }
 
-    await registrar_historico('Anterior traspaso', server.resultado);
+    // await registrar_historico('Anterior traspaso', response.anterior);
 
     let server = await server_inventario(model);
-    console.log(model)
+
     if (Array.isArray(server.resultado)) {
         seleccionar = []
         consultar_informacion();
         $('#mdl-traspaso').modal('hide')
-        await registrar_historico('Generarción de traspaso', server.resultado);
+        await registrar_historico('Generarción de traspaso', server.resultado.datos);
         mostrar_alerta('success', '¡Traspaso exitoso!', 'El traspaso se ha realizado correctamente');
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo realizar el traspaso. Inténtalo nuevamente.');
@@ -530,10 +528,10 @@ async function traspasos() {
 }
 
 async function mostrar_traspaso() {
-
     if (seleccionar.length == 0) {
-        mostrar_alerta('error', 'Error', 'Selecione al menos un usuario. Inténtalo nuevamente.')
+        mostrar_alerta('error', 'Error', 'Selecione al menos un activo. Inténtalo nuevamente.')
     } else {
+
         await general_select2({
             selectId: 'mdl-estado',
             tabla: 'inventario_ti_sur',
@@ -562,7 +560,7 @@ async function desactivar_registro() {
     };
 
     let response = await server_inventario(model);
-    //console.log(response)
+    console.log(response)
     if (Array.isArray(response.resultado)) {
         await registrar_historico('Eliminación de registro', response.resultado);
         mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
@@ -824,7 +822,7 @@ async function descargar_excel(params) {
     ruta.resultado = ruta.resultado.replace(/\.xlsx$/i, '.pdf');
 
     ruta.resultado = ruta.resultado.replace("C:/xampp/htdocs", "http://" + dominio + ":" + puerto)
-    console.log(ruta.resultado)
+    // console.log(ruta.resultado)
     window.open(ruta.resultado, '_blank');
 }
 
