@@ -310,6 +310,7 @@ function consultar_distintos($tabla, $campo)
             $sql = "SELECT DISTINCT `$campo` from `$tabla` WHERE `$campo` <> 'Baja';";
             break;
         case "zona":
+        case "evento":
             $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE  `$campo` <> 'NA'";
             break;
         default:

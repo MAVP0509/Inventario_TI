@@ -43,11 +43,9 @@ function registrar_historico($valores)
                     '$datos->estatus')";
             $query = mysqli_query($con, $sql);
             $resultados[] = $query;
-            
         }
         //var_dump($sql);
         return $resultados;
-
     } elseif (isset($valores->datos) && is_object($valores->datos)) {
         $datos = $valores->datos;
         $fecha_entrega = !empty($datos->fecha_entrega) ? date("Y-m-d H:i:s", strtotime($datos->fecha_entrega)) : date("Y-m-d H:i:s");
@@ -94,8 +92,13 @@ function consultar_historico($valores)
             $sql .= " WHERE DATE(fecha_evento) BETWEEN '$valores->fecha_inicio' AND '$valores->fecha_fin'";
         }
     }
+    if ($valores->evento != "") {
+        $sql .= " AND evento = '$valores->evento'";
+    }
 
     $sql .= " ORDER BY fecha_evento DESC LIMIT 100";
+
+
     /* var_dump($sql); */
     $query = mysqli_query($con, $sql);
     $datos = [];

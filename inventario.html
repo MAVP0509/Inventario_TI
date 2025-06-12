@@ -80,25 +80,27 @@
                                 <div class="card-header">
                                     <h3 class="card-title"><i class="fa-solid fa-table"></i> Inventario</h3>
                                     <div class="d-flex justify-content-end">
-                                                <button type="button" class="btn bg-navy rounded icon mr-3" onclick="mostrar_traspaso()">
-                                                    <i class="fa-solid fa-boxes-packing"></i> Traspaso
-                                                </button>
-                                                <button type="button" onclick="resguardo()"
-                                                    class="btn btn-info icon rounded mr-3" style="margin-left: 10px;"
-                                                    href="#"><i class="fa-solid fa-file-export fa-lg"></i> Resguardo
-                                                </button>
-                                                <button type="button" class="btn btn-success rounded mr-3 icon"
-                                                    onclick="mdl_nvo_registro()"><i class="fa-solid fa-plus fa-lg"></i> Nuevo
-                                                </button>
-                                                <button type="button" style="text-align: center"
-                                                    class="btn btn-danger rounded icon mr-3"
-                                                    onclick="confirmar_eliminacion()"><i
-                                                        class="fa-solid fa-trash-can fa-lg"></i> Eliminar
-                                                </button>
-                                                <button type="button" class="btn btn-light rounded mr-3 icon" onclick="consultar_num_serie()">
-                                                    <i class="fa-solid fa-clock-rotate-left"></i> Historial
-                                                </button>
-                                            </div><br>
+                                        <button type="button" class="btn bg-navy rounded icon mr-3"
+                                            onclick="mostrar_traspaso()">
+                                            <i class="fa-solid fa-boxes-packing"></i> Traspaso
+                                        </button>
+                                        <button type="button" onclick="resguardo()"
+                                            class="btn btn-info icon rounded mr-3" style="margin-left: 10px;"
+                                            href="#"><i class="fa-solid fa-file-export fa-lg"></i> Resguardo
+                                        </button>
+                                        <button type="button" class="btn btn-success rounded mr-3 icon"
+                                            onclick="mdl_nvo_registro()"><i class="fa-solid fa-plus fa-lg"></i> Nuevo
+                                        </button>
+                                        <button type="button" style="text-align: center"
+                                            class="btn btn-danger rounded icon mr-3"
+                                            onclick="confirmar_eliminacion()"><i
+                                                class="fa-solid fa-trash-can fa-lg"></i> Eliminar
+                                        </button>
+                                        <button type="button" class="btn btn-light rounded mr-3 icon"
+                                            onclick="consultar_num_serie()">
+                                            <i class="fa-solid fa-clock-rotate-left"></i> Historial
+                                        </button>
+                                    </div><br>
                                 </div>
                                 <!--Card Body-->
                                 <div class="card-body">
@@ -136,7 +138,7 @@
                                                 <span class="input-group-text"><i
                                                         class="fa-solid fa-desktop"></i></span>
                                             </div>
-                                            <select class="form-control select" id="inp-rubro" ></select>
+                                            <select class="form-control select" id="inp-rubro"></select>
                                             <div class="invalid-feedback">Por favor, seleccione un rubro</div>
                                         </div>
                                         <h6>Tipo de dispositivo</h6>
@@ -265,8 +267,8 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger icon" data-dismiss="modal">Cerrar <i
                             class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
-                    <button type="button" class="btn btn-success icon" id="btn-mdl-inventario"
-                        onclick="">Guardar <i class="fa-solid fa-floppy-disk fa-lg"></i></button>
+                    <button type="button" class="btn btn-success icon" id="btn-mdl-inventario" onclick="">Guardar <i
+                            class="fa-solid fa-floppy-disk fa-lg"></i></button>
                 </div>
             </div>
         </div>
@@ -274,7 +276,8 @@
 
 
     <!--Modal resguardo -->
-    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-res" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-res" role="dialog" data-backdrop="static"
+        data-keyboard="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -333,8 +336,9 @@
     </div>
 
     <!--Modal de historial-->
-    <div class="modal fade" id="modal-historial" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal fade" id="modal-historial" tabindex="-1" role="dialog" data-backdrop="static"
+        data-keyboard="false">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Historial del activo</h5>
@@ -347,13 +351,18 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <form id="form-historial">
-                                    <div class="form-group">
-                                        <label for="his-num-serie">Número de serie</label>
+                                    <label for="his-num-serie">Número de serie</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i
+                                                    class="fa-solid fa-square-binary"></i></span>
+                                        </div>
                                         <input type="text" class="form-control" id="his-num-serie" name="mdl-hst"
                                             placeholder="Ingrese un número de serie">
                                     </div>
-                                    <div class="form-group">
-                                        <label for="rango-fecha">Rango de fecha</label>
+                                    <label for="rango-fecha">Rango de fecha</label>
+                                    <div class="input-group">
+
                                         <div class="input-group">
                                             <div class="input-group-prepend"><span class="input-group-text"><i
                                                         class="fa-solid fa-calendar-days"></i></span></div>
@@ -362,8 +371,15 @@
                                         </div>
 
                                     </div>
-                                    <button type="button" class="btn btn-primary" id="btn-buscar"
-                                        onclick="mostrar_historial()">Buscar</button>
+                                    <label for="select-evento">Evento</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fa-solid fa-filter"></i></span>
+                                        </div>
+                                        <select class="form-control select" id="select-evento"></select>
+                                    </div></br>
+                                    <button type="button" class="btn btn-primary icon" id="btn-buscar"
+                                        onclick="mostrar_historial()"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
                                 </form>
                             </div>
                             <div class="col-md-8">
@@ -389,7 +405,7 @@
     </div>
     <!-- Modal traspaso -->
     <div class="modal fade" id="mdl-traspaso" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog modal-dialog-scrollable" >
+        <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Traspaso de activo</h5>
@@ -400,16 +416,18 @@
                 <div class="modal-body">
                     <label for="mdl-estado">Estado del activo</label>
                     <div class="input-group">
-                        <div class="input-group-prepend"><span class="input-group-text"><i class="fa-solid fa-circle-info"></i></span></div>
+                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                    class="fa-solid fa-circle-info"></i></span></div>
                         <select class="form-control select" id="mdl-estado"></select>
                     </div>
                     <label for="mdl-usuario">Usuario a traspasar</label>
                     <div class="input-group">
-                        <div class="input-group-prepend"><span class="input-group-text"><i class="fa-solid fa-user"></i></span></div>
+                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                    class="fa-solid fa-user"></i></span></div>
                         <select class="form-control select" id="mdl-usuario"></select>
                     </div>
                     <div>
-                        
+
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -422,7 +440,7 @@
                 </div>
             </div>
         </div>
-    </div> 
+    </div>
 
 </body>
 
