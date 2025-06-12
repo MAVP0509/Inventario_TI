@@ -75,7 +75,6 @@ function registrar_historico($valores)
     }
 }
 
-
 function consultar_historico($valores)
 {
     include("../conexion.php");
