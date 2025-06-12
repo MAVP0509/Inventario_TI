@@ -760,6 +760,7 @@ async function resguardo(userSelect) {
     }
 
     $('#select-usu').val(null).trigger('change');
+    $('#select-usu').prop('disabled', false)
     $('#select-region').val(null).trigger('change');
 
     $collapse = $('#collapse-resguardo');
@@ -792,8 +793,11 @@ async function resguardo(userSelect) {
         dropdownParent: '#mdl-res',
         tags: false
     });
-    //rellenar_select(userSelect, 'select-usu')
-    $('#select-usu').val(userSelect).trigger('change')
+    if(userSelect){
+        $('#select-usu').val(userSelect).trigger('change')
+        $('#select-usu').prop('disabled', true)
+    }
+    
     console.log(userSelect)
 
     $("#mdl-res").modal('show')
