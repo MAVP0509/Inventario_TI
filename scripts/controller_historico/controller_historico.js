@@ -170,7 +170,8 @@ async function consultar_historico() {
             { title: "Zona", field: "zona" },
             { title: "Ubicación del dispositivo", field: "ubicacion" },
             { title: "Nombre del usuario", field: "nombre" },
-            { title: "Numero de serie", field: "num_serie", headerMenu: [
+            {
+                title: "Numero de serie", field: "num_serie", headerMenu: [
                     {
                         label: "Fijar columna",
                         action: function (e, column) {
@@ -194,7 +195,8 @@ async function consultar_historico() {
             { title: "Activo fijo", field: "af" },
             { title: "TAG", field: "tag" },
             { title: "Fecha de registro", field: "fecha_registro" },
-            { title: "Estatus", field: "estatus", headerMenu: [
+            {
+                title: "Estatus", field: "estatus", headerMenu: [
                     {
                         label: "Fijar columna",
                         action: function (e, column) {
@@ -232,7 +234,7 @@ async function registrar_historico(evento, params) {
     //console.log(model);
 }
 
-function consultar_num_serie() {
+async function consultar_num_serie() {
     let input = document.getElementsByName('mdl-hst')
     for (let i = 0; i < input.length; i++) {
         if (input[i].id != "rango-fecha") {
@@ -241,12 +243,22 @@ function consultar_num_serie() {
         }
     }
 
+    await general_select2({
+        selectId: 'select-evento',
+        tabla: 'historico',
+        campo: 'evento',
+        placeholder: 'Selecione un evento',
+        dropdownParent: '#modal-historial',
+        tags: false,
+    })
+
     $('#his-versiones').empty();
     $('#resultado-historico').addClass('d-none');
     $("#modal-historial").modal('show')
 }
 
 async function mostrar_historial() {
+    //let evento =  $("#select-evento").select2('data')[0].text
     const validacion = ["his-num-serie"];
 
     if (!validar_campo(validacion)) {
@@ -260,13 +272,14 @@ async function mostrar_historial() {
         num_serie: $('#his-num-serie').val().trim(),
         fecha_inicio: fecha_inicio,
         fecha_fin: fecha_fin,
+        evento: $("#select-evento").select2('data')[0].text,
     };
 
     let respuesta_historico = await server_historico(model);
 
     const contenedor = $('#his-versiones');
     contenedor.empty();
-
+    idCollapse = 0
     if (respuesta_historico && respuesta_historico.resultado && respuesta_historico.resultado.length > 0) {
         respuesta_historico.resultado.forEach(registro => {
             var fecha = moment(registro.fecha_evento).local('es').format('D [de] MMMM [de] YYYY, h:mm:ss a');
@@ -301,11 +314,11 @@ async function mostrar_historial() {
                     <strong>${fecha}</strong><br>
                     <span>${registro.usuario_sesion}</span><br>
                     <em>${registro.evento}</em><br>
-                    <button class="btn btn-sm btn-link p-0 mt-2" data-toggle="collapse" data-target="#collapseId">
+                    <button class="btn btn-sm btn-link p-0 mt-2" data-toggle="collapse" data-target="#collapseId${idCollapse}">
                         Más información
                     </button>
 
-                    <div class="collapse mt-2" id="collapseId">
+                    <div class="collapse mt-2" id="collapseId${idCollapse}">
                         <ul class="mb-0">
                             ${datosTexto}
                         </ul>
@@ -313,6 +326,7 @@ async function mostrar_historial() {
                 </div>
             `;
             contenedor.append(item);
+            idCollapse++
         });
 
         $('#resultado-historico').removeClass('d-none');
@@ -357,4 +371,53 @@ function validar_campo(campos) {
     });
 
     return valido;
+}
+
+
+//TODO Funciones de los Select2
+
+async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags, popoverTitle, popoverContent }) {
+    //try {
+    const response = await server_inventario02({
+        accion: 5,
+        tabla: tabla,
+        campo: campo
+    });
+
+    //console.log('Respuesta del servidor para select2:', response);
+
+    const opciones = response.resultado.map(item => ({
+        id: item.id || '',
+        text: item[campo] || ''
+    }));
+
+    const $select = $('#' + selectId);
+    $select.empty().append(new Option('', '', false, false));
+
+    $select.select2({
+        theme: 'bootstrap4',
+        allowClear: true,
+        placeholder: placeholder,
+        tags: tags,
+        dropdownParent: $(dropdownParent),
+        data: opciones
+    });
+
+    $select.val(null).trigger('change');
+
+    //  Si se pasan datos de popover, aplicarlo
+    if (popoverTitle && popoverContent) {
+        const $select2Container = $select.next('.select2-container');
+
+        $select2Container.attr({
+            'data-toggle': 'popover',
+            'data-trigger': 'hover',
+            'data-html': 'true',
+            'title': popoverTitle,
+            'data-content': popoverContent
+        });
+
+        $select2Container.popover();
+    }
+
 }
