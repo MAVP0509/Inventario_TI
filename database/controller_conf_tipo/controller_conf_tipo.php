@@ -26,12 +26,12 @@ function insertar_tipo($valores){
     include("../conexion.php");
     $sql = 'INSERT INTO cat_tipo(tipo) VALUES ("' . $valores->tipo . '")';
 
-    $SQLStatement = "CALL pInsertarCatalogo('$sql','CAT_Tipo')";
+    //$SQLStatement = "CALL pInsertarCatalogo('$sql','CAT_Tipo')";
     $sql_val_tipo = "SELECT * FROM cat_tipo WHERE tipo = '$valores->tipo'";
     if (mysqli_query($con, $sql_val_tipo)->num_rows > 0) {   //*Validamos si ya existe el tipo
         return "Este tipo ya existe";
     } else {
-        return mysqli_query($con, $SQLStatement);
+        return mysqli_query($con, $sql);
     }
 }
 
