@@ -112,9 +112,9 @@ async function consultar_historico() {
             }
         },
         columns: [
-            { title: "ID", field: "id" },
+            { title: "ID", field: "id", headerHozAlign: "center" },
             {
-                title: "Fecha del evento", field: "fecha_evento", headerMenu: [
+                title: "Fecha del evento", field: "fecha_evento", headerHozAlign: "center", headerFilter: "input", headerMenu: [
                     {
                         label: "Fijar columna",
                         action: function (e, column) {
@@ -132,7 +132,11 @@ async function consultar_historico() {
                 ]
             },
             {
-                title: "Usuario del evento", field: "usuario_sesion", headerMenu: [
+                title: "Usuario del evento", field: "usuario_sesion", headerHozAlign: "center", headerFilter: "list",
+                headerFilterParams: {
+                    valuesLookup: true, clearable: true // se auto genera a partir de los valores únicos de la columna
+                },
+                headerMenu: [
                     {
                         label: "Fijar columna",
                         action: function (e, column) {
@@ -150,7 +154,11 @@ async function consultar_historico() {
                 ]
             },
             {
-                title: "Evento", field: "evento", headerMenu: [
+                title: "Evento", field: "evento", headerHozAlign: "center", headerFilter: "list",
+                headerFilterParams: {
+                    valuesLookup: true, clearable: true // se auto genera a partir de los valores únicos de la columna
+                },
+                headerMenu: [
                     {
                         label: "Fijar columna",
                         action: function (e, column) {
@@ -167,11 +175,11 @@ async function consultar_historico() {
                     }
                 ]
             },
-            { title: "Zona", field: "zona" },
-            { title: "Ubicación del dispositivo", field: "ubicacion" },
-            { title: "Nombre del usuario", field: "nombre" },
+            { title: "Zona", field: "zona", headerHozAlign: "center", headerFilter: "input" },
+            { title: "Ubicación del dispositivo", field: "ubicacion", headerHozAlign: "center", headerFilter: "input" },
+            { title: "Nombre del usuario", field: "nombre", headerHozAlign: "center", headerFilter: "input" },
             {
-                title: "Numero de serie", field: "num_serie", headerMenu: [
+                title: "Numero de serie", field: "num_serie", headerHozAlign: "center", headerFilter: "input", headerMenu: [
                     {
                         label: "Fijar columna",
                         action: function (e, column) {
@@ -188,15 +196,19 @@ async function consultar_historico() {
                     }
                 ]
             },
-            { title: "Rubro", field: "rubro" },
-            { title: "Tipo de dispositivo", field: "tipo" },
-            { title: "Modelo del dispositivo", field: "modelo" },
-            { title: "Marca del dispositivo", field: "marca" },
-            { title: "Activo fijo", field: "af" },
-            { title: "TAG", field: "tag" },
-            { title: "Fecha de registro", field: "fecha_registro" },
+            { title: "Rubro", field: "rubro", headerHozAlign: "center", headerFilter: "input" },
+            { title: "Tipo de dispositivo", field: "tipo", headerHozAlign: "center", headerFilter: "input" },
+            { title: "Modelo del dispositivo", field: "modelo", headerHozAlign: "center", headerFilter: "input" },
+            { title: "Marca del dispositivo", field: "marca", headerHozAlign: "center", headerFilter: "input" },
+            { title: "Activo fijo", field: "af", headerHozAlign: "center", headerFilter: "input" },
+            { title: "TAG", field: "tag", headerHozAlign: "center", headerFilter: "input" },
+            { title: "Fecha de registro", field: "fecha_registro", headerHozAlign: "center", headerFilter: "input" },
             {
-                title: "Estatus", field: "estatus", headerMenu: [
+                title: "Estatus", field: "estatus", headerFilter: "list",
+                headerFilterParams: {
+                    valuesLookup: true, clearable: true // se auto genera a partir de los valores únicos de la columna
+                },
+                headerMenu: [
                     {
                         label: "Fijar columna",
                         action: function (e, column) {
