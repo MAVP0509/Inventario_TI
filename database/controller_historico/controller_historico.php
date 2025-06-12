@@ -95,7 +95,7 @@ function consultar_historico($valores)
             $sql .= " WHERE DATE(fecha_evento) BETWEEN '$valores->fecha_inicio' AND '$valores->fecha_fin'";
         }
     }
-    if ($valores->evento != "") {
+    if (!empty($valores->evento)) {
         $sql .= " AND evento = '$valores->evento'";
     }
 
