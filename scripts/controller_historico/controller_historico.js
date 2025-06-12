@@ -53,6 +53,7 @@ async function consultar_historico() {
 
     const model = {
         accion: 0,
+        evento : ""
     };
 
     let response = await server_historico(model);
