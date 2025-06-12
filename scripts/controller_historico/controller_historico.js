@@ -95,7 +95,7 @@ async function consultar_historico() {
         locale: "es",
         data: dato,
         pagination: true,
-        paginationSize: 10,
+        paginationSize: 15,
         paginationSizeSelector: [5, 10, 15, 25, 35],
         movableColumns: true,
         paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
@@ -170,8 +170,7 @@ async function consultar_historico() {
             { title: "Zona", field: "zona" },
             { title: "Ubicación del dispositivo", field: "ubicacion" },
             { title: "Nombre del usuario", field: "nombre" },
-            {
-                title: "Numero de serie", field: "num_serie", headerMenu: [
+            { title: "Numero de serie", field: "num_serie", headerMenu: [
                     {
                         label: "Fijar columna",
                         action: function (e, column) {
@@ -195,6 +194,23 @@ async function consultar_historico() {
             { title: "Activo fijo", field: "af" },
             { title: "TAG", field: "tag" },
             { title: "Fecha de registro", field: "fecha_registro" },
+            { title: "Estatus", field: "estatus", headerMenu: [
+                    {
+                        label: "Fijar columna",
+                        action: function (e, column) {
+                            column.updateDefinition({ frozen: true });
+                            tabla.redraw(true);
+                        }
+                    },
+                    {
+                        label: "Desfijar columna",
+                        action: function (e, column) {
+                            column.updateDefinition({ frozen: false });
+                            tabla.redraw(true);
+                        }
+                    }
+                ]
+            },
         ],
         //layout: "fitColumns",
     });
@@ -268,7 +284,8 @@ async function mostrar_historial() {
                 marca: 'Marca',
                 modelo: 'Modelo',
                 af: 'AF',
-                tag: 'TAG'
+                tag: 'TAG',
+                estatus: 'Estatus'
             };
 
             let datosTexto = '';

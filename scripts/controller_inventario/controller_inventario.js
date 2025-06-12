@@ -516,7 +516,7 @@ async function traspasos() {
         seleccionar = []
         consultar_informacion();
         $('#mdl-traspaso').modal('hide')
-        await registrar_historico('Anterior traspaso', server.resultado.anterior);
+        await registrar_historico('Anterior asignación', server.resultado.anterior);
         await registrar_historico('Generarción de traspaso', server.resultado.nuevo);
         mostrar_alerta('success', '¡Traspaso exitoso!', 'El traspaso se ha realizado correctamente');
     } else {
