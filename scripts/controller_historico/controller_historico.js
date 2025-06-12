@@ -251,6 +251,14 @@ async function consultar_num_serie() {
         dropdownParent: '#modal-historial',
         tags: false,
     })
+    let opcionNueva = '20';
+    let opTexto = 'Todo';
+
+    // Crear la opción (selected = true, defaultSelected = true)
+    let nuevaOpcion = new Option(opTexto, opcionNueva, true, true);
+
+    // Agregar al select
+    $('#select-evento').prepend(nuevaOpcion).trigger('change');
 
     $('#his-versiones').empty();
     $('#resultado-historico').addClass('d-none');

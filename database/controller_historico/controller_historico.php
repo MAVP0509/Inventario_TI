@@ -49,11 +49,11 @@ function registrar_historico($valores)
         }
         //var_dump($sql);
         return $resultados;
-    } elseif (isset($valores->datos) && is_object($valores->datos)) { 
+    } elseif (isset($valores->datos) && is_object($valores->datos)) {
         $datos = $valores->datos;
         $fecha_entrega = !empty($datos->fecha_entrega) ? date("Y-m-d H:i:s", strtotime($datos->fecha_entrega)) : date("Y-m-d H:i:s");
-       $estatus = ($datos->fk_usuario == "5") ? 'Bodega' : 'Asignado';
-       $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro, estatus) 
+        $estatus = ($datos->fk_usuario == "5") ? 'Bodega' : 'Asignado';
+        $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro, estatus) 
         VALUES ('$fecha_evento',
         '$valores->usuario_sesion', 
         '$valores->evento', 
@@ -96,7 +96,9 @@ function consultar_historico($valores)
         }
     }
     if (!empty($valores->evento)) {
-        $sql .= " AND evento = '$valores->evento'";
+        if ($valores->evento != "Todo") {
+            $sql .= " AND evento = '$valores->evento'";
+        }
     }
 
     $sql .= " ORDER BY fecha_evento DESC LIMIT 100";
