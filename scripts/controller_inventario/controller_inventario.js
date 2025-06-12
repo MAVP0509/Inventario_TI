@@ -526,7 +526,7 @@ async function traspasos() {
 
 async function mostrar_traspaso() {
     if (seleccionar.length == 0) {
-        mostrar_alerta('error', 'Error', 'Selecione al menos un activo. Inténtalo nuevamente.')
+        mostrar_alerta('warning', 'Alerta', 'Selecione al menos un activo. Inténtalo nuevamente.')
     } else {
 
         await general_select2({
@@ -875,6 +875,4 @@ function myCallback(start, end) {
 
 
 }
-
-
 
