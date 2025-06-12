@@ -38,7 +38,7 @@ function insertar_datos($valores)
         $val_rubro = $valores->rubro;
     } else {
         $sql_rubro = "INSERT INTO cat_rubro(rubro) VALUES ('$rubro');";
-        // $SQLStatement = "CALL pInsertarCatalogo('$sql_rubro','CAT_Rubro')";
+        //$SQLStatement = "CALL pInsertarCatalogo('$sql_rubro','CAT_Rubro')";
         mysqli_query($con, $sql_rubro);
         $sql_ver_id_rubro = "SELECT id FROM cat_rubro WHERE rubro = '$rubro';";
         $idRub = mysqli_fetch_assoc(mysqli_query($con, $sql_ver_id_rubro));
@@ -96,23 +96,23 @@ function insertar_datos($valores)
         //var_dump($sql_num);
         $query_num = mysqli_query($con, $sql_num);
 
-        $sql = "INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, imei,estatus) 
+        /* $sql = "INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, imei,estatus) 
         VALUES ('$valores->zona', '$val_rubro','$val_af','$val_tipo','$val_marca','$valores->modelo', '$valores->num_serie', 
-        '$valores->ubicacion', '$val_tag', '$valores->usuario', '$registro', 'NA', '$val_estatus');";
+        '$valores->ubicacion', '$val_tag', '$valores->usuario', '$registro', 'NA', '$val_estatus');"; */
 
         $sql = 'INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, imei,estatus) 
         VALUES ("' . $valores->zona . '","' . $val_rubro . '","' . $val_af . '","' . $val_tipo . '","' . $val_marca . '","' . $valores->modelo . '","' . $valores->num_serie . '","' . $valores->ubicacion . '",
         "' . $val_tag . '","' . $valores->usuario . '","' . $registro . '","NA","' . $val_estatus . '")';
         //var_dump($sql);
-        $SQLStatement = "CALL pInsertarCatalogo('$sql','Insrt_Inventario')";
+        //$SQLStatement = "CALL pInsertarCatalogo('$sql','Insrt_Inventario')";
         if (mysqli_num_rows($query_num) > 0) {
             echo json_encode(["resultado" => false, "mensaje" => "Número de serie duplicado"]);
             exit;
         } else {
-            return mysqli_query($con, $SQLStatement);
+            return mysqli_query($con, $sql);
         }
     } else {
-        return mysqli_query($con, $SQLStatement);
+        return mysqli_query($con, $sql);
     }
 }
 
