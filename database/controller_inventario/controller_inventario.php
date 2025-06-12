@@ -31,6 +31,7 @@ function insertar_datos($valores)
     include("../conexion.php");
 
     $registro = date("Y-m-d H:i:s");
+    $datos = [];
 
     $rubro = verificar_nuevos_id($valores->rubro);
     $val_rubro;
@@ -104,15 +105,16 @@ function insertar_datos($valores)
         VALUES ("' . $valores->zona . '","' . $val_rubro . '","' . $val_af . '","' . $val_tipo . '","' . $val_marca . '","' . $valores->modelo . '","' . $valores->num_serie . '","' . $valores->ubicacion . '",
         "' . $val_tag . '","' . $valores->usuario . '","' . $registro . '","NA","' . $val_estatus . '")';
         //var_dump($sql);
+        $query = mysqli_query($con, $sql);
         //$SQLStatement = "CALL pInsertarCatalogo('$sql','Insrt_Inventario')";
         if (mysqli_num_rows($query_num) > 0) {
             echo json_encode(["resultado" => false, "mensaje" => "Número de serie duplicado"]);
             exit;
         } else {
-            return mysqli_query($con, $sql);
+            return $query;
         }
     } else {
-        return mysqli_query($con, $sql);
+        return $query;
     }
 }
 
@@ -121,6 +123,21 @@ function editar_datos($valores)
     include("../conexion.php");
 
     //$zona = 'Base Operativa Región Sur';
+    $sql_select = "SELECT num_serie, 
+                    fk_usuario, zona, ubicacion, af,
+                    fk_rubro,
+                    fk_tipo, 
+                    fk_marca, 
+                    modelo,
+                    tag, 
+                    fecha_entrega 
+                FROM inventario_ti_sur 
+                WHERE 
+                    id = '$valores->id'";
+
+    $query_select = mysqli_query($con, $sql_select);
+    $antes =  mysqli_fetch_assoc($query_select);
+
     $rubro = verificar_nuevos_id($valores->rubro);
     $val_rubro;
     if ($rubro === true) {
@@ -161,7 +178,18 @@ function editar_datos($valores)
     num_serie = '$valores->num_serie', ubicacion = '$valores->ubicacion', tag = '$valores->tag', fk_usuario = '$valores->usuario' WHERE id = '$valores->id';";
     //var_dump($sql);
     $result = mysqli_query($con, $sql);
-    return $result;
+
+    $sql_select_nuevo = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, modelo, tag, fecha_entrega 
+                         FROM inventario_ti_sur 
+                         WHERE id = '$valores->id'";
+    $query_select_nuevo = mysqli_query($con, $sql_select_nuevo);
+    $nuevo = mysqli_fetch_assoc($query_select_nuevo);
+
+    return [
+        'exito' => $result,
+        'anterior' => $antes,
+        'nuevo' => $nuevo
+    ];
 }
 
 function consultar_datos()
@@ -175,7 +203,6 @@ function consultar_datos()
     }
     return $array;
 }
-
 
 function desactivar_datos($valores)
 {
@@ -251,11 +278,6 @@ function consultar_para_resguardo($valores)
 
 
     return $datos;
-}
-
-function consultar_status()
-{
-    include("../conexion.php");
 }
 
 function consultar_distintos($tabla, $campo)
@@ -336,7 +358,6 @@ function consultar_distintos($tabla, $campo)
     return $datos;
 }
 
-
 function verificar_nuevos_id($valor)
 {
     if (ctype_digit($valor)) {
@@ -351,7 +372,7 @@ function verificar_nuevos_id($valor)
 
 function traspaso($valores)
 {
-    
+
     include("../conexion.php");
     $fecha = date('Y-m-d H:i:s');
     $usuario = '5';
@@ -366,12 +387,11 @@ function traspaso($valores)
                     fk_marca, 
                     modelo,
                     tag, 
-                    fecha_entrega,
-                    estatus 
+                    fecha_entrega 
                 FROM inventario_ti_sur 
                 WHERE 
                     id IN ($ids)";
-        
+
         $query = mysqli_query($con, $sql);
 
         while ($fila = mysqli_fetch_assoc($query)) {
@@ -384,15 +404,18 @@ function traspaso($valores)
             $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$valores->usuario', fecha_entrega = '$fecha' WHERE id IN ($ids)";
         }
         mysqli_query($con, $sql_datos);
+
         $query_nuevo = mysqli_query($con, $sql);
         while ($fila = mysqli_fetch_assoc($query_nuevo)) {
             array_push($nuevo, $fila);
         }
         // var_dump($sql_datos);
-        return ['anterior' => $datos, 
-                'nuevo' => $nuevo];
+        return [
+            'anterior' => $datos,
+            'nuevo' => $nuevo
+        ];
     } else {
-        $sql = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, modelo, tag, fecha_entrega, estatus FROM inventario_ti_sur WHERE id = '$valores->id'";
+        $sql = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, modelo, tag, fecha_entrega FROM inventario_ti_sur WHERE id = '$valores->id'";
         $query = mysqli_query($con, $sql);
         $datos = [];
         while ($fila = mysqli_fetch_assoc($query)) {

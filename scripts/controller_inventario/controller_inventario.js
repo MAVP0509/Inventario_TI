@@ -220,7 +220,7 @@ async function mdl_editar(params) {
         const element = datos[i];
         if (element.id_equipo === params.id_equipo) {
             selecreg = element;
-            console.log(selecreg)
+            // console.log(selecreg)
             break;
         }
     }
@@ -305,7 +305,7 @@ async function mdl_editar(params) {
     $("#mdl-inventario").modal("show");
     //console.log(selecreg)
 }
-async function editar_registro(params) {
+async function editar_registro() {
     //deshabilitar_campo();
     const validacion = [
         "inp-zona",
@@ -336,14 +336,14 @@ async function editar_registro(params) {
         fecha_entrega: $("#inp-fecha-entrega").val()
     }
 
-    await registrar_historico('Anterior edición de registro', selecreg);
+    
 
     let server = await server_inventario(model);
     //let response = JSON.parse(respuesta);
     //console.log(server);
-    if (server.resultado === true) {
-
-        await registrar_historico('Edición de registro', model);
+    if (server.resultado.exito === true) {
+        await registrar_historico('Anterior edición de registro', server.resultado.anterior);
+        await registrar_historico('Edición de registro', server.resultado.nuevo);
         mostrar_alerta('success', '¡Edición exitosa!', 'El registro se ha actualizado correctamente.');
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo editar el registro. Inténtalo nuevamente.');
@@ -569,7 +569,7 @@ async function desactivar_registro() {
     };
 
     let response = await server_inventario(model);
-    console.log(response)
+    // console.log(response)
     if (Array.isArray(response.resultado)) {
         await registrar_historico('Eliminación de registro', response.resultado);
         mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
