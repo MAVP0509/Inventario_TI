@@ -80,18 +80,24 @@
                                 <div class="card-header">
                                     <h3 class="card-title"><i class="fa-solid fa-table"></i> Inventario</h3>
                                     <div class="d-flex justify-content-end">
-                                                <button type="button" class="btn bg-navy rounded icon mr-3" onclick="mostrar_traspaso()"><i class="fa-solid fa-boxes-packing"></i> Traspaso</button>
+                                                <button type="button" class="btn bg-navy rounded icon mr-3" onclick="mostrar_traspaso()">
+                                                    <i class="fa-solid fa-boxes-packing"></i> Traspaso
+                                                </button>
                                                 <button type="button" onclick="resguardo()"
                                                     class="btn btn-info icon rounded mr-3" style="margin-left: 10px;"
-                                                    href="#"><i class="fa-solid fa-file-export fa-lg"></i>
-                                                    Resguardo</button>
+                                                    href="#"><i class="fa-solid fa-file-export fa-lg"></i> Resguardo
+                                                </button>
                                                 <button type="button" class="btn btn-success rounded mr-3 icon"
-                                                    onclick="mdl_nvo_registro()"><i class="fa-solid fa-plus fa-lg"></i> Nuevo</button>
+                                                    onclick="mdl_nvo_registro()"><i class="fa-solid fa-plus fa-lg"></i> Nuevo
+                                                </button>
                                                 <button type="button" style="text-align: center"
                                                     class="btn btn-danger rounded icon mr-3"
                                                     onclick="confirmar_eliminacion()"><i
-                                                        class="fa-solid fa-trash-can fa-lg"></i> Eliminar</button>
-                                                <button type="button" class="btn btn-light rounded mr-3 icon" onclick="consultar_num_serie()"><i class="fa-solid fa-clock-rotate-left"></i> Historial</button>
+                                                        class="fa-solid fa-trash-can fa-lg"></i> Eliminar
+                                                </button>
+                                                <button type="button" class="btn btn-light rounded mr-3 icon" onclick="consultar_num_serie()">
+                                                    <i class="fa-solid fa-clock-rotate-left"></i> Historial
+                                                </button>
                                             </div><br>
                                 </div>
                                 <!--Card Body-->
@@ -108,7 +114,7 @@
     </div>
 
     <!--Modal del inventario-->
-    <div class="modal fade" id="mdl-inventario">
+    <div class="modal fade" id="mdl-inventario" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
@@ -268,7 +274,7 @@
 
 
     <!--Modal resguardo -->
-    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-res" role="dialog">
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-res" role="dialog" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -327,7 +333,7 @@
     </div>
 
     <!--Modal de historial-->
-    <div class="modal fade" id="modal-historial" tabindex="-1" role="dialog">
+    <div class="modal fade" id="modal-historial" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -382,7 +388,7 @@
         </div>
     </div>
     <!-- Modal traspaso -->
-    <div class="modal fade" id="mdl-traspaso" tabindex="-1" role="dialog" aria-hidden="false">
+    <div class="modal fade" id="mdl-traspaso" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-dialog-scrollable" >
             <div class="modal-content">
                 <div class="modal-header">
