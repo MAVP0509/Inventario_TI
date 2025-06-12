@@ -503,6 +503,8 @@ async function crear_registro() {
 }
 
 async function traspasos() {
+
+
     let model = {
         accion: 6,
         id: seleccionar,
@@ -519,6 +521,12 @@ async function traspasos() {
         await registrar_historico('Anterior asignación', server.resultado.anterior);
         await registrar_historico('Generarción de traspaso', server.resultado.nuevo);
         mostrar_alerta('success', '¡Traspaso exitoso!', 'El traspaso se ha realizado correctamente');
+        if (selected) {
+            let userSelected = $('#mdl-usuario').val()
+            //let userSelected = $('#mdl-usuario').select2('data')[0].text
+            resguardo(userSelected)
+        }
+
     } else {
         mostrar_alerta('error', 'Error', 'No se pudo realizar el traspaso. Inténtalo nuevamente.');
     }
@@ -545,6 +553,10 @@ async function mostrar_traspaso() {
             dropdownParent: '#mdl-traspaso',
             tags: false,
         })
+
+        selected = false
+        $("#check-resguardo-icon").removeClass("fa-solid fa-square-check")
+        $("#check-resguardo-icon").addClass("fa-regular fa-square ")
         $("#mdl-traspaso").modal("show");
     }
 
@@ -712,15 +724,34 @@ $(document).ready(function () {
 
         if (seleccionado === 'Asignado') {
             $('#mdl-usuario').prop('disabled', false).addClass('is-requerid');
+            document.getElementById('alert-traspaso').style.display = 'block'
         } else {
             $('#mdl-usuario').prop('disabled', true).removeClass('is-requerid').val('')
+            document.getElementById('alert-traspaso').setAttribute('style', 'display:none !important; background-color:#e7f3fe; border-color:#b8daff; color:#004085; padding-right: 4rem;');
         }
     })
 })
 
+let selected = false
+$("#check-resguardo").on('click', function () {
+    selected = !selected;
+
+    // Cambiar el ícono del checkbox
+    let check = $("#check-resguardo-icon");
+    if (selected) {
+        check.removeClass("fa-regular fa-square");
+        check.addClass("fa-solid fa-square-check");
+    } else {
+        check.removeClass("fa-solid fa-square-check");
+        check.addClass("fa-regular fa-square ");
+    }
+
+    // Habilitar o deshabilitar el botón dependiendo de "selected"
+    //document.getElementById('mdl-btn-conf').disabled = !selected;
+});
 
 //TODO: Funciones para el resguardo
-function resguardo() {
+async function resguardo(userSelect) {
     let inputs = document.getElementsByName('inp-resg')
     for (let i = 0; i < inputs.length; i++) {
         inputs[i].classList.remove('is-invalid')
@@ -734,7 +765,7 @@ function resguardo() {
     $collapse = $('#collapse-resguardo');
     $collapse.slideUp();
     $collapse.closest('.card').addClass('collapsed-card');
-     $collapse.closest('.card')
+    $collapse.closest('.card')
         .find('[data-card-widget="collapse"] i')
         .removeClass('fa-minus')
         .addClass('fa-plus');
@@ -744,7 +775,7 @@ function resguardo() {
         $('#fecha-resguardo').val(hoy);
     });
 
-    general_select2({
+    await general_select2({
         selectId: 'select-usu',
         tabla: 'cat_usuarios',
         campo: 'nombre',
@@ -753,7 +784,7 @@ function resguardo() {
         tags: false
     });
 
-    general_select2({
+    await general_select2({
         selectId: 'select-region',
         tabla: 'supervisor',
         campo: 'region',
@@ -761,6 +792,9 @@ function resguardo() {
         dropdownParent: '#mdl-res',
         tags: false
     });
+    //rellenar_select(userSelect, 'select-usu')
+    $('#select-usu').val(userSelect).trigger('change')
+    console.log(userSelect)
 
     $("#mdl-res").modal('show')
 }

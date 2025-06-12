@@ -178,7 +178,7 @@ function mdl_editar_rubro(params) {
 }
 
 $("#check-editar").on('click', function () {
-    selected = !selected;
+    let selected = !selected;
 
     // Cambiar el ícono del checkbox
     let check = $("#check-editar-icon");

@@ -379,7 +379,8 @@
                                         <select class="form-control select" id="select-evento"></select>
                                     </div></br>
                                     <button type="button" class="btn btn-primary icon" id="btn-buscar"
-                                        onclick="mostrar_historial()"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
+                                        onclick="mostrar_historial()"><i class="fa-solid fa-magnifying-glass"></i>
+                                        Buscar</button>
                                 </form>
                             </div>
                             <div class="col-md-8">
@@ -421,15 +422,20 @@
                         <select class="form-control select" id="mdl-estado"></select>
                     </div>
                     <label for="mdl-usuario">Usuario a traspasar</label>
-                    <div class="input-group">
+                    <div class="input-group mb-3">
                         <div class="input-group-prepend"><span class="input-group-text"><i
                                     class="fa-solid fa-user"></i></span></div>
                         <select class="form-control select" id="mdl-usuario"></select>
                     </div>
-                    <div>
-
+                    <div class="alert alert-info position-relative d-flex align-items-start" role="alert" style="display:none ; background-color:#e7f3fe; border-color:#b8daff; color:#004085; padding-right: 4rem;"
+                        id="alert-traspaso">
+                        <button type='button' class='btn icon toggle-select me-2' id="check-resguardo">
+                            <i class='fa-regular fa-square fa-lg' id="check-resguardo-icon"></i>
+                        </button>
+                        ¿Desea generar el resguardo del usuario seleccionado?
                     </div>
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger icon" data-dismiss="modal">
                         Cerrar <i class="fa-solid fa-arrow-right-from-bracket fa-lg"></i>
