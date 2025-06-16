@@ -121,7 +121,6 @@ function insertar_datos($valores)
 function editar_datos($valores)
 {
     include("../conexion.php");
-
     //$zona = 'Base Operativa Región Sur';
     $sql_select = "SELECT num_serie, 
                     fk_usuario, zona, ubicacion, af,
