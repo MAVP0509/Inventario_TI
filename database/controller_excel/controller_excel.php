@@ -17,20 +17,23 @@ $respuesta_servidor = new stdClass();
 
 if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = resguardo($clientejson);
+} elseif ($clientejson->accion == 1) {
+    $respuesta_servidor->resultado = cargar_plantilla($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
 
 //* Función para generación de resguardos
-function resguardo($valores){
+function resguardo($valores)
+{
     // $className = \PhpOffice\PhpSpreadsheet\Writer\Pdf\Dompdf::class;
     // IOFactory::registerWriter('Pdf', $className);
 
     //todo Desglosamos la información recibida del JS
     //* Array de los equipos del usuario seleccionado
-    $datos = $valores->datos; 
+    $datos = $valores->datos;
     //* Accedemos al nombre del usuario 
-    $usuario = $datos[0]->usuario ?? ''; 
+    $usuario = $datos[0]->usuario ?? '';
     //*Accedemos al cargo que tiene el usuario
     $area = $datos[0]->posicion ?? '';
     //*Si se ingresó un comentario, se accede a éste
@@ -51,7 +54,7 @@ function resguardo($valores){
     /* 
     TODO Configuración de impresión
     * Es necesario para dar un formato, delimitar márgenes para cuando se exporte a pdf, el pdf no este descuadrado
-    */ 
+    */
     $pageSetup = $worksheet->getPageSetup();
     $pageSetup->setOrientation(PageSetup::ORIENTATION_PORTRAIT);
     $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LETTER);
@@ -73,17 +76,17 @@ function resguardo($valores){
 
     //* For para generar las filas de la tabla en el resguardo
     foreach ($datos as  $item) {
-        
-        //* Insertando una fila,  el 1 indica cuantas filas se insertarán
-        $worksheet->insertNewRowBefore($fila, 1); 
 
-         /* 
+        //* Insertando una fila,  el 1 indica cuantas filas se insertarán
+        $worksheet->insertNewRowBefore($fila, 1);
+
+        /* 
          TODO Reaplicar las combinaciones de celdas en la nueva fila
          * Al insertar nuevas filas, no respeta las combinaciones de celdas de la plantilla
-         */ 
-         $worksheet->mergeCells("D$fila:E$fila");
-         $worksheet->mergeCells("F$fila:G$fila");
-         $worksheet->mergeCells("H$fila:I$fila");
+         */
+        $worksheet->mergeCells("D$fila:E$fila");
+        $worksheet->mergeCells("F$fila:G$fila");
+        $worksheet->mergeCells("H$fila:I$fila");
 
         //* Copiando el estilo de la fila anterior para mantener el estilo de la plantilla
         $worksheet->duplicateStyle($worksheet->getStyle("A18:I18"), "A$fila:I$fila");
@@ -92,7 +95,7 @@ function resguardo($valores){
         $worksheet->getStyle("A$fila:I$fila")->getFont()->setBold(false);
 
         //* Rellenamos la fila con sus datos correspondientes 
-        $worksheet->setCellValue("A$fila", $num); 
+        $worksheet->setCellValue("A$fila", $num);
         $worksheet->setCellValue("B$fila", $item->tipo);
         $worksheet->setCellValue("C$fila", $item->marca);
         $worksheet->setCellValue("D$fila", $item->modelo);
@@ -102,7 +105,7 @@ function resguardo($valores){
         $fila++; //* Aumentamos el contador para avanzar a la siguiente fila
 
         //* Verificamos si el equipo tiene un TAG asignado
-        if ($item->tag != null && $item->tag != "NA"){
+        if ($item->tag != null && $item->tag != "NA") {
 
             //*Si tiene tag, se asigna una nueva fila
             $worksheet->insertNewRowBefore($fila, 1);
@@ -124,7 +127,7 @@ function resguardo($valores){
             $fila++; //* Aumentamos el contador para avanzar a la siguiente fila
         }
 
-        
+
         $num++; //*Aumentamos nuestro contador visual de la tabla
     }
     $worksheet->removeRow($fila); //* Elimina la fila extra insertada al final
@@ -151,34 +154,75 @@ function resguardo($valores){
     //TODO Exportando el nuevo archivo excel
 
     //* Al archivo se le pone el nombre del usuario, para ello, quitamos los espacios y unimos el nombre de la persona con "_"
-    $UserName = explode(" ",$usuario);
-    $UserName = join("_",$UserName);
-    
+    $UserName = explode(" ", $usuario);
+    $UserName = join("_", $UserName);
+
     //* Configuramos la ruta donde se guarda el excel
-    $excelFilePath ='C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_'.$UserName.'.xlsx';
+    $excelFilePath = 'C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_' . $UserName . '.xlsx';
     //* Especificamos la extención del archivo
     $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
     //* Indicamos como se llama el archivo
-    $writer->save('Resguardo_'.$UserName.'.xlsx');
+    $writer->save('Resguardo_' . $UserName . '.xlsx');
 
-   //* Mandamos a exportar a pdf el excel
-    exportar_pdf($excelFilePath);
+    //* Mandamos a exportar a pdf el excel
+    exportar_pdf($excelFilePath, 1);
 
     //*Retornamos la ruta del excel
     return $excelFilePath;
 }
 
 //*Función para exportar excel a PDF
-function exportar_pdf($file) {
-     //* Ruta a LibreOffice
-     $libreOfficePath = '"C:\\Program Files\\LibreOffice\\program\\soffice.bin"';
-    
-     //* Comando para convertir el archivo Excel a PDF
-     $command = "{$libreOfficePath} --headless --convert-to pdf {$file} >> out.txt 2>&1";
-   
-    //* Ejecutar el comando
-    exec($command, $output);
+function exportar_pdf($file, $code)
+{
+    if ($code == 1) {
+        //* Ruta a LibreOffice
+        $libreOfficePath = '"C:\\Program Files\\LibreOffice\\program\\soffice.bin"';
 
-    return true;
+        //* Comando para convertir el archivo Excel a PDF
+        $command = "{$libreOfficePath} --headless --convert-to pdf {$file} >> out.txt 2>&1";
+
+        //* Ejecutar el comando
+        exec($command, $output);
+
+        return true;
+    }else{
+        return false;
+    }
 }
-?>
+
+function cargar_plantilla()
+{
+    $respuesta = new stdClass();
+    if (isset($_FILES['resguardo']) && $_FILES['resguardo']['error'] === UPLOAD_ERR_OK) {
+        $nombreOriginal = $_FILES['resguardo']['name'];
+        $tmpPath = $_FILES['resguardo']['tmp_name'];
+
+        // Validar extensión .xlsx
+        $ext = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));
+        if ($ext !== 'xlsx') {
+            $respuesta->error = "Tipo de archivo no permitido. Solo .xlsx";
+            return $respuesta;
+        }
+
+        // Generar nombre único para evitar colisiones
+        $nuevoNombre = time() . '_' . basename($nombreOriginal);
+
+        // Ruta destino, __DIR__ es carpeta donde está este script PHP
+        $destino = __DIR__ . '/' . $nuevoNombre;
+
+        if (move_uploaded_file($tmpPath, $destino)) {
+            $respuesta->mensaje = "Archivo guardado correctamente";
+            $respuesta->ruta = $nuevoNombre;
+        } else {
+            $respuesta->error = "No se pudo mover el archivo.";
+        }
+    } else {
+        $respuesta->error = "No se recibió ningún archivo válido.";
+    }
+
+    return $respuesta;
+
+
+     $excelFilePath = 'C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_' . $nuevoNombre . '.xlsx';
+     exportar_pdf($nuevoNombre, 1);
+}
