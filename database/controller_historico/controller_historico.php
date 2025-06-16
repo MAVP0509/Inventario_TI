@@ -101,7 +101,7 @@ function consultar_historico($valores)
         }
     }
 
-    $sql .= " ORDER BY fecha_evento DESC LIMIT 100";
+    $sql .= " ORDER BY fecha_evento DESC";
 
 
     /* var_dump($sql); */
