@@ -99,7 +99,7 @@ function consultar_historico($valores)
         $sql .= " AND evento = '$valores->evento'";
     }
 
-    $sql .= " ORDER BY fecha_evento DESC LIMIT 100";
+    $sql .= " ORDER BY fecha_evento DESC";
 
 
     /* var_dump($sql); */
