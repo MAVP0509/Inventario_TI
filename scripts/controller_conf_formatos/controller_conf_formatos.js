@@ -20,9 +20,9 @@
 } */
 
 // Get a reference to the file input element
-let dominio = window.location.hostname
-let puerto = location.port
-let ruta = "htttp://"+ dominio + ":" + "puerto" + "/inventario_I/database/controller_excel/"
+dominio = window.location.hostname
+puerto = window.location.port
+let ruta = "htttp://" + dominio + ":" + puerto + "/Inventario_TI/database/controller_excel/"
 
 FilePond.registerPlugin(FilePondPluginFileValidateType);
 
@@ -62,7 +62,11 @@ const pond = FilePond.create(fileResguardo, {
                     } else {
                         //console.log("Archivo subido:", data);
                         alert("Subido: " + data.resultado.mensaje);
-                        window.open(ruta+data.resultado.mensaje, '_blank');
+
+
+                        // Cambia la extensión
+                        archivo = data.resultado.ruta.replace(/\.xlsx$/i, '.pdf');
+                        window.open(ruta + archivo, '_blank');
                         // Aquí puedes usar data.ruta si necesitas mostrarlo
                     }
 

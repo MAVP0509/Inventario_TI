@@ -165,29 +165,25 @@ function resguardo($valores)
     $writer->save('Resguardo_' . $UserName . '.xlsx');
 
     //* Mandamos a exportar a pdf el excel
-    exportar_pdf($excelFilePath, 1);
+    exportar_pdf($excelFilePath);
 
     //*Retornamos la ruta del excel
     return $excelFilePath;
 }
 
 //*Función para exportar excel a PDF
-function exportar_pdf($file, $code)
+function exportar_pdf($file)
 {
-    if ($code == 1) {
-        //* Ruta a LibreOffice
-        $libreOfficePath = '"C:\\Program Files\\LibreOffice\\program\\soffice.bin"';
+    //* Ruta a LibreOffice
+    $libreOfficePath = '"C:\\Program Files\\LibreOffice\\program\\soffice.bin"';
 
-        //* Comando para convertir el archivo Excel a PDF
-        $command = "{$libreOfficePath} --headless --convert-to pdf {$file} >> out.txt 2>&1";
+    //* Comando para convertir el archivo Excel a PDF
+    $command = "{$libreOfficePath} --headless --convert-to pdf {$file} >> out.txt 2>&1";
 
-        //* Ejecutar el comando
-        exec($command, $output);
+    //* Ejecutar el comando
+    exec($command, $output);
 
-        return true;
-    }else{
-        return false;
-    }
+    return true;
 }
 
 function cargar_plantilla()
@@ -196,6 +192,8 @@ function cargar_plantilla()
     if (isset($_FILES['resguardo']) && $_FILES['resguardo']['error'] === UPLOAD_ERR_OK) {
         $nombreOriginal = $_FILES['resguardo']['name'];
         $tmpPath = $_FILES['resguardo']['tmp_name'];
+        $nombreArchivo = explode(" ", $nombreOriginal);
+        $nombreArchivo = join("_", $nombreArchivo);
 
         // Validar extensión .xlsx
         $ext = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));
@@ -205,7 +203,7 @@ function cargar_plantilla()
         }
 
         // Generar nombre único para evitar colisiones
-        $nuevoNombre = time() . '_' . basename($nombreOriginal);
+        $nuevoNombre = time() . '_' . basename($nombreArchivo);
 
         // Ruta destino, __DIR__ es carpeta donde está este script PHP
         $destino = __DIR__ . '/' . $nuevoNombre;
@@ -219,10 +217,8 @@ function cargar_plantilla()
     } else {
         $respuesta->error = "No se recibió ningún archivo válido.";
     }
-
+    $excelFilePath = 'C:\xampp\htdocs\Inventario_TI\database\controller_excel\ ' . $nuevoNombre ;
+    exportar_pdf($excelFilePath);
+    //var_dump($excelFilePath);
     return $respuesta;
-
-
-     $excelFilePath = 'C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_' . $nuevoNombre . '.xlsx';
-     exportar_pdf($nuevoNombre, 1);
 }
