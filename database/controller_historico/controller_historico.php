@@ -27,7 +27,7 @@ function registrar_historico($valores)
     if (isset($valores->datos) && is_array($valores->datos)) {
         for ($i = 0; $i < count($valores->datos); $i++) {
             $datos = $valores->datos[$i];
-            $estatus = ($datos->fk_usuario == "5") ? 'Bodega' : 'Asigando';
+            $estatus = ($datos->fk_usuario == "5") ? 'Bodega' : 'Asignado';
             $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro, estatus) 
             VALUES ('$fecha_evento',
                     '$valores->usuario_sesion', 
@@ -79,9 +79,7 @@ function consultar_historico($valores)
 {
     include("../conexion.php");
 
-    // $sql = "SELECT * FROM historico ORDER BY fecha_evento DESC";
     $sql = "SELECT * FROM vhistorico";
-    //$sql = "SELECT * FROM historico";
     //var_dump($sql)
 
     if (!empty($valores->num_serie)) {
@@ -103,6 +101,9 @@ function consultar_historico($valores)
 
     $sql .= " ORDER BY fecha_evento DESC";
 
+    if (!empty($valores->limite) && $valores->limite === true) {
+        $sql .= " LIMIT 100";
+    }
 
     /* var_dump($sql); */
     $query = mysqli_query($con, $sql);

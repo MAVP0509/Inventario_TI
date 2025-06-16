@@ -503,8 +503,6 @@ async function crear_registro() {
 }
 
 async function traspasos() {
-
-
     let model = {
         accion: 6,
         id: seleccionar,
@@ -541,7 +539,7 @@ async function mostrar_traspaso() {
             selectId: 'mdl-estado',
             tabla: 'inventario_ti_sur',
             campo: 'estatus',
-            placeholder: 'Selecione un estatus',
+            placeholder: 'Seleccione un estatus',
             dropdownParent: '#mdl-traspaso',
             tags: false,
         })
@@ -549,7 +547,7 @@ async function mostrar_traspaso() {
             selectId: 'mdl-usuario',
             tabla: 'cat_usuarios',
             campo: 'nombre',
-            placeholder: 'Selecciones un usuario',
+            placeholder: 'Seleccione un usuario',
             dropdownParent: '#mdl-traspaso',
             tags: false,
         })
