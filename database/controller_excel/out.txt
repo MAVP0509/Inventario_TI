@@ -201,3 +201,10 @@ convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_B
 Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_Bauza_Valdez.pdf
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_Bauza_Valdez.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_Bauza_Valdez.pdf using filter : calc_pdf_Export
 Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_Bauza_Valdez.pdf
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Esthepanie_Arce.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Esthepanie_Arce.pdf using filter : calc_pdf_Export
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Juan_del_Carmen_de_los_Santos.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Juan_del_Carmen_de_los_Santos.pdf using filter : calc_pdf_Export
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Vanessa_Jimenez_Carpio.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Vanessa_Jimenez_Carpio.pdf using filter : calc_pdf_Export
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Javier_Zapata_López.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Javier_Zapata_López.pdf using filter : calc_pdf_Export
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Laura_Custodio_Diaz.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Laura_Custodio_Diaz.pdf using filter : calc_pdf_Export
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Juan_Carlos_Requena.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Juan_Carlos_Requena.pdf using filter : calc_pdf_Export
+Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Juan_Carlos_Requena.pdf

@@ -290,7 +290,7 @@ async function mostrar_historial() {
     idCollapse = 0
     if (respuesta_historico && respuesta_historico.resultado && respuesta_historico.resultado.length > 0) {
         respuesta_historico.resultado.forEach(registro => {
-            var fecha = moment(registro.fecha_evento).local('es').format('D [de] MMMM [de] YYYY, h:mm:ss a');
+            var fecha = moment(registro.fecha_evento).locale('es').format('D [de] MMMM [de] YYYY, h:mm:ss a');
             //console.log("Datos crudos:", registro.datos);
             //console.log("Tipo de datos:", typeof registro);
             const camposExcluir = ['id', 'fecha_evento', 'usuario_sesion', 'evento'];
