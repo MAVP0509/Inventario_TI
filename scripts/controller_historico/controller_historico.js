@@ -293,6 +293,7 @@ async function mostrar_historial() {
         fecha_inicio: fecha_inicio,
         fecha_fin: fecha_fin,
         evento: $("#select-evento").select2('data')[0].text,
+        limite: true,
     };
 
     let respuesta_historico = await server_historico(model);

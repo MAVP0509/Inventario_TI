@@ -91,6 +91,8 @@ function insertar_datos($valores)
         $val_af = $valores->af;
     }
 
+    $val_imei = empty($valores->imei) ? 'NA' : $valores_imei;
+    $val_imei = empty($valores->linea) ? 'NA' : $valores_linea;
 
     if ($valores->num_serie != "") {
         $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$valores->num_serie'";
@@ -103,7 +105,7 @@ function insertar_datos($valores)
 
         $sql = 'INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, imei,estatus) 
         VALUES ("' . $valores->zona . '","' . $val_rubro . '","' . $val_af . '","' . $val_tipo . '","' . $val_marca . '","' . $valores->modelo . '","' . $valores->num_serie . '","' . $valores->ubicacion . '",
-        "' . $val_tag . '","' . $valores->usuario . '","' . $registro . '","NA","' . $val_estatus . '")';
+        "' . $val_tag . '","' . $valores->usuario . '","' . $registro . '", "' . $val_imei . '","' . $val_estatus . '")';
         //var_dump($sql);
         $query = mysqli_query($con, $sql);
         //$SQLStatement = "CALL pInsertarCatalogo('$sql','Insrt_Inventario')";
