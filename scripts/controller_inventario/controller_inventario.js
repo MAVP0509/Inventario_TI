@@ -336,7 +336,7 @@ async function editar_registro() {
         fecha_entrega: $("#inp-fecha-entrega").val()
     }
 
-    
+
 
     let server = await server_inventario(model);
     //let response = JSON.parse(respuesta);
@@ -461,7 +461,7 @@ async function crear_registro() {
     if (user === "") {
         user = "5"
     }
-    
+
     // Crear el modelo con los datos del formulario
     let model = {
         accion: 0,
@@ -712,7 +712,7 @@ $(document).ready(function () {
         if (tipoSeleccionado === '58' || tipoSeleccionado === '40') {
             // Habilita el campo TAG y lo hace obligatorio
             $('#inp-tag').prop('disabled', false).addClass('is-required');
-        } else{
+        } else {
             // Deshabilita el campo TAG y elimina la obligatoriedad
             $('#inp-tag').prop('disabled', true).removeClass('is-required').val('');
         }
@@ -724,14 +724,10 @@ $(document).ready(function () {
             $('#inp-imei').prop('disabled', true).removeClass('is-required').val('');
             $('#inp-linea').prop('disabled', true).removeClass('is-required').val('');
         }
-        
-        $("#inp-ime").on('change', function () {
-            this.value = this.value.replace(/[^0-9]/g, '')
-            val_imei = $(this).val();
-            if (val_imei < 15 || val_imei.length === 0) {
-                $('#inp-imei').prop('disabled', false).addClass('is-required');
-            }
-        })
+
+        $('#inp-imei, #inp-linea').on('input', function () {
+            this.value = this.value.replace(/\D/g, ''); // Elimina todo lo que no sea dígito
+        });
     });
 });
 
@@ -810,11 +806,11 @@ async function resguardo(userSelect) {
         dropdownParent: '#mdl-res',
         tags: false
     });
-    if(userSelect){
+    if (userSelect) {
         $('#select-usu').val(userSelect).trigger('change')
         $('#select-usu').prop('disabled', true)
     }
-    
+
     console.log(userSelect)
 
     $("#mdl-res").modal('show')
