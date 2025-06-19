@@ -28,7 +28,7 @@ function registrar_historico($valores)
         for ($i = 0; $i < count($valores->datos); $i++) {
             $datos = $valores->datos[$i];
             $estatus = ($datos->fk_usuario == "5") ? 'Bodega' : 'Asignado';
-            $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro, estatus) 
+            $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, imei, linea, fecha_registro, estatus) 
             VALUES ('$fecha_evento',
                     '$valores->usuario_sesion', 
                     '$valores->evento', 
@@ -41,7 +41,9 @@ function registrar_historico($valores)
                     '$datos->fk_tipo', 
                     '$datos->fk_marca', 
                     '$datos->modelo', 
-                    '$datos->tag', 
+                    '$datos->tag',
+                    '$datos->imei',
+                    '$datos->linea', 
                     '$datos->fecha_entrega',
                     '$estatus')";
             $query = mysqli_query($con, $sql);
@@ -53,7 +55,7 @@ function registrar_historico($valores)
         $datos = $valores->datos;
         $fecha_entrega = !empty($datos->fecha_entrega) ? date("Y-m-d H:i:s", strtotime($datos->fecha_entrega)) : date("Y-m-d H:i:s");
         $estatus = ($datos->fk_usuario == "5") ? 'Bodega' : 'Asignado';
-        $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, fecha_registro, estatus) 
+        $sql = "INSERT INTO historico(fecha_evento, usuario_sesion, evento, num_serie, usuario, zona, ubicacion, af, rubro, tipo, marca, modelo, tag, imei, linea, fecha_registro, estatus) 
         VALUES ('$fecha_evento',
         '$valores->usuario_sesion', 
         '$valores->evento', 
@@ -66,7 +68,9 @@ function registrar_historico($valores)
         '$datos->fk_tipo', 
         '$datos->fk_marca', 
         '$datos->modelo', 
-        '$datos->tag', 
+        '$datos->tag',
+        '$datos->imei',
+        '$datos->linea', 
         '$fecha_entrega',
         '$estatus')";
         // var_dump($sql);

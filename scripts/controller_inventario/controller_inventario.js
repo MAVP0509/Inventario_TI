@@ -180,6 +180,7 @@ async function consultar_informacion() {
                 { title: "Ubicación", field: "ubicacion", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
                 { title: "TAG", field: "tag", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", width: 170 },
                 { title: "IMEI", field: "imei", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", width: 170 },
+                { title: "Linea", field: "linea", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", width: 170 },
                 { title: "Usuario", field: "usuario", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
                 { title: "Cargo del usuario", field: "posicion", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
                 { title: "Fecha de registro", field: "fecha_entrega", sorter: "date", headerFilter: "input", headerSort: false },
@@ -296,6 +297,8 @@ async function mdl_editar(params) {
     document.getElementById("inp-num-serie").value = selecreg.num_serie;
     document.getElementById("inp-ubicacion").value = selecreg.ubicacion;
     document.getElementById("inp-tag").value = selecreg.tag;
+    document.getElementById("inp-imei").value = selecreg.imei;
+    document.getElementById("inp-linea").value = selecreg.linea;
     rellenar_select(selecreg.usuario, "inp-usuario")
     document.getElementById("inp-fecha-entrega").value = selecreg.fecha_entrega;
 
@@ -331,6 +334,8 @@ async function editar_registro() {
         num_serie: $("#inp-num-serie").val().trim().toUpperCase(),
         ubicacion: $("#inp-ubicacion").val().trim(),
         tag: $("#inp-tag").val().trim(),
+        imei: $("#inp-imei").val().trim(),
+        linea: $("#inp-linea").val().trim(),
         usuario: user,
         //posicion: $("#edi-posicion").select2('data')[0].text,
         fecha_entrega: $("#inp-fecha-entrega").val()
