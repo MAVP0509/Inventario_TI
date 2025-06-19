@@ -206,18 +206,18 @@ function cargar_plantilla()
         $nuevoNombre = time() . '_' . basename($nombreArchivo);
 
         // Ruta destino, __DIR__ es carpeta donde está este script PHP
-        $destino = __DIR__ . '/' . $nuevoNombre;
+        $destino = __DIR__ . '/aFormato_Resguardo' . $nuevoNombre;
 
         if (move_uploaded_file($tmpPath, $destino)) {
             $respuesta->mensaje = "Archivo guardado correctamente";
-            $respuesta->ruta = $nuevoNombre;
+            $respuesta->ruta = 'C:\xampp\htdocs\Inventario_TI\database\controller_excel\aFormato_Resguardo'. $nuevoNombre;
         } else {
             $respuesta->error = "No se pudo mover el archivo.";
         }
     } else {
         $respuesta->error = "No se recibió ningún archivo válido.";
     }
-    $excelFilePath = 'C:\xampp\htdocs\Inventario_TI\database\controller_excel\ ' . $nuevoNombre ;
+    $excelFilePath = 'C:\xampp\htdocs\Inventario_TI\database\controller_excel\aFormato_Resguardo' . $nuevoNombre ;
     exportar_pdf($excelFilePath);
     //var_dump($excelFilePath);
     return $respuesta;

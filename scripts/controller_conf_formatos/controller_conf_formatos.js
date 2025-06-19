@@ -21,8 +21,8 @@
 
 // Get a reference to the file input element
 dominio = window.location.hostname
-puerto = window.location.port
-let ruta = "htttp://" + dominio + ":" + puerto + "/Inventario_TI/database/controller_excel/"
+puerto = location.port
+//let ruta = dominio + ":" + puerto + "/Inventario_TI/database/controller_excel/"
 
 FilePond.registerPlugin(FilePondPluginFileValidateType);
 
@@ -65,8 +65,16 @@ const pond = FilePond.create(fileResguardo, {
 
 
                         // Cambia la extensión
-                        archivo = data.resultado.ruta.replace(/\.xlsx$/i, '.pdf');
-                        window.open(ruta + archivo, '_blank');
+                        data.resultado.ruta = data.resultado.ruta.replace(/\.xlsx$/i, '.pdf')
+                        data.resultado.ruta = data.resultado.ruta.replace(/^"|"$/g, '')
+                        data.resultado.ruta = data.resultado.ruta.replace(/\\/g, '/')
+                        data.resultado.ruta = data.resultado.ruta.replace("C:/xampp/htdocs", "http://" + dominio + ":" + puerto)
+                        /* let contenedor = document.getElementById('pdf-preview');
+                        let iframe = document.getElementById('pdf-frame');
+
+                        iframe.src = data.tesultado.ruta;
+                        contenedor.style.display = 'block'; */
+                        window.open(data.resultado.ruta, '_blank');
                         // Aquí puedes usar data.ruta si necesitas mostrarlo
                     }
 
