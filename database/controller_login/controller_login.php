@@ -42,7 +42,7 @@
         $registro =date("Y-m-d H:i:s"); //* Guardamos la fecha y hora del registro
         $hashed_contraseña =password_hash($valores->contraseña, PASSWORD_BCRYPT); //* Encriptación de la contraseña
         $sql="INSERT INTO usuario(nombre,correo,contraseña,edad,telefono,fecha_nac,fecha_reg,habilitado,rol) VALUES ('$valores->nombre',
-        '$valores->correo','$hashed_contraseña','$valores->edad', '$valores->telefono','$valores->fecha_nac','$registro',1,'user')";
+        '$valores->correo','$hashed_contraseña','$valores->edad', '$valores->telefono','$valores->fecha_nac','$registro',1,'admin')";
         
         $sql_val_mail="SELECT * FROM usuario WHERE correo= '$valores->correo'";
 
