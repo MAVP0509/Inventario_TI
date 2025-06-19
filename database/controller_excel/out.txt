@@ -208,3 +208,33 @@ convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Javier
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Laura_Custodio_Diaz.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Laura_Custodio_Diaz.pdf using filter : calc_pdf_Export
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Juan_Carlos_Requena.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Juan_Carlos_Requena.pdf using filter : calc_pdf_Export
 Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Juan_Carlos_Requena.pdf
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Maria_Garcia_Ramirez.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Maria_Garcia_Ramirez.pdf using filter : calc_pdf_Export
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Abraham_Palayot_Sanchez.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Abraham_Palayot_Sanchez.pdf using filter : calc_pdf_Export
+Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Abraham_Palayot_Sanchez.pdf
+Error: source file could not be loaded
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\1750342501_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\1750342501_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.pdf using filter : calc_pdf_Export
+Error: source file could not be loaded
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\1750342571_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\1750342571_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.pdf using filter : calc_pdf_Export
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_Bauza_Valdez.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_Bauza_Valdez.pdf using filter : calc_pdf_Export
+Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_Bauza_Valdez.pdf
+Error: source file could not be loaded
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\1750342755_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\1750342755_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.pdf using filter : calc_pdf_Export
+Error: source file could not be loaded
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\1750344893_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\1750344893_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.pdf using filter : calc_pdf_Export
+Error: source file could not be loaded
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\1750344992_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\1750344992_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.pdf using filter : calc_pdf_Export
+Error: source file could not be loaded
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\1750345556_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\1750345556_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.pdf using filter : calc_pdf_Export
+Error: source file could not be loaded
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\1750345639_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\1750345639_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.pdf using filter : calc_pdf_Export
+Error: source file could not be loaded
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\1750346315_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\1750346315_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.pdf using filter : calc_pdf_Export
+Error: source file could not be loaded
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\1750346468_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\1750346468_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.pdf using filter : calc_pdf_Export
+Error: source file could not be loaded
+Error: source file could not be loaded
+Error: source file could not be loaded
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\aFormato_Resguardo1750347019_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\aFormato_Resguardo1750347019_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.pdf using filter : calc_pdf_Export
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\aFormato_Resguardo1750347793_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\aFormato_Resguardo1750347793_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.pdf using filter : calc_pdf_Export
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\aFormato_Resguardo1750347832_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\aFormato_Resguardo1750347832_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.pdf using filter : calc_pdf_Export
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\aFormato_Resguardo1750349184_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\aFormato_Resguardo1750349184_FO-DSP-TI-01_Resguardo_de_herramientas_TI_Rev.00.pdf using filter : calc_pdf_Export
