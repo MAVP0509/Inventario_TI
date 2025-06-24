@@ -146,7 +146,7 @@ async function consultar_informacion(params) {
                     seleccionar_supervisor(rowData.id)
                 }, headerSort: false, frozen: true
             },
-            { title: "ID", field: "id", width: 45, hozAlign: "center", headerSort: false, headerHozAlign: "center",   },
+            { title: "ID", field: "id", width: 45, hozAlign: "center", headerSort: false, headerHozAlign: "center", },
             {
                 title: "Nombre", field: "nombre", headerHozAlign: "center", headerFilter: "input", headerSort: false, cellClick: function (e, cell) {
                     // Alternar estado de seleccionado
@@ -157,7 +157,7 @@ async function consultar_informacion(params) {
                 }
             },
             {
-                title: "Cargo", field: "cargo", headerHozAlign: "center", headerFilter: "input", headerSort: false,  cellClick: function (e, cell) {
+                title: "Cargo", field: "cargo", headerHozAlign: "center", headerFilter: "input", headerSort: false, cellClick: function (e, cell) {
                     // Alternar estado de seleccionado
                     let rowData = cell.getRow().getData();
                     rowData.seleccionado = !rowData.seleccionado;
@@ -411,7 +411,37 @@ async function supervisor_habilitado(model) {
 
 //TODO Funciones para un nuevo supervisor
 function nuevo_supervisor() {
-    limpiar_campos_nuevo_supervisor()
+    $('.select').each(function () {
+        $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
+        $(this).removeClass('is-invalid'); // Elimina la clase de validación
+    });
+
+    general_select2({
+        selectId: 'inp-nombre',
+        tabla: 'cat_usuarios',
+        campo: 'nombre',
+        placeholder: 'Seleciona un supervisor',
+        dropdownParent: '#modalInsertar',
+        tags: true
+    });
+
+    general_select2({
+        selectId: 'inp-cargo',
+        tabla: 'cat_usuarios',
+        campo: 'cargo',
+        placeholder: 'Seleciona un cargo',
+        dropdownParent: '#modalInsertar',
+        tags: true
+    });
+
+    general_select2({
+        selectId: 'inp-region',
+        tabla: 'supervisor',
+        campo: 'region',
+        placeholder: 'Seleccione una región',
+        dropdownParent: '#modalInsertar',
+        tags: true,
+    });
 
     $("#modalInsertar").modal('show');
 }
@@ -448,46 +478,6 @@ async function insertar_supervisor() {
         mostrar_toast("error", "Error", "Supervisor ya existente")
         return
     }
-}
-
-function limpiar_campos_nuevo_supervisor() {
-    /* let inputs = document.getElementsByName('insertMdl');
-    for (let i = 0; i < inputs.length; i++) {
-        inputs[i].value = ""; // Limpia el valor del input
-        inputs[i].classList.remove('is-invalid'); // Elimina la clase de validación
-    } */
-
-    $('.select').each(function () {
-        $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
-        $(this).removeClass('is-invalid'); // Elimina la clase de validación
-    });
-
-    general_select2({
-        selectId: 'inp-nombre',
-        tabla: 'cat_usuarios',
-        campo: 'nombre',
-        placeholder: 'Seleciona un supervisor',
-        dropdownParent: '#modalInsertar',
-        tags: true
-    });
-
-    general_select2({
-        selectId: 'inp-cargo',
-        tabla: 'cat_usuarios',
-        campo: 'cargo',
-        placeholder: 'Seleciona un cargo',
-        dropdownParent: '#modalInsertar',
-        tags: true
-    });
-
-    general_select2({
-        selectId: 'inp-region',
-        tabla: 'supervisor',
-        campo: 'region',
-        placeholder: 'Seleccione una región',
-        dropdownParent: '#modalInsertar',
-        tags: true,
-    });
 }
 
 //TODO Funciones para editar los supervisores
