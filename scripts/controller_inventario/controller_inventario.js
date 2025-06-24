@@ -591,45 +591,7 @@ async function confirmar_eliminacion() {
     if (seleccionar.length === 0) {
         mostrar_alerta('warning', 'Advertencia', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
     } else {
-        let data = []
-        //let data = datos.filter(element => seleccionar.includes(element.id_equipo));
-        for (let i = 0; i < datos.length; i++) {
-            const element = datos[i];
-            if (seleccionar.includes(element.id_equipo)) {
-                data.push(element);
-                //break;
-            }
-        }
-        console.log(data)
-        var tblEliminar = new Tabulator("#tbl-mdl-eliminar", {
-            height: "311px",
-            data: data,
-            columns: [
-                { title: "Rubro", field: "rubro", headerHozAlign: "center",headerSort: false },
-                { title: "Tipo de dispositivo", field: "tipo", width: 150, sorter: "number", hozAlign: "left", editor: "input", editor: true, validator: ["min:0", "max:100", "numeric"] },
-                { title: "Marca", field: "marca", width: 150, editor: "input", validator: ["required", "in:male|female"] },
-                { title: "Modelo", field: "modelo", width: 150, editor: "input", hozAlign: "center", width: 100, editor: "input", validator: ["min:0", "max:5", "integer"] },
-                { title: "Número de serie", field: "num_serie", width: 150, editor: "input", validator: ["minLength:3", "maxLength:10", "string"] },
-                { title: "TAG", field: "tag", width: 150, editor: "input", validator: "required" },
-                { title: "IMEI", field: "imei", width: 150, editor: "input", validator: "required" },
-                { title: "Linea", field: "linea", width: 150, editor: "input", validator: "required" },
-                { title: "Usuario", field: "usuario", width: 150, editor: "input", validator: "required" },
-                { title: "Cargo del usuario", field: "posicion", width: 150, editor: "input", validator: "required" },
-                { title: "Estatus", field: "estatus", width: 150, editor: "input", validator: "required" },
-                { title: "Observaciones", width: 150, editor: "input", validator: "required", frozen: true },
-            ],
-        });
-
-        //handle validation failure
-        table.on("validationFailed", function (cell, value, validators) {
-            //cell - cell component for the edited cell
-            //value - the value that failed validation
-            //validatiors - an array of validator objects that failed
-
-            //take action on validation fail
-        });
-        $("#mdl-eliminar").modal("show");
-        //mostrar_alert('warning', `¿Está seguro de eliminar ${seleccionar.length} activos(s)?`, false, desactivar_registro)
+        mostrar_alert('warning', `¿Está seguro de eliminar ${seleccionar.length} activos(s)?`, false, desactivar_registro)
     }
 }
 
@@ -933,3 +895,44 @@ function myCallback(start, end) {
 
 }
 
+
+//todo codigo para la tabla dentro de un modal
+/* 
+let data = []
+        //let data = datos.filter(element => seleccionar.includes(element.id_equipo));
+        for (let i = 0; i < datos.length; i++) {
+            const element = datos[i];
+            if (seleccionar.includes(element.id_equipo)) {
+                data.push(element);
+                //break;
+            }
+        }
+        console.log(data)
+        var tblEliminar = new Tabulator("#tbl-mdl-eliminar", {
+            height: "311px",
+            data: data,
+            columns: [
+                { title: "Rubro", field: "rubro", headerHozAlign: "center",headerSort: false },
+                { title: "Tipo de dispositivo", field: "tipo", width: 150, sorter: "number", hozAlign: "left", editor: "input", editor: true, validator: ["min:0", "max:100", "numeric"] },
+                { title: "Marca", field: "marca", width: 150, editor: "input", validator: ["required", "in:male|female"] },
+                { title: "Modelo", field: "modelo", width: 150, editor: "input", hozAlign: "center", width: 100, editor: "input", validator: ["min:0", "max:5", "integer"] },
+                { title: "Número de serie", field: "num_serie", width: 150, editor: "input", validator: ["minLength:3", "maxLength:10", "string"] },
+                { title: "TAG", field: "tag", width: 150, editor: "input", validator: "required" },
+                { title: "IMEI", field: "imei", width: 150, editor: "input", validator: "required" },
+                { title: "Linea", field: "linea", width: 150, editor: "input", validator: "required" },
+                { title: "Usuario", field: "usuario", width: 150, editor: "input", validator: "required" },
+                { title: "Cargo del usuario", field: "posicion", width: 150, editor: "input", validator: "required" },
+                { title: "Estatus", field: "estatus", width: 150, editor: "input", validator: "required" },
+                { title: "Observaciones", width: 150, editor: "input", validator: "required", frozen: true },
+            ],
+        });
+
+        //handle validation failure
+        table.on("validationFailed", function (cell, value, validators) {
+            //cell - cell component for the edited cell
+            //value - the value that failed validation
+            //validatiors - an array of validator objects that failed
+
+            //take action on validation fail
+        });
+        $("#mdl-eliminar").modal("show"); */
