@@ -450,36 +450,6 @@ async function insertar_supervisor() {
     }
 }
 
-function validar_campos(campos) {
-    let valido = true;
-
-    campos.forEach(id => {
-        const campo = document.getElementById(id);
-        if (!campo) {
-            valido = false;
-            return;
-        }
-
-        if ($(campo).hasClass('is-required') && !campo.value.trim()) {
-            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
-            valido = false;
-        } else if (!campo.value.trim()) {
-            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
-            valido = false;
-        } else {
-            campo.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
-        }
-
-        campo.addEventListener('input', function () {
-            if (campo.value.trim()) {
-                campo.classList.remove('is-invalid');
-            }
-        });
-    });
-
-    return valido;
-}
-
 function limpiar_campos_nuevo_supervisor() {
     /* let inputs = document.getElementsByName('insertMdl');
     for (let i = 0; i < inputs.length; i++) {
@@ -632,19 +602,6 @@ async function general_select2({ selectId, tabla, campo, placeholder, dropdownPa
     //} catch (error) {
 
     //}
-}
-
-function mostrar_toast(tipo, titulo, mensaje) {
-    Swal.fire({
-        icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
-        title: titulo,
-        text: mensaje,
-        timer: 2500,
-        timerProgressBar: true,
-        showConfirmButton: false,
-        toast: true,
-        position: 'top-end',
-    });
 }
 
 async function mensaje_eliminar() {

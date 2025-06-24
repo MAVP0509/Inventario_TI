@@ -4,21 +4,6 @@ if (sessionStorage.getItem('log') !== 'true') {
   window.location.href = 'login.html';
 }
 
-
-//TODO animando iconos 
-$(".icon").on('mouseover', function () {
-  $(this).find('i').addClass("fa-bounce");
-})
-$(".icon").on('mouseout', function (e) {
-  $(this).find('i').removeClass("fa-bounce");
-})
-
-$(document).on('mouseover', '.icon', function () {
-  $(this).find('i').addClass('fa-bounce');
-}).on('mouseout', '.icon', function () {
-  $(this).find('i').removeClass('fa-bounce');
-});
-
 //TODO Animando icono de salir
 $("#log-out").on('mouseover', function () {
   $(this).find('i').removeClass('fa-solid fa-door-closed fa-lg').addClass('fa-solid fa-door-open fa-xl');
@@ -95,90 +80,4 @@ fetch('sidebar.html')
   .catch(err => console.error('Error al cargar sidebar:', err));
 
 
-  //*Función para mostrar un alert
-function mostrar_alert(tipo, mensaje, skip, funcion) {
-  Swal.fire({
-    title: 'Inventario TI',
-    text: mensaje,
-    icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
-    showCancelButton: true,
-    confirmButtonColor: '#0000FF',
-    allowOutsideClick: skip, // true, false
-    cancelButtonColor: '#FF0000',
-    confirmButtonText: 'Aceptar <i class="fa-solid fa-circle-check fa-lg">',
-    cancelButtonText: 'Cancelar <i class="fa-solid fa-xmark fa-lg"></i>',
-    reverseButtons: true, //* 👉 Esto cambia el orden de los botones
-    backdrop: `
-        rgba(0,0,123,0.4)` ,
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // Si el usuario hace clic en "Aceptar", ejecutamos la función que pasamos como parámetro
-      funcion();
-    }
-  })
-}
 
-//*Función para mostrar un toast
-function mostrar_toast(tipo, titulo, mensaje, tiempo) {
-  Swal.fire({
-    icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
-    title: titulo,
-    html: mensaje,
-    timer: tiempo || 2500,
-    timerProgressBar: true,
-    showConfirmButton: false,
-    toast: true,
-    position: 'top-end',
-    heightAuto: true,
-  });
-}
-
-
-//todo Animando modals
-$(document).ready(function () {
-    // Cambia aquí el tipo de animaciones que quieres
-    const entrada = 'animate__backInDown';
-    const salida = 'animate__backOutDown';
-
-    // Para rastrear si un modal está en proceso de cerrar
-    const modalesEnCierre = {};
-
-    // Animación de entrada
-    $(document).on('show.bs.modal', '.modal', function () {
-        const $modal = $(this);
-        const $dialog = $modal.find('.modal-dialog');
-
-        modalesEnCierre[$modal.attr('id')] = false;
-
-        $dialog
-            .removeClass(`animate__animated ${salida}`)
-            .addClass(`animate__animated ${entrada}`);
-    });
-
-    // Animación de salida
-    $(document).on('hide.bs.modal', '.modal', function (e) {
-        const $modal = $(this);
-        const id = $modal.attr('id');
-        const $dialog = $modal.find('.modal-dialog');
-
-        if (!modalesEnCierre[id]) {
-            e.preventDefault(); // Detener cierre inmediato
-            modalesEnCierre[id] = true;
-
-            $dialog
-                .removeClass(entrada)
-                .addClass(salida);
-
-            // Cierra después de la animación
-            setTimeout(() => {
-                $modal.modal('hide');
-            }, 500); // duración de la animación
-        }
-    });
-
-    // Limpieza de clases después del cierre
-    $(document).on('hidden.bs.modal', '.modal', function () {
-        const $dialog = $(this).find('.modal-dialog');
-        $dialog.removeClass(`animate__animated ${salida}`);
-    });
-});

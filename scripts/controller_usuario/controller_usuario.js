@@ -687,44 +687,6 @@ function crear_word() {
 
 }
 
-
-
-function mostrar_toast(tipo, titulo, mensaje) {
-    Swal.fire({
-        icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
-        title: titulo,
-        text: mensaje,
-        timer: 2500,
-        timerProgressBar: true,
-        showConfirmButton: false,
-        toast: true,
-        position: 'top-end',
-        heightAuto : true,
-    });
-}
-
-function mostrar_alert(tipo, mensaje, skip, funcion) {
-    Swal.fire({
-        title: 'Inventario TI',
-        text: mensaje,
-        icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
-        showCancelButton: true,
-        confirmButtonColor: '#0000FF',
-        allowOutsideClick : skip, // true, false
-        cancelButtonColor: '#FF0000',
-        confirmButtonText: 'Aceptar <i class="fa-solid fa-circle-check fa-lg">',
-        cancelButtonText: 'Cancelar <i class="fa-solid fa-xmark fa-lg"></i>',
-        reverseButtons: true, //* 👉 Esto cambia el orden de los botones
-        backdrop: `
-        rgba(0,0,123,0.4)` ,
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Si el usuario hace clic en "Aceptar", ejecutamos la función que pasamos como parámetro
-            funcion();
-        }
-    })
-}
-
 function mostrar_toast_cargando() {
     Swal.fire({
         toast: true,
@@ -758,33 +720,3 @@ async function selecionar_registro(params) {
         select.splice(index, 1); 
     } 
 }
-
-function validar_campos(campos) {
-    let valido = true;
-
-    campos.forEach(id => {
-        const campo = document.getElementById(id);
-        if (!campo) {
-            valido = false;
-            return;
-        }
-
-        if (!campo.value.trim()) {
-            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
-            valido = false;
-        } else {
-            campo.classList.remove  ('is-invalid'); // Remueve la clase si el campo es válido
-        }
-
-        campo.addEventListener('input', function () {
-            if (campo.value.trim()) {
-                campo.classList.remove('is-invalid');
-            }
-        });
-    });
-
-    return valido;
-}
-
-
-
