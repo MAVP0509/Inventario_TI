@@ -605,7 +605,7 @@ async function confirmar_eliminacion() {
             height: "311px",
             data: data,
             columns: [
-                { title: "Rubro", field: "rubro", width: 150, editor: "input", validator: "required" },
+                { title: "Rubro", field: "rubro", headerHozAlign: "center",headerSort: false },
                 { title: "Tipo de dispositivo", field: "tipo", width: 150, sorter: "number", hozAlign: "left", editor: "input", editor: true, validator: ["min:0", "max:100", "numeric"] },
                 { title: "Marca", field: "marca", width: 150, editor: "input", validator: ["required", "in:male|female"] },
                 { title: "Modelo", field: "modelo", width: 150, editor: "input", hozAlign: "center", width: 100, editor: "input", validator: ["min:0", "max:5", "integer"] },
