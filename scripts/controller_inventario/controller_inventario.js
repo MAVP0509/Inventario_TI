@@ -595,43 +595,6 @@ async function confirmar_eliminacion() {
     }
 }
 
-function validar_campos(campos) {
-    let valido = true;
-
-    campos.forEach(id => {
-        const campo = document.getElementById(id);
-        if (!campo) {
-            valido = false;
-            return;
-        }
-
-        if ($(campo).hasClass('is-required') && !campo.value.trim()) {
-            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
-            valido = false;
-        } else if (!campo.value.trim()) {
-            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
-            valido = false;
-        } else {
-            campo.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
-        }
-
-        /* if (!campo.value.trim()) {
-            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
-            valido = false;
-        } else {
-            campo.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
-        } */
-
-        campo.addEventListener('input', function () {
-            if (campo.value.trim()) {
-                campo.classList.remove('is-invalid');
-            }
-        });
-    });
-
-    return valido;
-}
-
 
 
 //TODO: Alertas, confirmaciones

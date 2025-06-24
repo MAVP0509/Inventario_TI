@@ -104,26 +104,6 @@ async function registrarUsu() {
 
 }
 
-function validar_campos(campos) {
-    let valido = true;
-
-    campos.forEach(id => {
-        const campo = document.getElementById(id);
-        if (!campo) {
-            valido = false;
-            return;
-        }
-
-        if (!campo.value.trim()) {
-            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
-            valido = false;
-        } else {
-            campo.classList.remove('is-invalid');
-        }
-    });
-    return valido;
-}
-
 //* Función para validar la edad del usuario
 let vEdad = false
 function calcularEdad() {
@@ -449,8 +429,6 @@ async function validar_email() {
 
 //TODO Función de recuperación de la contraseña y funciones derivadas
 async function recuperar_contraseña() {
-    cargando();
-
     //let dominio = window.location.hostname
     //let puerto = location.port
     const validacion = ["repcorreo"]
@@ -458,6 +436,7 @@ async function recuperar_contraseña() {
         mostrar_toast('error', 'Error', 'Rellena todos los campos correctamente para continuar. Inténtalo de nuevo.');
         return;
     }
+    cargando();
     let model = {
         accion: 0,
         correo: $("#repcorreo").val().trim(),
@@ -509,19 +488,6 @@ document.getElementById('repcorreo').addEventListener('keydown', function (event
 
 
 //TODO funciones para mostrar mensajes en pantalla
-function mostrar_toast(tipo, titulo, mensaje) {
-    Swal.fire({
-        icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
-        title: titulo,
-        text: mensaje,
-        timer: 2500,
-        timerProgressBar: true,
-        showConfirmButton: false,
-        toast: true,
-        position: 'top-end',
-        //heightAuto : true,
-    });
-}
 
 function cargando() {
     Swal.fire({
