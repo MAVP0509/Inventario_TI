@@ -51,7 +51,7 @@ window.addEventListener('load', function () {
 
     if (mensajeRegistro) {
         // Si el mensaje existe, mostramos el toast
-        mostrar_alerta('success', 'Bienvenido', mensajeRegistro);
+        mostrar_toast('success', 'Bienvenido', mensajeRegistro);
 
 
 
@@ -122,7 +122,7 @@ async function consultar_informacion() {
         return `<button type='button' class='btn btn-warning icon' onclick=''><i class='fa-solid fa-pen-to-square fa-lg'></i></button>`;
     }
 
-    async function selecionar_registro(params) {
+    async function seleccionar_registro(params) {
         let index = seleccionar.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
         if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
             seleccionar.push(params); // Añade uno o más elementos al final de un array
@@ -161,7 +161,7 @@ async function consultar_informacion() {
                         let rowData = cell.getRow().getData();
                         rowData.seleccionado = !rowData.seleccionado;
                         cell.getRow().reformat();
-                        selecionar_registro(rowData.id_equipo)
+                        seleccionar_registro(rowData.id_equipo)
                     }, headerSort: false, frozen: true, width: 70, hozAlign: "center",
                 },
                 { title: "ID", field: "id_equipo", width: 70, hozAlign: "center", headerSort: false, headerHozAlign: "center", },
@@ -349,9 +349,9 @@ async function editar_registro() {
     if (server.resultado.exito === true) {
         await registrar_historico('Anterior edición de registro', server.resultado.anterior);
         await registrar_historico('Edición de registro', server.resultado.nuevo);
-        mostrar_alerta('success', '¡Edición exitosa!', 'El registro se ha actualizado correctamente.');
+        mostrar_toast('success', '¡Edición exitosa!', 'El registro se ha actualizado correctamente.');
     } else {
-        mostrar_alerta('error', 'Error', 'No se pudo editar el registro. Inténtalo nuevamente.');
+        mostrar_toast('error', 'Error', 'No se pudo editar el registro. Inténtalo nuevamente.');
         return
     }
 
@@ -458,7 +458,7 @@ async function crear_registro() {
 
     // Validar campos
     if (!validar_campos(validacion)) {
-        mostrar_alerta('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
+        mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
         return;
     }
 
@@ -496,16 +496,16 @@ async function crear_registro() {
         consultar_informacion();
         $("#mdl-inventario").modal('hide');
         await registrar_historico('Nuevo registro', model);
-        mostrar_alerta('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
+        mostrar_toast('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
     } else if (server.resultado === false) {
         if (server.mensaje === "Número de serie duplicado") {
             serie.classList.add('is-invalid'); // Marcar el campo como inválido si hay un número de serie duplicado
-            mostrar_alerta('warning', 'Número de serie duplicado', 'Este número de serie ya está registrado.');
+            mostrar_toast('warning', 'Número de serie duplicado', 'Este número de serie ya está registrado.');
         } else {
-            mostrar_alerta('error', 'Error', 'No se pudo crear el registro. Inténtalo nuevamente.');
+            mostrar_toast('error', 'Error', 'No se pudo crear el registro. Inténtalo nuevamente.');
         }
     } else {
-        mostrar_alerta('error', 'Error', 'No se pudo crear el registro. Inténtalo nuevamente.');
+        mostrar_toast('error', 'Error', 'No se pudo crear el registro. Inténtalo nuevamente.');
     }
 
 }
@@ -526,7 +526,7 @@ async function traspasos() {
         $('#mdl-traspaso').modal('hide')
         await registrar_historico('Anterior asignación', server.resultado.anterior);
         await registrar_historico('Generarción de traspaso', server.resultado.nuevo);
-        mostrar_alerta('success', '¡Traspaso exitoso!', 'El traspaso se ha realizado correctamente');
+        mostrar_toast('success', '¡Traspaso exitoso!', 'El traspaso se ha realizado correctamente');
         if (selected) {
             let userSelected = $('#mdl-usuario').val()
             //let userSelected = $('#mdl-usuario').select2('data')[0].text
@@ -534,13 +534,13 @@ async function traspasos() {
         }
 
     } else {
-        mostrar_alerta('error', 'Error', 'No se pudo realizar el traspaso. Inténtalo nuevamente.');
+        mostrar_toast('error', 'Error', 'No se pudo realizar el traspaso. Inténtalo nuevamente.');
     }
 }
 
 async function mostrar_traspaso() {
     if (seleccionar.length == 0) {
-        mostrar_alerta('warning', 'Alerta', 'Selecione al menos un activo. Inténtalo nuevamente.')
+        mostrar_toast('warning', 'Alerta', 'Selecione al menos un activo. Inténtalo nuevamente.')
     } else {
 
         await general_select2({
@@ -578,10 +578,10 @@ async function desactivar_registro() {
     // console.log(response)
     if (Array.isArray(response.resultado)) {
         await registrar_historico('Eliminación de registro', response.resultado);
-        mostrar_alerta('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
+        mostrar_toast('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
         consultar_informacion();
     } else {
-        mostrar_alerta('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
+        mostrar_toast('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
     }
 }
 
@@ -589,27 +589,10 @@ async function desactivar_registro() {
 
 async function confirmar_eliminacion() {
     if (seleccionar.length === 0) {
-        mostrar_alerta('error', 'Error', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
+        mostrar_toast('info', 'Información', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
     } else {
         mostrar_alert('warning', `¿Está seguro de eliminar ${seleccionar.length} activos(s)?`, false, desactivar_registro)
     }
-}
-
-
-
-//TODO: Alertas, confirmaciones
-
-function mostrar_alerta(tipo, titulo, mensaje) {
-    Swal.fire({
-        icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
-        title: titulo,
-        text: mensaje,
-        timer: 2000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-        toast: true,
-        position: 'top-end'
-    });
 }
 
 //TODO Funciones de los Select2
@@ -792,7 +775,7 @@ async function crear_resguardo(params) {
         "select-region",
     ];
     if (!validar_campos(validacion)) {
-        mostrar_alerta('error', 'Error', 'Rellena los campos. Inténtelo nuevamente');
+        mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente');
         return;
     }
 

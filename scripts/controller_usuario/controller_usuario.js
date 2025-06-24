@@ -711,7 +711,7 @@ function mostrar_toast_cargando() {
 // TODO: seleciona usuarios por id
 let select = [];
 
-async function selecionar_registro(params) {
+async function seleccionar_registro(params) {
 
     let index = select.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
     if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.

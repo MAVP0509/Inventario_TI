@@ -282,7 +282,7 @@ async function mostrar_historial() {
     const validacion = ["his-num-serie"];
 
     if (!validar_campo(validacion)) {
-        mostrar_alerta('warning', 'Alerta', 'Rellena los campos. Inténtelo nuevamente.');
+        mostrar_toast('warning', 'Alerta', 'Rellena los campos. Inténtelo nuevamente.');
         return;
     }
     const rango_fecha = $('#rango-fecha').val();

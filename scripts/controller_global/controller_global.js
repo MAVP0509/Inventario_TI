@@ -24,15 +24,15 @@ function mostrar_alert(tipo, mensaje, skip, funcion) {
 //*Función para mostrar un toast
 function mostrar_toast(tipo, titulo, mensaje, tiempo) {
     Swal.fire({
-        icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
-        title: titulo,
-        html: mensaje,
-        timer: tiempo || 2500,
-        timerProgressBar: true,
-        showConfirmButton: false,
-        toast: true,
-        position: 'top-end',
-        heightAuto: true,
+        icon: tipo, // Tipo de ícono : 'success', 'error', 'warning', 'info', 'question'
+        title: titulo, // Tetxo que se mostrará como título del toast
+        html: mensaje, // Contenido del mensaje, se permite HTML
+        timer: tiempo || 2500, // Duración del toast en milisegundos (por defecto 2500)
+        timerProgressBar: true, // Muestra una barra de progreso durante el tiempo
+        showConfirmButton: false, // No se muestra el botón de "Aceptar"
+        toast: true, // Habilita el modo toast (pequeño, en una esquina)
+        position: 'top-end', // Posición del toast (derecha superior)
+        heightAuto: true, // Ajusta automáticamente la altura según el contenido
     });
 }
 
