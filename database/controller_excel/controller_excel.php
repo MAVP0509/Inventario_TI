@@ -8,6 +8,7 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 header('Content_Type: text/html; charset=UTF-8');
@@ -37,7 +38,7 @@ function resguardo($valores)
     //* Accedemos al nombre del usuario 
     $usuario = $datos[0]->usuario ?? '';
     //*Accedemos al cargo que tiene el usuario
-    $area = $datos[0]->posicion ?? '';
+    $cargo = $datos[0]->posicion ?? '';
     //*Si se ingresó un comentario, se accede a éste
     $comentario = $datos[0]->comentario ?? '';
     //*Se accede a la fecha en la que se configuró el resguardo
@@ -48,6 +49,12 @@ function resguardo($valores)
     //* Se accede a que supervisor tiene esa región y el cargo de éste
     $supervisor = $datos[0]->supervisor ?? '';
     $cargoSupervisor = $datos[0]->cargo ?? '';
+
+    $area = $datos[0]->area ?? '';
+    $ubicacion = $datos[0]->ubicacion ?? '';
+
+    $userPemex = $datos[0]->userPemex ?? '';
+    $userPemexCargo = $datos[0]->userPemexCargo ?? '';
 
 
     $spreadsheet = IOFactory::load('FO-DSP-TI-01 Resguardo de herramientas TI Rev.00.xlsx'); //*Cargando la plantilla del Excel
@@ -94,11 +101,17 @@ function resguardo($valores)
         //* Copiando el estilo de la fila anterior para mantener el estilo de la plantilla
         $worksheet->duplicateStyle($worksheet->getStyle("B17:J17"), "B$fila:J$fila");
 
+        // Activar el ajuste de texto para el rango de celdas (por ejemplo, toda la fila)
+        $worksheet->getStyle("B$fila:J$fila")->getAlignment()->setWrapText(true);
+        $worksheet->getRowDimension($fila)->setRowHeight(-1);
+
         $worksheet->getStyle("B$fila:J$fila")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FFFFFF');
         $worksheet->getStyle("B$fila:J$fila")->getFont()->getColor()->setRGB('000000');
 
         //* Al copiar el estilo de la fila, el texto lo configura en negritas, asi que se le quita las negritas
         $worksheet->getStyle("A$fila:I$fila")->getFont()->setBold(false);
+
+
 
         //* Rellenamos la fila con sus datos correspondientes 
         $worksheet->setCellValue("B$fila", $num);
@@ -149,12 +162,31 @@ function resguardo($valores)
     $worksheet->setCellValue('C8', $usuario);
     $worksheet->setCellValue('C10', $area);
     $worksheet->setCellValue('F10', $region);
+    $worksheet->setCellValue('J10', $ubicacion);
 
     //* Calculando las celdas de la información del supervisor y configurando su información
     $filaSupervisor = 18 + $fila;
     $filaCargoSupervisor = $filaSupervisor + 1;
     $worksheet->setCellValue("C$filaSupervisor", $supervisor);
     $worksheet->setCellValue("C$filaCargoSupervisor", $cargoSupervisor);
+
+    $worksheet->setCellValue("H$filaCargoSupervisor", $cargo);
+
+    if (!empty($userPemex)) {
+        $filaPemex = $filaCargoSupervisor + 7;
+        $filaUserPemex = $filaPemex + 2;
+        $filaCargoPemex = $filaUserPemex + 1;
+
+        $worksheet->getStyle("E$filaPemex:G$filaPemex")->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN)->setColor(new Color(Color::COLOR_BLACK));
+
+        $worksheet->setCellValue("F$filaUserPemex", $userPemex);
+        $worksheet->getStyle("F$fila:I$fila")->getFont()->setBold(false);
+
+        $worksheet->setCellValue("F$filaCargoPemex", $userPemexCargo);
+        $worksheet->getStyle("F$fila:I$fila")->getFont()->setBold(false);
+
+    }
+
 
 
     //TODO Exportando el nuevo archivo excel
@@ -216,14 +248,14 @@ function cargar_plantilla()
 
         if (move_uploaded_file($tmpPath, $destino)) {
             $respuesta->mensaje = "Archivo guardado correctamente";
-            $respuesta->ruta = 'C:\xampp\htdocs\Inventario_TI\database\controller_excel\aFormato_Resguardo'. $nuevoNombre;
+            $respuesta->ruta = 'C:\xampp\htdocs\Inventario_TI\database\controller_excel\aFormato_Resguardo' . $nuevoNombre;
         } else {
             $respuesta->error = "No se pudo mover el archivo.";
         }
     } else {
         $respuesta->error = "No se recibió ningún archivo válido.";
     }
-    $excelFilePath = 'C:\xampp\htdocs\Inventario_TI\database\controller_excel\aFormato_Resguardo' . $nuevoNombre ;
+    $excelFilePath = 'C:\xampp\htdocs\Inventario_TI\database\controller_excel\aFormato_Resguardo' . $nuevoNombre;
     exportar_pdf($excelFilePath);
     //var_dump($excelFilePath);
     return $respuesta;
