@@ -25,7 +25,7 @@ function server_supervisor(model) {
 let datos = []
 let elemento
 let table
-let seleccionados = []
+let supervisor_seleccionado = []
 
 async function consultar_informacion(params) {
     let model = {
@@ -76,18 +76,6 @@ async function consultar_informacion(params) {
     let editIcon = function (cell, formatterParams, onRendered) { //plain text value
         return "<button type='button' class='btn btn-warning icon' onclick=''><i class='fa-solid fa-pen-to-square fa-lg'></i></button>";
     };
-
-    // Función para alternar selección y actualizar array
-    function seleccionar_supervisor(params) {
-        let index = seleccionados.indexOf(params);
-
-        if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
-            seleccionados.push(params); // Añade uno o más elementos al final de un array
-        } else {
-            seleccionados.splice(index, 1);
-        }
-        console.log(seleccionados); // para depuración
-    }
 
     table = new Tabulator('#tbl', {
         locale: "es",
@@ -143,7 +131,7 @@ async function consultar_informacion(params) {
                     let rowData = cell.getRow().getData();
                     rowData.seleccionado = !rowData.seleccionado;
                     cell.getRow().reformat();
-                    seleccionar_supervisor(rowData.id)
+                    seleccionar_registro(rowData.id, supervisor_seleccionado)
                 }, headerSort: false, frozen: true
             },
             { title: "ID", field: "id", width: 45, hozAlign: "center", headerSort: false, headerHozAlign: "center", },
@@ -153,7 +141,7 @@ async function consultar_informacion(params) {
                     let rowData = cell.getRow().getData();
                     rowData.seleccionado = !rowData.seleccionado;
                     cell.getRow().reformat();
-                    seleccionar_supervisor(rowData.id)
+                    seleccionar_registro(rowData.id, supervisor_seleccionado)
                 }
             },
             {
@@ -162,7 +150,7 @@ async function consultar_informacion(params) {
                     let rowData = cell.getRow().getData();
                     rowData.seleccionado = !rowData.seleccionado;
                     cell.getRow().reformat();
-                    seleccionar_supervisor(rowData.id)
+                    seleccionar_registro(rowData.id, supervisor_seleccionado)
                 }
             },
             {
@@ -174,7 +162,7 @@ async function consultar_informacion(params) {
                     let rowData = cell.getRow().getData();
                     rowData.seleccionado = !rowData.seleccionado;
                     cell.getRow().reformat();
-                    seleccionar_supervisor(rowData.id)
+                    seleccionar_registro(rowData.id)
                 }
             },
             {
@@ -596,18 +584,18 @@ async function general_select2({ selectId, tabla, campo, placeholder, dropdownPa
 
 async function mensaje_eliminar() {
 
-    if (seleccionados.length === 0) {
+    if (supervisor_seleccionado.length === 0) {
         mostrar_toast('warning', 'Inventario TI', 'Por favor, selecciona al menos un supervisor para continuar')
 
     } else {
-        mostrar_alert('warning', `¿Está seguro de eliminar ${seleccionados.length} supervisor(es)?`, false, eliminar_supervisor);
+        mostrar_alert('warning', `¿Está seguro de eliminar ${supervisor_seleccionado.length} supervisor(es)?`, false, eliminar_supervisor);
     }
 }
 
 async function eliminar_supervisor() {
     let model = {
         accion: 5,
-        id: seleccionados
+        id: supervisor_seleccionado
     }
 
     let server = await server_supervisor(model);
@@ -627,8 +615,8 @@ function deseleccionar_todos() {
     //  Resetear propiedad "seleccionado"
     datos.forEach(d => d.seleccionado = false);
 
-    //  Limpiar el array de seleccionados
-    seleccionados = [];
+    //  Limpiar el array de supervisor_seleccionado
+    supervisor_seleccionado = [];
 
     //  Forzar re-renderizado de todas las filas para reflejar los íconos
     table.getRows().forEach(row => row.reformat());

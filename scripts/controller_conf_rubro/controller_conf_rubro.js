@@ -27,7 +27,7 @@ let elemento
 let table
 
 
-let seleccionados = []
+let rubro_selecionada = []
 async function consultar_informacion() {
     let server = await server_rubro({ accion: 2 })
 
@@ -83,18 +83,6 @@ async function consultar_informacion() {
         return "<button type='button' class='btn btn-warning icon' onclick=''><i class='fa-solid fa-pen-to-square fa-lg'></i></button>";
     };
 
-    // Función para alternar selección y actualizar array
-    function seleccionar_rubros(params) {
-        let index = seleccionados.indexOf(params);
-
-        if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
-            seleccionados.push(params); // Añade uno o más elementos al final de un array
-        } else {
-            seleccionados.splice(index, 1);
-        }
-        //console.log(seleccionados); // para depuración
-    }
-
     table = new Tabulator('#tbl', {
         locale: "es",
         data: datos,
@@ -125,7 +113,7 @@ async function consultar_informacion() {
                     let rowData = cell.getRow().getData();
                     rowData.seleccionado = !rowData.seleccionado;
                     cell.getRow().reformat();
-                    seleccionar_rubros(rowData.id)
+                    seleccionar_registro(rowData.id, rubro_selecionada)
                 }, headerSort: false, frozen: true
             },
 
@@ -138,7 +126,7 @@ async function consultar_informacion() {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
                         cell.getRow().reformat();
-                        seleccionar_rubros(rowData.id)
+                        seleccionar_registro(rowData.id, rubro_selecionada)
                     }
             },
             {
@@ -264,18 +252,18 @@ async function nuevo_rubro() {
 
 async function mensaje_eliminar() {
 
-    if (seleccionados.length === 0) {
+    if (rubro_selecionada.length === 0) {
         mostrar_toast('warning', 'Inventario TI', 'Por favor, selecciona al menos un rubro para continuar')
 
     } else {
-        mostrar_alert('warning', `¿Está seguro de eliminar ${seleccionados.length} rubro(s)?`, false, eliminar_rubro);
+        mostrar_alert('warning', `¿Está seguro de eliminar ${rubro_selecionada.length} rubro(s)?`, false, eliminar_rubro);
     }
 }
 
 async function eliminar_rubro(params) {
     let model = {
         accion: 3,
-        id: seleccionados
+        id: rubro_selecionada
     }
 
     let response = await server_rubro(model);
@@ -296,8 +284,8 @@ function deseleccionar_todos() {
     //  Resetear propiedad "seleccionado"
     datos.forEach(d => d.seleccionado = false);
 
-    //  Limpiar el array de seleccionados
-    seleccionados = [];
+    //  Limpiar el array de rubro_selecionada
+    rubro_selecionada = [];
 
     //  Forzar re-renderizado de todas las filas para reflejar los íconos
     table.getRows().forEach(row => row.reformat());

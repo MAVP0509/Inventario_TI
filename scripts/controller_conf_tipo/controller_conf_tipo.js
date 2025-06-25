@@ -25,7 +25,7 @@ function server_tipo(model) {
 let datos = []
 let elemento
 let table
-let seleccionados = []
+let tipo_selecionado = []
 
 async function consultar_informacion(){
     let server = await server_tipo({accion : 2})
@@ -82,18 +82,6 @@ async function consultar_informacion(){
         return "<button type='button' class='btn btn-warning icon' onclick=''><i class='fa-solid fa-pen-to-square fa-lg'></i></button>";
     };
 
-    // Función para alternar selección y actualizar array
-    function seleccionar_tipos(params) {
-        let index = seleccionados.indexOf(params);
-
-        if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
-            seleccionados.push(params); // Añade uno o más elementos al final de un array
-        } else {
-            seleccionados.splice(index, 1);
-        }
-        //console.log(seleccionados); // para depuración
-    }
-
      table = new Tabulator('#tbl', {
          locale: "es",
         data: datos,
@@ -124,7 +112,7 @@ async function consultar_informacion(){
                     let rowData = cell.getRow().getData();
                     rowData.seleccionado = !rowData.seleccionado;
                     cell.getRow().reformat();
-                    seleccionar_tipos(rowData.id)
+                    seleccionar_registro(rowData.id, tipo_selecionado)
                 }, headerSort: false, frozen: true
             },
             {title:"ID", field:"id", width: 45, hozAlign: "center", headerSort: false},
@@ -133,7 +121,7 @@ async function consultar_informacion(){
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
                         cell.getRow().reformat();
-                        seleccionar_tipos(rowData.id)
+                        seleccionar_registro(rowData.id, tipo_selecionado)
                     }},
             {
                 formatter: editIcon, width: 60, hozAlign: "center",
@@ -257,18 +245,18 @@ async function nuevo_tipo() {
 
 async function mensaje_eliminar() {
 
-    if (seleccionados.length === 0) {
+    if (tipo_selecionado.length === 0) {
         mostrar_toast('warning', 'Inventario TI', 'Por favor, selecciona al menos un tipo para continuar')
 
     } else {
-        mostrar_alert('warning', `¿Está seguro de eliminar ${seleccionados.length} tipo(s)?`, false, eliminar_tipo);
+        mostrar_alert('warning', `¿Está seguro de eliminar ${tipo_selecionado.length} tipo(s)?`, false, eliminar_tipo);
     }
 }
 
 async function eliminar_tipo(params) {
     let model = {
         accion: 3,
-        id: seleccionados
+        id: tipo_selecionado
     }
 
     let server = await server_tipo(model);
@@ -288,8 +276,8 @@ function deseleccionar_todos() {
     //  Resetear propiedad "seleccionado"
     datos.forEach(d => d.seleccionado = false);
 
-    //  Limpiar el array de seleccionados
-    seleccionados = [];
+    //  Limpiar el array de tipo_selecionado
+    tipo_selecionado = [];
 
     //  Forzar re-renderizado de todas las filas para reflejar los íconos
     table.getRows().forEach(row => row.reformat());

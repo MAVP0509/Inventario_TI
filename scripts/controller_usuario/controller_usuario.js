@@ -60,7 +60,7 @@ $(document).ready(function (){
 let datos = []
 let elemento
 let table
-let seleccionados = []
+let usuario_seleccionado = []
 async function consultar_usuarios() {
     
     let server = await server_usuario({accion : 2})
@@ -252,17 +252,6 @@ async function consultar_usuarios() {
         return "<button type='button' class='btn btn-warning icon' onclick=''><i class='fa-solid fa-pen-to-square fa-lg'></i></button>";
     };
 
-    // Función para alternar selección y actualizar array
-    function seleccionar_usuarios(params) {
-        let index = seleccionados.indexOf(params);
-
-        if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
-            seleccionados.push(params); // Añade uno o más elementos al final de un array
-        } else {
-            seleccionados.splice(index, 1);
-        }
-        //console.log(seleccionados); // para depuración
-    }
     table = new Tabulator('#tbl', {
         locale: "es",
         data: datos,
@@ -293,7 +282,7 @@ async function consultar_usuarios() {
                     let rowData = cell.getRow().getData();
                     rowData.seleccionado = !rowData.seleccionado;
                     cell.getRow().reformat();
-                    seleccionar_usuarios(rowData.id)
+                    seleccionar_registro(rowData.id, usuario_seleccionado)
                 }, headerSort: false, frozen: true
             },
             { title: "ID", field: "id", width: 45, hozAlign: "center", headerSort: false },
@@ -303,7 +292,7 @@ async function consultar_usuarios() {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
                         cell.getRow().reformat();
-                        seleccionar_usuarios(rowData.id)
+                        seleccionar_registro(rowData.id, usuario_seleccionado)
                     }
             },
             {
@@ -312,7 +301,7 @@ async function consultar_usuarios() {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
                         cell.getRow().reformat();
-                        seleccionar_usuarios(rowData.id)
+                        seleccionar_registro(rowData.id, usuario_seleccionado)
                     }
             },
             {
@@ -321,7 +310,7 @@ async function consultar_usuarios() {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
                         cell.getRow().reformat();
-                        seleccionar_usuarios(rowData.id)
+                        seleccionar_registro(rowData.id, usuario_seleccionado)
                     }
             },
             {
@@ -330,7 +319,7 @@ async function consultar_usuarios() {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
                         cell.getRow().reformat();
-                        seleccionar_usuarios(rowData.id)
+                        seleccionar_registro(rowData.id, usuario_seleccionado)
                     }
             },
             {
@@ -339,7 +328,7 @@ async function consultar_usuarios() {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
                         cell.getRow().reformat();
-                        seleccionar_usuarios(rowData.id)
+                        seleccionar_registro(rowData.id, usuario_seleccionado)
                     }
             },{
                 formatter: editIcon, width: 60, hozAlign: "center",
@@ -409,11 +398,11 @@ async function editar_usuario(params) {
 
 async function mensaje_eliminar() {
 
-    if (seleccionados.length === 0) {
+    if (usuario_seleccionado.length === 0) {
         mostrar_toast('warning', 'Inventario TI', 'Por favor, selecciona al menos un usuario para continuar')
         
     }else{
-        mostrar_alert('warning', `¿Está seguro de eliminar ${seleccionados.length} usuario(s)?`, false, eliminar_usuario);
+        mostrar_alert('warning', `¿Está seguro de eliminar ${usuario_seleccionado.length} usuario(s)?`, false, eliminar_usuario);
         /* modalElim = new bootstrap.Modal(document.getElementById('modalElim'))
         modalElim.show() */
     }
@@ -422,7 +411,7 @@ async function mensaje_eliminar() {
 async function eliminar_usuario(params) {
         let model = {
             accion : 3,
-            id : seleccionados
+            id : usuario_seleccionado
         }
 
         let response = await server_usuario(model);
@@ -442,8 +431,8 @@ function deseleccionar_todos() {
     //  Resetear propiedad "seleccionado"
     datos.forEach(d => d.seleccionado = false);
 
-    //  Limpiar el array de seleccionados
-    seleccionados = [];
+    //  Limpiar el array de usuario_seleccionado
+    usuario_seleccionado = [];
 
     //  Forzar re-renderizado de todas las filas para reflejar los íconos
     table.getRows().forEach(row => row.reformat());
@@ -706,17 +695,4 @@ function mostrar_toast_cargando() {
             //Swal.showLoading(); // Esto muestra el spinner
         }
     });
-}
-
-// TODO: seleciona usuarios por id
-let select = [];
-
-async function selecionar_registro(params) {
-
-    let index = select.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
-    if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
-        select.push(params); // Añade uno o más elementos al final de un array
-    } else {
-        select.splice(index, 1); 
-    } 
 }
