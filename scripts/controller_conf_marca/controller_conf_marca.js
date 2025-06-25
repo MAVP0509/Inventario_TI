@@ -25,7 +25,7 @@ function server_marca(model) {
 let datos = []
 let elemento
 let table
-let seleccionados = []
+let marca_selecionada = []
 
 async function consultar_informacion() {
     let server = await server_marca({ accion: 2 })
@@ -81,18 +81,6 @@ async function consultar_informacion() {
         return "<button type='button' class='btn btn-warning icon' onclick=''><i class='fa-solid fa-pen-to-square fa-lg'></i></button>";
     };
 
-    // Función para alternar selección y actualizar array
-    function seleccionar_marcas(params) {
-        let index = seleccionados.indexOf(params);
-
-        if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
-            seleccionados.push(params); // Añade uno o más elementos al final de un array
-        } else {
-            seleccionados.splice(index, 1);
-        }
-        //console.log(seleccionados); // para depuración
-    }
-
     table = new Tabulator('#tbl', {
         locale: "es",
         data: datos,
@@ -123,7 +111,7 @@ async function consultar_informacion() {
                     let rowData = cell.getRow().getData();
                     rowData.seleccionado = !rowData.seleccionado;
                     cell.getRow().reformat();
-                    seleccionar_marcas(rowData.id)
+                    seleccionar_registro(rowData.id, marca_selecionada)
                 }, headerSort: false, frozen: true
             },
             { title: "ID", field: "id", width: 45, hozAlign: "center", headerSort: false },
@@ -133,7 +121,7 @@ async function consultar_informacion() {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
                         cell.getRow().reformat();
-                        seleccionar_marcas(rowData.id)
+                        seleccionar_registro(rowData.id, marca_seleccionada)
                     }
             },
             {
@@ -261,18 +249,18 @@ async function nuevo_marca() {
 
 async function mensaje_eliminar() {
 
-    if (seleccionados.length === 0) {
+    if (marca_selecionada.length === 0) {
         mostrar_toast('warning', 'Inventario TI', 'Por favor, selecciona al menos un rubro para continuar')
 
     } else {
-        mostrar_alert('warning', `¿Está seguro de eliminar ${seleccionados.length} marca(s)?`, false, eliminar_marca);
+        mostrar_alert('warning', `¿Está seguro de eliminar ${marca_selecionada.length} marca(s)?`, false, eliminar_marca);
     }
 }
 
 async function eliminar_marca(params) {
     let model = {
         accion: 3,
-        id: seleccionados
+        id: marca_selecionada
     }
 
     let server = await server_marca(model);
@@ -292,8 +280,8 @@ function deseleccionar_todos() {
     //  Resetear propiedad "seleccionado"
     datos.forEach(d => d.seleccionado = false);
 
-    //  Limpiar el array de seleccionados
-    seleccionados = [];
+    //  Limpiar el array de marca_selecionada
+    marca_selecionada = [];
 
     //  Forzar re-renderizado de todas las filas para reflejar los íconos
     table.getRows().forEach(row => row.reformat());

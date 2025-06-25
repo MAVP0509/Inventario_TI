@@ -79,6 +79,16 @@ function validar_campos(campos) {
     return valido;
 }
 
+async function seleccionar_registro(id, lista) {
+    let index = lista.indexOf(id); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
+    if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
+        lista.push(id); // Añade uno o más elementos al final de un array
+    } else {
+        lista.splice(index, 1);
+    }
+    // console.log(seleccionar)
+}
+
 //TODO animando iconos 
 $(".icon").on('mouseover', function () {
     $(this).find('i').addClass("fa-bounce");

@@ -64,7 +64,7 @@ let datos = [];
 let elemento
 let table
 
-let seleccionar = [];
+let equipo_selecionado = [];
 
 async function consultar_informacion() {
     let model = {
@@ -122,16 +122,6 @@ async function consultar_informacion() {
         return `<button type='button' class='btn btn-warning icon' onclick=''><i class='fa-solid fa-pen-to-square fa-lg'></i></button>`;
     }
 
-    async function seleccionar_registro(params) {
-        let index = seleccionar.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
-        if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
-            seleccionar.push(params); // Añade uno o más elementos al final de un array
-        } else {
-            seleccionar.splice(index, 1);
-        }
-        // console.log(seleccionar)
-    }
-
     try {
         table = new Tabulator("#tbl01", {
             //layout: "fitColumns",
@@ -161,7 +151,7 @@ async function consultar_informacion() {
                         let rowData = cell.getRow().getData();
                         rowData.seleccionado = !rowData.seleccionado;
                         cell.getRow().reformat();
-                        seleccionar_registro(rowData.id_equipo)
+                        seleccionar_registro(rowData.id_equipo, equipo_selecionado)
                     }, headerSort: false, frozen: true, width: 70, hozAlign: "center",
                 },
                 { title: "ID", field: "id_equipo", width: 70, hozAlign: "center", headerSort: false, headerHozAlign: "center", },
@@ -513,7 +503,7 @@ async function crear_registro() {
 async function traspasos() {
     let model = {
         accion: 6,
-        id: seleccionar,
+        id: equipo_selecionado,
         estatus: $('#mdl-estado').val(),
         usuario: $('#mdl-usuario').val(),
     }
@@ -521,7 +511,7 @@ async function traspasos() {
     let server = await server_inventario(model);
 
     if (server.resultado) {
-        seleccionar = []
+        equipo_selecionado = []
         consultar_informacion();
         $('#mdl-traspaso').modal('hide')
         await registrar_historico('Anterior asignación', server.resultado.anterior);
@@ -539,7 +529,7 @@ async function traspasos() {
 }
 
 async function mostrar_traspaso() {
-    if (seleccionar.length == 0) {
+    if (equipo_selecionado.length == 0) {
         mostrar_toast('warning', 'Alerta', 'Selecione al menos un activo. Inténtalo nuevamente.')
     } else {
 
@@ -571,7 +561,7 @@ async function mostrar_traspaso() {
 async function desactivar_registro() {
     let model = {
         accion: 3,
-        id: seleccionar, // IDs seleccionados
+        id: equipo_selecionado, // IDs seleccionados
     };
 
     let response = await server_inventario(model);
@@ -588,10 +578,10 @@ async function desactivar_registro() {
 //TODO: Validación de funciones
 
 async function confirmar_eliminacion() {
-    if (seleccionar.length === 0) {
+    if (equipo_selecionado.length === 0) {
         mostrar_toast('info', 'Información', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
     } else {
-        mostrar_alert('warning', `¿Está seguro de eliminar ${seleccionar.length} activos(s)?`, false, desactivar_registro)
+        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_selecionado.length} activos(s)?`, false, desactivar_registro)
     }
 }
 
