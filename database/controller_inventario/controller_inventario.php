@@ -70,12 +70,12 @@ function insertar_datos($valores)
         $val_marca = $idMarca['id'];
     }
 
-    $val_estatus = "";
+    /* $val_estatus = "";
     if ($valores->usuario == "5") {
         $val_estatus = "Bodega";
     } else {
         $val_estatus = "Asignado";
-    }
+    } */
 
     $val_tag = "";
     if ($valores->tag == "") {
@@ -90,7 +90,7 @@ function insertar_datos($valores)
     } else {
         $val_af = $valores->af;
     }
-
+    $val_estatus = empty($valores->usuario) ? 'Bodega' : 'Asignado';
     $val_imei = empty($valores->imei) ? 'NA' : $valores_imei;
     $val_linea = empty($valores->linea) ? 'NA' : $valores_linea;
 

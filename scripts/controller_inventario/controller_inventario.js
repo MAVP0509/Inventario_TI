@@ -421,7 +421,17 @@ function mdl_nvo_registro() {
         campo: 'nombre',
         placeholder: 'Seleccione un usuario',
         dropdownParent: '#mdl-inventario',
+        tags: true
     });
+
+    general_select2({
+        selectId: 'inp-cargo',
+        tabla: 'cat_usuarios',
+        campo: 'nombre',
+        placeholder: 'Selecione un cargo',
+        dropdownParent: '#mdl-inventario',
+        tags: true
+    })
 
     document.getElementById('title-mdl-inventario').textContent = "Registro de Activo"
     document.getElementById('btn-mdl-inventario').onclick = function () { crear_registro() }
@@ -501,6 +511,14 @@ async function crear_registro() {
 }
 
 async function traspasos() {
+
+    const validacion = ['mdl-estado']
+
+    if (!validar_campos(validacion)) {
+        mostrar_toast('error', 'Error', 'Rellene los campos. Inténtalo nuevamente');
+        return false
+    }
+
     let model = {
         accion: 6,
         id: equipo_selecionado,
@@ -645,31 +663,60 @@ function rellenar_select(texto, select) {
 }
 
 //* Deshabilitando el input TAG del registro
-$(document).ready(function () {
-    // Escucha cambios en el campo "inp-tipo"
-    $('#inp-tipo').on('change', function () {
-        const tipoSeleccionado = $(this).val(); // Obtiene el valor seleccionado
+async function habilitar_campo({ id, condiciones }) {
+    const $select = $('#' + id);
 
-        if (tipoSeleccionado === '58' || tipoSeleccionado === '40') {
-            // Habilita el campo TAG y lo hace obligatorio
-            $('#inp-tag').prop('disabled', false).addClass('is-required');
-        } else {
-            // Deshabilita el campo TAG y elimina la obligatoriedad
-            $('#inp-tag').prop('disabled', true).removeClass('is-required').val('');
-        }
+    $select.on('change', function () {
+        const valor_seleccionado = $(this).val();
 
-        if (tipoSeleccionado === '85') {
-            $('#inp-imei').prop('disabled', false).addClass('is-required');
-            $('#inp-linea').prop('disabled', false).addClass('is-required');
-        } else {
-            $('#inp-imei').prop('disabled', true).removeClass('is-required').val('');
-            $('#inp-linea').prop('disabled', true).removeClass('is-required').val('');
-        }
+        condiciones.forEach(cond => {
+            const { mostrar, campos } = cond;
 
-        $('#inp-imei, #inp-linea').on('input', function () {
-            this.value = this.value.replace(/\D/g, ''); // Elimina todo lo que no sea dígito
+            if (mostrar.includes(valor_seleccionado)) {
+                campos.forEach(selector => {
+                    const $campo = $(selector);
+                    $campo.closest('.input-group').show();
+                    $campo.prop('disabled', false).addClass('is-requerid');
+                });
+            } else {
+                campos.forEach(selector => {
+                    const $campo = $(selector);
+                    $campo.closest('.input-group').show();
+                    $campo.prop('disabled', true).removeClass('is-requerid').val('');
+                })
+            }
+        })
+    })
+
+    condiciones.forEach(cond => {
+        cond.campos.forEach(selector => {
+            const $campo = $(selector);
+            $campo.closest('.input-group').hide();
+            $campo.prop('disabled', true).removeClass('is-required').val('');
         });
     });
+
+}
+
+$(document).ready(function () {
+    habilitar_campo({
+        id: 'inp-tipo',
+        condiciones: [
+            {
+                mostrar: ['58', '40'],
+                campos: ['#inp-tag']
+            },
+            {
+                mostrar: ['85'],
+                campos: ['#inp-imei', '#inp-linea']
+            },
+        ]
+    });
+    $('#inp-tipo').trigger('change')
+});
+
+$('#inp-imei, #inp-linea').on('input', function () {
+    this.value = this.value.replace(/\D/g, '');
 });
 
 $(document).ready(function () {

@@ -148,7 +148,8 @@
                                                         class="fa-solid fa-computer"></i></span>
                                             </div>
                                             <select class="form-control select" id="inp-tipo"></select>
-                                            <div class="invalid-feedback">Por favor, seleccione un tipo de dispositivo.</div>
+                                            <div class="invalid-feedback">Por favor, seleccione un tipo de dispositivo.
+                                            </div>
                                         </div>
                                         <h6>Marca del dispositivo</h6>
                                         <div class="input-group mb-3">
@@ -173,7 +174,8 @@
                                                 data-toggle="popover" data-trigger="hover" data-html="true"
                                                 title="Descripción"
                                                 data-content="Es el modelo específico del dispositivo.">
-                                            <div class="invalid-feedback">Por favor, ingrese un modelo de dispositivo.</div>
+                                            <div class="invalid-feedback">Por favor, ingrese un modelo de dispositivo.
+                                            </div>
                                         </div>
                                         <h6>Numero de serie</h6>
                                         <div class="input-group mb-3">
@@ -238,12 +240,14 @@
                                         <h6>IMEI del dispositivo</h6>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-hashtag"></i></span>
+                                                <span class="input-group-text"><i
+                                                        class="fa-solid fa-hashtag"></i></span>
                                             </div>
-                                            <input type="text" class="form-control" maxlength="15" id="inp-imei" name="mdl-reg"
-                                                    placeholder="IMEI" autocomplete="off" data-toggle="popover"
-                                                    data-trigger="hover" data-html="true" title="Descripción"
-                                                    data-content="Es un código de 15 dígitos único pregrabado en los teléfonos móviles, el cual identifica que tiene cada teléfono. (Para obtenerlo marca *#06#).">
+                                            <input type="text" class="form-control" maxlength="15" id="inp-imei"
+                                                name="mdl-reg" placeholder="IMEI" autocomplete="off"
+                                                data-toggle="popover" data-trigger="hover" data-html="true"
+                                                title="Descripción"
+                                                data-content="Es un código de 15 dígitos único pregrabado en los teléfonos móviles, el cual identifica que tiene cada teléfono. (Para obtenerlo marca *#06#).">
                                             <div class="invalid-feedback"> Por favor, ingrese el IMEI</div>
                                         </div>
                                         <h6>Número de teléfono</h6>
@@ -251,10 +255,11 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
                                             </div>
-                                            <input type="text" class="form-control" maxlength="15" id="inp-linea" name="mdl-reg"
-                                                    placeholder="Número de teléfono" autocomplete="off" data-toggle="popover"
-                                                    data-trigger="hover" data-html="true" title="Descripción"
-                                                    data-content="Es un código de 15 dígitos único pregrabado en los teléfonos móviles, el cual identifica que tiene cada teléfono. (Para obtenerlo marca *#06#)">
+                                            <input type="text" class="form-control" maxlength="15" id="inp-linea"
+                                                name="mdl-reg" placeholder="Número de teléfono" autocomplete="off"
+                                                data-toggle="popover" data-trigger="hover" data-html="true"
+                                                title="Descripción"
+                                                data-content="Es un código de 15 dígitos único pregrabado en los teléfonos móviles, el cual identifica que tiene cada teléfono. (Para obtenerlo marca *#06#)">
                                             <div class="invalid-feedback"> Por favor, una linea</div>
                                         </div>
                                     </div><!--col-->
@@ -267,9 +272,17 @@
                                         <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                                     </div>
                                     <select class="form-control select" id="inp-usuario" name="mdl-reg"
-                                        placeholder="usuario" data-toggle="popover" data-trigger="hover"
-                                        data-html="true" title="Descripción"
-                                        data-content="Es el modelo específico del dispositivo."></select>
+                                        data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción"
+                                        data-content="Nombre del usuario al que se le asignara un activo"></select>
+                                </div>
+                                <h6>Cargo del usuario</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-briefcase"></i></span>
+                                    </div>
+                                    <select class="form-control select" id="inp-cargo" name="mdl-reg"
+                                        data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción"
+                                        data-content="Puesto que emplea el usuario"></select>
                                 </div>
                                 <h6 id="lbl-fecha-reg">Fecha de registro</h6>
                                 <div class="input-group mb-3" id="inp-fecha-reg">
@@ -447,7 +460,8 @@
                                     class="fa-solid fa-user"></i></span></div>
                         <select class="form-control select" id="mdl-usuario"></select>
                     </div>
-                    <div class="alert alert-info position-relative d-flex align-items-start" role="alert" style="display:none ; background-color:#e7f3fe; border-color:#b8daff; color:#004085; padding-right: 4rem;"
+                    <div class="alert alert-info position-relative d-flex align-items-start" role="alert"
+                        style="display:none ; background-color:#e7f3fe; border-color:#b8daff; color:#004085; padding-right: 4rem;"
                         id="alert-traspaso">
                         <button type='button' class='btn icon toggle-select me-2' id="check-resguardo">
                             <i class='fa-regular fa-square fa-lg' id="check-resguardo-icon"></i>
