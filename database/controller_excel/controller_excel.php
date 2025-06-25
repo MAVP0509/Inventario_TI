@@ -7,6 +7,8 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 header('Content_Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
@@ -48,7 +50,7 @@ function resguardo($valores)
     $cargoSupervisor = $datos[0]->cargo ?? '';
 
 
-    $spreadsheet = IOFactory::load('Plantilla3.xlsx'); //*Cargando la plantilla del Excel
+    $spreadsheet = IOFactory::load('FO-DSP-TI-01 Resguardo de herramientas TI Rev.00.xlsx'); //*Cargando la plantilla del Excel
     $worksheet = $spreadsheet->getActiveSheet();
 
     /* 
@@ -70,9 +72,9 @@ function resguardo($valores)
     $pageMargins->setRight(0.5);
 
 
-    $fila = 19;        //* Fila desde donde se empezará a generar la tabla en el formato, funcionará como contador
+    $fila = 17;        //* Fila desde donde se empezará a generar la tabla en el formato, funcionará como contador
     $num = 1;          //* Número visual en la tabla, funcionará como contador
-    $filaInicio = 19;  //* Se guarda la fila de inicio para hacer cálculos después de generar la tabla del resguardo
+    $filaInicio = 17;  //* Se guarda la fila de inicio para hacer cálculos después de generar la tabla del resguardo
 
     //* For para generar las filas de la tabla en el resguardo
     foreach ($datos as  $item) {
@@ -84,23 +86,27 @@ function resguardo($valores)
          TODO Reaplicar las combinaciones de celdas en la nueva fila
          * Al insertar nuevas filas, no respeta las combinaciones de celdas de la plantilla
          */
-        $worksheet->mergeCells("D$fila:E$fila");
-        $worksheet->mergeCells("F$fila:G$fila");
-        $worksheet->mergeCells("H$fila:I$fila");
+        //$worksheet->mergeCells("D$fila:E$fila");
+        $worksheet->mergeCells("E$fila:F$fila");
+        $worksheet->mergeCells("G$fila:H$fila");
+        $worksheet->mergeCells("I$fila:J$fila");
 
         //* Copiando el estilo de la fila anterior para mantener el estilo de la plantilla
-        $worksheet->duplicateStyle($worksheet->getStyle("A18:I18"), "A$fila:I$fila");
+        $worksheet->duplicateStyle($worksheet->getStyle("B17:J17"), "B$fila:J$fila");
+
+        $worksheet->getStyle("B$fila:J$fila")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('FFFFFF');
+        $worksheet->getStyle("B$fila:J$fila")->getFont()->getColor()->setRGB('000000');
 
         //* Al copiar el estilo de la fila, el texto lo configura en negritas, asi que se le quita las negritas
         $worksheet->getStyle("A$fila:I$fila")->getFont()->setBold(false);
 
         //* Rellenamos la fila con sus datos correspondientes 
-        $worksheet->setCellValue("A$fila", $num);
-        $worksheet->setCellValue("B$fila", $item->tipo);
-        $worksheet->setCellValue("C$fila", $item->marca);
-        $worksheet->setCellValue("D$fila", $item->modelo);
-        $worksheet->setCellValue("F$fila", $item->num_serie ?? ''); //* Si el equipo no tiene num_serie, se le pone cadena vacía
-        $worksheet->setCellValue("H$filaInicio", $comentario); // H e I combinadas
+        $worksheet->setCellValue("B$fila", $num);
+        $worksheet->setCellValue("C$fila", $item->tipo);
+        $worksheet->setCellValue("D$fila", $item->marca);
+        $worksheet->setCellValue("E$fila", $item->modelo);
+        $worksheet->setCellValue("G$fila", $item->num_serie ?? ''); //* Si el equipo no tiene num_serie, se le pone cadena vacía
+        $worksheet->setCellValue("I$filaInicio", $comentario); // H e I combinadas
 
         $fila++; //* Aumentamos el contador para avanzar a la siguiente fila
 
@@ -111,18 +117,18 @@ function resguardo($valores)
             $worksheet->insertNewRowBefore($fila, 1);
 
             //* Reaplicar las combinaciones de celdas en la nueva fila
-            $worksheet->mergeCells("D$fila:E$fila");
-            $worksheet->mergeCells("F$fila:G$fila");
-            $worksheet->mergeCells("H$fila:I$fila");
+            $worksheet->mergeCells("E$fila:F$fila");
+            $worksheet->mergeCells("G$fila:H$fila");
+            $worksheet->mergeCells("I$fila:J$fila");
 
             //*  Copiar el estilo de la fila anterior 
-            $worksheet->duplicateStyle($worksheet->getStyle("A18:I18"), "A$fila:I$fila");
+            $worksheet->duplicateStyle($worksheet->getStyle("B17:J17"), "B$fila:J$fila");
 
             //* Activar negrita solo para la celda del tag
-            $worksheet->getStyle("D$fila")->getFont()->setBold(true);
+            $worksheet->getStyle("E$fila")->getFont()->setBold(true);
 
             //* Insertando el tag en la fila correspondiente
-            $worksheet->setCellValue("D$fila", $item->tag);
+            $worksheet->setCellValue("E$fila", $item->tag);
 
             $fila++; //* Aumentamos el contador para avanzar a la siguiente fila
         }
@@ -134,21 +140,21 @@ function resguardo($valores)
     $filaFin = $fila - 1; //* Se guarda la fila final para hacer cálculos
 
     //* Combinando las filas generadas en la columna de Comentario
-    $worksheet->mergeCells("H$filaInicio:I$filaFin");
+    $worksheet->mergeCells("I$filaInicio:J$filaFin");
 
     //*Asignando la fecha al resguardo
-    $worksheet->getCell('I8')->setValue($fechaFormato);
+    $worksheet->getCell('J8')->setValue($fechaFormato);
 
     //*Configurando en el resguardo la información del usuario
-    $worksheet->setCellValue('C10', $usuario);
-    $worksheet->setCellValue('C12', $area);
-    $worksheet->setCellValue('F12', $region);
+    $worksheet->setCellValue('C8', $usuario);
+    $worksheet->setCellValue('C10', $area);
+    $worksheet->setCellValue('F10', $region);
 
     //* Calculando las celdas de la información del supervisor y configurando su información
-    $filaSupervisor = 17 + $fila;
+    $filaSupervisor = 18 + $fila;
     $filaCargoSupervisor = $filaSupervisor + 1;
-    $worksheet->setCellValue("B$filaSupervisor", $supervisor);
-    $worksheet->setCellValue("B$filaCargoSupervisor", $cargoSupervisor);
+    $worksheet->setCellValue("C$filaSupervisor", $supervisor);
+    $worksheet->setCellValue("C$filaCargoSupervisor", $cargoSupervisor);
 
 
     //TODO Exportando el nuevo archivo excel
