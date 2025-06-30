@@ -53,11 +53,10 @@ window.addEventListener('load', function () {
         // Si el mensaje existe, mostramos el toast
         mostrar_toast('success', 'Bienvenido', mensajeRegistro);
 
-
-
         // Eliminamos el mensaje para evitar que aparezca nuevamente
         sessionStorage.removeItem('bienvenido');
     }
+
 })
 
 let datos = [];
@@ -128,8 +127,9 @@ async function consultar_informacion() {
             locale: "es",
             data: datos,
             pagination: true,
+            height: "800px",
             paginationSize: 10,
-            paginationSizeSelector: [5, 10, 25, 35],
+            paginationSizeSelector: [10, 25, 35, true],
             movableColumns: true,              //allow column order to be changed
             paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
                 const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
@@ -154,7 +154,6 @@ async function consultar_informacion() {
                         seleccionar_registro(rowData.id_equipo, equipo_seleccionado)
                     }, headerSort: false, frozen: true, width: 70, hozAlign: "center",
                 },
-                { title: "ID", field: "id_equipo", width: 70, hozAlign: "center", headerSort: false, headerHozAlign: "center", },
                 {
                     title: "Zona", field: "zona", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "list",
                     headerFilterParams: {

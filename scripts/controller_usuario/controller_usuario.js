@@ -285,7 +285,6 @@ async function consultar_usuarios() {
                     seleccionar_registro(rowData.id, usuario_seleccionado)
                 }, headerSort: false, frozen: true
             },
-            { title: "ID", field: "id", width: 45, hozAlign: "center", headerSort: false },
             {
                 title: "Nombre", field: "nombre", cellClick:
                     function (e, cell) {

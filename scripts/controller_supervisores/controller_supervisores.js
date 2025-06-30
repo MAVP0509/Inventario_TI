@@ -134,7 +134,6 @@ async function consultar_informacion(params) {
                     seleccionar_registro(rowData.id, supervisor_seleccionado)
                 }, headerSort: false, frozen: true
             },
-            { title: "ID", field: "id", width: 45, hozAlign: "center", headerSort: false, headerHozAlign: "center", },
             {
                 title: "Nombre", field: "nombre", headerHozAlign: "center", headerFilter: "input", headerSort: false, cellClick: function (e, cell) {
                     // Alternar estado de seleccionado

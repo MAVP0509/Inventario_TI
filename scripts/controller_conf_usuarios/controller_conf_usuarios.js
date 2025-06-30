@@ -112,7 +112,6 @@ async function consultar_informacion() {
                     seleccionar_registro(rowData.id, usuarios_seleccionados)
                 }, headerSort: false, frozen: true
             },
-            { title: "ID", field: "id", width: 45, hozAlign: "center", headerSort: false },
             {
                 title: "Nombre", field: "nombre", headerFilter: "input", headerSort: false, cellClick:
                     function (e, cell) {

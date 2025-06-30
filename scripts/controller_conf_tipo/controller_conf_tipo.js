@@ -115,7 +115,6 @@ async function consultar_informacion(){
                     seleccionar_registro(rowData.id, tipo_selecionado)
                 }, headerSort: false, frozen: true
             },
-            {title:"ID", field:"id", width: 45, hozAlign: "center", headerSort: false},
             {title:"Tipo", field:"tipo", headerFilter: "input", headerSort: false, cellClick:
                     function (e, cell) {
                         let rowData = cell.getRow().getData()
