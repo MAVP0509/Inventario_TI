@@ -10,6 +10,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
 header('Content_Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
@@ -173,17 +174,24 @@ function resguardo($valores)
     $worksheet->setCellValue("H$filaCargoSupervisor", $cargo);
 
     if (!empty($userPemex)) {
+        $filaHeaderPemex = $filaCargoSupervisor + 5;
         $filaPemex = $filaCargoSupervisor + 7;
         $filaUserPemex = $filaPemex + 2;
         $filaCargoPemex = $filaUserPemex + 1;
 
+        $worksheet->setCellValue("F$filaHeaderPemex", "ACEPTA Y RECIBE:");
+        $worksheet->getStyle("F$filaHeaderPemex")->getFont()->setBold(true);
+        $worksheet->getStyle("F$filaHeaderPemex")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
         $worksheet->getStyle("E$filaPemex:G$filaPemex")->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN)->setColor(new Color(Color::COLOR_BLACK));
 
         $worksheet->setCellValue("F$filaUserPemex", $userPemex);
-        $worksheet->getStyle("F$fila:I$fila")->getFont()->setBold(false);
+        $worksheet->getStyle("F$filaUserPemex")->getFont()->setBold(true);
+        $worksheet->getStyle("F$filaUserPemex")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         $worksheet->setCellValue("F$filaCargoPemex", $userPemexCargo);
-        $worksheet->getStyle("F$fila:I$fila")->getFont()->setBold(false);
+        $worksheet->getStyle("F$filaCargoPemex")->getFont()->setBold(true);
+        $worksheet->getStyle("F$filaCargoPemex")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
     }
 
