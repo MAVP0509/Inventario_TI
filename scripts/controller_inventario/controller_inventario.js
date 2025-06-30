@@ -222,6 +222,7 @@ async function mdl_editar(params) {
     //* Deshabilitando los input de usuario y fecha
     $('#inp-usuario').prop('disabled', true)
     $('#inp-fecha-entrega').prop('disabled', true)
+    $('#inp-cargo').prop('disabled', true)
 
 
     // Limpia y carga los select
@@ -277,6 +278,14 @@ async function mdl_editar(params) {
         dropdownParent: '#mdl-inventario',
     })
 
+    await general_select2({
+        selectId: 'inp-cargo',
+        tabla: 'cat_usuarios',
+        campo: 'cargo',
+        placeholder: 'NA',
+        dropdownParent: '#mdl-inventario',
+    })
+
     rellenar_select(selecreg.zona, "inp-zona")
     //document.getElementById("inp-zona").value = selecreg.zona;
     rellenar_select(selecreg.rubro, "inp-rubro")
@@ -290,6 +299,7 @@ async function mdl_editar(params) {
     document.getElementById("inp-imei").value = selecreg.imei;
     document.getElementById("inp-linea").value = selecreg.linea;
     rellenar_select(selecreg.usuario, "inp-usuario")
+    rellenar_select(selecreg.cargo, "inp-cargo")
     document.getElementById("inp-fecha-entrega").value = selecreg.fecha_entrega;
 
     document.getElementById('title-mdl-inventario').textContent = "Edición de Activo"
@@ -327,6 +337,7 @@ async function editar_registro() {
         imei: $("#inp-imei").val().trim(),
         linea: $("#inp-linea").val().trim(),
         usuario: user,
+        cargo: $("inp-cargo").val().trim(),
         //posicion: $("#edi-posicion").select2('data')[0].text,
         fecha_entrega: $("#inp-fecha-entrega").val()
     }
@@ -350,7 +361,6 @@ async function editar_registro() {
 
 }
 
-let ususelect = [];
 function mdl_nvo_registro() {
     let inputs = document.getElementsByName('mdl-reg');
     for (let i = 0; i < inputs.length; i++) {
@@ -427,7 +437,7 @@ function mdl_nvo_registro() {
     general_select2({
         selectId: 'inp-cargo',
         tabla: 'cat_usuarios',
-        campo: 'nombre',
+        campo: 'cargo',
         placeholder: 'Selecione un cargo',
         dropdownParent: '#mdl-inventario',
         tags: true
@@ -440,9 +450,29 @@ function mdl_nvo_registro() {
 
 }
 
+$('#inp-usuario').off('change').on('change', function () {
+    let userSelected = $(this).val()?.trim();
+    let select = $(this);
+    let nuevo = true;
+    
+    select.find('option').each(function () {
+        if ($(this).val() === userSelected && !$(this).attr('data-select2-tag')) {
+            nuevo = false; // Es un valor existente, no fue escrito por el usuario
+        }
+    });
+
+    if (userSelected && nuevo) {
+        $('#inp-cargo').prop('disabled', false); // Permitir escribir el cargo si es nuevo
+        $('#inp-cargo').val(null).trigger('change');
+    } else {
+        $('#inp-cargo').prop('disabled', true); // Desactiva el cargo si se eligió uno existente
+        $('#inp-cargo').val(userSelected).trigger('change'); // Puedes usar este valor si así lo deseas
+    }
+});
+
 async function crear_registro() {
     // Campos requeridos para validación
-    const validacion = [
+    let validacion = [
         "inp-zona",
         "inp-rubro",
         "inp-tipo",
@@ -462,11 +492,6 @@ async function crear_registro() {
         return;
     }
 
-    let user = $("#inp-usuario").val().trim()
-    if (user === "") {
-        user = "5"
-    }
-
     // Crear el modelo con los datos del formulario
     let model = {
         accion: 0,
@@ -481,7 +506,8 @@ async function crear_registro() {
         tag: $("#inp-tag").val().trim(),
         imei: $("#inp-imei").val().trim(),
         linea: $("#inp-linea").val().trim(),
-        usuario: user,
+        usuario: $("#inp-usuario").val().trim(),
+        cargo: $("#inp-cargo").val().trim(),
         fecha_entrega: $("#inp-fecha-entrega").val()
     };
 
@@ -492,10 +518,10 @@ async function crear_registro() {
     const serie = document.getElementById('inp-num-serie');
     serie.classList.remove('is-invalid'); // Remover clase de error si existía
 
-    if (server.resultado === true) {
+    if (server.resultado.exitoso === true) {
         consultar_informacion();
         $("#mdl-inventario").modal('hide');
-        await registrar_historico('Nuevo registro', model);
+        await registrar_historico('Nuevo registro', server.resultado.insercion);
         mostrar_toast('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
     } else if (server.resultado === false) {
         if (server.mensaje === "Número de serie duplicado") {
@@ -663,60 +689,31 @@ function rellenar_select(texto, select) {
 }
 
 //* Deshabilitando el input TAG del registro
-async function habilitar_campo({ id, condiciones }) {
-    const $select = $('#' + id);
+$(document).ready(function () {
+    // Escucha cambios en el campo "inp-tipo"
+    $('#inp-tipo').on('change', function () {
+        const tipoSeleccionado = $(this).val(); // Obtiene el valor seleccionado
 
-    $select.on('change', function () {
-        const valor_seleccionado = $(this).val();
+        if (tipoSeleccionado === '58' || tipoSeleccionado === '40') {
+            // Habilita el campo TAG y lo hace obligatorio
+            $('#inp-tag').prop('disabled', false).addClass('is-required');
+        } else {
+            // Deshabilita el campo TAG y elimina la obligatoriedad
+            $('#inp-tag').prop('disabled', true).removeClass('is-required').val('');
+        }
 
-        condiciones.forEach(cond => {
-            const { mostrar, campos } = cond;
+        if (tipoSeleccionado === '85') {
+            $('#inp-imei').prop('disabled', false).addClass('is-required');
+            $('#inp-linea').prop('disabled', false).addClass('is-required');
+        } else {
+            $('#inp-imei').prop('disabled', true).removeClass('is-required').val('');
+            $('#inp-linea').prop('disabled', true).removeClass('is-required').val('');
+        }
 
-            if (mostrar.includes(valor_seleccionado)) {
-                campos.forEach(selector => {
-                    const $campo = $(selector);
-                    $campo.closest('.input-group').show();
-                    $campo.prop('disabled', false).addClass('is-requerid');
-                });
-            } else {
-                campos.forEach(selector => {
-                    const $campo = $(selector);
-                    $campo.closest('.input-group').show();
-                    $campo.prop('disabled', true).removeClass('is-requerid').val('');
-                })
-            }
-        })
-    })
-
-    condiciones.forEach(cond => {
-        cond.campos.forEach(selector => {
-            const $campo = $(selector);
-            $campo.closest('.input-group').hide();
-            $campo.prop('disabled', true).removeClass('is-required').val('');
+        $('#inp-imei, #inp-linea').on('input', function () {
+            this.value = this.value.replace(/\D/g, ''); // Elimina todo lo que no sea dígito
         });
     });
-
-}
-
-$(document).ready(function () {
-    habilitar_campo({
-        id: 'inp-tipo',
-        condiciones: [
-            {
-                mostrar: ['58', '40'],
-                campos: ['#inp-tag']
-            },
-            {
-                mostrar: ['85'],
-                campos: ['#inp-imei', '#inp-linea']
-            },
-        ]
-    });
-    $('#inp-tipo').trigger('change')
-});
-
-$('#inp-imei, #inp-linea').on('input', function () {
-    this.value = this.value.replace(/\D/g, '');
 });
 
 $(document).ready(function () {
@@ -750,6 +747,15 @@ $("#check-resguardo").on('click', function () {
     // Habilitar o deshabilitar el botón dependiendo de "selected"
     //document.getElementById('mdl-btn-conf').disabled = !selected;
 });
+
+let usuario_seleccionado = false
+$("#inp-cargo").on('change', function () {
+    usuario_seleccionado = $(this).val();
+
+    if (usuario_seleccionado) {
+        $
+    }
+})
 
 //TODO: Funciones para el resguardo
 async function resguardo(userSelect) {
@@ -799,13 +805,13 @@ async function resguardo(userSelect) {
         $('#select-usu').prop('disabled', true)
     }
 
-    console.log(userSelect)
+    // console.log(userSelect)
 
     $("#mdl-res").modal('show')
 }
 
 let infoResguardo
-async function crear_resguardo(params) {
+async function crear_resguardo() {
 
     const validacion = [
         "select-usu",

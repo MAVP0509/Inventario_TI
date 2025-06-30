@@ -1,4 +1,7 @@
 <?php
+
+use Dom\Mysql;
+
 header('Content-Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
 
@@ -70,29 +73,44 @@ function insertar_datos($valores)
         $val_marca = $idMarca['id'];
     }
 
-    /* $val_estatus = "";
-    if ($valores->usuario == "5") {
-        $val_estatus = "Bodega";
+    // $usuario = verificar_nuevos_id($valores->usuario);
+    $val_usuario;
+    // Verifica si se proporcionó un usuario
+    if (empty($valores->usuario)) {
+        // Usuario vacío, usar el ID 5 por defecto
+        $usuario = 5;
     } else {
-        $val_estatus = "Asignado";
-    } */
+        // Verifica si el usuario ya existe
+        $usuario_check = verificar_nuevos_id($valores->usuario);
 
-    $val_tag = "";
-    if ($valores->tag == "") {
-        $val_tag = "NA";
-    } else {
-        $val_tag = $valores->tag;
+        if ($usuario_check === true) {
+            // Ya existe, usar el valor original
+            $val_usuario = $valores->usuario;
+        } else {
+            // No existe, insertarlo
+            $nombre = mysqli_real_escape_string($con, $usuario_check);
+            $cargo = mysqli_real_escape_string($con, $valores->cargo);
+
+            $sql_insert = "INSERT INTO cat_usuarios(nombre, cargo) VALUES ('$nombre', '$cargo');";
+            mysqli_query($con, $sql_insert);
+
+            // Obtener el ID insertado
+            $sql_get_id = "SELECT id FROM cat_usuarios WHERE nombre = '$nombre' AND cargo = '$cargo';";
+            $result = mysqli_query($con, $sql_get_id);
+            $idUsuario = mysqli_fetch_assoc($result);
+            $val_usuario = $idUsuario['id'];
+        }
+
+        // Asignar valor final a $usuario
+        $usuario = $val_usuario;
     }
 
-    $val_af = "";
-    if ($valores->af == "") {
-        $val_af = "NA";
-    } else {
-        $val_af = $valores->af;
-    }
     $val_estatus = empty($valores->usuario) ? 'Bodega' : 'Asignado';
-    $val_imei = empty($valores->imei) ? 'NA' : $valores_imei;
-    $val_linea = empty($valores->linea) ? 'NA' : $valores_linea;
+    $val_imei = empty($valores->imei) ? 'NA' : $valores->imei;
+    $val_linea = empty($valores->linea) ? 'NA' : $valores->linea;
+    // $usuario = empty($valores->usuario) ? '5' : $val_usuario;
+    $val_tag = empty($valores->tag) ? 'NA' : $valores->tag;
+    $val_af = empty($valores->af) ? 'NA' : $valores->af;
 
     if ($valores->num_serie != "") {
         $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$valores->num_serie'";
@@ -102,21 +120,43 @@ function insertar_datos($valores)
         /* $sql = "INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, imei,estatus) 
         VALUES ('$valores->zona', '$val_rubro','$val_af','$val_tipo','$val_marca','$valores->modelo', '$valores->num_serie', 
         '$valores->ubicacion', '$val_tag', '$valores->usuario', '$registro', 'NA', '$val_estatus');"; */
-
+        
         $sql = 'INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, imei, linea, estatus) 
         VALUES ("' . $valores->zona . '","' . $val_rubro . '","' . $val_af . '","' . $val_tipo . '","' . $val_marca . '","' . $valores->modelo . '","' . $valores->num_serie . '","' . $valores->ubicacion . '",
-        "' . $val_tag . '","' . $valores->usuario . '","' . $registro . '", "' . $val_imei . '", "' . $val_linea . '", "' . $val_estatus . '")';
+        "' . $val_tag . '","' . $usuario . '", "' . $registro . '", "' . $val_imei . '", "' . $val_linea . '", "' . $val_estatus . '")';
         //var_dump($sql);
         $query = mysqli_query($con, $sql);
+
+        $sql_select = "SELECT num_serie, 
+                    fk_usuario, zona, ubicacion, af,
+                    fk_rubro,
+                    fk_tipo, 
+                    fk_marca, 
+                    modelo,
+                    tag,
+                    imei,
+                    linea, 
+                    fecha_entrega 
+                FROM inventario_ti_sur 
+                WHERE 
+                    num_serie = '$valores->num_serie'";
+        $query_select = mysqli_query($con, $sql_select);
+        $resultado = mysqli_fetch_assoc($query_select);
         //$SQLStatement = "CALL pInsertarCatalogo('$sql','Insrt_Inventario')";
         if (mysqli_num_rows($query_num) > 0) {
             echo json_encode(["resultado" => false, "mensaje" => "Número de serie duplicado"]);
             exit;
         } else {
-            return $query;
+            return [
+                'exitoso' => $query,
+                'insercion' => $resultado,
+            ];
         }
     } else {
-        return $query;
+        return [
+                'exitoso' => $query,
+                'inserción' => $resultado,
+            ];
     }
 }
 
@@ -182,7 +222,19 @@ function editar_datos($valores)
     //var_dump($sql);
     $result = mysqli_query($con, $sql);
 
-    $sql_select_nuevo = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, modelo, tag, imei, linea, fecha_entrega 
+    $sql_select_nuevo = "SELECT num_serie, 
+                                fk_usuario, 
+                                zona, 
+                                ubicacion, 
+                                af, 
+                                fk_rubro, 
+                                fk_tipo, 
+                                fk_marca, 
+                                modelo, 
+                                tag, 
+                                imei, 
+                                linea, 
+                                fecha_entrega 
                          FROM inventario_ti_sur 
                          WHERE id = '$valores->id'";
     $query_select_nuevo = mysqli_query($con, $sql_select_nuevo);
