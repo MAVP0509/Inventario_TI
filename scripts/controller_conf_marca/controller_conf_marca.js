@@ -114,7 +114,6 @@ async function consultar_informacion() {
                     seleccionar_registro(rowData.id, marca_selecionada)
                 }, headerSort: false, frozen: true
             },
-            { title: "ID", field: "id", width: 45, hozAlign: "center", headerSort: false },
             {
                 title: "Marca", field: "marca", headerFilter: "input", headerSort: false, cellClick:
                     function (e, cell) {

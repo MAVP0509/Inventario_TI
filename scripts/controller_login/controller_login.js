@@ -68,6 +68,7 @@ async function registrarUsu() {
         "nombre",
         "regcorreo",
         "reg-contraseña",
+        "conf-contraseña",
         "telefono",
         "fechanac",
         "conf-contraseña"

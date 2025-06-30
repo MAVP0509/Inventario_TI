@@ -313,6 +313,10 @@ function consultar_para_resguardo($valores)
 
     $datos[0]['comentario'] = $valores->comentario ?? '';
     $datos[0]['fecha'] = $valores->fecha ?? '';
+    $datos[0]['area'] = $valores->area ?? '';
+    $datos[0]['ubicacion'] = $valores->ubicacion ?? '';
+    $datos[0]['userPemex'] = $valores->userPemex ?? '';
+    $datos[0]['userPemexCargo'] = $valores->userPemexCargo ?? '';
 
     $sql_supervisor = "SELECT * FROM supervisor WHERE region = '$valores->region' AND  habilitado = 1;";
     //  var_dump($sql_supervisor);

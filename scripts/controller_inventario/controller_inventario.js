@@ -53,18 +53,17 @@ window.addEventListener('load', function () {
         // Si el mensaje existe, mostramos el toast
         mostrar_toast('success', 'Bienvenido', mensajeRegistro);
 
-
-
         // Eliminamos el mensaje para evitar que aparezca nuevamente
         sessionStorage.removeItem('bienvenido');
     }
+
 })
 
 let datos = [];
 let elemento
 let table
 
-let equipo_selecionado = [];
+let equipo_seleccionado = [];
 
 async function consultar_informacion() {
     let model = {
@@ -128,8 +127,9 @@ async function consultar_informacion() {
             locale: "es",
             data: datos,
             pagination: true,
+            height: "800px",
             paginationSize: 10,
-            paginationSizeSelector: [5, 10, 25, 35],
+            paginationSizeSelector: [10, 25, 35, true],
             movableColumns: true,              //allow column order to be changed
             paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
                 const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
@@ -151,10 +151,9 @@ async function consultar_informacion() {
                         let rowData = cell.getRow().getData();
                         rowData.seleccionado = !rowData.seleccionado;
                         cell.getRow().reformat();
-                        seleccionar_registro(rowData.id_equipo, equipo_selecionado)
+                        seleccionar_registro(rowData.id_equipo, equipo_seleccionado)
                     }, headerSort: false, frozen: true, width: 70, hozAlign: "center",
                 },
-                { title: "ID", field: "id_equipo", width: 70, hozAlign: "center", headerSort: false, headerHozAlign: "center", },
                 {
                     title: "Zona", field: "zona", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "list",
                     headerFilterParams: {
@@ -547,7 +546,7 @@ async function traspasos() {
 
     let model = {
         accion: 6,
-        id: equipo_selecionado,
+        id: equipo_seleccionado,
         estatus: $('#mdl-estado').val(),
         usuario: $('#mdl-usuario').val(),
     }
@@ -555,7 +554,7 @@ async function traspasos() {
     let server = await server_inventario(model);
 
     if (server.resultado) {
-        equipo_selecionado = []
+        equipo_seleccionado = []
         consultar_informacion();
         $('#mdl-traspaso').modal('hide')
         await registrar_historico('Anterior asignación', server.resultado.anterior);
@@ -573,7 +572,7 @@ async function traspasos() {
 }
 
 async function mostrar_traspaso() {
-    if (equipo_selecionado.length == 0) {
+    if (equipo_seleccionado.length == 0) {
         mostrar_toast('warning', 'Alerta', 'Selecione al menos un activo. Inténtalo nuevamente.')
     } else {
 
@@ -605,7 +604,7 @@ async function mostrar_traspaso() {
 async function desactivar_registro() {
     let model = {
         accion: 3,
-        id: equipo_selecionado, // IDs seleccionados
+        id: equipo_seleccionado, // IDs seleccionados
     };
 
     let response = await server_inventario(model);
@@ -622,10 +621,49 @@ async function desactivar_registro() {
 //TODO: Validación de funciones
 
 async function confirmar_eliminacion() {
-    if (equipo_selecionado.length === 0) {
+    if (equipo_seleccionado.length === 0) {
         mostrar_toast('info', 'Información', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
     } else {
-        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_selecionado.length} activos(s)?`, false, desactivar_registro)
+
+        let data = []
+        //let data = datos.filter(element => seleccionar.includes(element.id_equipo));
+        for (let i = 0; i < datos.length; i++) {
+            const element = datos[i];
+            if (equipo_seleccionado.includes(element.id_equipo)) {
+                data.push(element);
+                //break;
+            }
+        }
+        console.log(data)
+        var tblEliminar = new Tabulator("#tbl-mdl-eliminar", {
+            height: "311px",
+            data: data,
+            columns: [
+                { title: "Rubro", field: "rubro", headerHozAlign: "center", headerSort: false },
+                { title: "Tipo de dispositivo", field: "tipo", width: 150, sorter: "number", hozAlign: "left", editor: "input", editor: true, validator: ["min:0", "max:100", "numeric"] },
+                { title: "Marca", field: "marca", width: 150, editor: "input", validator: ["required", "in:male|female"] },
+                { title: "Modelo", field: "modelo", width: 150, editor: "input", hozAlign: "center", width: 100, editor: "input", validator: ["min:0", "max:5", "integer"] },
+                { title: "Número de serie", field: "num_serie", width: 150, editor: "input", validator: ["minLength:3", "maxLength:10", "string"] },
+                { title: "TAG", field: "tag", width: 150, editor: "input", validator: "required" },
+                { title: "IMEI", field: "imei", width: 150, editor: "input", validator: "required" },
+                { title: "Linea", field: "linea", width: 150, editor: "input", validator: "required" },
+                { title: "Usuario", field: "usuario", width: 150, editor: "input", validator: "required" },
+                { title: "Cargo del usuario", field: "posicion", width: 150, editor: "input", validator: "required" },
+                { title: "Estatus", field: "estatus", width: 150, editor: "input", validator: "required" },
+                { title: "Observaciones", width: 150, editor: "input", validator: "required", frozen: true },
+            ],
+        });
+
+        //handle validation failure
+        table.on("validationFailed", function (cell, value, validators) {
+            //cell - cell component for the edited cell
+            //value - the value that failed validation
+            //validatiors - an array of validator objects that failed
+
+            //take action on validation fail
+        });
+        $("#mdl-eliminar").modal("show");
+        //mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, desactivar_registro)
     }
 }
 
@@ -716,6 +754,7 @@ $(document).ready(function () {
     });
 });
 
+
 $(document).ready(function () {
     $('#mdl-estado').on('change', function () {
         const seleccionado = $(this).val();
@@ -731,21 +770,8 @@ $(document).ready(function () {
 })
 
 let selected = false
-$("#check-resguardo").on('click', function () {
-    selected = !selected;
-
-    // Cambiar el ícono del checkbox
-    let check = $("#check-resguardo-icon");
-    if (selected) {
-        check.removeClass("fa-regular fa-square");
-        check.addClass("fa-solid fa-square-check");
-    } else {
-        check.removeClass("fa-solid fa-square-check");
-        check.addClass("fa-regular fa-square ");
-    }
-
-    // Habilitar o deshabilitar el botón dependiendo de "selected"
-    //document.getElementById('mdl-btn-conf').disabled = !selected;
+$('.check-button').on('click', function () {
+    button_checked($(this))
 });
 
 let usuario_seleccionado = false
@@ -805,10 +831,32 @@ async function resguardo(userSelect) {
         $('#select-usu').prop('disabled', true)
     }
 
-    // console.log(userSelect)
+    document.getElementById('col-pemex').style.display = 'none'
 
+    selected = false
+    $("#check-resguardo-pemex-icon").removeClass("fa-solid fa-square-check")
+    $("#check-resguardo-pemex-icon").addClass("fa-regular fa-square ")
     $("#mdl-res").modal('show')
 }
+
+//*Validando si será un resguardo de PEMEX
+$(document).ready(function () {
+    // Escucha cambios en el campo "inp-tipo"
+    $('#check-resguardo-pemex').on('click', function () {
+        
+        //console.log(selected)
+
+        if (selected) {
+            $('#inp-user-pemex').addClass('is-required');
+            $('#inp-cargo-pemex').addClass('is-required');
+            document.getElementById('col-pemex').style.display = 'block'
+        } else {
+            $('#inp-user-pemex').removeClass('is-required').val('');
+            $('#inp-cargo-pemex').removeClass('is-required').val('');
+            document.getElementById('col-pemex').style.display = 'none'
+        }
+    });
+});
 
 let infoResguardo
 async function crear_resguardo() {
@@ -816,9 +864,14 @@ async function crear_resguardo() {
     const validacion = [
         "select-usu",
         "select-region",
+        "inp-ubicacion-resg",
+        "inp-area",
     ];
+    if(selected){
+        validacion.push("inp-user-pemex","inp-cargo-pemex")
+    }
     if (!validar_campos(validacion)) {
-        mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente');
+        mostrar_toast('warning', 'Aviso', 'Rellena los campos. Inténtelo nuevamente');
         return;
     }
 
@@ -828,7 +881,11 @@ async function crear_resguardo() {
         //region : $('#select-region').val().trim(),
         region: $("#select-region").select2('data')[0].text,
         comentario: $('#txt-area').val().trim(),
-        fecha: $('#fecha-resguardo').val()
+        fecha: $('#fecha-resguardo').val(),
+        area: $('#inp-area').val(),
+        ubicacion: $('#inp-ubicacion-resg').val(),
+        userPemex: $('#inp-user-pemex').val(),
+        userPemexCargo: $('#inp-cargo-pemex').val()
     }
     let server = await server_inventario(model)
 
@@ -921,3 +978,15 @@ function myCallback(start, end) {
 
 }
 
+
+function button_checked(button) {
+    selected = !selected;
+
+    let icon = button.find('i')
+
+    if (selected) {
+        icon.removeClass("fa-regular fa-square").addClass("fa-solid fa-square-check");
+    } else {
+        icon.removeClass("fa-solid fa-square-check").addClass("fa-regular fa-square");
+    }
+}

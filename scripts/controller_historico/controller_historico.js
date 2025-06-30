@@ -112,7 +112,6 @@ async function consultar_historico() {
             }
         },
         columns: [
-            { title: "ID", field: "id", headerHozAlign: "center" },
             {
                 title: "Fecha del evento", field: "fecha_evento", headerHozAlign: "center", headerFilter: "input", headerMenu: [
                     {
