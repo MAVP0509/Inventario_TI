@@ -79,14 +79,18 @@ function validar_campos(campos) {
     return valido;
 }
 
-async function seleccionar_registro(id, lista) {
-    let index = lista.indexOf(id); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
-    if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
+//* Función para seleccionar/desceccionar uno o varios elementos
+function seleccionar_registro(id, lista) {
+    // Retorna el primer índice en el que se puede encontrar un elemento dado en el array.
+    let index = lista.indexOf(id); 
+    // ó retorna -1 si el elemento no está presente.
+    if (index === -1) {
         lista.push(id); // Añade uno o más elementos al final de un array
     } else {
-        lista.splice(index, 1);
+        lista.splice(index, 1); // Si ya existe, lo elimina del arreglo
     }
-    // console.log(seleccionar)
+    // Nota: Esta función no devuelve valor, modifica la lista directamente
+    // console.log(lista)
 }
 
 //TODO animando iconos 
