@@ -511,7 +511,7 @@ async function mdl_editar_supervisor(params) {
     $("#modalEditar").modal('show');
 }
 
-async function editar_supervisor(params) {
+async function editar_supervisor() {
     // Campos requeridos para validación
     const validacion = [
         "edi-nombre",
