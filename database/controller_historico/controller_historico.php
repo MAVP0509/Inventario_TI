@@ -85,7 +85,7 @@ function consultar_historico($valores)
 
     $sql = "SELECT * FROM vhistorico";
     //var_dump($sql)
-
+    // $sql .= " ORDER BY fecha_evento DESC";
     if (!empty($valores->num_serie)) {
         $sql .= " WHERE num_serie = '$valores->num_serie'";
     }
@@ -102,8 +102,6 @@ function consultar_historico($valores)
             $sql .= " AND evento = '$valores->evento'";
         }
     }
-
-    $sql .= " ORDER BY fecha_evento DESC";
 
     if (!empty($valores->limite) && $valores->limite === true) {
         $sql .= " LIMIT 100";

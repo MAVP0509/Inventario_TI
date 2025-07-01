@@ -22,29 +22,6 @@ function server_historico(model) {
     });
 }
 
-function server_inventario02(model) {
-    return new Promise((resolve, reject) => {
-        $.ajax({
-            type: "POST",
-            url: "database/controller_inventario/controller_inventario.php",
-            data: {
-                trama: JSON.stringify(model)
-            },
-            success: function (response) {
-                try {
-                    resolve(JSON.parse(response))
-                    console.log(resolve(JSON.parse(response)))
-                    respuesta_historico = response
-                } catch (error) {
-                    reject(error)
-                    //console.log(error);
-                }
-            }
-        })
-    });
-
-}
-
 let dato = [];
 let tabla;
 async function consultar_historico() {
@@ -280,7 +257,7 @@ async function mostrar_historial() {
     //let evento =  $("#select-evento").select2('data')[0].text
     const validacion = ["his-num-serie"];
 
-    if (!validar_campo(validacion)) {
+    if (!validar_campos(validacion)) {
         mostrar_toast('warning', 'Alerta', 'Rellena los campos. Inténtelo nuevamente.');
         return;
     }
@@ -354,90 +331,4 @@ async function mostrar_historial() {
         contenedor.html('<div class="list-group-item">No se encontraron moviemientos para ese número de serie.</div>');
         $('#resultado-historico').removeClass('d-none');
     }
-}
-
-function validar_campo(campos) {
-    let valido = true;
-
-    campos.forEach(id => {
-        const campo = document.getElementById(id);
-        if (!campo) {
-            valido = false;
-            return;
-        }
-
-        if ($(campo).hasClass('is-required') && !campo.value.trim()) {
-            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
-            valido = false;
-        } else if (!campo.value.trim()) {
-            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
-            valido = false;
-        } else {
-            campo.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
-        }
-
-        /* if (!campo.value.trim()) {
-            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
-            valido = false;
-        } else {
-            campo.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
-        } */
-
-        campo.addEventListener('input', function () {
-            if (campo.value.trim()) {
-                campo.classList.remove('is-invalid');
-            }
-        });
-    });
-
-    return valido;
-}
-
-
-//TODO Funciones de los Select2
-
-async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags, popoverTitle, popoverContent }) {
-    //try {
-    const response = await server_inventario02({
-        accion: 5,
-        tabla: tabla,
-        campo: campo
-    });
-
-    //console.log('Respuesta del servidor para select2:', response);
-
-    const opciones = response.resultado.map(item => ({
-        id: item.id || '',
-        text: item[campo] || ''
-    }));
-
-    const $select = $('#' + selectId);
-    $select.empty().append(new Option('', '', false, false));
-
-    $select.select2({
-        theme: 'bootstrap4',
-        allowClear: true,
-        placeholder: placeholder,
-        tags: tags,
-        dropdownParent: $(dropdownParent),
-        data: opciones
-    });
-
-    $select.val(null).trigger('change');
-
-    //  Si se pasan datos de popover, aplicarlo
-    if (popoverTitle && popoverContent) {
-        const $select2Container = $select.next('.select2-container');
-
-        $select2Container.attr({
-            'data-toggle': 'popover',
-            'data-trigger': 'hover',
-            'data-html': 'true',
-            'title': popoverTitle,
-            'data-content': popoverContent
-        });
-
-        $select2Container.popover();
-    }
-
 }
