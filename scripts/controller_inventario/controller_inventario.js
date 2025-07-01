@@ -370,7 +370,7 @@ async function editar_registro() {
 
 }
 
-function mdl_nvo_registro() {
+async function mdl_nvo_registro() {
     let inputs = document.getElementsByName('mdl-reg');
     for (let i = 0; i < inputs.length; i++) {
         inputs[i].value = ""; // Limpia el valor del input
@@ -390,7 +390,7 @@ function mdl_nvo_registro() {
     $('#lbl-fecha-reg').hide()
     $('#inp-fecha-reg').hide()
 
-    general_select2({
+    await general_select2({
         selectId: 'inp-rubro',
         tabla: 'cat_rubro',
         campo: 'rubro',
@@ -401,7 +401,7 @@ function mdl_nvo_registro() {
         popoverContent: "Categoría general del activo. Agrupa dispositivos por su tipo funcional, como computadoras, dispositivos móviles, etc."
     });
 
-    general_select2({
+    await general_select2({
         selectId: 'inp-tipo',
         tabla: 'cat_tipo',
         campo: 'tipo',
@@ -412,7 +412,7 @@ function mdl_nvo_registro() {
         popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
     });
 
-    general_select2({
+    await general_select2({
         selectId: 'inp-marca',
         tabla: 'cat_marca',
         campo: 'marca',
@@ -423,7 +423,7 @@ function mdl_nvo_registro() {
         popoverContent: "Es la marca del activo."
     })
 
-    general_select2({
+    await general_select2({
         selectId: 'inp-zona',
         tabla: 'inventario_ti_sur',
         campo: 'zona',
@@ -434,7 +434,7 @@ function mdl_nvo_registro() {
         popoverContent: "Zona operativa donde se ubica el activo."
     });
 
-    general_select2({
+    await general_select2({
         selectId: 'inp-ubicacion',
         tabla: 'inventario_ti_sur',
         campo: 'ubicacion',
@@ -445,7 +445,7 @@ function mdl_nvo_registro() {
         popoverContent: "Indica el lugar específico dentro de la zona donde se encuentra físicamente el dispositivo."
     });
 
-    general_select2({
+    await general_select2({
         selectId: 'inp-usuario',
         tabla: 'cat_usuarios',
         campo: 'nombre',
@@ -454,7 +454,7 @@ function mdl_nvo_registro() {
         tags: true
     });
 
-    general_select2({
+    await general_select2({
         selectId: 'inp-cargo',
         tabla: 'cat_usuarios',
         campo: 'cargo',
