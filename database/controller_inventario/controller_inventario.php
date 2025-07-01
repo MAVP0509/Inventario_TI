@@ -34,7 +34,6 @@ function insertar_datos($valores)
     include("../conexion.php");
 
     $registro = date("Y-m-d H:i:s");
-    $datos = [];
 
     $rubro = verificar_nuevos_id($valores->rubro);
     $val_rubro;
@@ -394,6 +393,7 @@ function consultar_distintos($tabla, $campo)
             $sql = "SELECT DISTINCT `$campo` from `$tabla` WHERE `$campo` <> 'Baja';";
             break;
         case "zona":
+        case "ubicacion":
         case "evento":
             $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE  `$campo` <> 'NA'";
             break;

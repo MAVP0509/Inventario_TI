@@ -166,7 +166,12 @@ async function consultar_informacion() {
                 { title: "Marca", field: "marca", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
                 { title: "Modelo", field: "modelo", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
                 { title: "Numero de serie", field: "num_serie", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
-                { title: "Ubicación", field: "ubicacion", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
+                {
+                    title: "Ubicación", field: "ubicacion", headerHozAlign: "center", headerFilter: "list", headerSort: false, hozAlign: "center",
+                    headerFilterParams: {
+                        valuesLookup: true, clearable: true // se auto genera a partir de los valores únicos de la columna
+                    },
+                },
                 { title: "TAG", field: "tag", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", width: 170 },
                 { title: "IMEI", field: "imei", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", width: 170 },
                 { title: "Linea", field: "linea", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", width: 170 },
@@ -270,6 +275,17 @@ async function mdl_editar(params) {
     });
 
     await general_select2({
+        selectId: 'inp-ubicacion',
+        tabla: 'inventario_ti_sur',
+        campo: 'ubicacion',
+        placeholder: 'Selecciona una ubicacion',
+        dropdownParent: '#mdl-inventario',
+        tags: true,
+        popoverTitle: "Descripción",
+        popoverContent: "Zona operativa donde se ubica el activo."
+    });
+
+    await general_select2({
         selectId: 'inp-usuario',
         tabla: 'cat_usuarios',
         campo: 'nombre',
@@ -327,7 +343,7 @@ async function editar_registro() {
         marca: $("#inp-marca").val().trim(),
         modelo: $("#inp-modelo").val().trim(),
         num_serie: $("#inp-num-serie").val().trim().toUpperCase(),
-        ubicacion: $("#inp-ubicacion").val().trim(),
+        ubicacion: $("#inp-ubicacion").select2('data')[0].text,
         tag: $("#inp-tag").val().trim(),
         imei: $("#inp-imei").val().trim(),
         linea: $("#inp-linea").val().trim(),
@@ -336,8 +352,6 @@ async function editar_registro() {
         //posicion: $("#edi-posicion").select2('data')[0].text,
         fecha_entrega: $("#inp-fecha-entrega").val()
     }
-
-
 
     let server = await server_inventario(model);
     //let response = JSON.parse(respuesta);
@@ -421,6 +435,15 @@ function mdl_nvo_registro() {
     });
 
     general_select2({
+        selectId: 'inp-ubicacion',
+        tabla: 'inventario_ti_sur',
+        campo: 'ubicacion',
+        placeholder: 'Seleccione una ubicación',
+        dropdownParent: '#mdl-inventario',
+        tags: true,
+    });
+
+    general_select2({
         selectId: 'inp-usuario',
         tabla: 'cat_usuarios',
         campo: 'nombre',
@@ -449,7 +472,7 @@ $('#inp-usuario').off('change').on('change', function () {
     let userSelected = $(this).val()?.trim();
     let select = $(this);
     let nuevo = true;
-    
+
     select.find('option').each(function () {
         if ($(this).val() === userSelected && !$(this).attr('data-select2-tag')) {
             nuevo = false; // Es un valor existente, no fue escrito por el usuario
@@ -497,7 +520,7 @@ async function crear_registro() {
         marca: $("#inp-marca").val().trim(),
         modelo: $("#inp-modelo").val().trim(),
         num_serie: $("#inp-num-serie").val().trim().toUpperCase(),
-        ubicacion: $("#inp-ubicacion").val().trim(),
+        ubicacion: $("#inp-ubicacion").select2('data')[0].text,
         tag: $("#inp-tag").val().trim(),
         imei: $("#inp-imei").val().trim(),
         linea: $("#inp-linea").val().trim(),
@@ -839,7 +862,7 @@ async function resguardo(userSelect) {
 $(document).ready(function () {
     // Escucha cambios en el campo "inp-tipo"
     $('#check-resguardo-pemex').on('click', function () {
-        
+
         //console.log(selected)
 
         if (selected) {
@@ -863,8 +886,8 @@ async function crear_resguardo() {
         "inp-ubicacion-resg",
         "inp-area",
     ];
-    if(selected){
-        validacion.push("inp-user-pemex","inp-cargo-pemex")
+    if (selected) {
+        validacion.push("inp-user-pemex", "inp-cargo-pemex")
     }
     if (!validar_campos(validacion)) {
         mostrar_toast('warning', 'Aviso', 'Rellena los campos. Inténtelo nuevamente');
