@@ -315,10 +315,6 @@ async function editar_registro() {
         "inp-tipo",
         "inp-ubicacion",
     ];
-    let user = $("#inp-usuario").val().trim()
-    if (user === "") {
-        user = "5"
-    }
 
     let model = {
         accion: 1,
@@ -335,8 +331,8 @@ async function editar_registro() {
         tag: $("#inp-tag").val().trim(),
         imei: $("#inp-imei").val().trim(),
         linea: $("#inp-linea").val().trim(),
-        usuario: user,
-        cargo: $("inp-cargo").val(),
+        usuario: $("#inp-usuario").val().trim(),
+        cargo: $("#inp-cargo").val().trim(),
         //posicion: $("#edi-posicion").select2('data')[0].text,
         fecha_entrega: $("#inp-fecha-entrega").val()
     }
