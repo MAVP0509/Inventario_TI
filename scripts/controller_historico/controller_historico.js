@@ -72,6 +72,7 @@ async function consultar_historico() {
         locale: "es",
         data: dato,
         pagination: true,
+        height: "800px",
         paginationSize: 15,
         paginationSizeSelector: [5, 10, 15, 25, 35],
         movableColumns: true,

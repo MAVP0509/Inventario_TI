@@ -114,17 +114,17 @@ function insertar_datos($valores)
     if ($valores->num_serie != "") {
         $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$valores->num_serie'";
         //var_dump($sql_num);
-        $query_num = mysqli_query($con, $sql_num);
+        //$query_num = mysqli_query($con, $sql_num);
 
         /* $sql = "INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, imei,estatus) 
         VALUES ('$valores->zona', '$val_rubro','$val_af','$val_tipo','$val_marca','$valores->modelo', '$valores->num_serie', 
         '$valores->ubicacion', '$val_tag', '$valores->usuario', '$registro', 'NA', '$val_estatus');"; */
-        
+
         $sql = 'INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, imei, linea, estatus) 
         VALUES ("' . $valores->zona . '","' . $val_rubro . '","' . $val_af . '","' . $val_tipo . '","' . $val_marca . '","' . $valores->modelo . '","' . $valores->num_serie . '","' . $valores->ubicacion . '",
         "' . $val_tag . '","' . $usuario . '", "' . $registro . '", "' . $val_imei . '", "' . $val_linea . '", "' . $val_estatus . '")';
         //var_dump($sql);
-        $query = mysqli_query($con, $sql);
+        //$query = mysqli_query($con, $sql);
 
         $sql_select = "SELECT num_serie, 
                     fk_usuario, zona, ubicacion, af,
@@ -139,23 +139,28 @@ function insertar_datos($valores)
                 FROM inventario_ti_sur 
                 WHERE 
                     num_serie = '$valores->num_serie'";
-        $query_select = mysqli_query($con, $sql_select);
-        $resultado = mysqli_fetch_assoc($query_select);
+        //$query_select = mysqli_query($con, $sql_select);
+        //$resultado = mysqli_fetch_assoc($query_select);
         //$SQLStatement = "CALL pInsertarCatalogo('$sql','Insrt_Inventario')";
-        if (mysqli_num_rows($query_num) > 0) {
-            echo json_encode(["resultado" => false, "mensaje" => "Número de serie duplicado"]);
-            exit;
+        if (mysqli_query($con, $sql_num)->num_rows > 0) {
+            return ["resultado" => false, "mensaje" => "Número de serie duplicado"];
         } else {
+            $query = mysqli_query($con, $sql);
+            $query_select = mysqli_query($con, $sql_select);
+            $resultado = mysqli_fetch_assoc($query_select);
             return [
                 'exitoso' => $query,
                 'insercion' => $resultado,
             ];
         }
     } else {
+        $query = mysqli_query($con, $sql);
+        $query_select = mysqli_query($con, $sql_select);
+        $resultado = mysqli_fetch_assoc($query_select);
         return [
-                'exitoso' => $query,
-                'inserción' => $resultado,
-            ];
+            'exitoso' => $query,
+            'inserción' => $resultado,
+        ];
     }
 }
 
@@ -392,7 +397,8 @@ function consultar_distintos($tabla, $campo)
     switch ($campo) {
         case "estatus":
             $datos = [
-                ['id' => 'Asignado', 'estatus' => 'Asignado'],['id' => 'Bodega', 'estatus' => 'Bodega']
+                ['id' => 'Asignado', 'estatus' => 'Asignado'],
+                ['id' => 'Bodega', 'estatus' => 'Bodega']
             ];
             return $datos;
         case "region":

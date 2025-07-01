@@ -557,8 +557,8 @@ async function crear_registro() {
         $("#mdl-inventario").modal('hide');
         await registrar_historico('Nuevo registro', server.resultado.insercion);
         mostrar_toast('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
-    } else if (server.resultado === false) {
-        if (server.mensaje === "Número de serie duplicado") {
+    } else if (server.resultado.resultado === false) {
+        if (server.resultado.mensaje === "Número de serie duplicado") {
             serie.classList.add('is-invalid'); // Marcar el campo como inválido si hay un número de serie duplicado
             mostrar_toast('warning', 'Número de serie duplicado', 'Este número de serie ya está registrado.');
         } else {
