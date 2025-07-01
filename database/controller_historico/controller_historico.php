@@ -49,7 +49,7 @@ function registrar_historico($valores)
             $query = mysqli_query($con, $sql);
             $resultados[] = $query;
         }
-        var_dump($sql);
+        //var_dump($sql);
         return $resultados;
     } elseif (isset($valores->datos) && is_object($valores->datos)) {
         $datos = $valores->datos;
