@@ -1,93 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="images/x-icon" href="images/diavaz.jfif">
     <title>Inventario TI</title>
 
     <link rel="stylesheet" href="libraries/bootstrap-4.6.2-dist/css/bootstrap-grid.min.css">
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="libraries/Tabulator/tabulator_bootstrap4.min.css">
     <link rel="stylesheet" href="libraries/fontawesome-free-6.7.2-web/css/all.min.css">
     <link rel="stylesheet" href="libraries/DataTables/datatables.min.css">
     <link rel="stylesheet" href="libraries/select2/css/select2-bootstrap4.min.css">
     <link rel="stylesheet" href="libraries/select2/css/select2.min.css">
-
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.2.2/css/fixedColumns.dataTables.min.css">
-
-<!-- JS -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/fixedcolumns/4.2.2/js/dataTables.fixedColumns.min.js"></script>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/css/tempusdominus-bootstrap-4.min.css"
+        integrity="sha512-3JRrEUwaCkFUBLK1N8HehwQgu8e23jTH4np5NHOmQOobuC4ROQxFwFgBLTnhcnQRMs84muMh0PnnwXlPq5MGjg=="
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
 </head>
+
 <body class="hold-transition sidebar-mini layout-fixed" onload="consultar_informacion()">
 
     <div class="wrapper">
 
         <!-- Preloader -->
         <div class="preloader flex-column justify-content-center align-items-center">
-            <img src="diavaz.png" alt="DiavazLogo" height="60" width="60">
+            <img src="images/diavaz.png" alt="DiavazLogo" height="60" width="60">
         </div>
 
         <nav class="main-header navbar navbar-expand navbar-white navbar-light fixed-top">
-            
+
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-                   
+
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="#" role="button" onclick="cerrar_sesionmsg()" id="log-out"><i class="fa-solid fa-door-closed fa-xl"></i></a>
+                    <a class="nav-link" href="#" role="button" onclick="cerrar_sesionmsg()" id="log-out"><i
+                            class="fa-solid fa-door-closed fa-xl"></i></a>
                 </li>
 
-            </ul> 
-        
+            </ul>
+
         </nav>
 
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <a href="#" class="brand-link">
-                <img src="diavaz.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <img src="images/diavaz.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-light">Inventario TI</span>
             </a>
 
-            <!-- <div class="sidebar">
-            
-                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                    <div class="image">
-                        <img src="user2.png" class="imagen-circle elevation-2" alt="User Image">
-                    </div>
-                    <div class="info">
-                        <a href="#" class="d-block" id="user">Name user</a>
-                    </div>
-                </div>
-                <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column"  data-widget="treeview" role="menu" data-accordion="false">
-                        <li class="nav-item">
-                            <a href="#" class="nav-link active">
-                                <i class="nav-icon fa-solid fa-cubes"></i>
-                                <p>
-                                  Inventario
-                                </p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="usuario.html" class="nav-link">
-                                <i class="nav-icon fa-solid fa-users"></i>
-                                <p>
-                                  Usuarios
-                                </p>
-                            </a>
-                          </li>
-                    </ul>
-                </nav>
-            </div> -->
             <div id="sidebar-container"></div>
         </aside>
 
-        
         <!--Contenedor Wrapper. Contenidos de la pagina-->
         <div class="content-wrapper">
             <!--Contenedor Header-->
@@ -106,52 +76,36 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-12">
-                            <div class="card">
+                            <div class="card card-tabs">
                                 <!--Card header-->
                                 <div class="card-header">
-                                    <h3 class="card-title"><i class="fa-solid fa-table"></i> Inventario de TI</h3>
-                                    <div class="d-flex justify-content-end mb-3">
-                                        <!-- <button type="button" onclick="resguardo()" class="btn btn-info icon" style="margin-left: 10px;" href="#" >Resguardo <i class="fa-solid fa-file-export fa-lg"></i></button> -->
-                                    </div>
+                                    <h3 class="card-title"><i class="fa-solid fa-table"></i> Inventario</h3>
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn bg-navy rounded icon mr-3"
+                                            onclick="mostrar_traspaso()">
+                                            <i class="fa-solid fa-boxes-packing"></i> Traspaso
+                                        </button>
+                                        <button type="button" onclick="resguardo()"
+                                            class="btn btn-info icon rounded mr-3" style="margin-left: 10px;"
+                                            href="#"><i class="fa-solid fa-file-export fa-lg"></i> Resguardo
+                                        </button>
+                                        <button type="button" class="btn btn-success rounded mr-3 icon"
+                                            onclick="mdl_nvo_registro()"><i class="fa-solid fa-plus fa-lg"></i> Nuevo
+                                        </button>
+                                        <button type="button" style="text-align: center"
+                                            class="btn btn-danger rounded icon mr-3"
+                                            onclick="confirmar_eliminacion()"><i
+                                                class="fa-solid fa-trash-can fa-lg"></i> Eliminar
+                                        </button>
+                                        <button type="button" class="btn btn-light rounded mr-3 icon"
+                                            onclick="consultar_num_serie()">
+                                            <i class="fa-solid fa-clock-rotate-left"></i> Historial
+                                        </button>
+                                    </div><br>
                                 </div>
                                 <!--Card Body-->
                                 <div class="card-body">
-                                    <div class="dataTables_wrapper dt-bootstrap4." id="table-usuario">
-                                        <div class="row">
-                                            <div class="col-sm-12 col-md-6"></div>
-                                            <div class="col-sm-12 col-md-6"></div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-sm-12">
-                                                <div class="table-responsive">
-                                                    <table class="table table-bordered table-hover dataTable dtr-inline table-striped" id="tabla1" aria-describedby="Tabla de usuarios" style="width: 100%;">
-                                                        <thead>
-                                                            <tr>
-                                                                <th></th>
-                                                                <th>ID</th>
-                                                                <th>Zona</th>
-                                                                <th>Rubro</th>
-                                                                <th>AF</th>
-                                                                <th>Tipo</th>
-                                                                <th>Marca</th>
-                                                                <th>Modelo</th>
-                                                                <th>Numero de serie</th>
-                                                                <th>Ubicación</th>
-                                                                <th>TAG</th>
-                                                                <th>Usuario</th>
-                                                                <th>Posición</th>
-                                                                <th>Fecha de entrega</th>
-                                                                <th>Editar</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody id="tbl-body">
-                                                            
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <div id="tbl01"></div>
                                 </div>
                             </div>
                         </div>
@@ -162,12 +116,12 @@
         </div>
     </div>
 
-    <!--Modal registro del inventario-->
-    <div class="modal fade" id="modal-registro">
+    <!--Modal del inventario-->
+    <div class="modal fade" id="mdl-inventario" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Registro</h4>
+                    <h4 class="modal-title" id="title-mdl-inventario">Registro de activo</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -182,90 +136,136 @@
                                         <h6>Rubro</h6>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-desktop"></i></span>
+                                                <span class="input-group-text"><i
+                                                        class="fa-solid fa-desktop"></i></span>
                                             </div>
-                                            <select class="form-control select" id="inp-rubro" data-toggle="popover" data-trigger="hover" 
-                                            data-html="true" title="Rubro" data-content="Es el tipo de activo o el grupo al que pertenece el dispositivo."></select>
+                                            <select class="form-control select" id="inp-rubro"></select>
                                             <div class="invalid-feedback">Por favor, seleccione un rubro</div>
                                         </div>
                                         <h6>Tipo de dispositivo</h6>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-computer"></i></span>
+                                                <span class="input-group-text"><i
+                                                        class="fa-solid fa-computer"></i></span>
                                             </div>
                                             <select class="form-control select" id="inp-tipo"></select>
-                                            <div class="invalid-feedback">Por favor, seleccione un tipo de dispositivo</div>
+                                            <div class="invalid-feedback">Por favor, seleccione un tipo de dispositivo.
+                                            </div>
                                         </div>
                                         <h6>Marca del dispositivo</h6>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-trademark"></i></span>
+                                                <span class="input-group-text"><i
+                                                        class="fa-solid fa-trademark"></i></span>
                                             </div>
-                                            <input type="text" class="form-control" id="inp-marca" name="mdl-reg" placeholder="Marca del dispositivo" autocomplete="off"
-                                            data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción" data-content="Es la marca del dispositivo">
-                                            <div class="invalid-feedback">Por favor, ingrese una marca de dispositivo.</div>
+                                            <select class="form-control select" id="inp-marca" data-toggle="popover"
+                                                data-trigger="hover" data-html="true" title="Descripción"
+                                                data-content="Es la marca del dispositivo"></select>
+                                            <div class="invalid-feedback">Por favor, ingrese una marca de dispositivo.
+                                            </div>
                                         </div>
                                         <h6>Modelo del dispositivo</h6>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                                                <span class="input-group-text"><i
+                                                        class="fa-solid fa-user-large"></i></span>
                                             </div>
-                                            <input type="text" class="form-control" id="inp-modelo" name="mdl-reg" placeholder="Modelo del dispositivo" autocomplete="off"
-                                            data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción" data-content="Es el modelo específico del dispositivo.">
-                                            <div class="invalid-feedback">Por favor, ingrese un modelo de dispositivo.</div>
+                                            <input type="text" class="form-control" id="inp-modelo" name="mdl-reg"
+                                                placeholder="Modelo del dispositivo" autocomplete="off"
+                                                data-toggle="popover" data-trigger="hover" data-html="true"
+                                                title="Descripción"
+                                                data-content="Es el modelo específico del dispositivo.">
+                                            <div class="invalid-feedback">Por favor, ingrese un modelo de dispositivo.
+                                            </div>
                                         </div>
                                         <h6>Numero de serie</h6>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-square-binary"></i></span>
+                                                <span class="input-group-text"><i
+                                                        class="fa-solid fa-square-binary"></i></span>
                                             </div>
-                                            <input type="text" class="form-control" id="inp-num-serie" name="mdl-reg" placeholder="Numero de serie" autocomplete="off"
-                                            data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción"
-                                            data-content="Es un identificador único que permite rastrear el dispositivo. Cada dispositivo tiene un número de serie único.">
+                                            <input type="text" class="form-control" id="inp-num-serie" name="mdl-reg"
+                                                placeholder="Numero de serie" autocomplete="off" data-toggle="popover"
+                                                data-trigger="hover" data-html="true" title="Descripción"
+                                                data-content="Es un identificador único que permite rastrear el dispositivo. Cada dispositivo tiene un número de serie único.">
                                             <div class="invalid-feedback">Por favor, ingrese un número de serie.</div>
-                                        </div>                     
+                                        </div>
                                     </div> <!--col-->
                                     <div class="col-md-6">
                                         <h5>Ubicación del dispositivo</h5>
                                         <h6>Zona Operativa</h6>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-warehouse"></i></span>
+                                                <span class="input-group-text"><i
+                                                        class="fa-solid fa-warehouse"></i></span>
                                             </div>
-                                            <input type="text" class="form-control" id="inp-zona" name="mdl-reg" placeholder="Zona" autocomplete="off"
-                                            data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción"
-                                            data-content="Es el tipo de activo o el grupo al que pertenece el dispositivo.">
+                                            <select class="form-control select" id="inp-zona"></select>
                                             <div class="invalid-feedback">Por favor, ingrese la zona operativa.</div>
                                         </div>
                                         <h6>Ubicacion del dispositivo</h6>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
+                                                <span class="input-group-text"><i
+                                                        class="fa-solid fa-location-dot"></i></span>
                                             </div>
-                                            <input type="text" class="form-control" id="inp-ubicacion" name="mdl-reg" placeholder="Ubicacion del dispositivo" autocomplete="off"
-                                            data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción"
-                                            data-content="Indica el lugar específico dentro de la zona donde se encuentra físicamente el dispositivo. Puede ser un nombre de área, oficina.">
+                                            <select class="form-control select" id="inp-ubicacion"></select>
                                             <div class="invalid-feedback">Por favor, ingrese una ubicación.</div>
                                         </div>
                                         <h5>Identificación del activo</h5>
                                         <h6>Activo Fijo</h6>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                                                <span class="input-group-text"><i
+                                                        class="fa-solid fa-user-large"></i></span>
                                             </div>
-                                            <input type="text" class="form-control" id="inp-af" name="mdl-reg" placeholder="AF" autocomplete="off"
-                                            data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción"
-                                            data-content="Es el número de identificación único del dispositivo dentro del inventario.">
-                                        </div> 
-                                        <h6>Etiqueta del dispositivo (TAG)</h6>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-tag"></i></span>
+                                            <input type="text" class="form-control" id="inp-af" name="mdl-reg"
+                                                placeholder="AF" autocomplete="off" data-toggle="popover"
+                                                data-trigger="hover" data-html="true" title="Descripción"
+                                                data-content="Es el número de identificación único del dispositivo dentro del inventario.">
+                                        </div>
+                                        <div id="sh-tag">
+                                            <h6>Etiqueta del dispositivo (TAG)</h6>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i
+                                                            class="fa-solid fa-tag"></i></span>
+                                                </div>
+                                                <input type="text" class="form-control" id="inp-tag" name="mdl-reg"
+                                                    placeholder="TAG" autocomplete="off" data-toggle="popover"
+                                                    data-trigger="hover" data-html="true" title="Descripción"
+                                                    data-content="Es un identificador o código asociado al dispositivo, que puede ser utilizado para la gestión del inventario, seguimiento, o categorización.">
+                                                <div class="invalid-feedback">Por favor, ingrese un TAG.</div>
                                             </div>
-                                            <input type="text" class="form-control" id="inp-tag" name="mdl-reg" placeholder="TAG" autocomplete="off"
-                                            data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción"
-                                            data-content="Es un identificador o código asociado al dispositivo, que puede ser utilizado para la gestión del inventario, seguimiento, o categorización.">
-                                            <div class="invalid-feedback">Por favor, ingrese un TAG.</div>
+                                        </div>
+                                        <div id="sh-imei">
+                                            <h6>IMEI del dispositivo</h6>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i
+                                                            class="fa-solid fa-hashtag"></i></span>
+                                                </div>
+                                                <input type="text" class="form-control" maxlength="15" id="inp-imei"
+                                                    name="mdl-reg" placeholder="IMEI" autocomplete="off"
+                                                    data-toggle="popover" data-trigger="hover" data-html="true"
+                                                    title="Descripción"
+                                                    data-content="Es un código de 15 dígitos único pregrabado en los teléfonos móviles, el cual identifica que tiene cada teléfono. (Para obtenerlo marca *#06#).">
+                                                <div class="invalid-feedback"> Por favor, ingrese el IMEI</div>
+                                            </div>
+                                        </div>
+                                        <div id="sh-linea">
+                                            <h6>Número de teléfono</h6>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i
+                                                            class="fa-solid fa-phone"></i></span>
+                                                </div>
+                                                <input type="text" class="form-control" maxlength="15" id="inp-linea"
+                                                    name="mdl-reg" placeholder="Número de teléfono" autocomplete="off"
+                                                    data-toggle="popover" data-trigger="hover" data-html="true"
+                                                    title="Descripción"
+                                                    data-content="Es un código de 15 dígitos único pregrabado en los teléfonos móviles, el cual identifica que tiene cada teléfono. (Para obtenerlo marca *#06#)">
+                                                <div class="invalid-feedback"> Por favor, una linea</div>
+                                            </div>
                                         </div>
                                     </div><!--col-->
                                 </div>
@@ -276,162 +276,47 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                                     </div>
-                                    <select class="form-control select" id="inp-usuario" name="mdl-reg" placeholder="usuario"
-                                    data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción" data-content="Es el modelo específico del dispositivo."></select>
+                                    <select class="form-control select" id="inp-usuario" name="mdl-reg"
+                                        data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción"
+                                        data-content="Nombre del usuario al que se le asignara un activo"></select>
                                 </div>
                                 <h6>Cargo del usuario</h6>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fa-solid fa-id-card"></i></span>
+                                        <span class="input-group-text"><i class="fa-solid fa-briefcase"></i></span>
                                     </div>
-                                    <select class="form-control select" id="inp-posicion" name="mdl-reg" placeholder="Cargo del usuario"
-                                    data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción" data-content="Es el modelo específico del dispositivo."></select>
+                                    <select class="form-control select" id="inp-cargo" name="mdl-reg"
+                                        data-toggle="popover" data-trigger="hover" data-html="true" title="Descripción"
+                                        data-content="Puesto que emplea el usuario"></select>
                                 </div>
-                                <h6>Fecha de registro</h6>
-                                <div class="input-group mb-3">
+                                <h6 id="lbl-fecha-reg">Fecha de registro</h6>
+                                <div class="input-group mb-3" id="inp-fecha-reg">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <input type="date" class="form-control" id="inp-fecha-entrega" name="mdl-reg">
+                                    <input type="datetime-local" class="form-control" id="inp-fecha-entrega"
+                                        name="mdl-reg">
                                 </div>
                             </div><!--Col12-->
                         </div><!--row-->
                     </div>
                 </div><!--body-->
-                    
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger icon" data-dismiss="modal">Cerrar <i class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
-                    <button type="button" class="btn btn-success icon" id="guardar-registro" onclick="crear_registro()">Guardar <i class="fa-solid fa-floppy-disk fa-lg"></i></button>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!--Modal editar registro del inventario-->
-    <div class="modal fade" id="modal-editar">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Registro</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <h5>Detalles del dispositivo</h5>
-                                        <h6>Rubro</h6>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-desktop"></i></span>
-                                            </div>
-                                            <select class="form-control select" id="edi-rubro"></select>
-                                        </div>
-                                        <h6>Tipo de dispositivo</h6>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-computer"></i></span>
-                                            </div>
-                                            <select class="form-control select" id="edi-tipo" ></select>
-                                        </div>
-                                        <h6>Marca del dispositivo</h6>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-trademark"></i></span>
-                                            </div>
-                                            <input type="text" class="form-control" id="edi-marca" placeholder="Marca del dispositivo" autocomplete="off">
-                                        </div>
-                                        <h6>Modelo del dispositivo</h6>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
-                                            </div>
-                                            <input type="text" class="form-control" id="edi-modelo" placeholder="Modelo del dispositivo" autocomplete="off">
-                                        </div>
-                                        <h6>Numero de serie</h6>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-square-binary"></i></span>
-                                            </div>
-                                            <input type="text" class="form-control" id="edi-num-serie" maxlength="30" placeholder="Numero de serie" autocomplete="off">
-                                        </div>
-                                    </div><!--col-->
-                                    <div class="col-md-6">
-                                        <h5>Ubicación del dispositivo</h5>
-                                        <h6>Zona Operativa</h6>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-warehouse"></i></span>
-                                            </div>
-                                            <input type="text" class="form-control" id="edi-zona" autocomplete="off">
-                                        </div>
-                                        <h6>Ubicacion del dispositivo</h6>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
-                                            </div>
-                                            <input type="text" class="form-control" id="edi-ubicacion" placeholder="Ubicacion del dispositivo" autocomplete="off">
-                                        </div>
-                                        <h5>Identificación del activo</h5>
-                                        <h6>Activo Fijo</h6>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
-                                            </div>
-                                            <input type="text" class="form-control" id="edi-af" placeholder="AF" autocomplete="off">
-                                        </div>
-                                        <h6>Etiqueta del dispositivo (TAG)</h6>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-tag"></i></span>
-                                            </div>
-                                            <input type="text" class="form-control" id="edi-tag" placeholder="TAG" autocomplete="off">
-                                        </div>
-                                    </div><!--col-->
-                                </div>
-                                <hr>
-                                <h5 class="input-title">Información del usuario asignado</h5>
-                                <h6>Nombre del usuario</h6>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
-                                    </div>
-                                    <select class="form-control select" id="edi-usuario"></select>
-                                </div>
-                                <h6>Cargo del usuario</h6>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fa-solid fa-id-card"></i></span>
-                                    </div>
-                                    <select class="form-control select" id="edi-posicion"></select>
-                                </div>
-                                <h6>Fecha de entrega</h6>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
-                                    </div>
-                                    <input type="date" class="form-control" id="edi-fecha-entrega">
-                                </div>
-                            </div>
-                        </div><!--row-->
-                    </div>
-                </div> <!--body-->
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger icon" data-dismiss="modal">Cerrar <i class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
-                    <button type="button" class="btn btn-success icon" id="editar-registro" onclick="editar_registro()">Guardar <i class="fa-solid fa-floppy-disk fa-lg"></i></button>
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal">Cerrar <i
+                            class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+                    <button type="button" class="btn btn-success icon" id="btn-mdl-inventario" onclick="">Guardar <i
+                            class="fa-solid fa-floppy-disk fa-lg"></i></button>
                 </div>
             </div>
         </div>
     </div>
 
 
-     <!--Modal resguardo -->
-    <div class="modal" tabindex="-1" aria-hidden="true"  id="mdl-res">
-        <div class="modal-dialog">
+    <!--Modal resguardo -->
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-res" role="dialog" data-backdrop="static"
+        data-keyboard="false">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Generar resguardo</h5>
@@ -440,46 +325,276 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                                    </div>
+                                    <select class="form-control select" id="select-usu" name="inp-resg"></select>
+                                    <div class="invalid-feedback">Por favor, seleccione un usuario.</div>
+                                </div>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i
+                                                class="fa-solid fa-map-location-dot"></i></span>
+                                    </div>
+                                    <select class="form-control select" id="select-region" name="inp-resg"></select>
+                                    <div class="invalid-feedback">Por favor, seleccione una región.</div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-street-view"></i></span>
+                                    </div>
+                                    <input class="form-control select" id="inp-area" name="inp-resg"
+                                        placeholder="Ingrese el área" autocomplete="off">
+                                    <div class="invalid-feedback">Por favor, ingrese un área.</div>
+                                </div>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i
+                                                class="fa-solid fa-location-dot fa-lg"></i></span>
+                                    </div>
+                                    <input class="form-control select" id="inp-ubicacion-resg" name="inp-resg"
+                                        placeholder="Ingrese la ubicación" autocomplete="off">
+                                    <div class="invalid-feedback">Por favor, ingrese una ubicación.</div>
+                                </div>
+                            </div>
                         </div>
-                        <select class="form-control select" id="select-usu"></select>  
-                        <div class="invalid-feedback">Por favor, seleccione un usuario.</div>                      
                     </div>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="fa-solid fa-map-location-dot"></i></span>
-                        </div>
-                        <select class="form-control select" id="select-region"></select>
-                        <div class="invalid-feedback">Por favor, seleccione una región.</div>
-                    </div>
+
+
                     <div class="card collapsed-card card-outline card-primary">
-                        <div class="card-header" data-card-widget="collapse" style="cursor: pointer;" >
+                        <div class="card-header" data-card-widget="collapse" style="cursor: pointer;">
                             <h3 class="card-title">Más opciones</h3>
                             <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                                <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
+                                        class="fas fa-plus"></i></button>
                             </div>
                         </div>
-                        <div class="card-body" style="display:none;" id="collapse-resguardo" >
-                            <label >Observaciones</label>
-                            <div class="input-group mb-3">
-                                <textarea class="form-control" id="txt-area" rows="3" name="resg-inpt"></textarea>
-                            </div>
-                            <label >Fecha de entrega</label>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                        <div class="card-body" style="display:none;" id="collapse-resguardo">
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col">
+                                        <label>Observaciones</label>
+                                        <div class="input-group mb-3">
+                                            <textarea class="form-control" id="txt-area" rows="3"
+                                                name="inp-resg"></textarea>
+                                        </div>
+                                        <label>Fecha de entrega</label>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i
+                                                        class="fa-solid fa-calendar-days"></i></span>
+                                            </div>
+                                            <input type="date" class="form-control" id="fecha-resguardo">
+                                        </div>
+                                    </div>
+                                    <div class="col" style="display: none;" id="col-pemex">
+                                        <label>Usuario de PEMEX</label>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                                            </div>
+                                            <input class="form-control select" id="inp-user-pemex" name="inp-resg"
+                                                placeholder="Ingrese el nombre completo del usuario">
+                                            <div class="invalid-feedback">Por favor, ingrese un usuario.</div>
+                                        </div>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i
+                                                        class="fa-solid fa-suitcase"></i></span>
+                                            </div>
+                                            <input class="form-control select" id="inp-cargo-pemex" name="inp-resg"
+                                                placeholder="Ingrese el cargo del usuario">
+                                            <div class="invalid-feedback">Por favor, ingrese un cargo.</div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <input type="date" class="form-control" id="fecha-resguardo">
+                            </div>
+
+                            <div class="container-fluid">
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="alert alert-info position-relative d-flex align-items-start"
+                                            role="alert"
+                                            style="display:none ; background-color: #DFF5E3; border-color: #007A33; color: #004420; padding-right: 4rem;"
+                                            id="alert-resguardo">
+                                            <button type='button' class='btn icon toggle-select me-2 check-button'
+                                                id="check-resguardo-pemex">
+                                                <i class='fa-regular fa-square fa-lg'
+                                                    id="check-resguardo-pemex-icon"></i>
+                                            </button>
+                                            ¿Desea generar el resguardo para PEMEX?
+                                        </div>
+                                    </div>
+                                    <!-- <div class="col">
+                                        <div class="alert alert-info position-relative d-flex align-items-start check-button"
+                                            role="alert"
+                                            style="display:none ; background-color:#e7f3fe; border-color:#b8daff; color:#004085; padding-right: 4rem;"
+                                            id="alert-resguardo-cel">
+                                            <button type='button' class='btn icon toggle-select me-2'
+                                                id="check-resguardo-cel" disabled>
+                                                <i class='fa-regular fa-square fa-lg' id="check-resguardo-cel-icon"></i>
+                                            </button>
+                                            ¿Desea generar el resguardo para celular?
+                                        </div>
+                                    </div> -->
+                                </div>
                             </div>
                         </div>
 
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cancelar <i class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
-                    <button type="button" class="btn btn-success icon" id="mdl-btn-conf" onclick="crear_resguardo()">Confirmar <i class="fa-solid fa-circle-check fa-lg"></i></button>
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cancelar <i
+                            class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+                    <button type="button" class="btn btn-success icon" id="mdl-btn-conf"
+                        onclick="crear_resguardo()">Confirmar <i class="fa-solid fa-circle-check fa-lg"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal de historial-->
+    <div class="modal fade" id="modal-historial" tabindex="-1" role="dialog" data-backdrop="static"
+        data-keyboard="false">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Historial del activo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <form id="form-historial">
+                                    <label for="his-num-serie">Número de serie</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i
+                                                    class="fa-solid fa-square-binary"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control" id="his-num-serie" name="mdl-hst"
+                                            placeholder="Ingrese un número de serie">
+                                    </div>
+                                    <label for="rango-fecha">Rango de fecha</label>
+                                    <div class="input-group">
+
+                                        <div class="input-group">
+                                            <div class="input-group-prepend"><span class="input-group-text"><i
+                                                        class="fa-solid fa-calendar-days"></i></span></div>
+                                            <input type="text" id="rango-fecha" class="form-control" name="mdl-hst"
+                                                autocomplete="off">
+                                        </div>
+
+                                    </div>
+                                    <label for="select-evento">Evento</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fa-solid fa-filter"></i></span>
+                                        </div>
+                                        <select class="form-control select" id="select-evento"></select>
+                                    </div></br>
+                                    <button type="button" class="btn btn-primary icon" id="btn-buscar"
+                                        onclick="mostrar_historial()"><i class="fa-solid fa-magnifying-glass"></i>
+                                        Buscar</button>
+                                </form>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card mt-3">
+                                    <div class="card-header">
+                                        Historial de movimientos
+                                    </div>
+                                    <div class="card-body d-none" style="height: 300px; overflow-y: auto;"
+                                        name="mdl-hst" id="resultado-historico">
+                                        <div class="list-group" id="his-versiones" name="mdl-hst"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="modal-btn-his"><i
+                            class="fa-solid fa-arrow-right-from-bracket fa-lg"></i> Salir</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal traspaso -->
+    <div class="modal fade" id="mdl-traspaso" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Traspaso de activo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <label for="mdl-estado">Estado del activo</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                    class="fa-solid fa-circle-info"></i></span></div>
+                        <select class="form-control select" id="mdl-estado"></select>
+                    </div>
+                    <label for="mdl-usuario">Usuario a traspasar</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend"><span class="input-group-text"><i
+                                    class="fa-solid fa-user"></i></span></div>
+                        <select class="form-control select" id="mdl-usuario"></select>
+                    </div>
+                    <div class="alert alert-info position-relative d-flex align-items-start" role="alert"
+                        style="display:none ; background-color:#e7f3fe; border-color:#b8daff; color:#004085; padding-right: 4rem;"
+                        id="alert-traspaso">
+                        <button type='button' class='btn icon toggle-select me-2 check-button' id="check-resguardo">
+                            <i class='fa-regular fa-square fa-lg' id="check-resguardo-icon"></i>
+                        </button>
+                        ¿Desea generar el resguardo del usuario seleccionado?
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal">
+                        Cerrar <i class="fa-solid fa-arrow-right-from-bracket fa-lg"></i>
+                    </button>
+                    <button type="button" class="btn btn-success icon" onclick="traspasos()">
+                        Guardar <i class="fa-solid fa-floppy-disk fa-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal eliminar -->
+    <div class="modal fade" id="mdl-eliminar" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bajas de activos</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="tbl-mdl-eliminar"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal">
+                        Cerrar <i class="fa-solid fa-arrow-right-from-bracket fa-lg"></i>
+                    </button>
+                    <button type="button" class="btn btn-success icon"
+                        onclick="mostrar_alert('warning', `¿Está seguro de eliminar ${seleccionar.length} activos(s)?`, false, desactivar_registro)">
+                        Guardar <i class="fa-solid fa-floppy-disk fa-lg"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -487,13 +602,33 @@
 
 </body>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script>
-    <script src="scripts/controller_acceso/controller_acceso.js"></script>
-    <script src="scripts/controller_inventario/controller_inventario.js"></script>
-    <script src="dist/js/adminlte.min.js"></script>
-    <script src="libraries/DataTables/datatables.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="libraries/select2/js/select2.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="libraries/Tabulator/tabulator.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+    integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"
+    integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+"
+    crossorigin="anonymous"></script>
+<script src="scripts/controller_acceso/controller_acceso.js"></script>
+<script src="scripts/controller_global/controller_global.js"></script>
+<script src="scripts/controller_inventario/controller_inventario.js"></script>
+<script src="scripts/controller_historico/controller_historico.js"></script>
+<script src="dist/js/adminlte.min.js"></script>
+<script src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/js/tempusdominus-bootstrap-4.min.js"
+    integrity="sha512-k6/Bkb8Fxf/c1Tkyl39yJwcOZ1P4cRrJu77p83zJjN2Z55prbFHxPs9vN7q3l3+tSMGPDdoH51AEU8Vgo1cgAA=="
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="libraries/select2/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment-with-locales.min.js"></script>
+
+
+
+
+
 </html>

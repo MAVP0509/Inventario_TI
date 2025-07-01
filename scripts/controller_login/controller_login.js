@@ -9,15 +9,15 @@ sessionStorage.setItem = function(key, value) {
 } */
 
 let respuesta = ""
-function server_usuario(model){
-    return new Promise ((resolve,reject)=>{
+function server_usuario(model) {
+    return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
             url: "database/controller_login/controller_login.php",
             data: {
-                trama:JSON.stringify(model)
+                trama: JSON.stringify(model)
             },
-            success: function(response){
+            success: function (response) {
                 respuesta = response
                 try {
                     resolve(JSON.parse(response))
@@ -27,22 +27,22 @@ function server_usuario(model){
                 }
             }
         })
-    })  
+    })
 }
 
-function server_email(model){
-    return new Promise ((resolve,reject)=>{
+function server_email(model) {
+    return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
             url: "database/controller_email/controller_email.php",
             data: {
-                trama:JSON.stringify(model)
+                trama: JSON.stringify(model)
             },
-            success: function(response){
+            success: function (response) {
                 respuesta = response
                 Swal.close()
                 try {
-                    resolve(JSON.parse(response))  
+                    resolve(JSON.parse(response))
                 } catch (error) {
                     reject(error)
                 }
@@ -52,98 +52,66 @@ function server_email(model){
 }
 
 //TODO funciones para animar los iconos de los botones
-$(".icon").on('mouseover', function(){
+$(".icon").on('mouseover', function () {
     $(this).find('i').addClass("fa-bounce");
 })
-$(".icon").on('mouseout', function(e){
+$(".icon").on('mouseout', function (e) {
     $(this).find('i').removeClass("fa-bounce");
 })
 
 
 
 //TODO Función para el formulario de registro y sus funciones derivadas
-async function registrarUsu(){
+async function registrarUsu() {
 
     const validacion = [
         "nombre",
         "regcorreo",
         "reg-contraseña",
+        "conf-contraseña",
         "telefono",
-        "fechanac"
+        "fechanac",
+        "conf-contraseña"
     ]
 
     if (!validar_campos(validacion)) {
         mostrar_toast('error', 'Error', 'Rellena todos los campos correctamente para continuar. Inténtalo de nuevo.');
         return;
     }
-    try{
-        /* if (!pass || !email || !tel || !nombre || !fecha || !vEdad  ) {
-            mostrar_toast('warning', 'Inventario TI', '¡Rellena todos los campos correctamente para continuar!');
+    try {
+        let model = {
+            accion: 1,
+            nombre: $("#nombre").val().trim(),
+            correo: $("#regcorreo").val().trim(),
+            contraseña: $("#reg-contraseña").val().trim(),
+            edad: $("#edad").val().trim(),
+            telefono: $("#telefono").val().trim(),
+            fecha_nac: $("#fechanac").val().trim(),
+        };
 
-            //console.log(pass, email, tel, nombre, fecha, edad)
-            return false;
-    
-        }else { */
-            
-            
-            /* let inputs = document.getElementsByName("inputReg");
-            for (let i = 0; i < inputs.length; i++) {
-                const element = inputs[i].value = "";
-            } 
-        }    */
-            let model = {
-                accion : 1,
-                nombre: $("#nombre").val().trim(),
-                correo :$("#regcorreo").val().trim(),
-                contraseña :$("#reg-contraseña").val().trim(),
-                edad : $("#edad").val().trim(),
-                telefono : $("#telefono").val().trim(),
-                fecha_nac : $("#fechanac").val().trim(),
-            };
 
-        
-            let respuesta = await server_usuario(model);
-        
-            if(respuesta.resultado === true){
-                localStorage.setItem('registroExitoso', '¡Usuario Registrado!');
-                window.location.href = "login.html"
-            }else if(respuesta.resultado === false){
-                mostrar_toast('warning', 'Inventario TI', 'El correo ya está registrado');
+        let respuesta = await server_usuario(model);
 
-            } 
-    }catch (error){
+        if (respuesta.resultado === true) {
+            localStorage.setItem('registroExitoso', '¡Usuario Registrado!');
+            window.location.href = "login.html"
+        } else if (respuesta.resultado === false) {
+            mostrar_toast('warning', 'Inventario TI', 'El correo ya está registrado');
+
+        }
+    } catch (error) {
         mostrar_toast('error', 'Inventario TI', 'No se puedo conectar al servidor');
     }
-    
-}
 
-function validar_campos(campos) {
-    let valido = true;
-    
-    campos.forEach(id => {
-        const campo = document.getElementById(id);
-        if (!campo) {
-            valido = false;
-            return;
-        }
-
-        if (!campo.value.trim()) {
-            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
-            valido = false;
-        } else {
-            campo.classList.remove('is-invalid');
-        }
-    });
-    return valido;
 }
 
 //* Función para validar la edad del usuario
-let vEdad=false
-function calcularEdad(){
+let vEdad = false
+function calcularEdad() {
     let fechaNacimiento = new Date(document.getElementById('fechanac').value);
     let hoy = new Date();
     let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
-    
+
     let mes = hoy.getMonth() - fechaNacimiento.getMonth();
 
     if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
@@ -152,18 +120,18 @@ function calcularEdad(){
 
     document.getElementById('edad').value = edad;
 
-    if (edad<18){
-        vEdad=false
-    }else{
-        vEdad=true
+    if (edad < 18) {
+        vEdad = false
+    } else {
+        vEdad = true
     }
 }
 
 //Comprueba en tiempo real las contraseñas
-let pass=false
-$('.ComprobarContraseña').on('input',function(e) {
+let pass = false
+$('.ComprobarContraseña').on('input', function (e) {
     //console.log(e.currentTarget.value)
-    
+
     validar_contraseña()
 })
 
@@ -177,16 +145,16 @@ function validar_contraseña() {
     let letrasmin = /[a-z]/.test(regcontraseña);
     let numeros = /\d/.test(regcontraseña);
     let especialesc = /[()*#@.]/.test(regcontraseña);
-    
+
     try {
-        document.getElementById('minlongitud').style.color = minlongitud ? 'green' : 'red';  
+        document.getElementById('minlongitud').style.color = minlongitud ? 'green' : 'red';
         document.getElementById('lestrasmm').style.color = (letrasmay && letrasmin) ? 'green' : 'red';
         document.getElementById('numeros').style.color = numeros ? 'green' : 'red';
         document.getElementById('caracteresp').style.color = especialesc ? 'green' : 'red';
-        } catch (error) {
-        
+    } catch (error) {
+
     }
-      
+
     let cumpleRequisitos = minlongitud && letrasmay && letrasmin && numeros && especialesc;
 
     if (!cumpleRequisitos) {
@@ -200,78 +168,78 @@ function validar_contraseña() {
     }
 
     if (event.target.id === 'conf-contraseña' || event.target.id === 'reg-contraseña') {
-        if (regcontraseña !== confcontraseña){
+        if (regcontraseña !== confcontraseña) {
             errorMessage.style.display = 'block';
             errorMessage.textContent = 'Las contraseñas no coinciden';
             document.getElementById('conf-contraseña').style.borderColor = 'red';
             pass = false
         } else {
-            errorMessage.style.display = 'none';    
+            errorMessage.style.display = 'none';
             document.getElementById('conf-contraseña').style.borderColor = 'green';
             pass = true
         }
     }
-    
+
     return true;
 
 }
 
 //*Función para comprobar que el telefono sea uno válido
-let tel= false
-$('#telefono').on('input', function() {
-    this.value= this.value.replace(/[^0-9]/g, '')
+let tel = false
+$('#telefono').on('input', function () {
+    this.value = this.value.replace(/[^0-9]/g, '')
     valTel = $(this).val();
-    if (valTel.length < 10 ||valTel.length === 0) {
+    if (valTel.length < 10 || valTel.length === 0) {
         document.getElementById('error-mensageTel').style = "display : block; color:red;"
-        tel=false
+        tel = false
         //document.getElementById('btn-reg').disabled= true;
     } else {
         document.getElementById('error-mensageTel').style = "display : none;"
-        tel=true
+        tel = true
         //document.getElementById('btn-reg').disabled= false;
     }
 });
 
 //*Función para comprobar que el nombre del registro sea uno válido
-let nombre= false
-$('#nombre').on('input', function(e) {
+let nombre = false
+$('#nombre').on('input', function (e) {
     //validar_nombre(e.currentTarget.value)
     const regexNombre = /^[a-zA-ZáéíóúÁÉÍÓÚüÜ\s]{3,}$/
-    if(!regexNombre.test(e.currentTarget.value)){
+    if (!regexNombre.test(e.currentTarget.value)) {
         document.getElementById('error-mensajeNombre').style = 'display : block; color:red;'
-        nombre=false
-    }else{
+        nombre = false
+    } else {
         document.getElementById('error-mensajeNombre').style = ' display : none;'
-        nombre=true
+        nombre = true
     }
-    
-}); 
+
+});
 
 //*Función para comprobar que se ingresó una fecha
-let fecha= false
-$('#fechanac').on('input', function(e) {
+let fecha = false
+$('#fechanac').on('input', function (e) {
     //validar_nombre(e.currentTarget.value)
     const regexFecha = /^\d{4}-\d{2}-\d{2}$/
-    if(!regexFecha.test(e.currentTarget.value)){
+    if (!regexFecha.test(e.currentTarget.value)) {
         document.getElementById('error-mensageFecha').style = 'display : block; color:red;'
-        fecha=false
-    }else{
+        fecha = false
+    } else {
         document.getElementById('error-mensageFecha').style = ' display : none;'
-        fecha=true
+        fecha = true
     }
-    
+
 });
 
 //*Función para ver las contraseñas del registro
 function togglePasswords() {
     let regPasswordInput = document.getElementById('reg-contraseña');
     let confPasswordInput = document.getElementById('conf-contraseña');
-    let toggleIcon = document.getElementById('toggle-password-icon');   
+    let toggleIcon = document.getElementById('toggle-password-icon');
 
     if (regPasswordInput.type === 'password') {
         regPasswordInput.type = 'text';
         confPasswordInput.type = 'text';
-        toggleIcon.classList.remove('fa-eye-slash');  
+        toggleIcon.classList.remove('fa-eye-slash');
         toggleIcon.classList.add('fa-eye');
     } else {
         regPasswordInput.type = 'password';
@@ -286,11 +254,11 @@ window.addEventListener('load', function () {
     // Leemos el mensaje del registro desde sessionStorage
     const mensajeRegistro = localStorage.getItem('registroExitoso');
     const mensajeContraseña = localStorage.getItem('reseteoContraseña')
-    
+
     if (mensajeRegistro) {
         // Si el mensaje existe, mostramos el toast
         mostrar_toast('success', 'Inventario TI', mensajeRegistro);
-    }else if(mensajeContraseña){
+    } else if (mensajeContraseña) {
         mostrar_toast('success', 'Inventario TI', mensajeContraseña);
     }
 
@@ -301,8 +269,8 @@ window.addEventListener('load', function () {
 
 //TODO Función para el formulario de ingreso y sus funciones derivadas
 async function validar_ingreso() {
- 
-    try{
+
+    try {
 
         const validacion = [
             "logcorreo",
@@ -313,24 +281,24 @@ async function validar_ingreso() {
             mostrar_toast('error', 'Error', 'Rellene los campos. Inténtelo nuevamente.');
             return;
         }
-        
+
         let model = {
             accion: 0,
-            correo : $("#logcorreo").val().trim(),
-            contraseña : $("#logcontraseña").val().trim(),
-    
+            correo: $("#logcorreo").val().trim(),
+            contraseña: $("#logcontraseña").val().trim(),
+
         }
-        
+
         let server = await server_usuario(model);
-    
-        let resp=JSON.parse(respuesta)
-        if (resp.resultado === false){
+
+        let resp = JSON.parse(respuesta)
+        if (resp.resultado === false) {
             mostrar_toast('error', 'Inventario TI', "Usuario/contraseña no válidos");
             let inputs = document.getElementsByName("inputInit");
             for (let i = 0; i < inputs.length; i++) {
-            const element = inputs[i].value = "";
+                const element = inputs[i].value = "";
             }
-        }else{
+        } else {
             sessionStorage.setItem("user", respuesta)
             sessionStorage.setItem("log", 'true')
             sessionStorage.setItem("rol", resp.resultado[5])
@@ -340,33 +308,33 @@ async function validar_ingreso() {
             for (let i = 0; i < inputs.length; i++) {
                 const element = inputs[i].value = "";
             }
-            }
-    }catch (error){
+        }
+    } catch (error) {
         mostrar_toast('error', 'Inventario TI', "No se pudo conectar al servidor");
     }
-    
+
 }
 
 //* Para poder ver la contraseña en el formulario
-function ver_contraseña(){
+function ver_contraseña() {
     let logPasswordInput = document.getElementById('logcontraseña')
-    let iconLog = document.getElementById('toggle-password-icon-log')    
+    let iconLog = document.getElementById('toggle-password-icon-log')
 
     if (logPasswordInput.type === 'password') {
         logPasswordInput.type = 'text';
-        iconLog.classList.remove('fa-eye-slash');  
+        iconLog.classList.remove('fa-eye-slash');
         iconLog.classList.add('fa-eye');
-    } else if(logPasswordInput.type === 'text'){
+    } else if (logPasswordInput.type === 'text') {
         logPasswordInput.type = 'password';
         iconLog.classList.remove('fa-eye');
         iconLog.classList.add('fa-eye-slash');
     }
 }
 //? Función para mandar el formulario con la tecla "Enter"
-document.getElementById('logcontraseña').addEventListener('keydown', function(event) {
+document.getElementById('logcontraseña').addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
-      event.preventDefault(); // Evita que se recargue la página si estás usando AJAX
-      document.getElementById('btn-ini').click(); // Llama al botón que hace el login
+        event.preventDefault(); // Evita que se recargue la página si estás usando AJAX
+        document.getElementById('btn-ini').click(); // Llama al botón que hace el login
     }
 });
 
@@ -385,12 +353,12 @@ document.addEventListener('keyup', (e) => {
 
 
 //TODO Función para navegar entre formularios del login
-async function toggleForms(showRegister = false, showRecovery = false){
-    if(showRecovery){
+async function toggleForms(showRegister = false, showRecovery = false) {
+    if (showRecovery) {
         $("#colrep").show(); //Muetsra el formulario de recuperación
         $("#colnone").hide(); //Oculta el formulario de inicio de sesión
         $("#colblock").hide(); //Oculta el formulario de registro
-    } else if(showRegister) {
+    } else if (showRegister) {
         $("#colnone").show(); //Muestra la sección de registro
         $("#colblock").hide(); //Oculta la sección de inicio de sesión
         $("#colrep").hide(); //Oculta la seccion de recuperación
@@ -403,60 +371,60 @@ async function toggleForms(showRegister = false, showRecovery = false){
 
 //TODO Función para llamar las funciones de validación y ver las contraseñas
 $(document).ready(function () {
-    $('[data-toggle="popover"]').popover(); 
-    
+    $('[data-toggle="popover"]').popover();
+
     // Añadimos el evento input al campo de confirmación de contraseña
     document.getElementById('conf-contraseña').addEventListener('input', validar_contraseña);
     document.getElementById('reg-contraseña').addEventListener('input', validar_contraseña);
-    document.getElementById('fechanac').addEventListener('input',calcularEdad);
+    document.getElementById('fechanac').addEventListener('input', calcularEdad);
     document.getElementById('toggle-password-icon').addEventListener('click', togglePasswords);
     document.getElementById('toggle-password-icon-log').addEventListener('click', ver_contraseña);
-    
+
 });
 
 
 
 //TODO Comprueba en tiempo real el contenido de los inputs tipo email
 let inputEmail
-let email=false
+let email = false
 let idInput
-$('.Comprobarmail').on('input',function(e){
+$('.Comprobarmail').on('input', function (e) {
     //console.log(e.currentTarget.value)
-    inputEmail =e.currentTarget.value
+    inputEmail = e.currentTarget.value
     idInput = e.currentTarget.id
     validar_email(e.currentTarget.value)
 }
 )
 
- async function validar_email(){
+async function validar_email() {
     const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
     //console.log(inputEmail)
 
-    if(idInput === "logcorreo"){
-        if(!regexEmail.test(inputEmail)){
+    if (idInput === "logcorreo") {
+        if (!regexEmail.test(inputEmail)) {
             document.getElementById('error-mensajeEmail-log').style = 'display : block; color:red;'
-        }else{
+        } else {
             document.getElementById('error-mensajeEmail-log').style = ' display : none;'
         }
-    }else if(idInput === "regcorreo"){
-        if(!regexEmail.test(inputEmail) || inputEmail === ""){
+    } else if (idInput === "regcorreo") {
+        if (!regexEmail.test(inputEmail) || inputEmail === "") {
             document.getElementById('error-mensajeEmail-reg').style = 'display : block; color:red;'
-            email=false
+            email = false
             //document.getElementById('btn-reg').disabled= true;
-        }else{
+        } else {
             document.getElementById('error-mensajeEmail-reg').style = ' display : none;'
-            email=true
+            email = true
             //document.getElementById('btn-reg').disabled= false;
         }
-    }else if(idInput === "repcorreo"){
-        if(!regexEmail.test(inputEmail)){
+    } else if (idInput === "repcorreo") {
+        if (!regexEmail.test(inputEmail)) {
             document.getElementById('error-mensajeEmail-rep').style = 'display : block; color:red;'
-        }else{
+        } else {
             document.getElementById('error-mensajeEmail-rep').style = ' display : none;'
         }
     }
-} 
+}
 
 
 
@@ -464,26 +432,32 @@ $('.Comprobarmail').on('input',function(e){
 async function recuperar_contraseña() {
     //let dominio = window.location.hostname
     //let puerto = location.port
-    let model ={
-        accion : 0,
-        correo : $("#repcorreo").val().trim(),
-        dominio : window.location.hostname,
-        puerto : location.port
+    const validacion = ["repcorreo"]
+    if (!validar_campos(validacion)) {
+        mostrar_toast('error', 'Error', 'Rellena todos los campos correctamente para continuar. Inténtalo de nuevo.');
+        return;
     }
-    
+    cargando();
+    let model = {
+        accion: 0,
+        correo: $("#repcorreo").val().trim(),
+        dominio: window.location.hostname,
+        puerto: location.port
+    }
+
     let response = await server_email(model);
 
     let emailmessages = document.getElementById('mensaje-correo-success');
     let emailmessaged = document.getElementById('mensaje-correo-danger');
 
-    if(response.resultado === true) {
+    if (response.resultado === true) {
 
         // let token = response.token; // Suponiendo que el servidor devuelve un token
         // let enlace = await enlaceconParametros(token); // Obtener el enlace con el token
         emailmessages.style.display = 'block';
         emailmessages.textContent = 'Te hemos enviado un correo para recuperar tu contraseña.';
         emailmessaged.style.display = 'none';
-        
+
     } else {
         emailmessaged.style.display = 'block';
         emailmessaged.textContent = 'El correo ingresado no está registrado. Por favor, inténtelo nuevamente.';
@@ -492,9 +466,9 @@ async function recuperar_contraseña() {
 }
 
 async function enlaceconParametros(token) {
-    
+
     let baseUrl = "http://localhost/Inventario/recuperacion.html";
-    
+
     let params = new URLSearchParams();
     params.append("ftygui", token);
 
@@ -504,32 +478,19 @@ async function enlaceconParametros(token) {
 }
 
 //? Función para mandar el correo con la tecla "Enter"
-document.getElementById('repcorreo').addEventListener('keydown', function(event) {
+document.getElementById('repcorreo').addEventListener('keydown', function (event) {
     if (event.key === 'Enter') {
-      event.preventDefault(); // Evita que se recargue la página si estás usando AJAX
-      document.getElementById('btn-recuperar').click(); // Llama al botón que hace el login
+        event.preventDefault(); // Evita que se recargue la página si estás usando AJAX
+        document.getElementById('btn-recuperar').click(); // Llama al botón que hace el login
 
-      document.getElementById('repcorreo').value = ""
+        document.getElementById('repcorreo').value = ""
     }
 });
 
 
 //TODO funciones para mostrar mensajes en pantalla
-function mostrar_toast(tipo, titulo, mensaje) {
-    Swal.fire({
-        icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
-        title: titulo,
-        text: mensaje,
-        timer: 2500,
-        timerProgressBar: true,
-        showConfirmButton: false,
-        toast: true,
-        position: 'top-end',
-        //heightAuto : true,
-    });
-}
 
-function cargando(){
+function cargando() {
     Swal.fire({
         title: 'Cargando...',
         text: 'Por favor espere un momento',
@@ -539,13 +500,13 @@ function cargando(){
         color: "#716add",
         backdrop: `
         rgba(0,0,123,0.4)` ,
-        imageUrl: "diavaz.png",
+        imageUrl: "images/diavaz.png",
         imageWidth: 200,
         imageHeight: 200,
         imageAlt: "Custom image",
         didOpen: () => {
-          Swal.showLoading();
+            Swal.showLoading();
         }
-        
-      });
+
+    });
 }

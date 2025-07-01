@@ -8,7 +8,7 @@ function server_supervisor(model) {
             data: {
                 trama: JSON.stringify(model)
             },
-            success: function(response) {
+            success: function (response) {
                 //console.log(response);
                 try {
                     resolve(JSON.parse(response))
@@ -22,131 +22,253 @@ function server_supervisor(model) {
     });
 }
 
-let datos = [];
+let datos = []
+let elemento
+let table
+let supervisor_seleccionado = []
 
 async function consultar_informacion(params) {
     let model = {
         accion: 2
     };
-    
-    let response = await server_supervisor(model);
 
-    datos = response.resultado;
+    let server = await server_supervisor(model);
 
-    let table = $('#tabla1').DataTable();
-    table.destroy();
-        
-    try {
-        $("#tabla1").DataTable({
-            data: datos,
-            columns: [
-                {
-                    data: "id",
-                    render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
-                        return control;
-                    }
-                },
-                {
-                    data: "nombre",
-                    render: function(data, type, row, meta) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
-                        return control
-                    }
-                },
-                {
-                    data: "cargo",
-                    render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
-                        return control;
-                    }
-                },
-                {
-                    data: "region",
-                    render: function(data, type, row) {
-                        let control = `<label style="font-weight: normal; font-size: 12px;">${data}</label>`
-                        return control;
-                    }
-                },
-                {
-                    data: "habilitado",
-                    render: function(data, type, row) {
-                        let switchId = `switch-${row.id}`; // Usa ID único
-                        let checked = (parseInt(data) === 1) ? 'checked' : ''; // Asegura que 1 = habilitado
-                        let control =   `<div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success text-center">
-                                            <input type="checkbox" class="custom-control-input switch-toggle" id="${switchId}"  data-id="${row.id}" ${checked}>
-                                            <label class="custom-control-label" for="${switchId}"></label>
-                                        </div>`
-                        return control;
-                    }
-                },
-                {
-                    data: "id",
-                    render: function(data, type, row) {
-                        let control = `<div class="d-flex justify-content-center align-items-center">
-                                        <button type="button" style="text-align: center" class="btn btn-warning icon" id="${data}" value="${data}" onclick="mostrar_registro(this)">
-                                        <i class="fa-solid fa-pen-to-square fa-lg"></i></button></div>`
-                        return control;
-                    }
-                },
-            ],
-            dom: `
-                <'row mb-2'<'col-sm-6 text-left'f><'col-sm-6 text-right'<'btn-group'B>>>
-                <'row'<'col-sm-12 text-center'tr>>
-                <'row mt-2'<'col-sm-3'l><'col-sm-5 text-center'i><'col-sm-4 text-right'p>>
-            `,
-            language: {
-                url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json',
-                paginate: {
-                    first: '<i class="fas fa-angle-double-left"></i>',
-                    previous: '<i class="fas fa-angle-left"></i>',
-                    next: '<i class="fas fa-angle-right"></i>',
-                    last: '<i class="fas fa-angle-double-right"></i>'
-                },
+    datos = server.resultado;
+    Tabulator.extendModule("localize", "langs", {
+        "es": {
+            "pagination": {
+                "first": '<i class="fa-solid fa-angles-right fa-flip-horizontal"></i>',
+                "first_title": "Primera página",
+                "last": '<i class="fa-solid fa-angles-right"></i>',
+                "last_title": "Última página",
+                "prev": '<i class="fa-solid fa-angle-right fa-flip-horizontal"></i>',
+                "prev_title": "Página anterior",
+                "next": '<i class="fa-solid fa-angle-right"></i>',
+                "next_title": "Página siguiente",
+                "page_size": "Tamaño",
+
             },
-            buttons: [
-                {
-                    html: `<div>
-                            <button type="button" onclick="nuevo_supervisor()" class="btn btn-success icon"><i class="fa-solid fa-plus fa-lg"></i> Nuevo Supervisor</button>
-                        </div>`,
-                },
-                
-            ],
-            stateSave: true,
-            responsive: true,
+            "headerFilters": {
+                "default": "Filtrar columna...",
+                "columns": {}
+            },
+            "groups": {
+                "item": "ítem",
+                "items": "ítems"
+            },
+        }
+    });
+
+    // Inicializar cada fila con "seleccionado: false"
+    datos.forEach(d => d.seleccionado = false);
+
+    // Formatter del ícono tipo checkbox
+    let squareIcon = function (cell, formatterParams, onRendered) {
+        const seleccionado = cell.getRow().getData().seleccionado;
+        const iconClass = seleccionado ? "fa-solid fa-square-check" : "fa-regular fa-square";
+        return `<button type='button' class='btn icon    toggle-select'>
+                    <i class='${iconClass} fa-lg'></i>
+                </button>`;
+    };
+
+
+    let editIcon = function (cell, formatterParams, onRendered) { //plain text value
+        return "<button type='button' class='btn btn-warning icon' onclick=''><i class='fa-solid fa-pen-to-square fa-lg'></i></button>";
+    };
+
+    table = new Tabulator('#tbl', {
+        locale: "es",
+        data: datos,
+        layout: "fitColumns",              //fit columns to width of table
+        pagination: true,               //paginate the data
+        paginationSize: 12,                //allow 10 rows per page of data
+        paginationSizeSelector: [12, 15, 20],
+        paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
+            const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
+            const end = Math.min(currentRowStart + pageSize - 1, totalRows);
+            return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
+        },
+        movableColumns: true,              //allow column order to be changed
+        paginationButtonCount: 3,
+        rowFormatter: function (row) {
+            const data = row.getData();
+            //const rowElement = row.getElement();
+            //const editBtn = rowElement.querySelector("button.btn-warning");
+
             
-            initComplete: function () {
-                $('#tabla1 tbody tr').each(function () {
-                    const row = $(this);
-                    const switchElement = row.find('.switch-toggle');
-                    const isChecked = switchElement.is(':checked');
-        
-                    if (isChecked) {
-                        const editButton = row.find('button');
-                        editButton.prop('disabled', true);
-                        editButton.attr({
-                            'data-toggle': 'popover',
-                            'data-trigger': 'hover',
-                            'data-html': 'true',
-                            'data-placement': 'top',
-                            'data-content': '<div class="bg-warning text-dark p-1 rounded">Deshabilite para editar</div>',
-                        });
-                        editButton.popover(); // Inicializa el popover
-                    }
+            //data = row.getData()
+            if (data.seleccionado === true) {
+                row.getElement().classList.add("bg-primary")
+            } else if (data.seleccionado === false) {
+                row.getElement().classList.remove("bg-primary")
+            }
+        },
+        groupBy: "region",
+        columns: [
+            {
+                formatter: squareIcon, width: 70, hozAlign: "center",
+                cellClick: function (e, cell) {
+                    // Alternar estado de seleccionado
+                    let rowData = cell.getRow().getData();
+                    rowData.seleccionado = !rowData.seleccionado;
+                    cell.getRow().reformat();
+                    seleccionar_registro(rowData.id, supervisor_seleccionado)
+                }, headerSort: false, frozen: true
+            },
+            {
+                title: "Nombre", field: "nombre", headerHozAlign: "center", headerFilter: "input", headerSort: false, cellClick: function (e, cell) {
+                    // Alternar estado de seleccionado
+                    let rowData = cell.getRow().getData();
+                    rowData.seleccionado = !rowData.seleccionado;
+                    cell.getRow().reformat();
+                    seleccionar_registro(rowData.id, supervisor_seleccionado)
                 }
-            )}
-        });
-        
-    } catch (error) {
-        console.log(error)
-    }
+            },
+            {
+                title: "Cargo", field: "cargo", headerHozAlign: "center", headerFilter: "input", headerSort: false, cellClick: function (e, cell) {
+                    // Alternar estado de seleccionado
+                    let rowData = cell.getRow().getData();
+                    rowData.seleccionado = !rowData.seleccionado;
+                    cell.getRow().reformat();
+                    seleccionar_registro(rowData.id, supervisor_seleccionado)
+                }
+            },
+            {
+                title: "Región", field: "region", headerHozAlign: "center", headerSort: false, width: 100, hozAlign: "center", headerFilter: "list",
+                headerFilterParams: {
+                    valuesLookup: true, clearable: true // se auto genera a partir de los valores únicos de la columna
+                }, cellClick: function (e, cell) {
+                    // Alternar estado de seleccionado
+                    let rowData = cell.getRow().getData();
+                    rowData.seleccionado = !rowData.seleccionado;
+                    cell.getRow().reformat();
+                    seleccionar_registro(rowData.id)
+                }
+            },
+            {
+                title: "Habilitado",
+                field: "habilitado", headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "1": "Activo", "0": "Inactivo" }, clearable: true },
+                formatter: function (cell, formatterParams, onRendered) {
+                    let value = cell.getValue();
+                    let icon = value === "1" ? "fa-solid fa-toggle-on fa-2xl" : "fa-solid fa-toggle-off fa-2xl";
+                    let color = value === "0" ? "#dc3545" : "#28a745";
+                    regionesSinSupervisor(table)
+                    return `<span class="custom-toggle"><i class="${icon}" style="color:${color}; font-size: 1.5em;"></i></span>`;
+                },
+                cellClick: function (e, cell) {
+                    const tableData = table.getData();
+                    const rowData = cell.getRow().getData();
+                    const id = rowData.id;
+                    const region = rowData.region;
+                    const current = rowData.habilitado;
+                    const isChecked = current === "1";
+
+                    let habilitadosEnRegion = tableData.filter(row =>
+                        row.region === region && row.habilitado === "1"
+                    );
+
+                    if (!isChecked) {
+                        // Habilitar este y deshabilitar el resto
+                        if (habilitadosEnRegion.length >= 1) {
+                            habilitadosEnRegion.forEach(sup => {
+                                if (sup.id !== id) {
+                                    const otherRow = table.getRow(sup.id);
+                                    if (otherRow) {
+                                        otherRow.update({ habilitado: "0" });
+
+                                        // Habilitar botón editar
+                                        const otherRowEl = otherRow.getElement();
+                                        const otherBtn = otherRowEl.querySelector("button.btn-warning");
+                                        if (otherBtn) {
+                                            otherBtn.disabled = false;
+                                            $(otherBtn).popover('dispose');
+                                            otherBtn.removeAttribute("data-toggle");
+                                            otherBtn.removeAttribute("data-trigger");
+                                            otherBtn.removeAttribute("data-html");
+                                            otherBtn.removeAttribute("data-placement");
+                                            otherBtn.removeAttribute("data-content");
+                                        }
+
+                                        supervisor_habilitado({
+                                            accion: 3,
+                                            id: sup.id,
+                                            habilitado: 0
+                                        });
+                                    }
+                                }
+                            });
+                        }
+
+                        // Activar actual
+                        cell.setValue("1");
+                        rowData.habilitado = "1";
+
+                        supervisor_habilitado({
+                            accion: 3,
+                            id: id,
+                            habilitado: 1
+                        });
+
+                        const editBtn = cell.getRow().getElement().querySelector("button.btn-warning");
+                        /* if (editBtn) {
+                            editBtn.disabled = true;
+                            editBtn.setAttribute("data-toggle", "popover");
+                            editBtn.setAttribute("data-trigger", "hover");
+                            editBtn.setAttribute("data-html", "true");
+                            editBtn.setAttribute("data-placement", "top");
+                            editBtn.setAttribute("data-content", '<div class="bg-warning text-dark p-1 rounded">Deshabilite para editar</div>');
+                            $(editBtn).popover();
+                        } */
+
+                    } else {
+                        // Intentamos desactivar
+                        if (habilitadosEnRegion.length <= 1) {
+                            mostrar_toast('warning', 'Advertencia', 'Debe haber un supervisor habilitado por región.');
+                            return;
+                        }
+
+                        cell.setValue("0");
+                        rowData.habilitado = "0";
+
+                        supervisor_habilitado({
+                            accion: 3,
+                            id: id,
+                            habilitado: 0
+                        });
+
+                        const editBtn = cell.getRow().getElement().querySelector("button");
+                        if (editBtn) {
+                            editBtn.disabled = false;
+                            $(editBtn).popover('dispose');
+                            editBtn.removeAttribute("data-toggle");
+                            editBtn.removeAttribute("data-trigger");
+                            editBtn.removeAttribute("data-html");
+                            editBtn.removeAttribute("data-placement");
+                            editBtn.removeAttribute("data-content");
+                        }
+                    }
+                }, width: 90, hozAlign: "center", headerSort: false,
+
+            },
+            {
+                formatter: editIcon, width: 60, hozAlign: "center",
+                cellClick: function (e, cell) {
+                    elemento = cell.getRow().getData();
+                    mdl_editar_supervisor(elemento);
+                },
+                headerSort: false, frozen: true
+            },
+        ],
+
+    })
 
 }
 
 
 //*TODO Controlar el switch de la tabla para activar o desactivar supervisores
 
-$('#tabla1 tbody').on('change', '.switch-toggle', function () {
+/* $('#tabla1 tbody').on('change', '.switch-toggle', function () {
 
     const switchElement = $(this);
     const id = switchElement.data('id');
@@ -251,14 +373,45 @@ $('#tabla1 tbody').on('change', '.switch-toggle', function () {
 
     }
 });
+ */
 
 async function supervisor_habilitado(model) {
     await server_supervisor(model)
 }
 
 //TODO Funciones para un nuevo supervisor
-function nuevo_supervisor(){
-    limpiar_campos_nuevo_supervisor()
+function nuevo_supervisor() {
+    $('.select').each(function () {
+        $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
+        $(this).removeClass('is-invalid'); // Elimina la clase de validación
+    });
+
+    general_select2({
+        selectId: 'inp-nombre',
+        tabla: 'cat_usuarios',
+        campo: 'nombre',
+        placeholder: 'Seleciona un supervisor',
+        dropdownParent: '#modalInsertar',
+        tags: true
+    });
+
+    general_select2({
+        selectId: 'inp-cargo',
+        tabla: 'cat_usuarios',
+        campo: 'cargo',
+        placeholder: 'Seleciona un cargo',
+        dropdownParent: '#modalInsertar',
+        tags: true
+    });
+
+    general_select2({
+        selectId: 'inp-region',
+        tabla: 'supervisor',
+        campo: 'region',
+        placeholder: 'Seleccione una región',
+        dropdownParent: '#modalInsertar',
+        tags: true,
+    });
 
     $("#modalInsertar").modal('show');
 }
@@ -276,104 +429,34 @@ async function insertar_supervisor() {
     }
 
     let model = {
-        accion : 0,
-        nombre : $('#inp-nombre').val().trim(),
-        cargo  : $('#inp-cargo').val().trim(),
-        region : $('#inp-region').val().trim(),
+        accion: 0,
+        nombre: $('#inp-nombre').val().trim(),
+        cargo: $('#inp-cargo').val().trim(),
+        region: $('#inp-region').val().trim(),
     }
 
     let server = await server_supervisor(model)
 
     let resultado = JSON.parse(respuesta)
 
-    if(resultado.resultado === true){
+    if (resultado.resultado === true) {
         mostrar_toast("success", "Supervisor registrado", "El supervisor ha sido registrado exitosamente")
-        consultar_informacion()   
+        consultar_informacion()
         $("#modalInsertar").modal('hide');
 
-    }else{
+    } else {
         mostrar_toast("error", "Error", "Supervisor ya existente")
         return
     }
 }
 
-function validar_campos(campos) {
-    let valido = true;
-
-    campos.forEach(id => {
-        const campo = document.getElementById(id);
-        if (!campo) {
-            valido = false;
-            return;
-        }
-
-        if ($(campo).hasClass('is-required') && !campo.value.trim()) {
-            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
-            valido = false;
-        } else if (!campo.value.trim()) {
-            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
-            valido = false;
-        } else {
-            campo.classList.remove('is-invalid'); // Remueve la clase si el campo es válido
-        }
-
-        campo.addEventListener('input', function () {
-            if (campo.value.trim()) {
-                campo.classList.remove('is-invalid');
-            }
-        });
-    });
-
-    return valido;
-}
-
-function limpiar_campos_nuevo_supervisor(){
-    /* let inputs = document.getElementsByName('insertMdl');
-    for (let i = 0; i < inputs.length; i++) {
-        inputs[i].value = ""; // Limpia el valor del input
-        inputs[i].classList.remove('is-invalid'); // Elimina la clase de validación
-    } */
-    
-    $('.select').each(function () {
-        $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
-        $(this).removeClass('is-invalid'); // Elimina la clase de validación
-    });
-
-    general_select2({
-        selectId: 'inp-nombre',
-        tabla: 'inventario_ti_sur',
-        campo: 'usuario',
-        placeholder: 'Seleciona un usuario',
-        dropdownParent: '#modalInsertar',
-        tags: true
-      });
-    
-    general_select2({
-        selectId: 'inp-cargo',
-        tabla: 'inventario_ti_sur',
-        campo: 'posicion',
-        placeholder: 'Seleciona un cargo',
-        dropdownParent: '#modalInsertar',
-        tags: true
-      });
-
-    general_select2({
-        selectId: 'inp-region',
-        tabla: 'supervisor',
-        campo: 'region',
-        placeholder: 'Seleccione una región',
-        dropdownParent: '#modalInsertar',
-        tags: true,
-    });
-}
-
 //TODO Funciones para editar los supervisores
-let selecreg =""
+let selecreg = ""
 
-async function mostrar_registro(params) {
+async function mdl_editar_supervisor(params) {
     for (let i = 0; i < datos.length; i++) {
         const element = datos[i];
-        if(element.id===params.value){
+        if (element.id === params.id) {
             selecreg = element;
             break;
         }
@@ -381,38 +464,37 @@ async function mostrar_registro(params) {
     // Limpia y carga los select
     await general_select2({
         selectId: 'edi-nombre',
-        tabla: 'inventario_ti_sur',
-        campo: 'usuario',
+        tabla: 'cat_usuarios',
+        campo: 'nombre',
         placeholder: 'Selecione un nombre',
         dropdownParent: '#modalEditar',
-        tags: true
     })
-    
+
     await general_select2({
         selectId: 'edi-cargo',
-        tabla: 'inventario_ti_sur',
-        campo: 'posicion',
+        tabla: 'cat_usuarios',
+        campo: 'cargo',
         placeholder: 'Selecione un cargo',
         dropdownParent: '#modalEditar',
-        tags: true
     })
-    
+
     await general_select2({
         selectId: 'edi-region',
         tabla: 'supervisor',
         campo: 'region',
         placeholder: 'Seleccione una region',
         dropdownParent: '#modalEditar',
+        tags: true,
     })
-    
-        $('#edi-nombre').val(selecreg.nombre).trigger('change');
-        $('#edi-cargo').val(selecreg.cargo).trigger('change');
-        $('#edi-region').val(selecreg.region).trigger('change');
 
-        $("#modalEditar").modal('show');
+    $('#edi-nombre').val(selecreg.nombre).trigger('change');
+    $('#edi-cargo').val(selecreg.cargo).trigger('change');
+    $('#edi-region').val(selecreg.region).trigger('change');
+
+    $("#modalEditar").modal('show');
 }
 
-async function editar_supervisor(params) {
+async function editar_supervisor() {
     // Campos requeridos para validación
     const validacion = [
         "edi-nombre",
@@ -425,72 +507,125 @@ async function editar_supervisor(params) {
     }
 
     let model = {
-        accion : 1,
-        id : selecreg.id,
-        nombre : $('#edi-nombre').val().trim(),
-        cargo  : $('#edi-cargo').val().trim(),
-        region : $('#edi-region').val().trim(),
+        accion: 1,
+        id: selecreg.id,
+        nombre: $('#edi-nombre').val().trim(),
+        cargo: $('#edi-cargo').val().trim(),
+        region: $('#edi-region').val().trim(),
     }
-    
-    let server = await server_supervisor(model)
-    let resultado = JSON.parse(respuesta)
 
-    if (typeof resultado.resultado === 'string'){
+    let server = await server_supervisor(model)
+    //let resultado = JSON.parse(respuesta)
+
+    if (typeof server.resultado === 'string') {
         mostrar_toast("error", "Error", resultado.resultado); // Muestra el mensaje que venga en el string
         return;
-    }else if(resultado.resultado === true){    
+    } else if (server.resultado === true) {
         mostrar_toast("success", "Éxito", "Supervisor editado exitosamente")
         consultar_informacion()
         $("#modalEditar").modal('hide')
-    }else{
+    } else {
         mostrar_toast("error", "Error", "Supervisor no pudo editarse")
         return
     }
 }
 
-async function general_select2({selectId, tabla, campo, placeholder, dropdownParent, tags}){
+async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags }) {
     //try {
-        const response = await server_supervisor({
-            accion: 4,
-            tabla: tabla, 
-            campo: campo
-        });
+    const response = await server_supervisor({
+        accion: 4,
+        tabla: tabla,
+        campo: campo
+    });
 
-        //console.log('Respuesta del servidor para select2:', response);
+    //console.log('Respuesta del servidor para select2:', response);
 
-        const opciones = response.resultado.map(item => ({
-            id: item[campo] || '',
-            text: item[campo] || ''
-          }));
+    const opciones = response.resultado.map(item => ({
+        id: item[campo] || '',
+        text: item[campo] || ''
+    }));
 
-        const $select = $('#' + selectId);
-        $select.empty().append(new Option('', '', false, false));
+    const $select = $('#' + selectId);
+    $select.empty().append(new Option('', '', false, false));
 
-        $select.select2({
-            theme: 'bootstrap4',
-            allowClear: true,
-            placeholder: placeholder,
-            tags: tags,
-            dropdownParent: $(dropdownParent),
-            data: opciones
-        });
+    $select.select2({
+        theme: 'bootstrap4',
+        allowClear: true,
+        placeholder: placeholder,
+        tags: tags,
+        dropdownParent: $(dropdownParent),
+        data: opciones
+    });
 
-        $select.val(null).trigger('change');
+    $select.val(null).trigger('change');
 
     //} catch (error) {
-        
+
     //}
 }
 
-function mostrar_toast(tipo, titulo, mensaje) {
-    Swal.fire({
-        icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
-        title: titulo,
-        text: mensaje,
-        timer: 2500,
-        timerProgressBar: true,
-        showConfirmButton: false,
-        toast: true,
-        position: 'top-end',
+async function mensaje_eliminar() {
+
+    if (supervisor_seleccionado.length === 0) {
+        mostrar_toast('warning', 'Inventario TI', 'Por favor, selecciona al menos un supervisor para continuar')
+
+    } else {
+        mostrar_alert('warning', `¿Está seguro de eliminar ${supervisor_seleccionado.length} supervisor(es)?`, false, eliminar_supervisor);
+    }
+}
+
+async function eliminar_supervisor() {
+    let model = {
+        accion: 5,
+        id: supervisor_seleccionado
+    }
+
+    let server = await server_supervisor(model);
+
+    if (server.resultado.error) {
+        mostrar_toast('warning', 'Aviso', server.resultado.error, 4000)
+    } else if (server.resultado.mensaje) {
+        mostrar_toast('success', '¡Éxito!', server.resultado.mensaje)
+        consultar_informacion();
+    } else {
+        mostrar_toast('error', 'Error', 'Fallo al conectar');
+    }
+    deseleccionar_todos()
+}
+
+function deseleccionar_todos() {
+    //  Resetear propiedad "seleccionado"
+    datos.forEach(d => d.seleccionado = false);
+
+    //  Limpiar el array de supervisor_seleccionado
+    supervisor_seleccionado = [];
+
+    //  Forzar re-renderizado de todas las filas para reflejar los íconos
+    table.getRows().forEach(row => row.reformat());
+}
+
+function regionesSinSupervisor(table) {
+    const data = table.getData();
+
+    // Crear un objeto para contar habilitados por región
+    const regiones = {};
+
+    data.forEach(row => {
+        const region = row.region;
+        const habilitado = row.habilitado === "1";
+
+        if (!regiones[region]) {
+            regiones[region] = 0;
+        }
+
+        if (habilitado) {
+            regiones[region]++;
+        }
     });
+
+    // Contar cuántas regiones tienen cero habilitados
+    const sinSupervisores = Object.values(regiones).filter(cantidad => cantidad === 0).length;
+
+    // Actualizar el contador en el DOM
+    document.getElementById("contador-region").textContent = sinSupervisores;
 }

@@ -1,4 +1,5 @@
- let respuesta
+
+let respuesta
 function server_usuario(model) {
     return new Promise ((resolve,reject)=>{
         $.ajax({
@@ -56,16 +57,17 @@ $(document).ready(function (){
 })
 
 
-let usuarios = []
+let datos = []
+let elemento
+let table
+let usuario_seleccionado = []
 async function consultar_usuarios() {
-    /* let usuarioLog = JSON.parse(sessionStorage.getItem('user'))
-    let user = document.getElementById('user')
-    user.textContent = usuarioLog.resultado[0]  */
-    let r = await server_usuario({accion : 2})
+    
+    let server = await server_usuario({accion : 2})
 
-    usuarios = r.resultado
+    datos = server.resultado
         
-    let table = $("#tbl-usuario").DataTable()
+    /* let table = $("#tbl-usuario").DataTable()
     table.destroy()
 
     $("#tbl-usuario").DataTable({
@@ -199,23 +201,156 @@ async function consultar_usuarios() {
                 responsive: true,
                 //!Esta parte del codigo (DOM) es para que los botones, paginacion y filtros de busqueda se acomoden a sus necesidades, si quieren pueden buscar mas info en la documentacion de datatables, pero en este caso no es necesario.
   
-    })   
+    }) */   
+    //* Idioma Español
+    Tabulator.extendModule("localize", "langs", {
+        "es": {
+            "pagination": {
+                "first": '<i class="fa-solid fa-angles-right fa-flip-horizontal"></i>',
+                "first_title": "Primera página",
+                "last": '<i class="fa-solid fa-angles-right"></i>',
+                "last_title": "Última página",
+                "prev": '<i class="fa-solid fa-angle-right fa-flip-horizontal"></i>',
+                "prev_title": "Página anterior",
+                "next": '<i class="fa-solid fa-angle-right"></i>',
+                "next_title": "Página siguiente",
+                "page_size": "Tamaño",
+
+            },
+            "headerFilters": {
+                "default": "Filtrar columna...",
+                "columns": {}
+            },
+            "groups": {
+                "item": "ítem",
+                "items": "ítems"
+            },
+            "ajax": {
+                "loading": "Cargando...",
+                "error": "Error al cargar datos"
+            },
+            "data": {
+                "loading": "Cargando datos...",
+                "error": "Error al cargar datos"
+            }
+        }
+    });
+
+    // Inicializar cada fila con "seleccionado: false"
+    datos.forEach(d => d.seleccionado = false);
+
+    // Formatter del ícono tipo checkbox
+    let squareIcon = function (cell, formatterParams, onRendered) {
+        const seleccionado = cell.getRow().getData().seleccionado;
+        const iconClass = seleccionado ? "fa-solid fa-square-check" : "fa-regular fa-square";
+        return `<button type='button' class='btn icon    toggle-select'>
+                    <i class='${iconClass} fa-lg'></i>
+                </button>`;
+    };
+
+    let editIcon = function (cell, formatterParams, onRendered) { //plain text value
+        return "<button type='button' class='btn btn-warning icon' onclick=''><i class='fa-solid fa-pen-to-square fa-lg'></i></button>";
+    };
+
+    table = new Tabulator('#tbl', {
+        locale: "es",
+        data: datos,
+        layout: "fitColumns",              //fit columns to width of table
+        pagination: true,               //paginate the data
+        paginationSize: 10,                //allow 10 rows per page of data
+        paginationSizeSelector: [5, 10, 15, 20],
+        paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
+            const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
+            const end = Math.min(currentRowStart + pageSize - 1, totalRows);
+            return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
+        },
+        movableColumns: true,              //allow column order to be changed
+        rowFormatter: function (row) {
+            data = row.getData()
+            if (data.seleccionado === true) {
+                row.getElement().classList.add("bg-primary")
+            } else if (data.seleccionado === false) {
+                row.getElement().classList.remove("bg-primary")
+            }
+        },
+        paginationButtonCount: 3,
+        columns: [
+            {
+                formatter: squareIcon, width: 70, hozAlign: "center",
+                cellClick: function (e, cell) {
+                    // Alternar estado de seleccionado
+                    let rowData = cell.getRow().getData();
+                    rowData.seleccionado = !rowData.seleccionado;
+                    cell.getRow().reformat();
+                    seleccionar_registro(rowData.id, usuario_seleccionado)
+                }, headerSort: false, frozen: true
+            },
+            {
+                title: "Nombre", field: "nombre", cellClick:
+                    function (e, cell) {
+                        let rowData = cell.getRow().getData()
+                        rowData.seleccionado = !rowData.seleccionado
+                        cell.getRow().reformat();
+                        seleccionar_registro(rowData.id, usuario_seleccionado)
+                    }
+            },
+            {
+                title: "Correo", field: "correo", cellClick:
+                    function (e, cell) {
+                        let rowData = cell.getRow().getData()
+                        rowData.seleccionado = !rowData.seleccionado
+                        cell.getRow().reformat();
+                        seleccionar_registro(rowData.id, usuario_seleccionado)
+                    }
+            },
+            {
+                title: "Edad", field: "edad", cellClick:
+                    function (e, cell) {
+                        let rowData = cell.getRow().getData()
+                        rowData.seleccionado = !rowData.seleccionado
+                        cell.getRow().reformat();
+                        seleccionar_registro(rowData.id, usuario_seleccionado)
+                    }
+            },
+            {
+                title: "Teléfono", field: "telefono", cellClick:
+                    function (e, cell) {
+                        let rowData = cell.getRow().getData()
+                        rowData.seleccionado = !rowData.seleccionado
+                        cell.getRow().reformat();
+                        seleccionar_registro(rowData.id, usuario_seleccionado)
+                    }
+            },
+            {
+                title: "Fecha de Nacimiento", field: "fecha_nac", cellClick:
+                    function (e, cell) {
+                        let rowData = cell.getRow().getData()
+                        rowData.seleccionado = !rowData.seleccionado
+                        cell.getRow().reformat();
+                        seleccionar_registro(rowData.id, usuario_seleccionado)
+                    }
+            },{
+                formatter: editIcon, width: 60, hozAlign: "center",
+                cellClick: function (e, cell) {
+                    elemento = cell.getRow().getData();
+                    mdl_editar_usuario(elemento);
+                },
+                headerSort: false, frozen: true
+            },
+        ],
+    })
 }
 
 
 let usuSelect = ""
 let modalEdit 
-async function seleccionar_usuario(params) {
+async function mdl_editar_usuario(params) {
 
-    for (let i = 0; i < usuarios.length; i++) {
-        const element = usuarios[i];
+    for (let i = 0; i < datos.length; i++) {
+        const element = datos[i];
 
-        if(element.id===params.value){
+        if(element.id===params.id){
 
-            /* let model ={
-                contraseña : element.contraseña
-            }
-            console.log(model) */
             usuSelect = element;
             break;
         }
@@ -229,9 +364,8 @@ async function seleccionar_usuario(params) {
     document.getElementById('edad').value=usuSelect.edad
     document.getElementById('fecha_reg').value=usuSelect.fecha_reg
     document.getElementById('contraseña').value=usuSelect.contraseña
-    
-    modalEdit = new bootstrap.Modal(document.getElementById('modalEditar'))
-    modalEdit.show()
+
+    $("#modalEditar").modal('show')
 }
 
 async function editar_usuario(params) {
@@ -247,39 +381,27 @@ async function editar_usuario(params) {
         contraseña : $('#contraseña').val().trim()
     }
 
-    let r = await server_usuario(model)
+    let server = await server_usuario(model)
 
-    let resp=JSON.parse(respuesta)
-    if(resp.resultado === true){
+    if(server.resultado === true){
         mostrar_toast('success', 'Inventario TI', 'Usuario editado')
-    }else if(resp.resultado === false){
+    }else if(server.resultado === false){
         mostrar_toast('error', 'Inventario TI', 'Error en la consulta')
     } 
-    usuSelect = ""
+
     consultar_usuarios()
-    modalEdit.hide()
-}
-
-
-let usuSeleccionado = []
-async function seleccionar_usuarios(params) {
-
-    let index = usuSeleccionado.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
-    if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
-        usuSeleccionado.push(params); // Añade uno o más elementos al final de un array
-    } else {
-        usuSeleccionado.splice(index, 1); 
-    }
+    
+    $("#modalEditar").modal('hide')
 }
 
 
 async function mensaje_eliminar() {
 
-    if (usuSeleccionado.length === 0) {
+    if (usuario_seleccionado.length === 0) {
         mostrar_toast('warning', 'Inventario TI', 'Por favor, selecciona al menos un usuario para continuar')
         
     }else{
-        mostrar_alert('warning', `¿Está seguro de eliminar ${usuSeleccionado.length} usuario(s)?`, false, eliminar_usuario);
+        mostrar_alert('warning', `¿Está seguro de eliminar ${usuario_seleccionado.length} usuario(s)?`, false, eliminar_usuario);
         /* modalElim = new bootstrap.Modal(document.getElementById('modalElim'))
         modalElim.show() */
     }
@@ -288,7 +410,7 @@ async function mensaje_eliminar() {
 async function eliminar_usuario(params) {
         let model = {
             accion : 3,
-            id : usuSeleccionado
+            id : usuario_seleccionado
         }
 
         let response = await server_usuario(model);
@@ -296,34 +418,37 @@ async function eliminar_usuario(params) {
         if (response.resultado) {
             mostrar_toast('success', 'Inventario TI', 'Usuario(s) eliminado(s) correctamente')
 
-            usuSeleccionado = [];
-            let table = $("#tbl-usuario").DataTable();
-            table.destroy();
             consultar_usuarios();
         } else {
             mostrar_toast('error', 'Inventario TI', 'Error en la consulta');
         }
+        deseleccionar_todos()
         
 }
 
-let modalReg
-async function nuevo_usuario(params) {
+function deseleccionar_todos() {
+    //  Resetear propiedad "seleccionado"
+    datos.forEach(d => d.seleccionado = false);
+
+    //  Limpiar el array de usuario_seleccionado
+    usuario_seleccionado = [];
+
+    //  Forzar re-renderizado de todas las filas para reflejar los íconos
+    table.getRows().forEach(row => row.reformat());
+}
+
+
+async function mdl_nuevo_usuario(params) {
     let inputs = document.getElementsByName('insertMdl')
         for (let i = 0; i < inputs.length; i++) {
             const element = inputs[i].value = "";
         }
-    modalReg = new bootstrap.Modal(document.getElementById('modalInsertar'))
-    modalReg.show()
+    
+    $("#modalInsertar").modal('show')
 }
 
 async function insertar_usuario(params) {
 
-    
-    /* if(!email || !tel || !nombre ||!fecha || !pass){
-        mostrar_toast('warning', 'Inventario TI', '¡Rellena todos los campos correctamente para continuar!');
-        return false;
-        
-    }else{ */
 
     const validacion = [
         "nombreReg",
@@ -351,25 +476,15 @@ async function insertar_usuario(params) {
 
         let server = await server_usuario(model)
 
-        let resp=JSON.parse(respuesta)
-        if(resp.resultado === true){
+        if(server.resultado === true){
             mostrar_toast('success', 'Inventario TI', 'Usuario registrado correctamente')
-        }else if(resp.resultado === false){
+        }else if(server.resultado === false){
             mostrar_toast('warning', 'Inventario TI', 'El correo ya está registrado')
             return;
         } 
     
-        let table = $("#tbl-usuario").DataTable()
-        table.destroy()
         consultar_usuarios()
-        modalReg.hide()
-        
-        /* email = false
-        tel = false
-        nombre = false
-        fecha = false
-        pass = false */
-    //}
+        $("#modalInsertar").modal('hide')
 }
 
 
@@ -419,8 +534,8 @@ function ver_contraseña(){
 
 let usuDes
 async function desactivar_usuariomsg(params) {
-    for (let i = 0; i < usuarios.length; i++) {
-        const element = usuarios[i];
+    for (let i = 0; i < datos.length; i++) {
+        const element = datos[i];
 
         if(element.id===params.value){
             usuDes = element;
@@ -560,44 +675,6 @@ function crear_word() {
 
 }
 
-
-
-function mostrar_toast(tipo, titulo, mensaje) {
-    Swal.fire({
-        icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
-        title: titulo,
-        text: mensaje,
-        timer: 2500,
-        timerProgressBar: true,
-        showConfirmButton: false,
-        toast: true,
-        position: 'top-end',
-        heightAuto : true,
-    });
-}
-
-function mostrar_alert(tipo, mensaje, skip, funcion) {
-    Swal.fire({
-        title: 'Inventario TI',
-        text: mensaje,
-        icon: tipo, // 'success', 'error', 'warning', 'info', 'question'
-        showCancelButton: true,
-        confirmButtonColor: '#0000FF',
-        allowOutsideClick : skip, // true, false
-        cancelButtonColor: '#FF0000',
-        confirmButtonText: 'Aceptar <i class="fa-solid fa-circle-check fa-lg">',
-        cancelButtonText: 'Cancelar <i class="fa-solid fa-xmark fa-lg"></i>',
-        reverseButtons: true, //* 👉 Esto cambia el orden de los botones
-        backdrop: `
-        rgba(0,0,123,0.4)` ,
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Si el usuario hace clic en "Aceptar", ejecutamos la función que pasamos como parámetro
-            funcion();
-        }
-    })
-}
-
 function mostrar_toast_cargando() {
     Swal.fire({
         toast: true,
@@ -617,44 +694,4 @@ function mostrar_toast_cargando() {
             //Swal.showLoading(); // Esto muestra el spinner
         }
     });
-}
-
-// TODO: seleciona usuarios por id
-let select = [];
-
-async function selecionar_registro(params) {
-
-    let index = select.indexOf(params); // Retorna el primer índice en el que se puede encontrar un elemento dado en el array,
-    if (index === -1) {                  // ó retorna -1 si el elemento no esta presente.
-        select.push(params); // Añade uno o más elementos al final de un array
-    } else {
-        select.splice(index, 1); 
-    } 
-}
-
-function validar_campos(campos) {
-    let valido = true;
-
-    campos.forEach(id => {
-        const campo = document.getElementById(id);
-        if (!campo) {
-            valido = false;
-            return;
-        }
-
-        if (!campo.value.trim()) {
-            campo.classList.add('is-invalid'); // Agrega la clase de advertencia
-            valido = false;
-        } else {
-            campo.classList.remove  ('is-invalid'); // Remueve la clase si el campo es válido
-        }
-
-        campo.addEventListener('input', function () {
-            if (campo.value.trim()) {
-                campo.classList.remove('is-invalid');
-            }
-        });
-    });
-
-    return valido;
 }

@@ -35,7 +35,7 @@ use PHPMailer\PHPMailer\PHPMailer;
         if ($query->num_rows > 0) { //verifica email
             $usuario =mysqli_fetch_assoc($query);
             $token = bin2hex(random_bytes(16)); //Creación del token
-            $token_expiracion = date("Y-m-d H:i:s", time() + 300); //fecha del token
+            $token_expiracion = date("Y-m-d H:i:s", time() + 300); //fecha de expiracion del token (5 minutos)
             token_expirados($valores->correo);
             $update_token_sql = "UPDATE usuario SET token = '$token', token_expiracion = '$token_expiracion' WHERE correo = '$valores->correo'";
             if (mysqli_query($con, $update_token_sql)) {
@@ -71,14 +71,14 @@ use PHPMailer\PHPMailer\PHPMailer;
             $mail->Host = 'smtp.gmail.com'; // Servidor SMTP de Gmail (ajustar según el servidor que uses)
             $mail->SMTPSecure = "ssl";
             $mail->SMTPAuth = true; // Habilitar la autenticación SMTP
-            $mail->Username = 'janny.garcia703@gmail.com'; // Tu dirección de correo electrónico
-            $mail->Password = 'cgwrbvbjzgmjuyws'; // Tu contraseña de correo electrónico
+            $mail->Username = 'diavazdsp@diavaz.com'; // Dirección de correo electrónico
+            $mail->Password = 'nttbycbzoljyqitu'; // Contraseña de correo electrónico
             $mail->Port = 465; // Puerto SMTP
             
             $Year =  date("Y");
             $mail->CharSet = 'UTF-8';
             // Configuración del remitente y destinatario
-            $mail->setFrom('janny.garcia703@gmail.com', 'Inventario_TI');
+            $mail->setFrom('diavazdsp@diavaz.com', 'Inventario_TI');
             $mail->addAddress($destino->correo, 'Destinatario');
             //$IP = exec("curl https://checkip.amazonaws.com");
             //$Puerto = $_SERVER['SERVER_PORT'];
@@ -90,97 +90,26 @@ use PHPMailer\PHPMailer\PHPMailer;
             $mail->isHTML(true); // Usar HTML en el correo
             $mail->Subject = 'Recuperación de contraseña';
             $mail->Body = 
-            $mail->Body = 
             '<html>
-                <head>
-                    <style>
-                        body {
-                            font-family: Arial, sans-serif;
-                            background-color: #f9fafc;
-                            color: #333;
-                            margin: 0;
-                            padding: 0;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            min-height: 100vh;
-                        }
-                        .email-container {
-                            max-width: 400px;
-                            background-color: #ffffff;
-                            border-radius: 8px;
-                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                            overflow: hidden;
-                            border: 1px solid #e0e0e0;
-                            text-align: center;
-                        }
-                        .header {
-                            background-color: #007bff;
-                            color: #ffffff;
-                            padding: 20px;
-                            text-align: center;
-                            font-size: 20px;
-                            font-weight: bold;
-                        }
-                        .content {
-                            padding: 20px;
-                            text-align: center;
-                        }
-                        .content h2 {
-                            color: #007bff;
-                            margin-bottom: 15px;
-                            font-size: 22px;
-                        }
-                        .content p {
-                            font-size: 16px;
-                            line-height: 1.6;
-                            color: #555;
-                            margin-bottom: 20px;
-                        }
-                        .content a {
-                            display: inline-block;
-                            background-color: #007bff;
-                            color: #ffffff;
-                            text-decoration: none;
-                            padding: 10px 20px;
-                            border-radius: 5px;
-                            font-size: 16px;
-                            font-weight: bold;
-                            margin-top: 10px;
-                        }
-                        .content a:hover {
-                            background-color: #0056b3;
-                        }
-                        .footer {
-                            background-color: #f9fafc;
-                            color: #888;
-                            text-align: center;
-                            padding: 15px;
-                            font-size: 12px;
-                            border-top: 1px solid #e0e0e0;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="email-container">
-                        <div class="header">
-                            Notificación de Inventario_TI
-                        </div>
-                        <div class="content">
-                            <h2>Recuperación de contraseña</h2>
-                            <p>Hemos recibido una solicitud para recuperar tu contraseña.</p>
-                            <p>Haz clic en el botón de abajo para restablecer tu contraseña:</p>
-                            <a href="'.$reset_link.'">Restablecer Contraseña</a>
-                            <p>Este mensaje es válido por 5 minutos.</p>
-                            <p>Si no solicitaste este cambio, ignora este correo.</p>
-                        </div>
-                        <div class="footer">
-                            &copy; '.$Year.' Inventario_TI. Todos los derechos reservados.
-                        </div>
+                <body style="font-family: Arial, sans-serif; background-color: #f9fafc; color: #333; margin: 0; padding: 0;">
+                    <div style="max-width: 400px; margin: 40px auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; border: 1px solid #e0e0e0; text-align: center;">
+                    <div style="background-color: #007bff; color: #ffffff; padding: 20px; font-size: 20px; font-weight: bold;">
+                        Notificación de Inventario_TI
+                    </div>
+                    <div style="padding: 20px; text-align: center;">
+                        <h2 style="color: #007bff; margin-bottom: 15px; font-size: 22px;">Recuperación de contraseña</h2>
+                        <p style="font-size: 16px; line-height: 1.6; color: #555;">Hemos recibido una solicitud para recuperar tu contraseña.</p>
+                        <p style="font-size: 16px; line-height: 1.6; color: #555;">Haz clic en el botón de abajo para restablecer tu contraseña:</p>
+                        <a href="'.$reset_link.'" style="display: inline-block; background-color: #007bff; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; margin-top: 10px;">Restablecer Contraseña</a>
+                        <p style="font-size: 14px; color: #999; margin-top: 20px;">Este mensaje es válido por 5 minutos.<br>Si no solicitaste este cambio, puedes ignorar este correo.</p>
+                    </div>
+                    <div style="background-color: #f9fafc; color: #888; text-align: center; padding: 15px; font-size: 12px; border-top: 1px solid #e0e0e0;">
+                        &copy; '.$Year.' Inventario_TI.
+                    </div>
                     </div>
                 </body>
             </html>';
-            $mail->AltBody = 'Recuperación de contraseña.';
+            $mail->AltBody = 'Recuperación de contraseña';
         
             // Enviar el correo
             $mail->send();
