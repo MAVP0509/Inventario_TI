@@ -336,7 +336,7 @@ async function editar_registro() {
         imei: $("#inp-imei").val().trim(),
         linea: $("#inp-linea").val().trim(),
         usuario: user,
-        cargo: $("inp-cargo").val().trim(),
+        cargo: $("inp-cargo").val(),
         //posicion: $("#edi-posicion").select2('data')[0].text,
         fecha_entrega: $("#inp-fecha-entrega").val()
     }
