@@ -282,7 +282,7 @@ async function mdl_editar(params) {
         dropdownParent: '#mdl-inventario',
         tags: true,
         popoverTitle: "Descripción",
-        popoverContent: "Zona operativa donde se ubica el activo."
+        popoverContent: "Indica el lugar específico dentro de la zona donde se encuentra físicamente el dispositivo."
     });
 
     await general_select2({
@@ -441,6 +441,8 @@ function mdl_nvo_registro() {
         placeholder: 'Seleccione una ubicación',
         dropdownParent: '#mdl-inventario',
         tags: true,
+        popoverTitle: "Descripción",
+        popoverContent: "Indica el lugar específico dentro de la zona donde se encuentra físicamente el dispositivo."
     });
 
     general_select2({
@@ -500,10 +502,24 @@ async function crear_registro() {
         "inp-num-serie",
     ];
 
-    if (!$('#inp-tag').prop('disabled')) {
-        validacion.push('inp-tag');
-    }
+    /* if (!$('#inp-tag').prop('disabled') || !$('#inp-imei').prop('disabled') || !$('#inp-linea').prop('disabled')) {
+        validacion.push('inp-tag', 'inp-imei', 'inp-linea');
+    } */
+    const tipo_seleccionado = $('#inp-tipo').val();
 
+    switch (tipo_seleccionado) {
+        case '58':
+        case '40':
+            validacion.push("inp-tag");
+            break;
+        case '85':
+            validacion.push('inp-imei', 'inp-linea');
+        default:
+            validacion
+            break;
+    }
+    console.log(validacion)
+    
     // Validar campos
     if (!validar_campos(validacion)) {
         mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
@@ -748,23 +764,22 @@ function rellenar_select(texto, select) {
 //* Deshabilitando el input TAG del registro
 $(document).ready(function () {
     // Escucha cambios en el campo "inp-tipo"
+    $('#sh-tag, #sh-imei, #sh-linea').hide();
     $('#inp-tipo').on('change', function () {
         const tipoSeleccionado = $(this).val(); // Obtiene el valor seleccionado
 
         if (tipoSeleccionado === '58' || tipoSeleccionado === '40') {
             // Habilita el campo TAG y lo hace obligatorio
-            $('#inp-tag').prop('disabled', false).addClass('is-required');
+            $('#sh-tag').show();
         } else {
             // Deshabilita el campo TAG y elimina la obligatoriedad
-            $('#inp-tag').prop('disabled', true).removeClass('is-required').val('');
+            $('#sh-tag').hide();
         }
 
         if (tipoSeleccionado === '85') {
-            $('#inp-imei').prop('disabled', false).addClass('is-required');
-            $('#inp-linea').prop('disabled', false).addClass('is-required');
+            $('#sh-imei, #sh-linea').show();
         } else {
-            $('#inp-imei').prop('disabled', true).removeClass('is-required').val('');
-            $('#inp-linea').prop('disabled', true).removeClass('is-required').val('');
+            $('#sh-imei, #sh-linea').hide();
         }
 
         $('#inp-imei, #inp-linea').on('input', function () {

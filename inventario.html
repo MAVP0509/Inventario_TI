@@ -195,7 +195,8 @@
                                         <h6>Zona Operativa</h6>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-warehouse"></i></span>
+                                                <span class="input-group-text"><i
+                                                        class="fa-solid fa-warehouse"></i></span>
                                             </div>
                                             <select class="form-control select" id="inp-zona"></select>
                                             <div class="invalid-feedback">Por favor, ingrese la zona operativa.</div>
@@ -203,7 +204,8 @@
                                         <h6>Ubicacion del dispositivo</h6>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
+                                                <span class="input-group-text"><i
+                                                        class="fa-solid fa-location-dot"></i></span>
                                             </div>
                                             <select class="form-control select" id="inp-ubicacion"></select>
                                             <div class="invalid-feedback">Por favor, ingrese una ubicación.</div>
@@ -220,41 +222,49 @@
                                                 data-trigger="hover" data-html="true" title="Descripción"
                                                 data-content="Es el número de identificación único del dispositivo dentro del inventario.">
                                         </div>
-                                        <h6>Etiqueta del dispositivo (TAG)</h6>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-tag"></i></span>
+                                        <div id="sh-tag">
+                                            <h6>Etiqueta del dispositivo (TAG)</h6>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i
+                                                            class="fa-solid fa-tag"></i></span>
+                                                </div>
+                                                <input type="text" class="form-control" id="inp-tag" name="mdl-reg"
+                                                    placeholder="TAG" autocomplete="off" data-toggle="popover"
+                                                    data-trigger="hover" data-html="true" title="Descripción"
+                                                    data-content="Es un identificador o código asociado al dispositivo, que puede ser utilizado para la gestión del inventario, seguimiento, o categorización.">
+                                                <div class="invalid-feedback">Por favor, ingrese un TAG.</div>
                                             </div>
-                                            <input type="text" class="form-control" id="inp-tag" name="mdl-reg"
-                                                placeholder="TAG" autocomplete="off" data-toggle="popover"
-                                                data-trigger="hover" data-html="true" title="Descripción"
-                                                data-content="Es un identificador o código asociado al dispositivo, que puede ser utilizado para la gestión del inventario, seguimiento, o categorización.">
-                                            <div class="invalid-feedback">Por favor, ingrese un TAG.</div>
                                         </div>
-                                        <h6>IMEI del dispositivo</h6>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i
-                                                        class="fa-solid fa-hashtag"></i></span>
+                                        <div id="sh-imei">
+                                            <h6>IMEI del dispositivo</h6>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i
+                                                            class="fa-solid fa-hashtag"></i></span>
+                                                </div>
+                                                <input type="text" class="form-control" maxlength="15" id="inp-imei"
+                                                    name="mdl-reg" placeholder="IMEI" autocomplete="off"
+                                                    data-toggle="popover" data-trigger="hover" data-html="true"
+                                                    title="Descripción"
+                                                    data-content="Es un código de 15 dígitos único pregrabado en los teléfonos móviles, el cual identifica que tiene cada teléfono. (Para obtenerlo marca *#06#).">
+                                                <div class="invalid-feedback"> Por favor, ingrese el IMEI</div>
                                             </div>
-                                            <input type="text" class="form-control" maxlength="15" id="inp-imei"
-                                                name="mdl-reg" placeholder="IMEI" autocomplete="off"
-                                                data-toggle="popover" data-trigger="hover" data-html="true"
-                                                title="Descripción"
-                                                data-content="Es un código de 15 dígitos único pregrabado en los teléfonos móviles, el cual identifica que tiene cada teléfono. (Para obtenerlo marca *#06#).">
-                                            <div class="invalid-feedback"> Por favor, ingrese el IMEI</div>
                                         </div>
-                                        <h6>Número de teléfono</h6>
-                                        <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+                                        <div id="sh-linea">
+                                            <h6>Número de teléfono</h6>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i
+                                                            class="fa-solid fa-phone"></i></span>
+                                                </div>
+                                                <input type="text" class="form-control" maxlength="15" id="inp-linea"
+                                                    name="mdl-reg" placeholder="Número de teléfono" autocomplete="off"
+                                                    data-toggle="popover" data-trigger="hover" data-html="true"
+                                                    title="Descripción"
+                                                    data-content="Es un código de 15 dígitos único pregrabado en los teléfonos móviles, el cual identifica que tiene cada teléfono. (Para obtenerlo marca *#06#)">
+                                                <div class="invalid-feedback"> Por favor, una linea</div>
                                             </div>
-                                            <input type="text" class="form-control" maxlength="15" id="inp-linea"
-                                                name="mdl-reg" placeholder="Número de teléfono" autocomplete="off"
-                                                data-toggle="popover" data-trigger="hover" data-html="true"
-                                                title="Descripción"
-                                                data-content="Es un código de 15 dígitos único pregrabado en los teléfonos móviles, el cual identifica que tiene cada teléfono. (Para obtenerlo marca *#06#)">
-                                            <div class="invalid-feedback"> Por favor, una linea</div>
                                         </div>
                                     </div><!--col-->
                                 </div>
@@ -386,8 +396,7 @@
                                         <label>Usuario de PEMEX</label>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text"><i
-                                                        class="fa-solid fa-user"></i></span>
+                                                <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
                                             </div>
                                             <input class="form-control select" id="inp-user-pemex" name="inp-resg"
                                                 placeholder="Ingrese el nombre completo del usuario">
