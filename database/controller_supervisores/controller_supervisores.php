@@ -43,7 +43,7 @@ function insertar_supervisor($valores)
 function editar_supervisor($valores)
 {
     include("../conexion.php");
-
+    
     $sql = "UPDATE supervisor SET nombre='$valores->nombre', cargo='$valores->cargo', region='$valores->region', habilitado = 0 WHERE id='$valores->id';";
 
     return mysqli_query($con, $sql);
@@ -96,17 +96,21 @@ function consultar_distintos($tabla, $campo)
 function eliminar_supervisor($valores)
 {
     include("../conexion.php");
+    $respuesta = new stdClass();
+
     foreach ($valores->id as $id) {
         $id = intval($id); //* Validamos que el id sea un número, al ser un arreglo, se valida cada uno
         $sql_val = "SELECT * FROM supervisor WHERE habilitado = 1 AND id = '$id'";
-        $res = mysqli_query($con, $sql_val);  //* Consultamos si esa marca esta en uso, si es así, no puede "eliminarse"
+        $res = mysqli_query($con, $sql_val);  
 
         if ($res && $res->num_rows > 0) {
-            return "Uno o más supervisores están habilitados, no pueden ser eliminados";
+            $respuesta->error =  "Uno o más supervisores están habilitados, no pueden ser eliminados";
         }
     }
 
     $ids = implode(",", array_map('intval', $valores->id)); //* Convierte el array de IDs en una lista separada por comas
     $sql = "UPDATE supervisor SET habilitado = 2 WHERE id IN ($ids);"; //* Consulta sql usando IN para "eliminar" múltiples registros
-    return mysqli_query($con, $sql);
+    mysqli_query($con, $sql);
+    $respuesta->mensaje = "Supervisor(es) eliminado(s) correctamente";
+    return $respuesta;
 }
