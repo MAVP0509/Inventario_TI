@@ -93,28 +93,10 @@ async function consultar_informacion(params) {
         paginationButtonCount: 3,
         rowFormatter: function (row) {
             const data = row.getData();
-            const rowElement = row.getElement();
-            const editBtn = rowElement.querySelector("button.btn-warning");
+            //const rowElement = row.getElement();
+            //const editBtn = rowElement.querySelector("button.btn-warning");
 
-            if (editBtn) {
-                if (data.habilitado === "1") {
-                    editBtn.disabled = true;
-                    editBtn.setAttribute("data-toggle", "popover");
-                    editBtn.setAttribute("data-trigger", "hover");
-                    editBtn.setAttribute("data-html", "true");
-                    editBtn.setAttribute("data-placement", "top");
-                    editBtn.setAttribute("data-content", '<div class="bg-warning text-dark p-1 rounded">Deshabilite para editar</div>');
-                    $(editBtn).popover();
-                } else {
-                    editBtn.disabled = false;
-                    $(editBtn).popover('dispose');
-                    editBtn.removeAttribute("data-toggle");
-                    editBtn.removeAttribute("data-trigger");
-                    editBtn.removeAttribute("data-html");
-                    editBtn.removeAttribute("data-placement");
-                    editBtn.removeAttribute("data-content");
-                }
-            }
+            
             //data = row.getData()
             if (data.seleccionado === true) {
                 row.getElement().classList.add("bg-primary")
@@ -171,6 +153,7 @@ async function consultar_informacion(params) {
                     let value = cell.getValue();
                     let icon = value === "1" ? "fa-solid fa-toggle-on fa-2xl" : "fa-solid fa-toggle-off fa-2xl";
                     let color = value === "0" ? "#dc3545" : "#28a745";
+                    regionesSinSupervisor(table)
                     return `<span class="custom-toggle"><i class="${icon}" style="color:${color}; font-size: 1.5em;"></i></span>`;
                 },
                 cellClick: function (e, cell) {
@@ -228,7 +211,7 @@ async function consultar_informacion(params) {
                         });
 
                         const editBtn = cell.getRow().getElement().querySelector("button.btn-warning");
-                        if (editBtn) {
+                        /* if (editBtn) {
                             editBtn.disabled = true;
                             editBtn.setAttribute("data-toggle", "popover");
                             editBtn.setAttribute("data-trigger", "hover");
@@ -236,7 +219,7 @@ async function consultar_informacion(params) {
                             editBtn.setAttribute("data-placement", "top");
                             editBtn.setAttribute("data-content", '<div class="bg-warning text-dark p-1 rounded">Deshabilite para editar</div>');
                             $(editBtn).popover();
-                        }
+                        } */
 
                     } else {
                         // Intentamos desactivar
@@ -532,12 +515,12 @@ async function editar_supervisor() {
     }
 
     let server = await server_supervisor(model)
-    let resultado = JSON.parse(respuesta)
+    //let resultado = JSON.parse(respuesta)
 
-    if (typeof resultado.resultado === 'string') {
+    if (typeof server.resultado === 'string') {
         mostrar_toast("error", "Error", resultado.resultado); // Muestra el mensaje que venga en el string
         return;
-    } else if (resultado.resultado === true) {
+    } else if (server.resultado === true) {
         mostrar_toast("success", "Éxito", "Supervisor editado exitosamente")
         consultar_informacion()
         $("#modalEditar").modal('hide')
@@ -599,10 +582,10 @@ async function eliminar_supervisor() {
 
     let server = await server_supervisor(model);
 
-    if (typeof server.resultado === "string") {
-        mostrar_toast('error', 'Error', server.resultado, 4000)
-    } else if (server.resultado) {
-        mostrar_toast('success', '¡Éxito!', 'Supervisor(es) eliminado(s) correctamente')
+    if (server.resultado.error) {
+        mostrar_toast('warning', 'Aviso', server.resultado.error, 4000)
+    } else if (server.resultado.mensaje) {
+        mostrar_toast('success', '¡Éxito!', server.resultado.mensaje)
         consultar_informacion();
     } else {
         mostrar_toast('error', 'Error', 'Fallo al conectar');
@@ -619,4 +602,30 @@ function deseleccionar_todos() {
 
     //  Forzar re-renderizado de todas las filas para reflejar los íconos
     table.getRows().forEach(row => row.reformat());
+}
+
+function regionesSinSupervisor(table) {
+    const data = table.getData();
+
+    // Crear un objeto para contar habilitados por región
+    const regiones = {};
+
+    data.forEach(row => {
+        const region = row.region;
+        const habilitado = row.habilitado === "1";
+
+        if (!regiones[region]) {
+            regiones[region] = 0;
+        }
+
+        if (habilitado) {
+            regiones[region]++;
+        }
+    });
+
+    // Contar cuántas regiones tienen cero habilitados
+    const sinSupervisores = Object.values(regiones).filter(cantidad => cantidad === 0).length;
+
+    // Actualizar el contador en el DOM
+    document.getElementById("contador-region").textContent = sinSupervisores;
 }

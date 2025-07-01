@@ -219,8 +219,10 @@ function editar_datos($valores)
         $val_marca = $idMarca['id'];
     }
 
+    $val_usuario = empty($valores->usuario) ? '5' : $valores->usuario;
+
     $sql = "UPDATE inventario_ti_sur SET zona = '$valores->zona', fk_rubro = '$val_rubro', af = '$valores->af', fk_tipo ='$val_tipo', fk_marca = '$val_marca', modelo = '$valores->modelo',
-    num_serie = '$valores->num_serie', ubicacion = '$valores->ubicacion', tag = '$valores->tag', imei = '$valores->imei', linea = '$valores->linea', fk_usuario = '$valores->usuario' WHERE id = '$valores->id';";
+    num_serie = '$valores->num_serie', ubicacion = '$valores->ubicacion', tag = '$valores->tag', imei = '$valores->imei', linea = '$valores->linea', fk_usuario = '$val_usuario' WHERE id = '$valores->id';";
     //var_dump($sql);
     $result = mysqli_query($con, $sql);
 
@@ -329,9 +331,9 @@ function consultar_para_resguardo($valores)
         $supervisor[] = $row;
     }
 
-    $datos[0]['supervisor'] = $supervisor[0]['nombre'];
-    $datos[0]['cargo'] = $supervisor[0]['cargo'];
-    $datos[0]['region'] = $supervisor[0]['region'];
+    $datos[0]['supervisor'] = $supervisor[0]['nombre'] ?? '';
+    $datos[0]['cargo'] = $supervisor[0]['cargo'] ?? '';
+    $datos[0]['region'] = $supervisor[0]['region'] ?? '';
 
     //Actualizando la fecha de entrega de todos los equipos del resguardo
     $sql_fecha_update = "UPDATE inventario_ti_sur SET fecha_entrega = '$valores->fecha' where fk_usuario = '$valores->usuario'";
@@ -388,8 +390,12 @@ function consultar_distintos($tabla, $campo)
     } */
 
     switch ($campo) {
-        case "region":
         case "estatus":
+            $datos = [
+                ['id' => 'Asignado', 'estatus' => 'Asignado'],['id' => 'Bodega', 'estatus' => 'Bodega']
+            ];
+            return $datos;
+        case "region":
             $sql = "SELECT DISTINCT `$campo` from `$tabla` WHERE `$campo` <> 'Baja';";
             break;
         case "zona":
