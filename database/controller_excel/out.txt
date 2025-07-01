@@ -358,3 +358,4 @@ convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Abraha
 Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Abraham_Palayot_Sanchez.pdf
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Miguel_Ángel_Vera_Pérez.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Miguel_Ángel_Vera_Pérez.pdf using filter : calc_pdf_Export
 Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Miguel_Ángel_Vera_Pérez.pdf
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Janny_Leticia_García_Mendoza.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Janny_Leticia_García_Mendoza.pdf using filter : calc_pdf_Export

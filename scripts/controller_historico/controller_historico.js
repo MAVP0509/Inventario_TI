@@ -285,7 +285,7 @@ async function mostrar_historial() {
             //console.log("Tipo de datos:", typeof registro);
             const camposExcluir = ['id', 'fecha_evento', 'usuario_sesion', 'evento'];
             const clavesAmigables = {
-                fecha_registro: 'Fecha de registro',
+                fecha_registro: 'Fecha de asignación',
                 zona: 'Zona',
                 ubicacion: 'Ubicación',
                 nombre: 'Nombre del usuario',
