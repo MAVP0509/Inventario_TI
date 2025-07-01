@@ -329,9 +329,9 @@ function consultar_para_resguardo($valores)
         $supervisor[] = $row;
     }
 
-    $datos[0]['supervisor'] = $supervisor[0]['nombre'];
-    $datos[0]['cargo'] = $supervisor[0]['cargo'];
-    $datos[0]['region'] = $supervisor[0]['region'];
+    $datos[0]['supervisor'] = $supervisor[0]['nombre'] ?? '';
+    $datos[0]['cargo'] = $supervisor[0]['cargo'] ?? '';
+    $datos[0]['region'] = $supervisor[0]['region'] ?? '';
 
     //Actualizando la fecha de entrega de todos los equipos del resguardo
     $sql_fecha_update = "UPDATE inventario_ti_sur SET fecha_entrega = '$valores->fecha' where fk_usuario = '$valores->usuario'";
@@ -388,8 +388,12 @@ function consultar_distintos($tabla, $campo)
     } */
 
     switch ($campo) {
-        case "region":
         case "estatus":
+            $datos = [
+                ['id' => 'Asignado', 'estatus' => 'Asignado'],['id' => 'Bodega', 'estatus' => 'Bodega']
+            ];
+            return $datos;
+        case "region":
             $sql = "SELECT DISTINCT `$campo` from `$tabla` WHERE `$campo` <> 'Baja';";
             break;
         case "zona":

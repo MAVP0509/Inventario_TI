@@ -105,6 +105,7 @@ function eliminar_supervisor($valores)
 
         if ($res && $res->num_rows > 0) {
             $respuesta->error =  "Uno o más supervisores están habilitados, no pueden ser eliminados";
+            return $respuesta;
         }
     }
 
