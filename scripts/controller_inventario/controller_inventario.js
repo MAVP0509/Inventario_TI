@@ -309,7 +309,7 @@ async function mdl_editar(params) {
     rellenar_select(selecreg.marca, "inp-marca")
     document.getElementById("inp-modelo").value = selecreg.modelo;
     document.getElementById("inp-num-serie").value = selecreg.num_serie;
-    document.getElementById("inp-ubicacion").value = selecreg.ubicacion;
+    rellenar_select(selecreg.ubicacion, "inp-ubicacion")
     document.getElementById("inp-tag").value = selecreg.tag;
     document.getElementById("inp-imei").value = selecreg.imei;
     document.getElementById("inp-linea").value = selecreg.linea;
@@ -644,7 +644,7 @@ async function confirmar_eliminacion() {
         mostrar_toast('info', 'Información', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
     } else {
 
-        let data = []
+       /*  let data = []
         //let data = datos.filter(element => seleccionar.includes(element.id_equipo));
         for (let i = 0; i < datos.length; i++) {
             const element = datos[i];
@@ -681,8 +681,8 @@ async function confirmar_eliminacion() {
 
             //take action on validation fail
         });
-        $("#mdl-eliminar").modal("show");
-        //mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, desactivar_registro)
+        $("#mdl-eliminar").modal("show"); */
+        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, desactivar_registro)
     }
 }
 
@@ -769,7 +769,7 @@ $(document).ready(function () {
 
         $('#inp-imei, #inp-linea').on('input', function () {
             this.value = this.value.replace(/\D/g, ''); // Elimina todo lo que no sea dígito
-        });
+        });/*  */
     });
 });
 
