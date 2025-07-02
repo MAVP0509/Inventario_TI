@@ -131,6 +131,7 @@ async function consultar_informacion() {
             paginationSize: 10,
             paginationSizeSelector: [10, 25, 35, true],
             movableColumns: true,              //allow column order to be changed
+            printAsHtml: true,
             paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
                 const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
                 const end = Math.min(currentRowStart + pageSize - 1, totalRows);
@@ -194,7 +195,9 @@ async function consultar_informacion() {
     } catch (error) {
         console.log(error)
     }
-
+    $('#btn-imprimir').on("click", function () {
+        table.print(true, false);
+    })
 }
 
 let selecreg = ""; // No limpiar la variable
@@ -370,7 +373,7 @@ async function editar_registro() {
 
 }
 
-function mdl_nvo_registro() {
+async function mdl_nvo_registro() {
     let inputs = document.getElementsByName('mdl-reg');
     for (let i = 0; i < inputs.length; i++) {
         inputs[i].value = ""; // Limpia el valor del input
@@ -390,7 +393,7 @@ function mdl_nvo_registro() {
     $('#lbl-fecha-reg').hide()
     $('#inp-fecha-reg').hide()
 
-    general_select2({
+    await general_select2({
         selectId: 'inp-rubro',
         tabla: 'cat_rubro',
         campo: 'rubro',
@@ -401,7 +404,7 @@ function mdl_nvo_registro() {
         popoverContent: "Categoría general del activo. Agrupa dispositivos por su tipo funcional, como computadoras, dispositivos móviles, etc."
     });
 
-    general_select2({
+    await general_select2({
         selectId: 'inp-tipo',
         tabla: 'cat_tipo',
         campo: 'tipo',
@@ -412,7 +415,7 @@ function mdl_nvo_registro() {
         popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
     });
 
-    general_select2({
+    await general_select2({
         selectId: 'inp-marca',
         tabla: 'cat_marca',
         campo: 'marca',
@@ -423,7 +426,7 @@ function mdl_nvo_registro() {
         popoverContent: "Es la marca del activo."
     })
 
-    general_select2({
+    await general_select2({
         selectId: 'inp-zona',
         tabla: 'inventario_ti_sur',
         campo: 'zona',
@@ -434,7 +437,7 @@ function mdl_nvo_registro() {
         popoverContent: "Zona operativa donde se ubica el activo."
     });
 
-    general_select2({
+    await general_select2({
         selectId: 'inp-ubicacion',
         tabla: 'inventario_ti_sur',
         campo: 'ubicacion',
@@ -445,7 +448,7 @@ function mdl_nvo_registro() {
         popoverContent: "Indica el lugar específico dentro de la zona donde se encuentra físicamente el dispositivo."
     });
 
-    general_select2({
+    await general_select2({
         selectId: 'inp-usuario',
         tabla: 'cat_usuarios',
         campo: 'nombre',
@@ -454,7 +457,7 @@ function mdl_nvo_registro() {
         tags: true
     });
 
-    general_select2({
+    await general_select2({
         selectId: 'inp-cargo',
         tabla: 'cat_usuarios',
         campo: 'cargo',
@@ -474,6 +477,8 @@ $('#inp-usuario').off('change').on('change', function () {
     let userSelected = $(this).val()?.trim();
     let select = $(this);
     let nuevo = true;
+    const cargo = $('#inp-cargo')
+    let texto = "";
 
     select.find('option').each(function () {
         if ($(this).val() === userSelected && !$(this).attr('data-select2-tag')) {
@@ -482,12 +487,43 @@ $('#inp-usuario').off('change').on('change', function () {
     });
 
     if (userSelected && nuevo) {
-        $('#inp-cargo').prop('disabled', false); // Permitir escribir el cargo si es nuevo
+        $('#inp-cargo').prop('disabled', false);
         $('#inp-cargo').val(null).trigger('change');
+
     } else {
-        $('#inp-cargo').prop('disabled', true); // Desactiva el cargo si se eligió uno existente
-        $('#inp-cargo').val(userSelected).trigger('change'); // Puedes usar este valor si así lo deseas
+
+        cargo.prop('disabled', true);
+        // Verifica si el valor ya existe como opción
+        if (!cargo.find(userSelected).length) {
+            const vista = select.find('option:selected').text().trim();
+            
+            for (let i = 0; i < datos.length; i++) {
+                const element = datos[i];
+                if (element.usuario === vista) {
+                    texto = element.posicion;
+                    // console.log(selecreg)
+                    break;
+                }
+            }
+            // Si no existe, agrégalo dinámicamente como nueva opción
+            const nueva_opcion = new Option(texto, userSelected, true, true);
+
+            cargo.append(nueva_opcion).trigger('change');
+        } else {
+            cargo.val(userSelected).trigger('change');
+        }
     }
+
+    /* if (userSelected && nuevo) {
+        $cargo.prop('disabled', false); // Permitir escribir el cargo si es nuevo
+        $cargo.val(null).trigger('change');
+    } else {
+        $cargo.prop('disabled', true); // Desactiva el cargo si se eligió uno existente
+
+            $cargo.val(userSelected).trigger('change'); // Puedes usar este valor si así lo deseas
+        }
+        
+    } */
 });
 
 async function crear_registro() {
@@ -502,9 +538,6 @@ async function crear_registro() {
         "inp-num-serie",
     ];
 
-    /* if (!$('#inp-tag').prop('disabled') || !$('#inp-imei').prop('disabled') || !$('#inp-linea').prop('disabled')) {
-        validacion.push('inp-tag', 'inp-imei', 'inp-linea');
-    } */
     const tipo_seleccionado = $('#inp-tipo').val();
 
     switch (tipo_seleccionado) {
@@ -512,14 +545,14 @@ async function crear_registro() {
         case '40':
             validacion.push("inp-tag");
             break;
-        case '85':
+        case '132':
             validacion.push('inp-imei', 'inp-linea');
         default:
             validacion
             break;
     }
     console.log(validacion)
-    
+
     // Validar campos
     if (!validar_campos(validacion)) {
         mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
@@ -660,44 +693,44 @@ async function confirmar_eliminacion() {
         mostrar_toast('info', 'Información', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
     } else {
 
-       /*  let data = []
-        //let data = datos.filter(element => seleccionar.includes(element.id_equipo));
-        for (let i = 0; i < datos.length; i++) {
-            const element = datos[i];
-            if (equipo_seleccionado.includes(element.id_equipo)) {
-                data.push(element);
-                //break;
-            }
-        }
-        console.log(data)
-        var tblEliminar = new Tabulator("#tbl-mdl-eliminar", {
-            height: "311px",
-            data: data,
-            columns: [
-                { title: "Rubro", field: "rubro", headerHozAlign: "center", headerSort: false },
-                { title: "Tipo de dispositivo", field: "tipo", width: 150, sorter: "number", hozAlign: "left", editor: "input", editor: true, validator: ["min:0", "max:100", "numeric"] },
-                { title: "Marca", field: "marca", width: 150, editor: "input", validator: ["required", "in:male|female"] },
-                { title: "Modelo", field: "modelo", width: 150, editor: "input", hozAlign: "center", width: 100, editor: "input", validator: ["min:0", "max:5", "integer"] },
-                { title: "Número de serie", field: "num_serie", width: 150, editor: "input", validator: ["minLength:3", "maxLength:10", "string"] },
-                { title: "TAG", field: "tag", width: 150, editor: "input", validator: "required" },
-                { title: "IMEI", field: "imei", width: 150, editor: "input", validator: "required" },
-                { title: "Linea", field: "linea", width: 150, editor: "input", validator: "required" },
-                { title: "Usuario", field: "usuario", width: 150, editor: "input", validator: "required" },
-                { title: "Cargo del usuario", field: "posicion", width: 150, editor: "input", validator: "required" },
-                { title: "Estatus", field: "estatus", width: 150, editor: "input", validator: "required" },
-                { title: "Observaciones", width: 150, editor: "input", validator: "required", frozen: true },
-            ],
-        });
-
-        //handle validation failure
-        table.on("validationFailed", function (cell, value, validators) {
-            //cell - cell component for the edited cell
-            //value - the value that failed validation
-            //validatiors - an array of validator objects that failed
-
-            //take action on validation fail
-        });
-        $("#mdl-eliminar").modal("show"); */
+        /*  let data = []
+         //let data = datos.filter(element => seleccionar.includes(element.id_equipo));
+         for (let i = 0; i < datos.length; i++) {
+             const element = datos[i];
+             if (equipo_seleccionado.includes(element.id_equipo)) {
+                 data.push(element);
+                 //break;
+             }
+         }
+         console.log(data)
+         var tblEliminar = new Tabulator("#tbl-mdl-eliminar", {
+             height: "311px",
+             data: data,
+             columns: [
+                 { title: "Rubro", field: "rubro", headerHozAlign: "center", headerSort: false },
+                 { title: "Tipo de dispositivo", field: "tipo", width: 150, sorter: "number", hozAlign: "left", editor: "input", editor: true, validator: ["min:0", "max:100", "numeric"] },
+                 { title: "Marca", field: "marca", width: 150, editor: "input", validator: ["required", "in:male|female"] },
+                 { title: "Modelo", field: "modelo", width: 150, editor: "input", hozAlign: "center", width: 100, editor: "input", validator: ["min:0", "max:5", "integer"] },
+                 { title: "Número de serie", field: "num_serie", width: 150, editor: "input", validator: ["minLength:3", "maxLength:10", "string"] },
+                 { title: "TAG", field: "tag", width: 150, editor: "input", validator: "required" },
+                 { title: "IMEI", field: "imei", width: 150, editor: "input", validator: "required" },
+                 { title: "Linea", field: "linea", width: 150, editor: "input", validator: "required" },
+                 { title: "Usuario", field: "usuario", width: 150, editor: "input", validator: "required" },
+                 { title: "Cargo del usuario", field: "posicion", width: 150, editor: "input", validator: "required" },
+                 { title: "Estatus", field: "estatus", width: 150, editor: "input", validator: "required" },
+                 { title: "Observaciones", width: 150, editor: "input", validator: "required", frozen: true },
+             ],
+         });
+ 
+         //handle validation failure
+         table.on("validationFailed", function (cell, value, validators) {
+             //cell - cell component for the edited cell
+             //value - the value that failed validation
+             //validatiors - an array of validator objects that failed
+ 
+             //take action on validation fail
+         });
+         $("#mdl-eliminar").modal("show"); */
         mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, desactivar_registro)
     }
 }
@@ -776,7 +809,7 @@ $(document).ready(function () {
             $('#sh-tag').hide();
         }
 
-        if (tipoSeleccionado === '85') {
+        if (tipoSeleccionado === '132') {
             $('#sh-imei, #sh-linea').show();
         } else {
             $('#sh-imei, #sh-linea').hide();
@@ -1002,7 +1035,6 @@ function myCallback(start, end) {
 
 
 }
-
 
 function button_checked(button) {
     selected = !selected;
