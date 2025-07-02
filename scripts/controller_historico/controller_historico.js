@@ -179,7 +179,7 @@ async function consultar_historico() {
             { title: "Marca del dispositivo", field: "marca", headerHozAlign: "center", headerFilter: "input" },
             { title: "Activo fijo", field: "af", headerHozAlign: "center", headerFilter: "input" },
             { title: "TAG", field: "tag", headerHozAlign: "center", headerFilter: "input" },
-            { title: "Fecha de registro", field: "fecha_registro", headerHozAlign: "center", headerFilter: "input" },
+            { title: "Fecha de asignación", field: "fecha_registro", headerHozAlign: "center", headerFilter: "input" },
             {
                 title: "Estatus", field: "estatus", headerFilter: "list",
                 headerFilterParams: {
