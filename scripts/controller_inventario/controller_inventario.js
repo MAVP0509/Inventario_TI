@@ -347,8 +347,8 @@ async function editar_registro() {
         tag: $("#inp-tag").val().trim(),
         imei: $("#inp-imei").val().trim(),
         linea: $("#inp-linea").val().trim(),
-        usuario: $("#inp-usuario").val().trim(),
-        cargo: $("#inp-cargo").val().trim(),
+        usuario: $("#inp-usuario").val(),
+        cargo: $("#inp-cargo").val(),
         //posicion: $("#edi-posicion").select2('data')[0].text,
         fecha_entrega: $("#inp-fecha-entrega").val()
     }
@@ -807,15 +807,6 @@ let selected = false
 $('.check-button').on('click', function () {
     button_checked($(this))
 });
-
-let usuario_seleccionado = false
-$("#inp-cargo").on('change', function () {
-    usuario_seleccionado = $(this).val();
-
-    if (usuario_seleccionado) {
-        $
-    }
-})
 
 //TODO: Funciones para el resguardo
 async function resguardo(userSelect) {
