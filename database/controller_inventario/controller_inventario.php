@@ -33,7 +33,7 @@ function insertar_datos($valores)
 {
     include("../conexion.php");
 
-    $registro = date("Y-m-d H:i:s");
+    $registro = date("Y-m-d");
 
     $rubro = verificar_nuevos_id($valores->rubro);
     $val_rubro;
@@ -354,45 +354,6 @@ function consultar_distintos($tabla, $campo)
     //Validación para evitar inyecciones
     $tabla = mysqli_real_escape_string($con, $tabla);
     $campo = mysqli_real_escape_string($con, $campo);
-
-    // TODO: Conservar
-
-    /* if ($campo === "region" || $campo === "estatus") {
-        $num = 1;
-        $sql = "SELECT DISTINCT `$campo` from `$tabla` WHERE `$campo` <> 'Baja';";
-        $query = mysqli_query($con, $sql);
-        //var_dump($sql);
-        $datos = [];
-
-        while ($fila = mysqli_fetch_assoc($query)) {
-            $datos[] = [
-                'id' => $fila[$campo],
-                $campo => $fila[$campo]
-            ];
-            $num++;
-        }
-
-        return $datos;
-    } else {
-        //Validación para evitar inyecciones
-        $tabla = mysqli_real_escape_string($con, $tabla);
-        $campo = mysqli_real_escape_string($con, $campo);
-
-        $sql = "SELECT DISTINCT `$campo`,id FROM `$tabla` WHERE  `$campo` <> 'NA' AND habilitado <> 0;";
-        $query = mysqli_query($con, $sql);
-
-        $datos = [];
-        while ($fila = mysqli_fetch_assoc($query)) {
-            $id = $fila['id'];
-            $valor = $fila[$campo];
-            $datos[] = [
-                'id' => $id,
-                $campo => $valor
-            ];
-        }
-        //var_dump($datos);
-        return $datos;
-    } */
 
     switch ($campo) {
         case "estatus":
