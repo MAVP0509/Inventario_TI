@@ -177,7 +177,7 @@ async function consultar_informacion() {
                 { title: "Linea", field: "linea", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", width: 170 },
                 { title: "Usuario", field: "usuario", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
                 { title: "Cargo del usuario", field: "posicion", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
-                { title: "Fecha de registro", field: "fecha_entrega", sorter: "date", headerFilter: "input", headerSort: false },
+                { title: "Fecha de asignación", field: "fecha_entrega", sorter: "date", headerFilter: "input", headerSort: false },
                 { title: "Estatus", field: "estatus", width: 120, frozen: true, headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "Asignado": "Asignado", "Bodega": "Bodega" }, clearable: true }, headerSort: false },
                 {
                     formatter: editIcon, width: 60, hozAlign: "center",
@@ -541,7 +541,7 @@ async function crear_registro() {
         imei: $("#inp-imei").val().trim(),
         linea: $("#inp-linea").val().trim(),
         usuario: $("#inp-usuario").val().trim(),
-        cargo: $("#inp-cargo").val().trim(),
+        cargo: $("#inp-cargo").select2('data')[0].text,
         fecha_entrega: $("#inp-fecha-entrega").val()
     };
 
