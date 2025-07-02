@@ -310,6 +310,8 @@ function desactivar_datos($valores)
 function consultar_para_resguardo($valores)
 {
     include("../conexion.php");
+    $respuesta = new stdClass();
+
     $sql = "call sp_info_resguardo('$valores->usuario');";
     $query = mysqli_query($con, $sql);
 
@@ -329,8 +331,13 @@ function consultar_para_resguardo($valores)
 
     $sql_supervisor = "SELECT * FROM supervisor WHERE region = '$valores->region' AND  habilitado = 1;";
     //  var_dump($sql_supervisor);
-    $query2 = mysqli_query($con, $sql_supervisor);
+    //$query2 = mysqli_query($con, $sql_supervisor);
 
+    if (mysqli_query($con,$sql_supervisor)->num_rows == 0) {
+        $respuesta->error =  "No hay supervisores habilitados en esta región";
+        return $respuesta ; 
+    }
+    $query2 = mysqli_query($con, $sql_supervisor);
     $supervisor = [];
     while ($row = mysqli_fetch_assoc($query2)) {
         $supervisor[] = $row;
@@ -344,8 +351,8 @@ function consultar_para_resguardo($valores)
     $sql_fecha_update = "UPDATE inventario_ti_sur SET fecha_entrega = '$valores->fecha' where fk_usuario = '$valores->usuario'";
     mysqli_query($con, $sql_fecha_update);
 
-
-    return $datos;
+    $respuesta->datos = $datos;
+    return $respuesta;
 }
 
 function consultar_distintos($tabla, $campo)

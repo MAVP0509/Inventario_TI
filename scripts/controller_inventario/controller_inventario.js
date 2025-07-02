@@ -484,6 +484,7 @@ $('#inp-usuario').off('change').on('change', function () {
     if (userSelected && nuevo) {
         $('#inp-cargo').prop('disabled', false); // Permitir escribir el cargo si es nuevo
         $('#inp-cargo').val(null).trigger('change');
+
     } else {
         $('#inp-cargo').prop('disabled', true); // Desactiva el cargo si se eligió uno existente
         $('#inp-cargo').val(userSelected).trigger('change'); // Puedes usar este valor si así lo deseas
@@ -519,7 +520,7 @@ async function crear_registro() {
             break;
     }
     console.log(validacion)
-    
+
     // Validar campos
     if (!validar_campos(validacion)) {
         mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
@@ -660,44 +661,44 @@ async function confirmar_eliminacion() {
         mostrar_toast('info', 'Información', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
     } else {
 
-       /*  let data = []
-        //let data = datos.filter(element => seleccionar.includes(element.id_equipo));
-        for (let i = 0; i < datos.length; i++) {
-            const element = datos[i];
-            if (equipo_seleccionado.includes(element.id_equipo)) {
-                data.push(element);
-                //break;
-            }
-        }
-        console.log(data)
-        var tblEliminar = new Tabulator("#tbl-mdl-eliminar", {
-            height: "311px",
-            data: data,
-            columns: [
-                { title: "Rubro", field: "rubro", headerHozAlign: "center", headerSort: false },
-                { title: "Tipo de dispositivo", field: "tipo", width: 150, sorter: "number", hozAlign: "left", editor: "input", editor: true, validator: ["min:0", "max:100", "numeric"] },
-                { title: "Marca", field: "marca", width: 150, editor: "input", validator: ["required", "in:male|female"] },
-                { title: "Modelo", field: "modelo", width: 150, editor: "input", hozAlign: "center", width: 100, editor: "input", validator: ["min:0", "max:5", "integer"] },
-                { title: "Número de serie", field: "num_serie", width: 150, editor: "input", validator: ["minLength:3", "maxLength:10", "string"] },
-                { title: "TAG", field: "tag", width: 150, editor: "input", validator: "required" },
-                { title: "IMEI", field: "imei", width: 150, editor: "input", validator: "required" },
-                { title: "Linea", field: "linea", width: 150, editor: "input", validator: "required" },
-                { title: "Usuario", field: "usuario", width: 150, editor: "input", validator: "required" },
-                { title: "Cargo del usuario", field: "posicion", width: 150, editor: "input", validator: "required" },
-                { title: "Estatus", field: "estatus", width: 150, editor: "input", validator: "required" },
-                { title: "Observaciones", width: 150, editor: "input", validator: "required", frozen: true },
-            ],
-        });
-
-        //handle validation failure
-        table.on("validationFailed", function (cell, value, validators) {
-            //cell - cell component for the edited cell
-            //value - the value that failed validation
-            //validatiors - an array of validator objects that failed
-
-            //take action on validation fail
-        });
-        $("#mdl-eliminar").modal("show"); */
+        /*  let data = []
+         //let data = datos.filter(element => seleccionar.includes(element.id_equipo));
+         for (let i = 0; i < datos.length; i++) {
+             const element = datos[i];
+             if (equipo_seleccionado.includes(element.id_equipo)) {
+                 data.push(element);
+                 //break;
+             }
+         }
+         console.log(data)
+         var tblEliminar = new Tabulator("#tbl-mdl-eliminar", {
+             height: "311px",
+             data: data,
+             columns: [
+                 { title: "Rubro", field: "rubro", headerHozAlign: "center", headerSort: false },
+                 { title: "Tipo de dispositivo", field: "tipo", width: 150, sorter: "number", hozAlign: "left", editor: "input", editor: true, validator: ["min:0", "max:100", "numeric"] },
+                 { title: "Marca", field: "marca", width: 150, editor: "input", validator: ["required", "in:male|female"] },
+                 { title: "Modelo", field: "modelo", width: 150, editor: "input", hozAlign: "center", width: 100, editor: "input", validator: ["min:0", "max:5", "integer"] },
+                 { title: "Número de serie", field: "num_serie", width: 150, editor: "input", validator: ["minLength:3", "maxLength:10", "string"] },
+                 { title: "TAG", field: "tag", width: 150, editor: "input", validator: "required" },
+                 { title: "IMEI", field: "imei", width: 150, editor: "input", validator: "required" },
+                 { title: "Linea", field: "linea", width: 150, editor: "input", validator: "required" },
+                 { title: "Usuario", field: "usuario", width: 150, editor: "input", validator: "required" },
+                 { title: "Cargo del usuario", field: "posicion", width: 150, editor: "input", validator: "required" },
+                 { title: "Estatus", field: "estatus", width: 150, editor: "input", validator: "required" },
+                 { title: "Observaciones", width: 150, editor: "input", validator: "required", frozen: true },
+             ],
+         });
+ 
+         //handle validation failure
+         table.on("validationFailed", function (cell, value, validators) {
+             //cell - cell component for the edited cell
+             //value - the value that failed validation
+             //validatiors - an array of validator objects that failed
+ 
+             //take action on validation fail
+         });
+         $("#mdl-eliminar").modal("show"); */
         mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, desactivar_registro)
     }
 }
@@ -923,15 +924,19 @@ async function crear_resguardo() {
     }
     let server = await server_inventario(model)
 
+    if (server.resultado.error) {
+        mostrar_toast('warning', 'Aviso', server.resultado.error)
+    } else {
+        infoResguardo = server.resultado.datos
+        consultar_informacion();
 
-    infoResguardo = server.resultado
-    //console.log(infoResguardo)
-    consultar_informacion();
+
+        $("#mdl-res").modal('hide')
+        mostrar_toast_cargando()
+        descargar_excel()
+    }
 
 
-    $("#mdl-res").modal('hide')
-    mostrar_toast_cargando()
-    descargar_excel()
 }
 
 
