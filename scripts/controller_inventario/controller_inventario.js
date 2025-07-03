@@ -131,6 +131,7 @@ async function consultar_informacion() {
             paginationSize: 10,
             paginationSizeSelector: [10, 25, 35, true],
             movableColumns: true,              //allow column order to be changed
+            printAsHtml: true,
             paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
                 const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
                 const end = Math.min(currentRowStart + pageSize - 1, totalRows);
@@ -194,7 +195,9 @@ async function consultar_informacion() {
     } catch (error) {
         console.log(error)
     }
-
+    $('#btn-imprimir').on("click", function () {
+        table.print(true, false);
+    })
 }
 
 let selecreg = ""; // No limpiar la variable
@@ -347,8 +350,8 @@ async function editar_registro() {
         tag: $("#inp-tag").val().trim(),
         imei: $("#inp-imei").val().trim(),
         linea: $("#inp-linea").val().trim(),
-        usuario: $("#inp-usuario").val().trim(),
-        cargo: $("#inp-cargo").select2('data')[0].text,
+        usuario: $("#inp-usuario").val(),
+        cargo: $("#inp-cargo").val(),
         //posicion: $("#edi-posicion").select2('data')[0].text,
         fecha_entrega: $("#inp-fecha-entrega").val()
     }
@@ -474,6 +477,8 @@ $('#inp-usuario').off('change').on('change', function () {
     let userSelected = $(this).val()?.trim();
     let select = $(this);
     let nuevo = true;
+    const cargo = $('#inp-cargo')
+    let texto = "";
 
     select.find('option').each(function () {
         if ($(this).val() === userSelected && !$(this).attr('data-select2-tag')) {
@@ -482,13 +487,43 @@ $('#inp-usuario').off('change').on('change', function () {
     });
 
     if (userSelected && nuevo) {
-        $('#inp-cargo').prop('disabled', false); // Permitir escribir el cargo si es nuevo
+        $('#inp-cargo').prop('disabled', false);
         $('#inp-cargo').val(null).trigger('change');
 
     } else {
-        $('#inp-cargo').prop('disabled', true); // Desactiva el cargo si se eligió uno existente
-        $('#inp-cargo').val(userSelected).trigger('change'); // Puedes usar este valor si así lo deseas
+
+        cargo.prop('disabled', true);
+        // Verifica si el valor ya existe como opción
+        if (!cargo.find(userSelected).length) {
+            const vista = select.find('option:selected').text().trim();
+            
+            for (let i = 0; i < datos.length; i++) {
+                const element = datos[i];
+                if (element.usuario === vista) {
+                    texto = element.posicion;
+                    // console.log(selecreg)
+                    break;
+                }
+            }
+            // Si no existe, agrégalo dinámicamente como nueva opción
+            const nueva_opcion = new Option(texto, userSelected, true, true);
+
+            cargo.append(nueva_opcion).trigger('change');
+        } else {
+            cargo.val(userSelected).trigger('change');
+        }
     }
+
+    /* if (userSelected && nuevo) {
+        $cargo.prop('disabled', false); // Permitir escribir el cargo si es nuevo
+        $cargo.val(null).trigger('change');
+    } else {
+        $cargo.prop('disabled', true); // Desactiva el cargo si se eligió uno existente
+
+            $cargo.val(userSelected).trigger('change'); // Puedes usar este valor si así lo deseas
+        }
+        
+    } */
 });
 
 async function crear_registro() {
@@ -503,9 +538,6 @@ async function crear_registro() {
         "inp-num-serie",
     ];
 
-    /* if (!$('#inp-tag').prop('disabled') || !$('#inp-imei').prop('disabled') || !$('#inp-linea').prop('disabled')) {
-        validacion.push('inp-tag', 'inp-imei', 'inp-linea');
-    } */
     const tipo_seleccionado = $('#inp-tipo').val();
 
     switch (tipo_seleccionado) {
@@ -513,7 +545,7 @@ async function crear_registro() {
         case '40':
             validacion.push("inp-tag");
             break;
-        case '85':
+        case '132':
             validacion.push('inp-imei', 'inp-linea');
         default:
             validacion
@@ -777,7 +809,7 @@ $(document).ready(function () {
             $('#sh-tag').hide();
         }
 
-        if (tipoSeleccionado === '85') {
+        if (tipoSeleccionado === '132') {
             $('#sh-imei, #sh-linea').show();
         } else {
             $('#sh-imei, #sh-linea').hide();
@@ -808,15 +840,6 @@ let selected = false
 $('.check-button').on('click', function () {
     button_checked($(this))
 });
-
-let usuario_seleccionado = false
-$("#inp-cargo").on('change', function () {
-    usuario_seleccionado = $(this).val();
-
-    if (usuario_seleccionado) {
-        $
-    }
-})
 
 //TODO: Funciones para el resguardo
 async function resguardo(userSelect) {
@@ -1016,7 +1039,6 @@ function myCallback(start, end) {
 
 
 }
-
 
 function button_checked(button) {
     selected = !selected;
