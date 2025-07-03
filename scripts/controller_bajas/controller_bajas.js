@@ -75,7 +75,6 @@ async function consultar_informacion(){
         movableColumns: true,              //allow column order to be changed
         paginationButtonCount: 3,
         columns:[
-            {title:"ID", field:"id_equipo", width: 70, hozAlign: "center", headerSort: false, headerHozAlign: "center", frozen:true},
             {title:"Zona", field:"zona",hozAlign: "center", headerSort: false,headerHozAlign: "center", headerFilter: "list",
                     headerFilterParams: {
                         valuesLookup: true, clearable: true // se auto genera a partir de los valores únicos de la columna

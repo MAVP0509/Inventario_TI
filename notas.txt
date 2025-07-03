@@ -13,5 +13,6 @@ ver 1.1.1 :{
     11: Arreglo en inserciones no deseadas cuando hay número de serie duplicado,
     12: Cambio lógico en el módulo de editar supervisores,
     13: El programa detecta y avisa si una región no tiene supervisor habilitado,
-    14: Cambio de imagen del login al logo de Diavaz
+    14: Cambio de imagen del login al logo de Diavaz,
+    15: En ninguna tabla aparece el campo id,
 }
