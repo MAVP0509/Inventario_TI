@@ -131,7 +131,7 @@ async function consultar_informacion() {
             paginationSize: 10,
             paginationSizeSelector: [10, 25, 35, true],
             movableColumns: true,              //allow column order to be changed
-            printAsHtml: true,
+            //printStyled: true,
             paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
                 const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
                 const end = Math.min(currentRowStart + pageSize - 1, totalRows);
@@ -195,9 +195,7 @@ async function consultar_informacion() {
     } catch (error) {
         console.log(error)
     }
-    $('#btn-imprimir').on("click", function () {
-        table.print(true, false);
-    })
+    
 }
 
 let selecreg = ""; // No limpiar la variable

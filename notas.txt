@@ -1,22 +1,17 @@
-<?php
-// Ruta al archivo Excel generado
-$excelPath = __DIR__ . '/reporte.xlsx';
 
-// Ruta donde se guardará el PDF
-$pdfOutputDir = __DIR__;
-
-// Ruta al ejecutable de LibreOffice
-$libreOfficePath = '"C:\Program Files\LibreOffice\program\soffice.exe"';
-
-// Comando para convertir
-$command = $libreOfficePath . ' --headless --convert-to pdf --outdir ' . escapeshellarg($pdfOutputDir) . ' ' . escapeshellarg($excelPath);
-
-// Ejecutar el comando
-exec($command, $output, $resultCode);
-
-if ($resultCode === 0) {
-    echo "PDF generado correctamente.";
-} else {
-    echo "Error al generar PDF. Código de error: $resultCode";
-    print_r($output);
+ver 1.1.1 :{
+    0: Opción para resguardos de PEMEX,
+    1: Nuevos campos en modal  de resguardo, área y ubicación,
+    2: Nuevos campos en modal de registro de activo, IMEI y linea. Solo aparecerán cuando tipo sea Telefono celular,
+    3: En el modal de registro de activo el campo ubicación se volvió select,
+    4: En el modal registro de activo se puede añadir un nuevo usuario junto con su cargo, 
+    5: En la tabla de inventario, el campo de fecha de asignación se volvió date en vez de datetime,
+    6: Opción de ver todos los registros en la tabla inventario,
+    7: Opción de imprimir en PDF y Excel la tabla actual de inventario, permite impresión con filtros activados,
+    8: Actualización de la plantilla de resguardo,
+    10: Cambio de orden en la tabla de activos de baja e historial,
+    11: Arreglo en inserciones no deseadas cuando hay número de serie duplicado,
+    12: Cambio lógico en el módulo de editar supervisores,
+    13: El programa detecta y avisa si una región no tiene supervisor habilitado,
+    14: Cambio de imagen del login al logo de Diavaz
 }
