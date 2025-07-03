@@ -192,12 +192,153 @@ async function consultar_informacion() {
             ],
 
         });
+
+
     } catch (error) {
         console.log(error)
     }
-    $('#btn-imprimir').on("click", function () {
-        table.print(true, false);
-    })
+
+    document.getElementById("pdf").addEventListener("click", () => {
+        const checkboxes = document.querySelectorAll("#mdl-imprimir .modal-body input[type=checkbox]:checked");
+        const camposSeleccionados = Array.from(checkboxes).map(c => c.value);
+
+        const filtrados = table.getData("active");
+
+        const headers = camposSeleccionados.map(field => {
+            const col = table.getColumn(field);
+            return col ? limpiarTexto(col.getDefinition().title) : field;
+        });
+
+        const body = [
+            headers,
+            ...filtrados.map(row =>
+                camposSeleccionados.map(field => limpiarTexto(row[field] || ""))
+            )
+        ];
+
+        const docDefinition = {
+            pageOrientation: 'landscape',
+            pageMargins: [10, 10, 10, 10],
+            content: [
+                { text: 'Inventario de Equipos', style: 'header' },
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: Array(camposSeleccionados.length).fill("auto"),
+                        body: body,
+                        dontBreakRows: true
+                    },
+                    layout: 'lightHorizontalLines'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 16,
+                    bold: true,
+                    margin: [0, 0, 0, 10]
+                }
+            },
+            defaultStyle: {
+                fontSize: 7,
+                alignment: 'center',
+                wordBreak: 'break-word',
+            }
+        };
+
+        pdfMake.createPdf(docDefinition).download("inventario_tabulator.pdf");
+
+        $('#mdl-imprimir').modal('hide'); // Cierra modal
+    });
+
+
+    /* document.getElementById("pdf").addEventListener("click", function () {
+
+        const checkboxes = document.querySelectorAll("#columnas-checkboxes input[type=checkbox]:checked");
+        const camposSeleccionados = Array.from(checkboxes).map(c => c.value);
+
+        const filtrados = table.getData("active");
+
+        // Títulos y datos solo de columnas seleccionadas
+        const headers = camposSeleccionados.map(field => {
+            const col = table.getColumn(field);
+            return col ? col.getDefinition().title : field;
+        });
+        // Crear encabezados (puedes adaptarlos)
+        // const filtrados = table.getData("active");
+        // const headers = [
+        //     "Zona", "Rubro", "Activo fijo", "Tipo", "Marca", "Modelo", "Serie",
+        //     "Ubicación", "TAG", "IMEI", "Línea", "Usuario", "Cargo", "Fecha", "Estatus"
+        // ];
+
+        // Crear filas de datos
+        const body = [
+            headers, // primera fila con encabezados
+            ...filtrados.map(row => [
+                camposSeleccionados.map(field => limpiarTexto(row[field] || ""))
+                // row.zona || "",
+                // row.rubro || "",
+                // row.af || "",
+                // row.tipo || "",
+                // row.marca || "",
+                // row.modelo || "",
+                // row.num_serie || "",
+                // row.ubicacion || "",
+                // row.tag || "",
+                // row.imei || "",
+                // row.linea || "",
+                // row.usuario || "",
+                // row.posicion || "",
+                // row.fecha_entrega || "",
+                // row.estatus || ""
+            ])
+        ];
+
+        // Definición del PDF
+        const docDefinition = {
+            pageOrientation: 'landscape',
+            // pageSize: 'A4',
+            pageMargins: [10, 10, 10, 10],
+            content: [
+                { text: 'Inventario de Equipos', style: 'header' },
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: Array(15).fill(40),
+                        // [
+                        //     40, 40, 40, 40, 40, 40, 40,
+                        //     40, 40, 40, 40, 50, 50, 40,40
+                        // ],
+                        body: body,
+                        dontBreakRows: true
+                    },
+                    layout: 'lightHorizontalLines'
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 16,
+                    bold: true,
+                    margin: [0, 0, 0, 10]
+                }
+            },
+            defaultStyle: {
+                fontSize: 7,
+                alignment: 'center',
+                wordBreak: 'break-word',
+            }
+        };
+
+        // Generar y descargar PDF
+        pdfMake.createPdf(docDefinition).download("inventario_tabulator.pdf");
+
+        $("#mdl-imprimir").modal("hide");
+    }); */
+
+    $("#btn-excel").on("click", function () {
+        table.download("xlsx", "Inventario_tabulator.xlsx", {
+            sheetName: "inventario"
+        })
+    });
 }
 
 let selecreg = ""; // No limpiar la variable
@@ -326,6 +467,7 @@ async function mdl_editar(params) {
     $("#mdl-inventario").modal("show");
     //console.log(selecreg)
 }
+
 async function editar_registro() {
     //deshabilitar_campo();
     const validacion = [
@@ -496,7 +638,7 @@ $('#inp-usuario').off('change').on('change', function () {
         // Verifica si el valor ya existe como opción
         if (!cargo.find(userSelected).length) {
             const vista = select.find('option:selected').text().trim();
-            
+
             for (let i = 0; i < datos.length; i++) {
                 const element = datos[i];
                 if (element.usuario === vista) {
@@ -684,6 +826,160 @@ async function desactivar_registro() {
     } else {
         mostrar_toast('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
     }
+}
+
+function limpiarTexto(texto) {
+    if (typeof texto !== "string") return texto;
+    return texto.normalize("NFKD").replace(/[\u0300-\u036f]/g, ""); // elimina acentos
+}
+
+async function mdl_imprimir() {
+
+    const columnasCheckboxContainer = document.querySelector("#mdl-imprimir .modal-body");
+    const columnasParaExportar = table.getColumns().filter(col => col.getField() && col.getDefinition().title);
+
+    columnasCheckboxContainer.innerHTML = "<p>Selecciona las columnas que deseas incluir en el PDF:</p>";
+
+    columnasParaExportar.forEach(col => {
+        const field = col.getField();
+        const title = col.getDefinition().title;
+
+        const div = document.createElement("div");
+        div.className = "form-check";
+
+        div.innerHTML = `
+        <input class="form-check-input" type="checkbox" value="${field}" id="chk-${field}" checked>
+        <label class="form-check-label" for="chk-${field}">
+            ${title}
+        </label>`;
+        columnasCheckboxContainer.appendChild(div);
+    });
+
+    $("#mdl-imprimir").modal("show");
+}
+
+async function imprimir_pdf() {
+
+    const checkboxes = document.querySelectorAll("#mdl-imprimir .modal-body input[type=checkbox]:checked");
+    let camposSeleccionados = Array.from(checkboxes).map(c => c.value);
+
+    const filtrados = table.getData("active");
+
+    const headers = camposSeleccionados.map(field => {
+        const col = table.getColumn(field);
+        return col ? col.getDefinition().title : field;
+    });
+
+    const body = [
+        headers,
+        ...filtrados.map(row =>
+            camposSeleccionados.map(field => row[field] || "")
+        )
+    ];
+
+    const docDefinition = {
+        pageOrientation: 'landscape',
+        pageMargins: [10, 10, 10, 10],
+        content: [
+            { text: 'Inventario de Activos', style: 'header' },
+            {
+                table: {
+                    headerRows: 1,
+                    widths: Array(camposSeleccionados.length).fill(40),
+                    body: body,
+                    dontBreakRows: true
+                },
+                layout: 'lightHorizontalLines'
+            }
+        ],
+        styles: {
+            header: {
+                fontSize: 16,
+                bold: true,
+                margin: [0, 0, 0, 10]
+            }
+        },
+        defaultStyle: {
+            fontSize: 7,
+            alignment: 'center',
+            wordBreak: 'break-word',
+        }
+    };
+
+    pdfMake.createPdf(docDefinition).download("inventario_tabulator.pdf");
+
+    $('#mdl-imprimir').modal('hide'); // Cierra modal
+
+    /* const filtrados = table.getData("active");
+
+    // Crear encabezados (puedes adaptarlos)
+    // const filtrados = table.getData("active");
+    // const headers = [
+    //     "Zona", "Rubro", "Activo fijo", "Tipo", "Marca", "Modelo", "Serie",
+    //     "Ubicación", "TAG", "IMEI", "Línea", "Usuario", "Cargo", "Fecha", "Estatus"
+    // ];
+
+    // Crear filas de datos
+    const body = [
+        headers, // primera fila con encabezados
+        ...filtrados.map(row => [
+            camposSeleccionados.map(field => row[field] || "")
+            // row.zona || "",
+            // row.rubro || "",
+            // row.af || "",
+            // row.tipo || "",
+            // row.marca || "",
+            // row.modelo || "",
+            // row.num_serie || "",
+            // row.ubicacion || "",
+            // row.tag || "",
+            // row.imei || "",
+            // row.linea || "",
+            // row.usuario || "",
+            // row.posicion || "",
+            // row.fecha_entrega || "",
+            // row.estatus || ""
+        ])
+    ];
+
+    // Definición del PDF
+    const docDefinition = {
+        pageOrientation: 'landscape',
+        // pageSize: 'A4',
+        pageMargins: [10, 10, 10, 10],
+        content: [
+            { text: 'Inventario de Equipos', style: 'header' },
+            {
+                table: {
+                    headerRows: 1,
+                    widths: Array(15).fill(40),
+                    // [
+                    //     40, 40, 40, 40, 40, 40, 40,
+                    //     40, 40, 40, 40, 50, 50, 40,40
+                    // ],
+                    body: body,
+                    dontBreakRows: true
+                },
+                layout: 'lightHorizontalLines'
+            }
+        ],
+        styles: {
+            header: {
+                fontSize: 16,
+                bold: true,
+                margin: [0, 0, 0, 10]
+            }
+        },
+        defaultStyle: {
+            fontSize: 7,
+            alignment: 'center',
+            wordBreak: 'break-word',
+        }
+    };
+
+    // Generar y descargar PDF
+    pdfMake.createPdf(docDefinition).download("inventario_tabulator.pdf"); */
+
 }
 
 //TODO: Validación de funciones
@@ -957,7 +1253,6 @@ async function crear_resguardo() {
     mostrar_toast_cargando()
     descargar_excel()
 }
-
 
 async function descargar_excel(params) {
     dominio = window.location.hostname,
