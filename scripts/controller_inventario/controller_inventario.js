@@ -198,8 +198,8 @@ async function consultar_informacion() {
     }
 
     $("#btn-excel").on("click", function () {
-        table.download("xlsx", "Inventario_tabulator.xlsx", {
-            sheetName: "inventario"
+        table.download("xlsx", "Inventario_TI.xlsx", {
+            sheetName: "Inventario"
         })
     });
 }
@@ -701,12 +701,12 @@ function limpiarTexto(texto) {
 
 async function mdl_imprimir() {
 
-    const columnasCheckboxContainer = document.querySelector("#mdl-imprimir .modal-body");
-    const columnasParaExportar = table.getColumns().filter(col => col.getField() && col.getDefinition().title);
+    const check_columnas = document.querySelector("#mdl-imprimir .modal-body");
+    const columnas_exp = table.getColumns().filter(col => col.getField() && col.getDefinition().title);
 
-    columnasCheckboxContainer.innerHTML = "<p>Selecciona las columnas que deseas incluir en el PDF:</p>";
+    check_columnas.innerHTML = "<p>Selecciona las columnas que deseas incluir en el PDF:</p>";
 
-    columnasParaExportar.forEach(col => {
+    columnas_exp.forEach(col => {
         const field = col.getField();
         const title = col.getDefinition().title;
 
@@ -714,24 +714,54 @@ async function mdl_imprimir() {
         div.className = "form-check";
 
         div.innerHTML = `
-        <input class="form-check-input" type="checkbox" value="${field}" id="chk-${field}" checked>
-        <label class="form-check-label" for="chk-${field}">
-            ${title}
-        </label>`;
-        columnasCheckboxContainer.appendChild(div);
+            <div class="form-check">
+                <button type="button" class="btn btn-lg toggle-select icon" data-field="${field}" data-checked="true">
+                    <i class="fa-solid fa-square-check"></i>
+                </button>
+                <span>${title}</span>
+            </div>`;
+        check_columnas.appendChild(div);
+
+
     });
 
+    if (!check_columnas.dataset.listenerAttached) {
+        check_columnas.addEventListener("click", function (e) {
+            const button = e.target.closest(".toggle-select");
+            if (!button) return;
+
+            const checked = button.dataset.checked === "true";
+            button.dataset.checked = (!checked).toString();
+
+            button.innerHTML = checked
+                ? '<i class="fa-regular fa-square"></i>'
+                : '<i class="fa-solid fa-square-check"></i>';
+        });
+
+        check_columnas.dataset.listenerAttached = "true";
+    }
+
     $("#mdl-imprimir").modal("show");
+
 }
+
 
 async function imprimir_pdf() {
 
-    let checkboxes = document.querySelectorAll("#mdl-imprimir .modal-body input[type=checkbox]:checked");
-    let camposSeleccionados = Array.from(checkboxes).map(c => c.value);
+    let seleccionados = document.querySelectorAll("#mdl-imprimir .toggle-select[data-checked='true']");
+    let campos_selecionados = Array.from(seleccionados).map(el => el.dataset.field);
 
     const filtrados = table.getData("active");
 
-    let headers = camposSeleccionados.map(field => {
+    let campos
+    if (campos_selecionados.length >= 14) {
+        campos = Array(campos_selecionados.length).fill(40)
+
+    } else {
+        campos = Array(campos_selecionados.length).fill('auto')
+    }
+
+    let headers = campos_selecionados.map(field => {
         const col = table.getColumn(field);
         return col ? col.getDefinition().title : field;
     });
@@ -739,7 +769,7 @@ async function imprimir_pdf() {
     let body = [
         headers,
         ...filtrados.map(row =>
-            camposSeleccionados.map(field => row[field] || "")
+            campos_selecionados.map(field => row[field] || "")
         )
     ];
 
@@ -751,7 +781,7 @@ async function imprimir_pdf() {
             {
                 table: {
                     headerRows: 1,
-                    widths: Array(camposSeleccionados.length).fill(40),
+                    widths: campos,
                     body: body,
                     dontBreakRows: true
                 },
@@ -772,80 +802,9 @@ async function imprimir_pdf() {
         }
     };
 
-    pdfMake.createPdf(docDefinition).download("inventario_tabulator.pdf");
+    pdfMake.createPdf(docDefinition).download("Inventario_TI.pdf");
 
     $('#mdl-imprimir').modal('hide'); // Cierra modal
-
-    /* const filtrados = table.getData("active");
-
-    // Crear encabezados (puedes adaptarlos)
-    // const filtrados = table.getData("active");
-    // const headers = [
-    //     "Zona", "Rubro", "Activo fijo", "Tipo", "Marca", "Modelo", "Serie",
-    //     "Ubicación", "TAG", "IMEI", "Línea", "Usuario", "Cargo", "Fecha", "Estatus"
-    // ];
-
-    // Crear filas de datos
-    const body = [
-        headers, // primera fila con encabezados
-        ...filtrados.map(row => [
-            camposSeleccionados.map(field => row[field] || "")
-            // row.zona || "",
-            // row.rubro || "",
-            // row.af || "",
-            // row.tipo || "",
-            // row.marca || "",
-            // row.modelo || "",
-            // row.num_serie || "",
-            // row.ubicacion || "",
-            // row.tag || "",
-            // row.imei || "",
-            // row.linea || "",
-            // row.usuario || "",
-            // row.posicion || "",
-            // row.fecha_entrega || "",
-            // row.estatus || ""
-        ])
-    ];
-
-    // Definición del PDF
-    const docDefinition = {
-        pageOrientation: 'landscape',
-        // pageSize: 'A4',
-        pageMargins: [10, 10, 10, 10],
-        content: [
-            { text: 'Inventario de Equipos', style: 'header' },
-            {
-                table: {
-                    headerRows: 1,
-                    widths: Array(15).fill(40),
-                    // [
-                    //     40, 40, 40, 40, 40, 40, 40,
-                    //     40, 40, 40, 40, 50, 50, 40,40
-                    // ],
-                    body: body,
-                    dontBreakRows: true
-                },
-                layout: 'lightHorizontalLines'
-            }
-        ],
-        styles: {
-            header: {
-                fontSize: 16,
-                bold: true,
-                margin: [0, 0, 0, 10]
-            }
-        },
-        defaultStyle: {
-            fontSize: 7,
-            alignment: 'center',
-            wordBreak: 'break-word',
-        }
-    };
-
-    // Generar y descargar PDF
-    pdfMake.createPdf(docDefinition).download("inventario_tabulator.pdf"); */
-
 }
 
 //TODO: Validación de funciones

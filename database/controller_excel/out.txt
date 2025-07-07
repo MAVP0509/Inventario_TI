@@ -369,3 +369,5 @@ convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_B
 Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_Bauza_Valdez.pdf
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristell_Hernandez_Contreras.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristell_Hernandez_Contreras.pdf using filter : calc_pdf_Export
 Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristell_Hernandez_Contreras.pdf
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_Bauza_Valdez.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_Bauza_Valdez.pdf using filter : calc_pdf_Export
+Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_Bauza_Valdez.pdf
