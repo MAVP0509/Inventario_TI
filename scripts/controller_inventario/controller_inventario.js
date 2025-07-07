@@ -459,7 +459,10 @@ async function mdl_nvo_registro() {
         campo: 'nombre',
         placeholder: 'Seleccione un usuario',
         dropdownParent: '#mdl-inventario',
-        tags: true
+        tags: true,
+        popoverTitle: "Aviso",
+        popoverContent: "Si se ingresa un nuevo usuario, favor de asignarle un cargo",
+        placement: 'top'
     });
 
     await general_select2({
@@ -468,7 +471,7 @@ async function mdl_nvo_registro() {
         campo: 'cargo',
         placeholder: 'Selecione un cargo',
         dropdownParent: '#mdl-inventario',
-        tags: true
+        tags: true,
     })
 
     document.getElementById('title-mdl-inventario').textContent = "Registro de Activo"
@@ -896,7 +899,7 @@ async function confirmar_eliminacion() {
 
 //TODO Funciones de los Select2
 
-async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags, popoverTitle, popoverContent }) {
+async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags, popoverTitle, popoverContent, placement }) {
     //try {
     const response = await server_inventario({
         accion: 5,
@@ -934,7 +937,8 @@ async function general_select2({ selectId, tabla, campo, placeholder, dropdownPa
             'data-trigger': 'hover',
             'data-html': 'true',
             'title': popoverTitle,
-            'data-content': popoverContent
+            'data-content': popoverContent,
+            'data-placement': placement
         });
 
         $select2Container.popover();
@@ -1106,15 +1110,19 @@ async function crear_resguardo() {
     }
     let server = await server_inventario(model)
 
+    if (server.resultado.error) {
+        mostrar_toast('warning', 'Aviso', server.resultado.error)
+    } else {
+        infoResguardo = server.resultado.datos
+        consultar_informacion();
 
-    infoResguardo = server.resultado
-    //console.log(infoResguardo)
-    consultar_informacion();
+
+        $("#mdl-res").modal('hide')
+        mostrar_toast_cargando()
+        descargar_excel()
+    }
 
 
-    $("#mdl-res").modal('hide')
-    mostrar_toast_cargando()
-    descargar_excel()
 }
 
 async function descargar_excel(params) {
