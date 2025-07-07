@@ -131,7 +131,7 @@ async function consultar_informacion() {
             paginationSize: 10,
             paginationSizeSelector: [10, 25, 35, true],
             movableColumns: true,              //allow column order to be changed
-            printAsHtml: true,
+            // printAsHtml: true,
             paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
                 const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
                 const end = Math.min(currentRowStart + pageSize - 1, totalRows);
