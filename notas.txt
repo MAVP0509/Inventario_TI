@@ -1,5 +1,5 @@
 
-ver 1.1.1 :{
+ver 1.1.0 :{
     0: Opción para resguardos de PEMEX,
     1: Nuevos campos en modal  de resguardo, área y ubicación,
     2: Nuevos campos en modal de registro de activo, IMEI y linea. Solo aparecerán cuando tipo sea Telefono celular,
@@ -16,3 +16,4 @@ ver 1.1.1 :{
     14: Cambio de imagen del login al logo de Diavaz,
     15: En ninguna tabla aparece el campo id,
 }
+
