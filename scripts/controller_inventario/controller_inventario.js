@@ -193,7 +193,6 @@ async function consultar_informacion() {
 
         });
 
-
     } catch (error) {
         console.log(error)
     }
