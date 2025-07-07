@@ -860,17 +860,17 @@ async function mdl_imprimir() {
 
 async function imprimir_pdf() {
 
-    const checkboxes = document.querySelectorAll("#mdl-imprimir .modal-body input[type=checkbox]:checked");
+    let checkboxes = document.querySelectorAll("#mdl-imprimir .modal-body input[type=checkbox]:checked");
     let camposSeleccionados = Array.from(checkboxes).map(c => c.value);
 
     const filtrados = table.getData("active");
 
-    const headers = camposSeleccionados.map(field => {
+    let headers = camposSeleccionados.map(field => {
         const col = table.getColumn(field);
         return col ? col.getDefinition().title : field;
     });
 
-    const body = [
+    let body = [
         headers,
         ...filtrados.map(row =>
             camposSeleccionados.map(field => row[field] || "")
