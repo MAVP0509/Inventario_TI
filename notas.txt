@@ -19,5 +19,6 @@ ver 1.1.0 :{
 
 VER 1.1.1 : {
     0: Pulida de exportar a PDF la tabla inventario así como mejorar el diseño de su modal,
-    
+    1: Opción de generar resguardo de celulares,
+
 }
