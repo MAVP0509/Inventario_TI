@@ -315,9 +315,20 @@ function consultar_para_resguardo($valores)
     $sql = "call sp_info_resguardo('$valores->usuario');";
     $query = mysqli_query($con, $sql);
 
+    $cel = $valores->cel;
+
     $datos = [];
     while ($fila = mysqli_fetch_assoc($query)) {
-        $datos[] = $fila;
+        //$datos[] = $fila;
+        if($cel){
+            if($fila['tipo'] === "Teléfono Celular"){
+                $datos[] = $fila;
+            }
+        }else{
+            if($fila['tipo'] !== "Teléfono Celular"){
+                $datos[] = $fila;
+            }
+        }
     }
     mysqli_free_result($query);
     mysqli_next_result($con);
@@ -328,6 +339,7 @@ function consultar_para_resguardo($valores)
     $datos[0]['ubicacion'] = $valores->ubicacion ?? '';
     $datos[0]['userPemex'] = $valores->userPemex ?? '';
     $datos[0]['userPemexCargo'] = $valores->userPemexCargo ?? '';
+    $datos[0]['cel'] = $valores->cel;
 
     $sql_supervisor = "SELECT * FROM supervisor WHERE region = '$valores->region' AND  habilitado = 1;";
     //  var_dump($sql_supervisor);

@@ -17,3 +17,7 @@ ver 1.1.0 :{
     15: En ninguna tabla aparece el campo id,
 }
 
+VER 1.1.1 : {
+    0: Pulida de exportar a PDF la tabla inventario así como mejorar el diseño de su modal,
+    
+}

@@ -959,6 +959,7 @@ $(document).ready(function () {
 })
 
 let selected = false
+let celSelected = false
 $('.check-button').on('click', function () {
     button_checked($(this))
 });
@@ -1014,8 +1015,12 @@ async function resguardo(userSelect) {
     document.getElementById('col-pemex').style.display = 'none'
 
     selected = false
+    celSelected = false
     $("#check-resguardo-pemex-icon").removeClass("fa-solid fa-square-check")
     $("#check-resguardo-pemex-icon").addClass("fa-regular fa-square ")
+
+    $("#check-resguardo-cel-icon").removeClass("fa-solid fa-square-check")
+    $("#check-resguardo-cel-icon").addClass("fa-regular fa-square ")
     $("#mdl-res").modal('show')
 }
 
@@ -1058,14 +1063,14 @@ async function crear_resguardo() {
     let model = {
         accion: 4,
         usuario: $('#select-usu').val().trim(),
-        //region : $('#select-region').val().trim(),
         region: $("#select-region").select2('data')[0].text,
         comentario: $('#txt-area').val().trim(),
         fecha: $('#fecha-resguardo').val(),
         area: $('#inp-area').val(),
         ubicacion: $('#inp-ubicacion-resg').val(),
         userPemex: $('#inp-user-pemex').val(),
-        userPemexCargo: $('#inp-cargo-pemex').val()
+        userPemexCargo: $('#inp-cargo-pemex').val(),
+        cel : celSelected ? 1 : 0
     }
     let server = await server_inventario(model)
 
@@ -1162,13 +1167,27 @@ function myCallback(start, end) {
 }
 
 function button_checked(button) {
-    selected = !selected;
+    //console.log(button[0].id)
+    if (button[0].id == "check-resguardo-pemex") {
+        selected = !selected;
 
-    let icon = button.find('i')
+        let icon = button.find('i')
 
-    if (selected) {
-        icon.removeClass("fa-regular fa-square").addClass("fa-solid fa-square-check");
-    } else {
-        icon.removeClass("fa-solid fa-square-check").addClass("fa-regular fa-square");
+        if (selected) {
+            icon.removeClass("fa-regular fa-square").addClass("fa-solid fa-square-check");
+        } else {
+            icon.removeClass("fa-solid fa-square-check").addClass("fa-regular fa-square");
+        }
+    } else if (button[0].id == "check-resguardo-cel") {
+        celSelected = !celSelected;
+
+        let icon = button.find('i')
+
+        if (celSelected) {
+            icon.removeClass("fa-regular fa-square").addClass("fa-solid fa-square-check");
+        } else {
+            icon.removeClass("fa-solid fa-square-check").addClass("fa-regular fa-square");
+        }
     }
+
 }
