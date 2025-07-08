@@ -272,7 +272,7 @@ function desactivar_datos($valores)
 {
     include("../conexion.php");
     //var_dump($valores);
-    $registro = date("Y-m-d H:i:s");
+    $registro = date("Y-m-d");
 
     if (is_array($valores->id)) { // Verifica si $valores->id es un array
 
@@ -429,7 +429,7 @@ function traspaso($valores)
 {
 
     include("../conexion.php");
-    $fecha = date('Y-m-d H:i:s');
+    $fecha = date('Y-m-d');
     $usuario = '5';
     $datos = [];
     $nuevo = [];
