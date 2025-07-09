@@ -45,6 +45,27 @@ function server_excel(model) {
     });
 }
 
+function server_word(model) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: "POST",
+            url: "database/controller_word/controller_word.php",
+            data: {
+                trama: JSON.stringify(model)
+            },
+            success: function (response) {
+                try {
+                    resolve(JSON.parse(response))
+                    //console.log(resolve(JSON.parse(response)))
+                    respuesta = response
+                } catch (error) {
+                    reject(error)
+                }
+            }
+        })
+    });
+}
+
 window.addEventListener('load', function () {
     // Leemos el mensaje del registro desde localStorage
     const mensajeRegistro = sessionStorage.getItem('bienvenido');
@@ -745,7 +766,6 @@ async function mdl_imprimir() {
 
 }
 
-
 async function imprimir_pdf() {
 
     let seleccionados = document.querySelectorAll("#mdl-imprimir .toggle-select[data-checked='true']");
@@ -814,6 +834,106 @@ async function confirmar_eliminacion() {
         mostrar_toast('info', 'Información', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
     } else {
 
+        let opcion = [
+            { id: 1, text: 'Inservible' },
+            { id: 2, text: 'Robo' },
+            { id: 3, text: 'Extravio' },
+            { id: 4, text: 'Venta' },
+            { id: 6, text: 'Reubicación de instalación o pozo' },
+            { id: 5, text: 'Otro' }
+        ]
+
+        await general_select2({
+            selectId: 'slc-motivo',
+            data: opcion,
+            placeholder: 'Selecione un motivo',
+            dropdownParent: '#mdl-baja',
+            popoverTitle: 'Descripción',
+            popoverContent: 'Causa por la cual no se encuentre en condiciones óptimas para su uso y/o aprovechamiento.',
+            tags: false
+        })
+
+        $('#sh-motivo').hide();
+
+        let data = datos.filter(el => equipo_seleccionado.includes(el.id_equipo));
+
+        let tbl_baja
+
+        $('#slc-motivo').off('change').on('change', function () {
+            let motivo_seleccionado = $(this).val();
+
+            if (motivo_seleccionado === '5') {
+                $('#sh-motivo').show();
+            } else {
+                $('#sh-motivo').hide();
+            }
+
+            if(!motivo_seleccionado){
+                if (tbl_baja) tbl_baja.clearData();
+                return;
+            }
+
+            let data_motivo = data.map(item => ({ ...item, motivo_baja_id: motivo_seleccionado }));
+
+            if(!tbl_baja) {
+                tbl_baja = new Tabulator('#tbl-baja', {
+                    height: "800px",
+                    data: data_motivo,
+                    columns: [
+                        { title: "ITEM", formatter: "rownum", hozAlign: "center" },
+                        { title: "TIPO", field: "motivo_baja_id", hozAlign: "center" },
+                        {
+                            title: "DESCRIPCIÓN",
+                            formatter: function (cell) {
+                                let d = cell.getData();
+                                return `${d.tipo || ''} Marca ${d.marca || ''} Serie ${d.num_serie || ''} Modelo ${d.modelo || ''}`;
+                            }
+                        },
+                        { title: "LOTE", field: "lote" }, // campo lote, ajusta si tienes otro nombre
+                        { title: "ÁREA", field: "ubicacion" },
+                        { title: "ACTIVO FIJO", field: "af" },
+                    ]
+                });
+            } else {
+                // Actualizar datos si ya existe tabla
+                tbl_baja.setData(data_motivo);
+            }
+            
+        })
+
+
+
+        /* const motivo_id = $('#slc-motivo').val();
+
+        motivo_id.forEach(item => {
+            item.opciones = motivo_id;
+        });
+
+        var tbl_baja = new Tabulator('#tbl-baja', {
+            height: "800px",
+            data: data,
+            columns: [
+                { title: "ITEM", field: "rownum", hozAlign: "center" },
+                { title: "TIPO", field: "tipo" },
+                {
+                    title: "DESCRIPCIÓN", formatter: function (cell) {
+                        let data = cell.getData();
+                        return `${data.tipo || ''} Marca ${data.marca || ''} Serie ${data.num_serie || ''} Modelo ${data.modelo || ''}`;
+                    }
+                },
+                { title: "LOTE", field: "" },
+                // { title: "ÁREA", formatter: () => "TI", hozAlign: "center"},
+                { title: "ÁREA", field: "ubicacion" },
+                { title: "ACTIVO FIJO", field: "af" },
+            ]
+        }); */
+
+
+
+
+        $("#mdl-baja").modal("show");
+
+
         /*  let data = []
          //let data = datos.filter(element => seleccionar.includes(element.id_equipo));
          for (let i = 0; i < datos.length; i++) {
@@ -847,31 +967,43 @@ async function confirmar_eliminacion() {
          table.on("validationFailed", function (cell, value, validators) {
              //cell - cell component for the edited cell
              //value - the value that failed validation
-             //validatiors - an array of validator objects that failed
+             //validatiors - an datos of validator objects that failed
  
              //take action on validation fail
          });
          $("#mdl-eliminar").modal("show"); */
-        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, desactivar_registro)
+
     }
+
+    // mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, desactivar_registro)
 }
 
 //TODO Funciones de los Select2
 
-async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags, popoverTitle, popoverContent, placement }) {
+async function general_select2({ selectId, tabla, campo, data, placeholder, dropdownParent, tags, popoverTitle, popoverContent, placement }) {
     //try {
-    const response = await server_inventario({
-        accion: 5,
-        tabla: tabla,
-        campo: campo
-    });
+    let opciones = [];
 
-    //console.log('Respuesta del servidor para select2:', response);
+    if (data && Array.isArray(data)) {
+        // Si se pasan los datos directamente
+        opciones = data.map(item => ({
+            id: item.id ?? '',
+            text: item.text ?? ''
 
-    const opciones = response.resultado.map(item => ({
-        id: item.id || '',
-        text: item[campo] || ''
-    }));
+        }));
+    } else if (tabla && campo) {
+        const response = await server_inventario({
+            accion: 5,
+            tabla: tabla,
+            campo: campo
+        });
+        //console.log('Respuesta del servidor para select2:', response);
+        opciones = response.resultado.map(item => ({
+            id: item.id || '',
+            text: item[campo] || ''
+        }));
+
+    }
 
     const $select = $('#' + selectId);
     $select.empty().append(new Option('', '', false, false));
@@ -942,7 +1074,6 @@ $(document).ready(function () {
         });/*  */
     });
 });
-
 
 $(document).ready(function () {
     $('#mdl-estado').on('change', function () {
@@ -1157,7 +1288,6 @@ $(document).ready(function () {
 
 function myCallback(start, end) {
     $("#rango-fecha span").html(start.format("MMMM D, YYYY") + " - " + end.format("MMMM D, YYYY"))
-
 
 }
 
