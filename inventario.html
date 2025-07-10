@@ -19,6 +19,10 @@
         integrity="sha512-3JRrEUwaCkFUBLK1N8HehwQgu8e23jTH4np5NHOmQOobuC4ROQxFwFgBLTnhcnQRMs84muMh0PnnwXlPq5MGjg=="
         crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
+    <link href="https://unpkg.com/filepond-plugin-pdf-preview/dist/filepond-plugin-pdf-preview.css" rel="stylesheet" />
+
+
 
 
 </head>
@@ -29,7 +33,8 @@
 
         <!-- Preloader -->
         <div class="preloader flex-column justify-content-center align-items-center">
-            <img src="images/diavaz.png" alt="DiavazLogo" height="60" width="60">
+            <img src="images/diavaz.png" alt="DiavazLogo" height="60" width="60"><br><i
+                class="fa-solid fa-spinner fa-spin fa-lg"></i>
         </div>
 
         <nav class="main-header navbar navbar-expand navbar-white navbar-light fixed-top">
@@ -103,11 +108,18 @@
                                             <i class="fa-solid fa-clock-rotate-left"></i> Historial
                                         </button>
                                         <button type="button" class="btn btn-lg btn-outline-danger mr-3 icon"
-                                            onclick="mdl_imprimir()"
-                                            id="btn-imprimir"><i class="fa-solid fa-file-pdf"></i>
+                                            onclick="mdl_imprimir()" id="btn-imprimir"><i
+                                                class="fa-solid fa-file-pdf"></i>
                                         </button>
                                         <button type="button" class="btn btn-lg btn-outline-success mr-3 icon"
                                             id="btn-excel"><i class="fa-solid fa-file-excel"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-lg  btn-outline-info mr-3 icon"
+                                            data-toggle="popover" data-trigger="hover" data-html="true"
+                                            data-placement="bottom" data-content="Resguardos firmados"
+                                            data-widget="control-sidebar" data-slide="true"
+                                            onclick="abrir_control_sidebar()">
+                                            <i class="fa-solid fa-file-signature"></i>
                                         </button>
                                     </div><br>
                                 </div>
@@ -119,10 +131,37 @@
                         </div>
                     </div>
                 </div>
+
             </section> <!--Container-->
 
         </div>
+        <aside class="control-sidebar control-sidebar-light" id="control-sidebar" style="width: 400px !important;">
+            <div class="p-3 control-sidebar-content">
+                <h5><i class="fa-solid fa-file-arrow-up"></i> Subir resguardos firmados</h5>
+                <hr class="mb-2">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col">
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                                </div>
+                                <select class="form-control select" id="select-usu-file" name="inp-resg"></select>
+                                <div class="invalid-feedback">Por favor, seleccione un usuario.</div>
+                            </div>
+                            
+                            <input type="file" id="up-resguardo-file" name="resguardo" >
+                            <button type="button" class="btn btn-lock btn-outline-dark icon" onclick="ver_pdf()" id="btn-ver-pdf" disabled><i class="fa-solid fa-eye"></i> Ver</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </aside>
     </div>
+
+
 
     <!--Modal del inventario-->
     <div class="modal fade" id="mdl-inventario" data-backdrop="static" data-keyboard="false">
@@ -444,7 +483,7 @@
                                             style="display:none ; background-color:#e7f3fe; border-color:#b8daff; color:#004085; padding-right: 4rem;"
                                             id="alert-resguardo-cel">
                                             <button type='button' class='btn icon toggle-select me-2 check-button'
-                                                id="check-resguardo-cel" >
+                                                id="check-resguardo-cel">
                                                 <i class='fa-regular fa-square fa-lg' id="check-resguardo-cel-icon"></i>
                                             </button>
                                             ¿Desea generar el resguardo para celular?
@@ -630,6 +669,39 @@
         </div>
     </div>
 
+    <!--Modal subir pdf-->
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-file-up" role="dialog" data-backdrop="static"
+        data-keyboard="false">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fa-solid fa-file-signature"></i> Resguardo firmado</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col">
+                                <embed id="pdf-viewer" src="libraries/web/viewer.html"
+                                    style="width: 100%; height: 700px; border: none; margin-top: 20px;" loading="lazy"
+                                    referrerpolicy="no-referrer"
+                                    sandbox="allow-scripts allow-same-origin allow-downloads"></embed>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
+                            class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+                    <button type="button" class="btn btn-success icon" id="mdl-btn-conf"
+                        onclick="subir_pdf()">Subir <i class="fa-solid fa-upload"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -643,6 +715,11 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"
     integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+"
     crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
+<script src="https://unpkg.com/filepond-plugin-pdf-preview/dist/filepond-plugin-pdf-preview.min.js"></script>
+<script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 <script src="scripts/controller_acceso/controller_acceso.js"></script>
 <script src="scripts/controller_global/controller_global.js"></script>
 <script src="scripts/controller_inventario/controller_inventario.js"></script>

@@ -23,6 +23,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_distintos($clientejson->tabla, $clientejson->campo);
 } elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = traspaso($clientejson);
+} elseif ($clientejson->accion == 7) {
+    $respuesta_servidor->resultado = cargar_resguardo_firmado($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -320,12 +322,12 @@ function consultar_para_resguardo($valores)
     $datos = [];
     while ($fila = mysqli_fetch_assoc($query)) {
         //$datos[] = $fila;
-        if($cel){
-            if($fila['tipo'] === "Teléfono Celular"){
+        if ($cel) {
+            if ($fila['tipo'] === "Teléfono Celular") {
                 $datos[] = $fila;
             }
-        }else{
-            if($fila['tipo'] !== "Teléfono Celular"){
+        } else {
+            if ($fila['tipo'] !== "Teléfono Celular") {
                 $datos[] = $fila;
             }
         }
@@ -345,9 +347,9 @@ function consultar_para_resguardo($valores)
     //  var_dump($sql_supervisor);
     //$query2 = mysqli_query($con, $sql_supervisor);
 
-    if (mysqli_query($con,$sql_supervisor)->num_rows == 0) {
+    if (mysqli_query($con, $sql_supervisor)->num_rows == 0) {
         $respuesta->error =  "No hay supervisores habilitados en esta región";
-        return $respuesta ; 
+        return $respuesta;
     }
     $query2 = mysqli_query($con, $sql_supervisor);
     $supervisor = [];
@@ -484,4 +486,36 @@ function traspaso($valores)
 
         return $datos;
     }
+}
+
+function cargar_resguardo_firmado()
+{
+    $respuesta = new stdClass();
+    if (isset($_FILES['resguardo']) && $_FILES['resguardo']['error'] === UPLOAD_ERR_OK) {
+        $nombreOriginal = $_FILES['resguardo']['name'];
+        $tmpPath = $_FILES['resguardo']['tmp_name'];
+
+        // Validar extensión .xlsx
+        $ext = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));
+        if ($ext !== 'pdf') {
+            $respuesta->error = "Tipo de archivo no permitido. Solo .pdf";
+            return $respuesta;
+        }
+
+        // Generar nombre único para evitar colisiones
+        $nuevoNombre = date('Ymd_His') . '_' . $nombreOriginal;
+
+        // Ruta destino, __DIR__ es carpeta donde está este script PHP
+        $destino = __DIR__ . '/' . $nuevoNombre;
+
+        if (move_uploaded_file($tmpPath, $destino)) {
+            $respuesta->mensaje = "Archivo guardado correctamente";
+            $respuesta->ruta = 'C:\\xampp\\htdocs\\Inventario_TI\\database\\controller_inventario\\' . $nuevoNombre;
+        } else {
+            $respuesta->error = "No se pudo mover el archivo.";
+        }
+    }else{
+        $respuesta->error = "No se recibió ningún archivo válido.";
+    }
+    return $respuesta;
 }

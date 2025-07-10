@@ -1070,7 +1070,7 @@ async function crear_resguardo() {
         ubicacion: $('#inp-ubicacion-resg').val(),
         userPemex: $('#inp-user-pemex').val(),
         userPemexCargo: $('#inp-cargo-pemex').val(),
-        cel : celSelected ? 1 : 0
+        cel: celSelected ? 1 : 0
     }
     let server = await server_inventario(model)
 
@@ -1190,4 +1190,162 @@ function button_checked(button) {
         }
     }
 
+}
+
+//*Cerrando el control-sidebar con click fuera de éste
+$(".content-wrapper").click(function () {
+    if ($('body').hasClass('control-sidebar-slide-open')) {
+        //console.log('cerrando sidebar');
+        $('[data-widget="control-sidebar"]').ControlSidebar('toggle');
+    }
+});
+
+let dominio = window.location.hostname
+let puerto = location.port
+
+FilePond.registerPlugin(FilePondPluginFileValidateType);
+
+
+let fileResguardo = document.getElementById('up-resguardo-file')
+
+// Create a FilePond instance
+const pond = FilePond.create(fileResguardo, {
+    maxFiles: 1,
+    labelIdle: 'Arrastra y suelta tu archivo .pdf o <span class="filepond--label-action"> Examina </span>',
+    allowMultiple: false,
+    dropOnPage: true,
+    dropValidation: true,
+    instantUpload: false,
+    acceptedFileTypes: ['application/pdf'],
+    labelFileTypeNotAllowed: 'Archivo no válido. Solo se permiten archivos .pdf',
+    disabled : true,
+    server: {
+        process: {
+            url: "database/controller_inventario/controller_inventario.php",
+            method: 'POST',
+            name: 'resguardo',
+            withCredentials: false,
+            ondata: (formData) => {
+                const trama = {
+                    accion: 7,
+                };
+                formData.append('trama', JSON.stringify(trama));
+                return formData;
+            },
+            onload: (response) => {
+                try {
+                    const data = JSON.parse(response); // <- convierte string en objeto
+                    if (data.resultado.error) {
+                        //console.error("Error del servidor:", data.resultado.error);
+                        alert("Error: " + data.resultado.error);
+                    } else {
+                        mostrar_toast("success", "Subido", data.resultado.mensaje)
+
+                        pond.removeFile();
+
+                        // Cambia la extensión
+                        data.resultado.ruta = data.resultado.ruta.replace(/\.xlsx$/i, '.pdf')
+                        data.resultado.ruta = data.resultado.ruta.replace(/^"|"$/g, '')
+                        data.resultado.ruta = data.resultado.ruta.replace(/\\/g, '/')
+                        data.resultado.ruta = data.resultado.ruta.replace("C:/xampp/htdocs", "http://" + dominio + ":" + puerto)
+                        /* let contenedor = document.getElementById('pdf-preview');
+                        let iframe = document.getElementById('pdf-frame');
+
+                        iframe.src = data.tesultado.ruta;
+                        contenedor.style.display = 'block'; */
+                        //window.open(data.resultado.ruta, '_blank');
+                        // Aquí puedes usar data.ruta si necesitas mostrarlo
+                        //$('#mdl-file-up').modal('hide');
+                    }
+
+                } catch (e) {
+                    console.error("Error al parsear respuesta:", e);
+                }
+            },
+            onerror: (error) => {
+                console.error('Error al subir:', error);
+                alert("Error al subir archivo.");
+            }
+        },
+    }
+
+
+});
+
+
+let fileToOpen;
+
+pond.on('addfile', (error, fileItem) => {
+    if (error) {
+        console.error('Error al cargar PDF:', error);
+        return;
+    }
+
+    // Generar URL temporal para el archivo PDF
+    fileToOpen = URL.createObjectURL(fileItem.file);
+
+    const viewer = document.getElementById('pdf-viewer');
+    viewer.src = fileToOpen;
+
+    // Mostrar el modal
+    //$('#mdl-file-up').modal('show');
+});
+
+$('#mdl-file-up').on('shown.bs.modal', function () {
+    const viewer = document.getElementById('pdf-viewer');
+    viewer.src = fileToOpen;
+});
+
+async function abrir_control_sidebar() {
+    $('#select-usu-file').val(null).trigger('change');
+
+    await general_select2({
+        selectId: 'select-usu-file',
+        tabla: 'cat_usuarios',
+        campo: 'nombre',
+        placeholder: 'Seleccione un usuario',
+        dropdownParent: '#control-sidebar',
+        tags: false
+    });
+}
+
+function subir_pdf() {
+    $('#mdl-file-up').modal('hide');
+    pond.processFile()
+        .then(() => {
+            // Opcional: limpiar FilePond 
+            pond.removeFile();
+        })
+        .catch(error => {
+            console.error('Error al subir archivo:', error);
+            mostrar_toast("error", "Error",'Error al subir archivo. Inténtalo de nuevo.'+ error);
+        });
+}
+
+//*Habilitando el input para subir archivos
+$('#select-usu-file').on('change', function () {
+    const seleccionado = $(this).val();
+
+    if (seleccionado !== '') {
+        pond.setOptions({disabled : false})
+    } else {
+        pond.setOptions({disabled : true})
+        $('#btn-ver-pdf').prop('disabled', true)
+    }
+})
+
+//*Habilitando el boton de ver pdf cuando haya un archivo en el filePond
+document.addEventListener('FilePond:addfile', (e) => {
+    $('#btn-ver-pdf').prop('disabled', false)
+})
+
+//* Deshabilitando el boton de ver pdf cuando el archivo haya sido removido del filePond
+document.addEventListener('FilePond:removefile', (e) =>{
+    $('#btn-ver-pdf').prop('disabled', true)
+    $('#select-usu-file').val(null).trigger('change');
+})
+
+
+function ver_pdf(){
+    $('#mdl-file-up').modal('show');
 }
