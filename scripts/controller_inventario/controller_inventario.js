@@ -2,6 +2,7 @@ let respuesta
 
 function server_inventario(model) {
     return new Promise((resolve, reject) => {
+
         $.ajax({
             type: "POST",
             url: "database/controller_inventario/controller_inventario.php",
@@ -580,7 +581,7 @@ async function crear_registro() {
             validacion
             break;
     }
-    console.log(validacion)
+    // console.log(validacion)
 
     // Validar campos
     if (!validar_campos(validacion)) {
@@ -828,6 +829,17 @@ async function imprimir_pdf() {
 }
 
 //TODO: Validación de funciones
+$(document).ready(function () {
+    $('#smartwizard').smartWizard({
+        theme: 'dots',
+        autoAdjustHeight: true,
+        toolbarSettings: {
+            toolbarPosition: 'bottom',
+            showNextButton: true,
+            showPreviousButton: true,
+        }
+    });
+});
 
 async function confirmar_eliminacion() {
     if (equipo_seleccionado.length === 0) {
@@ -848,18 +860,20 @@ async function confirmar_eliminacion() {
             data: opcion,
             placeholder: 'Selecione un motivo',
             dropdownParent: '#mdl-baja',
-            popoverTitle: 'Descripción',
-            popoverContent: 'Causa por la cual no se encuentre en condiciones óptimas para su uso y/o aprovechamiento.',
-            tags: false
-        })
+            // popoverTitle: 'Descripción',
+            // popoverContent: 'Causa por la cual no se encuentre en condiciones óptimas para su uso y/o aprovechamiento.',
+            // placement: "right",
 
+        })
+        // console.log(opcion)
         $('#sh-motivo').hide();
+        $('#sh-monto, #sh-quincena').hide();
 
         let data = datos.filter(el => equipo_seleccionado.includes(el.id_equipo));
 
         let tbl_baja
 
-        $('#slc-motivo').off('change').on('change', function () {
+        $('#slc-motivo').on('change', function () {
             let motivo_seleccionado = $(this).val();
 
             if (motivo_seleccionado === '5') {
@@ -867,17 +881,22 @@ async function confirmar_eliminacion() {
             } else {
                 $('#sh-motivo').hide();
             }
+            if (motivo_seleccionado === '3') {
+                $('#sh-monto, #sh-quincena').show();
+            } else {
+                $('#sh-monto, #sh-quincena').hide();
+            }
 
-            if(!motivo_seleccionado){
+            if (!motivo_seleccionado) {
                 if (tbl_baja) tbl_baja.clearData();
                 return;
             }
 
             let data_motivo = data.map(item => ({ ...item, motivo_baja_id: motivo_seleccionado }));
 
-            if(!tbl_baja) {
+            if (!tbl_baja) {
                 tbl_baja = new Tabulator('#tbl-baja', {
-                    height: "800px",
+                    height: "350px",
                     data: data_motivo,
                     columns: [
                         { title: "ITEM", formatter: "rownum", hozAlign: "center" },
@@ -889,7 +908,7 @@ async function confirmar_eliminacion() {
                                 return `${d.tipo || ''} Marca ${d.marca || ''} Serie ${d.num_serie || ''} Modelo ${d.modelo || ''}`;
                             }
                         },
-                        { title: "LOTE", field: "lote" }, // campo lote, ajusta si tienes otro nombre
+                        { title: "LOTE", field: "lote" },
                         { title: "ÁREA", field: "ubicacion" },
                         { title: "ACTIVO FIJO", field: "af" },
                     ]
@@ -898,7 +917,7 @@ async function confirmar_eliminacion() {
                 // Actualizar datos si ya existe tabla
                 tbl_baja.setData(data_motivo);
             }
-            
+
         })
 
 
@@ -991,6 +1010,7 @@ async function general_select2({ selectId, tabla, campo, data, placeholder, drop
             text: item.text ?? ''
 
         }));
+
     } else if (tabla && campo) {
         const response = await server_inventario({
             accion: 5,
