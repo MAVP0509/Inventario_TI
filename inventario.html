@@ -137,11 +137,19 @@
         </div>
         <aside class="control-sidebar control-sidebar-light" id="control-sidebar" style="width: 400px !important;">
             <div class="p-3 control-sidebar-content">
-                <h5><i class="fa-solid fa-file-arrow-up"></i> Subir resguardos firmados</h5>
-                <hr class="mb-2">
+                <h4><i class="fa-solid fa-file-invoice"></i> Resguardos firmados</h4>
+                <div class=" d-flex justify-content-center gap-2 mt-3">
+                    <button type="button" class="btn btn-lock btn-outline-dark icon mr-3 w-100" onclick="col_subir_resguardos_firmados()"
+                        id="btn-col-subir" disabled><i class="fa-solid fa-file-arrow-up"></i> Subir</button>
+                    <button type="button" class="btn btn-lock btn-outline-dark icon w-100" onclick="col_ver_resguardos_firmados()"
+                        id="btn-col-descargar"><i class="fa-solid fa-file-arrow-down"></i> Descargar</button>
+                </div>
+
+                <hr class="mb-3">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col">
+                        <div class="col" style="display:block;" id="col-subir">
+                            <h5><i class="fa-solid fa-file-arrow-up"></i> Subir</h5>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
@@ -149,9 +157,22 @@
                                 <select class="form-control select" id="select-usu-file" name="inp-resg"></select>
                                 <div class="invalid-feedback">Por favor, seleccione un usuario.</div>
                             </div>
-                            
-                            <input type="file" id="up-resguardo-file" name="resguardo" >
-                            <button type="button" class="btn btn-lock btn-outline-dark icon" onclick="ver_pdf()" id="btn-ver-pdf" disabled><i class="fa-solid fa-eye"></i> Ver</button>
+
+                            <input type="file" id="up-resguardo-file" name="resguardo">
+                            <button type="button" class="btn btn-lock btn-outline-dark icon" onclick="ver_pdf()"
+                                id="btn-ver-pdf" disabled><i class="fa-solid fa-eye"></i> Ver</button>
+                        </div>
+                        <div class="col" style="display: none;" id="col-descargar">
+                            <h5><i class="fa-solid fa-file-arrow-down"></i> Descargar</h5>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                                </div>
+                                <select class="form-control select" id="select-ver-usu-file" name="inp-resg"></select>
+                                <div class="invalid-feedback">Por favor, seleccione un usuario.</div>
+                            </div>
+                            <div id="lista-documentos" class="list-group mt-3"></div>
+
                         </div>
                     </div>
                 </div>
@@ -695,8 +716,8 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
                             class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
-                    <button type="button" class="btn btn-success icon" id="mdl-btn-conf"
-                        onclick="subir_pdf()">Subir <i class="fa-solid fa-upload"></i></button>
+                    <button type="button" class="btn btn-success icon" id="mdl-btn-subir-pdf" onclick="subir_pdf()">Subir <i
+                            class="fa-solid fa-upload"></i></button>
                 </div>
             </div>
         </div>

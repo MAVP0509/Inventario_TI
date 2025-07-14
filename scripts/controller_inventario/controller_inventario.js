@@ -1188,6 +1188,15 @@ function button_checked(button) {
         } else {
             icon.removeClass("fa-solid fa-square-check").addClass("fa-regular fa-square");
         }
+    } else {
+        selected = !selected;
+
+        let icon = button.find('i')
+        if (selected) {
+            icon.removeClass("fa-regular fa-square").addClass("fa-solid fa-square-check");
+        } else {
+            icon.removeClass("fa-solid fa-square-check").addClass("fa-regular fa-square");
+        }
     }
 
 }
@@ -1218,7 +1227,7 @@ const pond = FilePond.create(fileResguardo, {
     instantUpload: false,
     acceptedFileTypes: ['application/pdf'],
     labelFileTypeNotAllowed: 'Archivo no válido. Solo se permiten archivos .pdf',
-    disabled : true,
+    disabled: true,
     server: {
         process: {
             url: "database/controller_inventario/controller_inventario.php",
@@ -1228,6 +1237,7 @@ const pond = FilePond.create(fileResguardo, {
             ondata: (formData) => {
                 const trama = {
                     accion: 7,
+                    usuario: $('#select-usu-file').val()
                 };
                 formData.append('trama', JSON.stringify(trama));
                 return formData;
@@ -1242,20 +1252,6 @@ const pond = FilePond.create(fileResguardo, {
                         mostrar_toast("success", "Subido", data.resultado.mensaje)
 
                         pond.removeFile();
-
-                        // Cambia la extensión
-                        data.resultado.ruta = data.resultado.ruta.replace(/\.xlsx$/i, '.pdf')
-                        data.resultado.ruta = data.resultado.ruta.replace(/^"|"$/g, '')
-                        data.resultado.ruta = data.resultado.ruta.replace(/\\/g, '/')
-                        data.resultado.ruta = data.resultado.ruta.replace("C:/xampp/htdocs", "http://" + dominio + ":" + puerto)
-                        /* let contenedor = document.getElementById('pdf-preview');
-                        let iframe = document.getElementById('pdf-frame');
-
-                        iframe.src = data.tesultado.ruta;
-                        contenedor.style.display = 'block'; */
-                        //window.open(data.resultado.ruta, '_blank');
-                        // Aquí puedes usar data.ruta si necesitas mostrarlo
-                        //$('#mdl-file-up').modal('hide');
                     }
 
                 } catch (e) {
@@ -1287,17 +1283,11 @@ pond.on('addfile', (error, fileItem) => {
     const viewer = document.getElementById('pdf-viewer');
     viewer.src = fileToOpen;
 
-    // Mostrar el modal
-    //$('#mdl-file-up').modal('show');
 });
 
-$('#mdl-file-up').on('shown.bs.modal', function () {
-    const viewer = document.getElementById('pdf-viewer');
-    viewer.src = fileToOpen;
-});
 
+//* Función para abrir el sidebar para la subida y visualización de resguardos
 async function abrir_control_sidebar() {
-    $('#select-usu-file').val(null).trigger('change');
 
     await general_select2({
         selectId: 'select-usu-file',
@@ -1307,18 +1297,30 @@ async function abrir_control_sidebar() {
         dropdownParent: '#control-sidebar',
         tags: false
     });
+
+    await general_select2({
+        selectId: 'select-ver-usu-file',
+        tabla: 'cat_usuarios',
+        campo: 'nombre',
+        placeholder: 'Seleccione un usuario',
+        dropdownParent: '#control-sidebar',
+        tags: false
+    });
+
+    col_subir_resguardos_firmados()
 }
 
+//* Función para subir el pdf desde el modal de visualización del archivo
 function subir_pdf() {
     $('#mdl-file-up').modal('hide');
     pond.processFile()
         .then(() => {
-            // Opcional: limpiar FilePond 
+            //* limpiar FilePond 
             pond.removeFile();
         })
         .catch(error => {
             console.error('Error al subir archivo:', error);
-            mostrar_toast("error", "Error",'Error al subir archivo. Inténtalo de nuevo.'+ error);
+            mostrar_toast("error", "Error", 'Error al subir archivo. Inténtalo de nuevo.' + error);
         });
 }
 
@@ -1327,9 +1329,9 @@ $('#select-usu-file').on('change', function () {
     const seleccionado = $(this).val();
 
     if (seleccionado !== '') {
-        pond.setOptions({disabled : false})
+        pond.setOptions({ disabled: false })
     } else {
-        pond.setOptions({disabled : true})
+        pond.setOptions({ disabled: true })
         $('#btn-ver-pdf').prop('disabled', true)
     }
 })
@@ -1340,12 +1342,151 @@ document.addEventListener('FilePond:addfile', (e) => {
 })
 
 //* Deshabilitando el boton de ver pdf cuando el archivo haya sido removido del filePond
-document.addEventListener('FilePond:removefile', (e) =>{
+document.addEventListener('FilePond:removefile', (e) => {
     $('#btn-ver-pdf').prop('disabled', true)
     $('#select-usu-file').val(null).trigger('change');
 })
 
+//* Abrir modal para visualizar el pdf en la aplicación
+function ver_pdf(ruta) {
+    if (ruta) {
+        //*Si el modal se abre desde descargar archivos
 
-function ver_pdf(){
-    $('#mdl-file-up').modal('show');
+        const viewer = document.getElementById('pdf-viewer');
+        viewer.src = ruta;
+
+        $('#mdl-btn-subir-pdf').css('display', 'none')
+        $('#mdl-file-up').modal('show');
+    }else{
+        //* Si el modal se abre desde subir archivos
+        $('#mdl-btn-subir-pdf').css('display', 'block')
+         $('#mdl-file-up').modal('show');
+    }
+   
 }
+
+//*mostrar formulario de descarga de archivos
+function col_ver_resguardos_firmados() {
+    $('#col-subir').hide()
+    $('#btn-col-subir').prop('disabled', false)
+    $('#btn-col-descargar').prop('disabled', true)
+    $('#select-ver-usu-file').val(null).trigger('change');
+    let contenedor = document.getElementById('lista-documentos');
+    contenedor.innerHTML = '';
+    pond.removeFile();
+    $('#col-descargar').show()
+}
+
+//*mostrar formulario de carga de archivos
+function col_subir_resguardos_firmados() {
+    $('#col-descargar').hide()
+    $('#btn-col-descargar').prop('disabled', false)
+    $('#btn-col-subir').prop('disabled', true)
+    $('#select-usu-file').val(null).trigger('change');
+    $('#col-subir').show()
+}
+
+//* consultar los documentos de ese usuario
+$('#select-ver-usu-file').on('change', async function () {
+
+    if ($(this).val() === "") {
+        return
+    }
+
+    dominio = window.location.hostname
+    puerto = location.port
+
+    model = {
+        accion: 8,
+        usuario: $("#select-ver-usu-file").val()
+    }
+
+    server = await server_inventario(model)
+
+    if (server.resultado.documentos) {
+        //console.log(server.resultado.documentos)
+
+        let documentos = server.resultado.documentos.map(rutaCompleta => {
+            // Extraer solo el nombre del archivo
+            let nombreArchivoCompleto = rutaCompleta.split('/').pop();
+
+            // Dividir nombre del archivo en partes (fecha, hora, resto)
+            let [fecha, hora] = nombreArchivoCompleto.split('_');
+            let nombreArchivo = nombreArchivoCompleto.split('_').slice(2).join('_');
+
+            return {
+                fecha,
+                hora,
+                nombreArchivo,
+                ruta: rutaCompleta
+            };
+        });
+
+
+
+        let contenedor = document.getElementById('lista-documentos');
+        contenedor.innerHTML = '';
+
+        documentos.forEach(doc => {
+            // doc.ruta es la ruta completa para href/download
+            // doc.fecha, doc.hora, doc.nombreArchivo son las partes separadas
+            let ruta = dominio + ':' + puerto + doc.ruta
+
+            fecha = doc.fecha
+            // Extraemos partes de la fecha
+            const anio = fecha.substring(0, 4);
+            const mes = fecha.substring(4, 6);
+            const dia = fecha.substring(6, 8);
+
+            const fechaFormateada = `${dia}-${mes}-${anio}`; // "14-07-2025"
+
+
+            const item = `
+            <div class="list-group-item">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img src="https://static.vecteezy.com/system/resources/previews/023/234/824/non_2x/pdf-icon-red-and-white-color-for-free-png.png" alt="Imagen descriptiva" style="max-width: 100%; height: 80px;">
+                        </div>
+                        <div class="col-md-8">
+                            <strong>${fechaFormateada}</strong>
+                            <span>Resguardo_${doc.fecha}_${doc.hora}</span>
+                            <br>
+                            <button  type="button" class="btn btn-lock btn-outline-dark icon" onclick="ver_pdf('http://${ruta}')"><i class="fa-solid fa-eye"></i> Ver</button>
+                        </div>
+                    </div>
+                </div>
+                                
+            </div>`;
+
+            contenedor.innerHTML += item;
+        });
+
+
+    } else if (server.resultado.mensaje) {
+        //console.log(server.resultado.mensaje)
+        let mensaje = server.resultado.mensaje
+
+        let contenedor = document.getElementById('lista-documentos');
+        contenedor.innerHTML = '';
+
+        const item = `
+            <div class="list-group-item">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col">
+                            <strong>El usuario no cuenta con resguardos subidos</strong>
+                        </div>
+                    </div>
+                </div>
+                                
+            </div>`;
+
+        contenedor.innerHTML += item;
+
+
+
+    } else {
+        mostrar_toast("error", "Error", 'Hubo un problema con el servidor')
+    }
+})

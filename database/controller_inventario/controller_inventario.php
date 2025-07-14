@@ -25,6 +25,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = traspaso($clientejson);
 } elseif ($clientejson->accion == 7) {
     $respuesta_servidor->resultado = cargar_resguardo_firmado($clientejson);
+}elseif ($clientejson->accion == 8){
+    $respuesta_servidor->resultado = consultar_resguardos_firmados($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -488,9 +490,10 @@ function traspaso($valores)
     }
 }
 
-function cargar_resguardo_firmado()
+function cargar_resguardo_firmado($valores)
 {
     $respuesta = new stdClass();
+
     if (isset($_FILES['resguardo']) && $_FILES['resguardo']['error'] === UPLOAD_ERR_OK) {
         $nombreOriginal = $_FILES['resguardo']['name'];
         $tmpPath = $_FILES['resguardo']['tmp_name'];
@@ -502,20 +505,62 @@ function cargar_resguardo_firmado()
             return $respuesta;
         }
 
-        // Generar nombre único para evitar colisiones
+        //* Generar nombre único para evitar colisiones
         $nuevoNombre = date('Ymd_His') . '_' . $nombreOriginal;
 
-        // Ruta destino, __DIR__ es carpeta donde está este script PHP
-        $destino = __DIR__ . '/' . $nuevoNombre;
+
+        //* Ruta de la carpeta
+        $ruta = __DIR__ . '/../../documentos/' . $valores->usuario;
+
+        //* Validando si el usuario ya tiene su carpeta o no
+        if (is_dir($ruta)) {
+            //* Ruta destino, __DIR__ es carpeta donde está este script PHP
+            $destino = $ruta . '/' . $nuevoNombre;
+        } else {
+            //* Creación de la carpeta
+            mkdir($ruta, 0777, true);
+
+            //* Ruta destino
+            $destino = $ruta . '/' . $nuevoNombre;
+        }
 
         if (move_uploaded_file($tmpPath, $destino)) {
             $respuesta->mensaje = "Archivo guardado correctamente";
-            $respuesta->ruta = 'C:\\xampp\\htdocs\\Inventario_TI\\database\\controller_inventario\\' . $nuevoNombre;
+            //$respuesta->ruta = 'C:\\xampp\\htdocs\\Inventario_TI\\database\\controller_inventario\\' . $nuevoNombre;
         } else {
             $respuesta->error = "No se pudo mover el archivo.";
         }
-    }else{
+    } else {
         $respuesta->error = "No se recibió ningún archivo válido.";
     }
+    return $respuesta;
+}
+
+function consultar_resguardos_firmados($valores)
+{
+    $respuesta = new stdClass();
+
+    $carpeta = __DIR__ . '/../../documentos/' . $valores->usuario;
+
+    $carpetaUrl ='/Inventario_TI/documentos'.'/'.$valores->usuario;
+
+    if (is_dir($carpeta)) {
+        $archivos = array_diff(scandir($carpeta), ['.', '..']);
+
+        $ruta = [];
+
+        foreach ($archivos as $archivo) {
+            $ruta[] = $carpetaUrl . '/' . $archivo;
+        }
+        // array_reverse($ruta);
+        if (!empty($ruta)) {
+            $respuesta->documentos = $ruta;
+        } else {
+            $respuesta->mensaje = "El usuario no tiene resguardos subidos";
+        }
+    }else{
+        $respuesta->mensaje = "El usuario no tiene resguardos subidos";
+    }
+
     return $respuesta;
 }
