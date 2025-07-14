@@ -46,27 +46,6 @@ function server_excel(model) {
     });
 }
 
-function server_word(model) {
-    return new Promise((resolve, reject) => {
-        $.ajax({
-            type: "POST",
-            url: "database/controller_word/controller_word.php",
-            data: {
-                trama: JSON.stringify(model)
-            },
-            success: function (response) {
-                try {
-                    resolve(JSON.parse(response))
-                    //console.log(resolve(JSON.parse(response)))
-                    respuesta = response
-                } catch (error) {
-                    reject(error)
-                }
-            }
-        })
-    });
-}
-
 window.addEventListener('load', function () {
     // Leemos el mensaje del registro desde localStorage
     const mensajeRegistro = sessionStorage.getItem('bienvenido');
@@ -214,6 +193,7 @@ async function consultar_informacion() {
             ],
 
         });
+        // console.log(datos)
 
     } catch (error) {
         console.log(error)
@@ -225,6 +205,8 @@ async function consultar_informacion() {
         })
     });
 }
+
+
 
 let selecreg = ""; // No limpiar la variable
 
@@ -829,21 +811,22 @@ async function imprimir_pdf() {
 }
 
 //TODO: Validación de funciones
-$(document).ready(function () {
-    $('#smartwizard').smartWizard({
-        theme: 'dots',
-        autoAdjustHeight: true,
-        toolbarSettings: {
-            toolbarPosition: 'bottom',
-            showNextButton: true,
-            showPreviousButton: true,
-        }
-    });
-});
 
+let evento = false;
 async function confirmar_eliminacion() {
+
+    let data = datos.filter(el => equipo_seleccionado.includes(el.id_equipo));
     if (equipo_seleccionado.length === 0) {
         mostrar_toast('info', 'Información', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
+        return;
+    }
+
+    let estado = data.some(item => item.estatus === 'Asignado')
+    console.log(estado)
+    if (estado) {
+        mostrar_toast('warning', 'Alerta', 'Uno o más activos se encuentran asignados. Inténtalo nuevamente.');
+        return;
+
     } else {
 
         let opcion = [
@@ -859,143 +842,133 @@ async function confirmar_eliminacion() {
             selectId: 'slc-motivo',
             data: opcion,
             placeholder: 'Selecione un motivo',
-            dropdownParent: '#mdl-baja',
+            dropdownParent: '#step-1',
             // popoverTitle: 'Descripción',
             // popoverContent: 'Causa por la cual no se encuentre en condiciones óptimas para su uso y/o aprovechamiento.',
             // placement: "right",
 
         })
+
+        await general_select2({
+            selectId: 'slc-emisor',
+            tabla: 'cat_usuarios',
+            campo: 'nombre',
+            dropdownParent: '#step-3',
+        })
+
+        await general_select2({
+            selectId: 'slc-supervisor',
+            tabla: 'supervisor',
+            campo: 'nombre',
+            dropdownParent: '#step-3',
+        })
+
+        await general_select2({
+            selectId: 'slc-vobo',
+            tabla: 'cat_usuarios',
+            campo: 'nombre',
+            placeholder: 'Seleccione un usuario',
+            dropdownParent: '#step-3',
+        })
+
+        await general_select2({
+            selectId: 'slc-autorizo',
+            tabla: 'cat_usuarios',
+            campo: 'nombre',
+            placeholder: 'Seleccione un usuario',
+            dropdownParent: '#step-3',
+        })
+
         // console.log(opcion)
         $('#sh-motivo').hide();
         $('#sh-monto, #sh-quincena').hide();
+        $('#sh-reubicacion').hide();
 
-        let data = datos.filter(el => equipo_seleccionado.includes(el.id_equipo));
+        $('#smartwizard').smartWizard("reset");
+        $('#smartwizard').smartWizard({
+            theme: 'dots',
+            autoAdjustHeight: true,
+            selected: 0,
+            toolbarSettings: {
+                toolbarPosition: 'top',
+                showNextButton: true,
+                showPreviousButton: true,
+            },
+            keyboard: {
+                keyNavigation: true,
+                keyLeft: [37],
+                keyRight: [39]
+            },
+            lang: {
+                next: 'Siguiente',
+                previous: 'Anterior'
+            }
+        });
+
+        $('#mdl-baja').modal("show");
 
         let tbl_baja
 
-        $('#slc-motivo').on('change', function () {
-            let motivo_seleccionado = $(this).val();
+        if (!evento) {
+            evento = true
+            $('#slc-motivo').on('change', function () {
+                let motivo_seleccionado = $(this).val();
 
-            if (motivo_seleccionado === '5') {
-                $('#sh-motivo').show();
-            } else {
-                $('#sh-motivo').hide();
-            }
-            if (motivo_seleccionado === '3') {
-                $('#sh-monto, #sh-quincena').show();
-            } else {
-                $('#sh-monto, #sh-quincena').hide();
-            }
-
-            if (!motivo_seleccionado) {
-                if (tbl_baja) tbl_baja.clearData();
-                return;
-            }
-
-            let data_motivo = data.map(item => ({ ...item, motivo_baja_id: motivo_seleccionado }));
-
-            if (!tbl_baja) {
-                tbl_baja = new Tabulator('#tbl-baja', {
-                    height: "350px",
-                    data: data_motivo,
-                    columns: [
-                        { title: "ITEM", formatter: "rownum", hozAlign: "center" },
-                        { title: "TIPO", field: "motivo_baja_id", hozAlign: "center" },
-                        {
-                            title: "DESCRIPCIÓN",
-                            formatter: function (cell) {
-                                let d = cell.getData();
-                                return `${d.tipo || ''} Marca ${d.marca || ''} Serie ${d.num_serie || ''} Modelo ${d.modelo || ''}`;
-                            }
-                        },
-                        { title: "LOTE", field: "lote" },
-                        { title: "ÁREA", field: "ubicacion" },
-                        { title: "ACTIVO FIJO", field: "af" },
-                    ]
-                });
-            } else {
-                // Actualizar datos si ya existe tabla
-                tbl_baja.setData(data_motivo);
-            }
-
-        })
+                if (motivo_seleccionado === '5') {
+                    $('#sh-motivo').show();
+                } else {
+                    $('#sh-motivo').hide();
+                }
+                if (motivo_seleccionado === '3') {
+                    $('#sh-monto, #sh-quincena').show();
+                } else {
+                    $('#sh-monto, #sh-quincena').hide();
+                }
+                if (motivo_seleccionado === '6') {
+                    $('#sh-reubicacion').show();
+                } else {
+                    $('#sh-reubicacion').hide();
+                }
 
 
+                if (!motivo_seleccionado) {
+                    if (tbl_baja) tbl_baja.clearData();
+                    return;
+                }
 
-        /* const motivo_id = $('#slc-motivo').val();
+                let data_motivo = data.map(item => ({ ...item, motivo_baja_id: motivo_seleccionado }));
 
-        motivo_id.forEach(item => {
-            item.opciones = motivo_id;
-        });
+                if (!tbl_baja) {
+                    tbl_baja = new Tabulator('#tbl-baja', {
+                        height: "300px",
+                        data: data_motivo,
+                        columns: [
+                            { title: "ITEM", formatter: "rownum", hozAlign: "center" },
+                            { title: "TIPO", field: "motivo_baja_id", hozAlign: "center" },
+                            {
+                                title: "DESCRIPCIÓN", hozAlign: "center",
+                                formatter: function (cell) {
+                                    let d = cell.getData();
+                                    return `${d.tipo || ''} Marca ${d.marca || ''} Serie ${d.num_serie || ''} Modelo ${d.modelo || ''}`;
+                                }
+                            },
+                            { title: "LOTE", field: "lote", hozAlign: "center", },
+                            { title: "ÁREA", field: "ubicacion", hozAlign: "center", },
+                            { title: "ACTIVO FIJO", field: "af", hozAlign: "center", },
+                        ]
+                    });
+                } else {
+                    // Actualizar datos si ya existe tabla
+                    tbl_baja.setData(data_motivo);
+                }
 
-        var tbl_baja = new Tabulator('#tbl-baja', {
-            height: "800px",
-            data: data,
-            columns: [
-                { title: "ITEM", field: "rownum", hozAlign: "center" },
-                { title: "TIPO", field: "tipo" },
-                {
-                    title: "DESCRIPCIÓN", formatter: function (cell) {
-                        let data = cell.getData();
-                        return `${data.tipo || ''} Marca ${data.marca || ''} Serie ${data.num_serie || ''} Modelo ${data.modelo || ''}`;
-                    }
-                },
-                { title: "LOTE", field: "" },
-                // { title: "ÁREA", formatter: () => "TI", hozAlign: "center"},
-                { title: "ÁREA", field: "ubicacion" },
-                { title: "ACTIVO FIJO", field: "af" },
-            ]
-        }); */
-
-
-
-
-        $("#mdl-baja").modal("show");
-
-
-        /*  let data = []
-         //let data = datos.filter(element => seleccionar.includes(element.id_equipo));
-         for (let i = 0; i < datos.length; i++) {
-             const element = datos[i];
-             if (equipo_seleccionado.includes(element.id_equipo)) {
-                 data.push(element);
-                 //break;
-             }
-         }
-         console.log(data)
-         var tblEliminar = new Tabulator("#tbl-mdl-eliminar", {
-             height: "311px",
-             data: data,
-             columns: [
-                 { title: "Rubro", field: "rubro", headerHozAlign: "center", headerSort: false },
-                 { title: "Tipo de dispositivo", field: "tipo", width: 150, sorter: "number", hozAlign: "left", editor: "input", editor: true, validator: ["min:0", "max:100", "numeric"] },
-                 { title: "Marca", field: "marca", width: 150, editor: "input", validator: ["required", "in:male|female"] },
-                 { title: "Modelo", field: "modelo", width: 150, editor: "input", hozAlign: "center", width: 100, editor: "input", validator: ["min:0", "max:5", "integer"] },
-                 { title: "Número de serie", field: "num_serie", width: 150, editor: "input", validator: ["minLength:3", "maxLength:10", "string"] },
-                 { title: "TAG", field: "tag", width: 150, editor: "input", validator: "required" },
-                 { title: "IMEI", field: "imei", width: 150, editor: "input", validator: "required" },
-                 { title: "Linea", field: "linea", width: 150, editor: "input", validator: "required" },
-                 { title: "Usuario", field: "usuario", width: 150, editor: "input", validator: "required" },
-                 { title: "Cargo del usuario", field: "posicion", width: 150, editor: "input", validator: "required" },
-                 { title: "Estatus", field: "estatus", width: 150, editor: "input", validator: "required" },
-                 { title: "Observaciones", width: 150, editor: "input", validator: "required", frozen: true },
-             ],
-         });
- 
-         //handle validation failure
-         table.on("validationFailed", function (cell, value, validators) {
-             //cell - cell component for the edited cell
-             //value - the value that failed validation
-             //validatiors - an datos of validator objects that failed
- 
-             //take action on validation fail
-         });
-         $("#mdl-eliminar").modal("show"); */
-
+            })
+        }
     }
 
     // mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, desactivar_registro)
 }
+
 
 //TODO Funciones de los Select2
 

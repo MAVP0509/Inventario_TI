@@ -484,8 +484,9 @@
                         <div id="smartwizard" class="sw-theme-dots">
                             <ul class="nav">
                                 <li><a class="nav-link" href="#step-1">Paso 1<br /><small>Motivo</small></a></li>
-                                <li><a class="nav-link" href="#step-2">Paso 2<br /><small>Montos</small></a></li>
-                                <li><a class="nav-link" href="#step-3">Paso 3<br /><small>Tabla</small></a></li>
+                                <li><a class="nav-link" href="#step-2">Paso 2<br /><small>Observaciones</small></a></li>
+                                <li><a class="nav-link" href="#step-3">Paso 3<br /><small>Encargados</small></a></li>
+                                <li><a class="nav-link" href="#step-4">Paso 4<br /><small>Tabla</small></a></li>
                             </ul>
 
                             <div class="tab-content">
@@ -496,15 +497,29 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fa-solid fa-list-ul"></i></span>
                                         </div>
-                                        <select class="form-control" id="slc-motivo"></select>
+                                        <select class="form-control" id="slc-motivo" style="z-index: 2000;"> </select>
                                     </div>
-                                    <div class="input-group mb-3" id="sh-motivo">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i
-                                                    class="fa-solid fa-clipboard-question"></i></span>
+                                    <div id="sh-motivo">
+                                        <h6>Otro motivo de baja</h6>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i
+                                                        class="fa-solid fa-clipboard-question"></i></span>
+                                            </div>
+                                            <input type="text" class="form-control" id="inp-motivo"
+                                                placeholder="Especifique el motivo de baja">
                                         </div>
-                                        <input type="text" class="form-control" id="inp-motivo"
-                                            placeholder="Especifique el motivo de baja">
+                                    </div>
+                                    <div id="sh-reubicacion">
+                                        <h6>Nueva ubicación</h6>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text"><i
+                                                        class="fa-solid fa-clipboard-question"></i></span>
+                                            </div>
+                                            <input type="text" class="form-control" id="inp-reubicacion"
+                                                placeholder="Especifique la nueva ubicación del activo">
+                                        </div>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6" id="sh-monto">
@@ -534,88 +549,79 @@
 
                                 <!-- Paso 2 -->
                                 <div id="step-2" class="tab-pane" role="tabpanel">
-
+                                    <h6>Observaciones de activos</h6>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i
+                                                    class="fa-solid fa-clipboard-question"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control" id="inp-observaciones"
+                                            placeholder="Observaciones de activos">
+                                    </div>
                                 </div>
-
                                 <!-- Paso 3 -->
                                 <div id="step-3" class="tab-pane" role="tabpanel">
-                                    <div id="tbl-baja">
-                                        <!-- Aquí puedes insertar tu tabla o contenido final -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- <div class="row">
-                            <div class="col-md-12">
-                                <h6>Motivo de baja</h6>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fa-solid fa-list-ul"></i></span>
-                                    </div>
-                                    <select class="form-control" id="slc-motivo"></select>
-                                </div>
-                                <div class="input-group mb-3" id="sh-motivo">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i
-                                                class="fa-solid fa-clipboard-question"></i></span>
-                                    </div>
-                                    <input type="text" class="form-control" id="inp-motivo"
-                                        placeholder="Especifique el motivo de baja">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div id="sh-monto">
-                                    <h6>Monto a descontar</h6>
-                                    <div class="input-group mb-3">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i
-                                                    class="fa-solid fa-clipboard-question"></i></span>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Emitió</h6>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i
+                                                            class="fa-solid fa-person-circle-plus"></i></span>
+                                                </div>
+                                                <select id="slc-emisor"></select>
+                                            </div>
                                         </div>
-                                        <input type="text" class="form-control" id="inp-monto"
-                                            placeholder="Especifique el monto a descontar">
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div class="col-md-6">
-                                <div id="sh-quincena">
-                                    <h6>Número de quincenas</h6>
-                                    <div class="input-group mb-3">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text"><i
-                                                    class="fa-solid fa-clipboard-question"></i></span>
+                                        <div class="col-md-6">
+                                            <h6>Superviso</h6>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i
+                                                            class="fa-solid fa-person-circle-exclamation"></i></span>
+                                                </div>
+                                                <select id="slc-supervisor"></select>
+                                            </div>
                                         </div>
-                                        <input type="text" class="form-control" id="inp-quincena"
-                                            placeholder="Especifique el número de quincenas a descontar">
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h6>Visto Bueno</h6>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i
+                                                            class="fa-solid fa-person-chalkboard"></i></span>
+                                                </div>
+                                                <select id="slc-vobo"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6>Autorizo</h6>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i
+                                                            class="fa-solid fa-person-circle-check"></i></span>
+                                                </div>
+                                                <select id="slc-autorizo"></select>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-
+                                <!-- Paso 4 -->
+                                <div id="step-4" class="tab-pane" role="tabpanel">
+                                    <div id="tbl-baja"></div>
+                                </div>
                             </div>
-                            <div id="tbl-baja"></div>
 
                         </div>
-                        <div id="smartwizard" class="sw-theme-dots">
-                            <ul class="nav">
-                                <li><a class="nav-link" href="#step-1"><span class="step-icon">Paso 1</span>Motivo de baja</a></li>
-                                <li><a class="nav-link" href="#step-2">Paso 2</a></li>
-                                <li><a class="nav-link" href="#step-3">Paso 3</a></li>
-                            </ul>
-
-                            <div class="tab-content">
-                                <div id="step-1" class="tab-pane">Contenido del paso 1</div>
-                                <div id="step-2" class="tab-pane">Contenido del paso 2</div>
-                                <div id="step-3" class="tab-pane">Contenido del paso 3</div>
-                            </div>
-
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
-                            </div>
-                        </div> -->
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="modal-btn-his"><i
-                            class="fa-solid fa-arrow-right-from-bracket fa-lg"></i> Cancelar</button>
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="modal-btn-his">Cancelar
+                        <i class="fa-solid fa-arrow-right-from-bracket fa-lg"></i>
+                    </button>
+                    <button type="button" class="btn btn-success icon" id="conf-baja">Confirmar
+                        <i class="fa-solid fa-circle-check fa-lg"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -728,33 +734,6 @@
                         Cerrar <i class="fa-solid fa-arrow-right-from-bracket fa-lg"></i>
                     </button>
                     <button type="button" class="btn btn-success icon" onclick="traspasos()">
-                        Guardar <i class="fa-solid fa-floppy-disk fa-lg"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal eliminar -->
-    <div class="modal fade" id="mdl-eliminar" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Bajas de activos</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div id="tbl-mdl-eliminar"></div>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger icon" data-dismiss="modal">
-                        Cerrar <i class="fa-solid fa-arrow-right-from-bracket fa-lg"></i>
-                    </button>
-                    <button type="button" class="btn btn-success icon"
-                        onclick="mostrar_alert('warning', `¿Está seguro de eliminar ${seleccionar.length} activos(s)?`, false, desactivar_registro)">
                         Guardar <i class="fa-solid fa-floppy-disk fa-lg"></i>
                     </button>
                 </div>

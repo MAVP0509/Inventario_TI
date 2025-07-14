@@ -23,6 +23,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = resguardo($clientejson);
 } elseif ($clientejson->accion == 1) {
     $respuesta_servidor->resultado = cargar_plantilla($clientejson);
+} elseif ($clientejson->accion == 2) {
+    $respuesta_servidor->resultado == bajas($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -267,4 +269,51 @@ function cargar_plantilla()
     exportar_pdf($excelFilePath);
     //var_dump($excelFilePath);
     return $respuesta;
+}
+
+function bajas($valores){
+    $datos = $valores->datos;
+    
+    $spreadsheet = IOFactory::load('Baja FO-DSP BAJA.xlsx');
+    $worksheet = $spreadsheet->getActiveSheet();
+
+    $pageSetup = $worksheet->getPageSetup();
+    $pageSetup->setOrientation(PageSetup::ORIENTATION_PORTRAIT);
+    $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LETTER);
+    $pageSetup->setFitToPage(true);
+    $pageSetup->setFitToWidth(1);
+    $pageSetup->setFitToHeight(0);
+
+    $pageMargins = $worksheet->getPageMargins();
+    $pageMargins->setTop(0.5);
+    $pageMargins->setBottom(0.5);
+    $pageMargins->setLeft(0.5);
+    $pageMargins->setRight(0.5);
+
+    $fila = 15;
+    $fila_ini = 17;
+
+    foreach ($datos as $item) {
+        $worksheet->insertNewRowBefore($fila, 1);
+
+        $worksheet->mergeCells("D$fila:H$fila");
+
+        $worksheet->duplicateStyle($worksheet->getStyle("B15:K15"), "B$fila:K$fila");
+
+        $worksheet->getStyle("B$fila:K$fila")->getAlignment()->setWrapText(true);
+        $worksheet->getRowDimension($fila)->setRowHeight(-1);
+
+        $worksheet->getStyle("B$fila:K$fila")->getFont()->setBold(false);
+
+        $worksheet->setCellValue("B$fila", $item->con);
+        $worksheet->setCellValue("C$fila", $item->tipo);
+        $worksheet->setCellValue("D$fila", $item->descripcion);
+        $worksheet->setCellValue("I$fila", $item->lote);
+        $worksheet->setCellValue("J$fila", $item->area);
+        $worksheet->setCellValue("K$fila", $item->af);
+
+        $fila++;
+
+        
+    }
 }
