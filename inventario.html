@@ -136,7 +136,7 @@
 
         </div>
         <aside class="control-sidebar control-sidebar-light" id="control-sidebar" style="width: 400px !important;">
-            <div class="p-3 control-sidebar-content">
+            <div class="p-3 control-sidebar-content d-flex flex-column h-100 overflow-hidden">
                 <h4><i class="fa-solid fa-file-invoice"></i> Resguardos firmados</h4>
                 <div class=" d-flex justify-content-center gap-2 mt-3">
                     <button type="button" class="btn btn-lock btn-outline-dark icon mr-3 w-100" onclick="col_subir_resguardos_firmados()"
@@ -162,7 +162,7 @@
                             <button type="button" class="btn btn-lock btn-outline-dark icon" onclick="ver_pdf()"
                                 id="btn-ver-pdf" disabled><i class="fa-solid fa-eye"></i> Ver</button>
                         </div>
-                        <div class="col" style="display: none;" id="col-descargar">
+                        <div class="col " style="display: none;" id="col-descargar">
                             <h5><i class="fa-solid fa-file-arrow-down"></i> Descargar</h5>
                             <div class="input-group mb-3">
                                 <div class="input-group-prepend">
@@ -171,7 +171,7 @@
                                 <select class="form-control select" id="select-ver-usu-file" name="inp-resg"></select>
                                 <div class="invalid-feedback">Por favor, seleccione un usuario.</div>
                             </div>
-                            <div id="lista-documentos" class="list-group mt-3"></div>
+                            <div id="lista-documentos" class="list-group mt-3 overflow-auto flex-grow-1" style="max-height: 60vh;"></div>
 
                         </div>
                     </div>

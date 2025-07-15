@@ -10,12 +10,13 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
         integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
     <link rel="stylesheet" href="libraries/fontawesome-free-6.7.2-web/css/all.min.css">
+    <link rel="stylesheet" href="css/login.css">
 
 
     <title>Inventario TI</title>
 </head>
 
-<body class="container-fluid d-flex justify-content-center align-items-center vh-100">
+<body>
     <!-- <style>
         body.swal2-height-auto {
             height: 100% !important
@@ -24,13 +25,13 @@
 
     <div class="row">
         <!--Col de Iniciar sesión-->
-        <div class="col" style="display: block;" id="colblock">
-            <div class="card text-center" style="width: 50vh;">
+        <div class=" fade-column show"  id="colblock">
+            <div class="card text-center" style="width: min(90vw, 400px);">
                 <div class="card-body" id="form-login">
                     <h5>Iniciar sesión</h5><br>
                     <!--Logotipo del usuario-->
                     <!-- <i class="fa-solid fa-circle-user fa-5x"></i><br><br> -->
-                     <img src="images/diavaz.jfif" alt="Logo de la empresa" width="150"><br><br>
+                     <img src="images/diavaz.jfif" alt="Logo de la empresa" width="150" style="border-radius: 15px;"><br><br>
                     <!--Input del correo-->
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
@@ -48,9 +49,9 @@
                         </div>
                         <input type="password" class="form-control" id="logcontraseña" placeholder="Contraseña" name="inputInit">
                     </div>
-                    <span id="caps-lock-msg" style="display: none;"><i class="fa-solid fa-triangle-exclamation fa-shake fa-lg"></i> Bloq Mayús está activado</span><br><br>
+                    <span id="caps-lock-msg" style="display: none;"><i class="fa-solid fa-triangle-exclamation fa-shake fa-lg"></i> Bloq Mayús está activado</span><br>
 
-                    <a clas="form-sublink" href="#" onclick="toggleForms(false, true)">¿Olvidaste tu contraseña?</a><br>
+                    <a class="form-sublink" href="#" onclick="toggleForms(false, true)">¿Olvidaste tu contraseña?</a><br>
                     <br><button class="btn btn-primary icon" id="btn-ini" onclick="validar_ingreso()">Iniciar sesión <i
                             class="fa-solid fa-circle-chevron-up fa-lg"></i></button><br>
                     <br>
@@ -61,11 +62,11 @@
         </div>
 
         <!--Col de registro de usuario-->
-        <div class="col" style="display: none;" id="colnone">
-            <div class="card text-center" style="width: 50vh;">
+        <div class=" fade-column"  id="colnone">
+            <div class="card text-center" style="width: min(90vw, 400px);">
                 <div class="card-body">
                     <h5>Crear una cuenta</h5>
-                    <i class="fa-solid fa-circle-user fa-5x"></i><br><br>
+                    <!-- <img src="images/diavaz.jfif" alt="Logo de la empresa" width="70" style="border-radius: 15px;"><br><br> -->
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
@@ -133,11 +134,11 @@
         </div>
 
         <!--Col de recuperación de contraseña-->
-        <div class="col" style="display: none;" id="colrep">
-            <div class="card text-center" style="width: 50vh;">
+        <div class=" fade-column"  id="colrep">
+            <div class="card text-center" style="width: min(90vw, 400px);">
                 <div class="card-body">
                     <h5>Recupera tu cuenta</h5>
-                    <i class="fa-solid fa-circle-user fa-5x"></i><br><br>
+                    <img src="images/diavaz.jfif" alt="Logo de la empresa" width="150" style="border-radius: 15px;"><br><br>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-sharp fa-solid fa-at"></i></span>
@@ -160,31 +161,6 @@
             </div>
         </div>
 
-        <!--Col de reseteo de contraseña-->
-        <!--div class="col" style="display: none;" id="col-reset">
-                    <div class="card text-center" style="width: 50vh;" id="form-resetPass" >
-                        <div class="card-body">
-                            <h5>Resestablece tu contraseña</h5>
-                            <i class="fa-solid fa-user-secret fa-5x"></i><br><br>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                                </div>
-                                <input type="password" class="form-control" id="respass" placeholder="Nueva contraseña" name="inputReset">
-                            </div>
-                            <div class="input-group mb-3">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
-                                </div>
-                                <input type="password" class="form-control" id="conf-respass" placeholder="Confirmar contraseña" name="inputReset">
-                            </div>
-                            <div class="form-group">
-                                <button type="button" class="btn btn-primary" onclick="confirmarReset()">Confirmar</button>
-                            </div>
-                        </div>
-                    </div>        
-
-                </div-->
     </div><!--Termina la "row"-->
 
 

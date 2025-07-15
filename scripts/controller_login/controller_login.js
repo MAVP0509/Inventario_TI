@@ -353,7 +353,7 @@ document.addEventListener('keyup', (e) => {
 
 
 //TODO Función para navegar entre formularios del login
-async function toggleForms(showRegister = false, showRecovery = false) {
+/* async function toggleForms(showRegister = false, showRecovery = false) {
     if (showRecovery) {
         $("#colrep").show(); //Muetsra el formulario de recuperación
         $("#colnone").hide(); //Oculta el formulario de inicio de sesión
@@ -367,10 +367,41 @@ async function toggleForms(showRegister = false, showRecovery = false) {
         $("#colblock").show(); //Muestra el formulario de inicio de sesión
         $("#colrep").hide(); //Oculta la sección de recuperación
     }
+} */
+
+
+function toggleForms(showRegister = false, showRecovery = false) {
+    const login = document.getElementById("colblock");
+    const register = document.getElementById("colnone");
+    const recover = document.getElementById("colrep");
+
+    const allForms = [login, register, recover];
+    let elToShow = login;
+    if (showRecovery) elToShow = recover;
+    else if (showRegister) elToShow = register;
+
+    // Oculta todos excepto el que vamos a mostrar
+    allForms.forEach(el => {
+        if (el !== elToShow) {
+            el.classList.remove("show");
+            // Espera a que termine la transición antes de ocultar
+            setTimeout(() => el.classList.add("hidden"), 400);
+        }
+    });
+
+    // Mostrar el nuevo formulario
+    // Primero quitar hidden, luego activar la animación con show
+    elToShow.classList.remove("hidden");
+    // Permitir que el navegador registre el cambio antes de agregar .show
+    setTimeout(() => elToShow.classList.add("show"), 20);
 }
+
+
+
 
 //TODO Función para llamar las funciones de validación y ver las contraseñas
 $(document).ready(function () {
+    console.log("Inicializando popover...");
     $('[data-toggle="popover"]').popover();
 
     // Añadimos el evento input al campo de confirmación de contraseña

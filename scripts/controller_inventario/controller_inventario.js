@@ -1,4 +1,5 @@
 let respuesta
+let loading = false
 
 function server_inventario(model) {
     return new Promise((resolve, reject) => {
@@ -12,6 +13,11 @@ function server_inventario(model) {
                 //console.log(response);
                 try {
                     resolve(JSON.parse(response))
+                    if (loading){
+                        Swal.close()
+                        loading = !loading
+                    }
+                   
                     console.log(resolve(JSON.parse(response)))
                     respuesta = response
                 } catch (error) {
@@ -23,7 +29,7 @@ function server_inventario(model) {
     });
 }
 
-function server_excel(model) {
+/* function server_excel(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
@@ -34,7 +40,7 @@ function server_excel(model) {
             success: function (response) {
                 try {
                     resolve(JSON.parse(response))
-                    Swal.close()
+                    
                     //console.log(resolve(JSON.parse(response)))
                     respuesta = response
                 } catch (error) {
@@ -43,7 +49,7 @@ function server_excel(model) {
             }
         })
     });
-}
+} */
 
 window.addEventListener('load', function () {
     // Leemos el mensaje del registro desde localStorage
@@ -52,6 +58,7 @@ window.addEventListener('load', function () {
     if (mensajeRegistro) {
         // Si el mensaje existe, mostramos el toast
         mostrar_toast('success', 'Bienvenido', mensajeRegistro);
+        console.log('Mensaje encontrado:', mensajeRegistro);
 
         // Eliminamos el mensaje para evitar que aparezca nuevamente
         sessionStorage.removeItem('bienvenido');
@@ -1043,7 +1050,7 @@ $(document).ready(function () {
     });
 });
 
-let infoResguardo
+//let infoResguardo
 async function crear_resguardo() {
 
     const validacion = [
@@ -1072,45 +1079,43 @@ async function crear_resguardo() {
         userPemexCargo: $('#inp-cargo-pemex').val(),
         cel: celSelected ? 1 : 0
     }
+    loading  = true
+    mostrar_toast_cargando()
     let server = await server_inventario(model)
 
     if (server.resultado.error) {
         mostrar_toast('warning', 'Aviso', server.resultado.error)
     } else {
-        infoResguardo = server.resultado.datos
-        consultar_informacion();
-
-
         $("#mdl-res").modal('hide')
-        mostrar_toast_cargando()
-        descargar_excel()
+        abrir_resguardo(server.resultado)
+        consultar_informacion();
     }
 
 
 }
 
-async function descargar_excel(params) {
+function abrir_resguardo(datos) {
     dominio = window.location.hostname,
         puerto = location.port
-    let model = {
+    /* let model = {
         accion: 0,
         datos: infoResguardo
     }
-    let server = await server_excel(model)
+    let server = await server_excel(model) */
 
-    let ruta = JSON.parse(respuesta)
+    let ruta = datos.resultado
     // Elimina comillas si vienen así: '"C:\\ruta\\archivo.xlsx"'
-    ruta.resultado = ruta.resultado.replace(/^"|"$/g, '');
+    ruta = ruta.replace(/^"|"$/g, '');
 
     // Reemplaza las \ por /
-    ruta.resultado = ruta.resultado.replace(/\\/g, '/');
+    ruta = ruta.replace(/\\/g, '/');
 
     // Cambia la extensión
-    ruta.resultado = ruta.resultado.replace(/\.xlsx$/i, '.pdf');
+    ruta = ruta.replace(/\.xlsx$/i, '.pdf');
 
-    ruta.resultado = ruta.resultado.replace("C:/xampp/htdocs", "http://" + dominio + ":" + puerto)
+    ruta = ruta.replace("C:/xampp/htdocs", "http://" + dominio + ":" + puerto)
     // console.log(ruta.resultado)
-    window.open(ruta.resultado, '_blank');
+    window.open(ruta, '_blank');
 }
 
 function mostrar_toast_cargando() {

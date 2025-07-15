@@ -30,8 +30,7 @@ print(json_encode($respuesta_servidor));
 //* Función para generación de resguardos
 function resguardo($valores)
 {
-    // $className = \PhpOffice\PhpSpreadsheet\Writer\Pdf\Dompdf::class;
-    // IOFactory::registerWriter('Pdf', $className);
+    
 
     //todo Desglosamos la información recibida del JS
     //* Array de los equipos del usuario seleccionado

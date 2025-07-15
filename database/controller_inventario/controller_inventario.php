@@ -25,7 +25,7 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = traspaso($clientejson);
 } elseif ($clientejson->accion == 7) {
     $respuesta_servidor->resultado = cargar_resguardo_firmado($clientejson);
-}elseif ($clientejson->accion == 8){
+} elseif ($clientejson->accion == 8) {
     $respuesta_servidor->resultado = consultar_resguardos_firmados($clientejson);
 }
 
@@ -334,6 +334,10 @@ function consultar_para_resguardo($valores)
             }
         }
     }
+    if (empty($datos)) {
+        $respuesta->error = "El usuario no tiene celulares asignados";
+        return $respuesta;
+    }
     mysqli_free_result($query);
     mysqli_next_result($con);
 
@@ -367,8 +371,26 @@ function consultar_para_resguardo($valores)
     $sql_fecha_update = "UPDATE inventario_ti_sur SET fecha_entrega = '$valores->fecha' where fk_usuario = '$valores->usuario'";
     mysqli_query($con, $sql_fecha_update);
 
-    $respuesta->datos = $datos;
-    return $respuesta;
+    //$respuesta->datos = $datos;
+    //return $respuesta;
+
+    // 👉 Enviar a segundo PHP con cURL
+    $datos_para_envio = new stdClass();
+    $datos_para_envio->accion = 0;
+    $datos_para_envio->datos = $datos;
+
+    $ch = curl_init('http://localhost/Inventario_TI/database/controller_excel/controller_excel.php'); // Reemplaza con tu URL real
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, [
+        'trama' => json_encode($datos_para_envio)
+    ]);
+
+    $respuesta_raw = curl_exec($ch);
+    curl_close($ch);
+
+    // Retornar al frontend lo que devuelva el segundo PHP
+    return json_decode($respuesta_raw);
 }
 
 function consultar_distintos($tabla, $campo)
@@ -542,7 +564,7 @@ function consultar_resguardos_firmados($valores)
 
     $carpeta = __DIR__ . '/../../documentos/' . $valores->usuario;
 
-    $carpetaUrl ='/Inventario_TI/documentos'.'/'.$valores->usuario;
+    $carpetaUrl = '/Inventario_TI/documentos' . '/' . $valores->usuario;
 
     if (is_dir($carpeta)) {
         $archivos = array_diff(scandir($carpeta), ['.', '..']);
@@ -558,7 +580,7 @@ function consultar_resguardos_firmados($valores)
         } else {
             $respuesta->mensaje = "El usuario no tiene resguardos subidos";
         }
-    }else{
+    } else {
         $respuesta->mensaje = "El usuario no tiene resguardos subidos";
     }
 

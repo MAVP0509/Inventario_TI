@@ -1,0 +1,98 @@
+html,
+body {
+    overflow: hidden;
+    height: 100%;
+}
+
+body {
+    background-image: url('../images/fondo-login-4.jfif');
+    /* ruta a tu imagen */
+    background-size: cover;
+    /* hace que la imagen cubra todo */
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+    /* hace que se quede fijo al hacer scroll */
+
+    height: 100%;
+    margin: 0;
+}
+
+.card {
+    background-color: rgba(255, 255, 255, 0.1);
+    /* blanco semitransparente */
+    backdrop-filter: blur(3px);
+    /* efecto difuminado detrás */
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+
+
+
+    padding: 30px;
+
+    max-height: 100%;
+    /* overflow-y: auto; */
+
+    width: min(90vw, 400px); /* Ancho responsivo */
+    margin: 0 auto;
+}
+
+
+
+.row {
+    height: 100vh;
+    /* ocupa toda la pantalla */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.fade-column {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    pointer-events: none;
+    z-index: 1;
+
+
+
+    width: auto;
+    max-width: 90vw;
+    /* opcional para responsividad */
+    box-sizing: border-box;
+
+
+    max-width: 90vw;
+    max-height: 90vh;
+    /* overflow-y: auto; */
+    overflow: visible !important; /* evita recorte del popover */
+}
+
+.fade-column.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: auto;
+    z-index: 30;
+}
+
+.fade-column.hidden {
+    display: none !important;
+}
+
+.card-body {
+    max-height: 100%;
+    overflow-y: auto;
+
+
+    overflow: visible !important; /* <-- Importante para permitir popovers */
+    position: relative;           /* <-- Necesario para z-index y posicionamiento */
+    z-index: 2;                  /* Que esté por encima del resto */
+}
+
+.popover {
+    z-index: 1050 !important; /* asegúrate que el popover esté encima de todo */
+}
