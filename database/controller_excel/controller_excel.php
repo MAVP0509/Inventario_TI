@@ -12,7 +12,7 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
-header('Content_Type: text/html; charset=UTF-8');
+header('Content-Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
 
 $clientejson = json_decode($_POST['trama']);
@@ -24,7 +24,7 @@ if ($clientejson->accion == 0) {
 } elseif ($clientejson->accion == 1) {
     $respuesta_servidor->resultado = cargar_plantilla($clientejson);
 } elseif ($clientejson->accion == 2) {
-    $respuesta_servidor->resultado == bajas($clientejson);
+    $respuesta_servidor->resultado = bajas($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -114,8 +114,6 @@ function resguardo($valores)
         //* Al copiar el estilo de la fila, el texto lo configura en negritas, asi que se le quita las negritas
         $worksheet->getStyle("A$fila:I$fila")->getFont()->setBold(false);
 
-
-
         //* Rellenamos la fila con sus datos correspondientes 
         $worksheet->setCellValue("B$fila", $num);
         $worksheet->setCellValue("C$fila", $item->tipo);
@@ -194,7 +192,6 @@ function resguardo($valores)
         $worksheet->setCellValue("F$filaCargoPemex", $userPemexCargo);
         $worksheet->getStyle("F$filaCargoPemex")->getFont()->setBold(true);
         $worksheet->getStyle("F$filaCargoPemex")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
     }
 
 
@@ -271,9 +268,10 @@ function cargar_plantilla()
     return $respuesta;
 }
 
-function bajas($valores){
-    $datos = $valores->datos;
-    
+function bajas($valores)
+{
+    $datos = $valores->tabla_baja;
+
     $spreadsheet = IOFactory::load('Baja FO-DSP BAJA.xlsx');
     $worksheet = $spreadsheet->getActiveSheet();
 
@@ -291,7 +289,6 @@ function bajas($valores){
     $pageMargins->setRight(0.5);
 
     $fila = 15;
-    $fila_ini = 17;
 
     foreach ($datos as $item) {
         $worksheet->insertNewRowBefore($fila, 1);
@@ -305,15 +302,70 @@ function bajas($valores){
 
         $worksheet->getStyle("B$fila:K$fila")->getFont()->setBold(false);
 
-        $worksheet->setCellValue("B$fila", $item->con);
-        $worksheet->setCellValue("C$fila", $item->tipo);
+        $worksheet->setCellValue("B$fila", $item->rownum);
+        $worksheet->setCellValue("C$fila", $item->motivo_baja_id);
         $worksheet->setCellValue("D$fila", $item->descripcion);
-        $worksheet->setCellValue("I$fila", $item->lote);
-        $worksheet->setCellValue("J$fila", $item->area);
+        // $worksheet->setCellValue("I$fila", $item->lote);
+        $worksheet->setCellValue("J$fila", $item->ubicacion);
         $worksheet->setCellValue("K$fila", $item->af);
 
         $fila++;
-
-        
     }
+
+    $worksheet->removeRow($fila);
+    $fila_final = $fila - 1;
+
+    if ($valores->motivo == '5') {
+        $worksheet->setCellValue('F12', $valores->otro);
+    }
+
+    if ($valores->motivo == '3') {
+        $worksheet->setCellValue('F18', $valores->monto);
+        $worksheet->setCellValue('F19', $valores->quincena);
+    }
+
+    if ($valores->motivo == '6') {
+        $worksheet->setCellValue('E24', $valores->reubicacion);
+    }
+
+    $fila_observaciones = 16 + $fila;
+    $worksheet->setCellValue("B$fila_observaciones", $valores->observaciones);
+
+    $fila_superior = 22 + $fila;
+
+    $worksheet->setCellValue("C$fila_superior", $valores->emisor);
+    $worksheet->setCellValue("E$fila_superior", $valores->supervisor);
+    $worksheet->setCellValue("G$fila_superior", $valores->vobo);
+    $worksheet->setCellValue("I$fila_superior", $valores->autorizo);
+
+    $nombre_doc = explode(" ", $valores->motivo);
+    $nombre_doc = join("_", $nombre_doc);
+    $fecha = date('Ymd_His');
+    $nombreArchivo = "Baja_FO_DSP_{$nombre_doc}_{$fecha}.xlsx";
+
+    $ruta_guardado = "C:\\xampp\\htdocs\\Inventario_TI\\database\\controller_excel\\{$nombreArchivo}";
+    $url_descarga = "http://localhost/Inventario_TI/database/controller_excel/{$nombreArchivo}";
+
+
+     // No guardamos el archivo en disco, en vez de eso enviamos al navegador:
+    /* header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header("Content-Disposition: attachment; filename=\"$nombreArchivo\"");
+    header('Cache-Control: max-age=0');
+    header('Expires: 0');
+    header('Pragma: public'); */
+
+    $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+    // $writer->save('php://output');
+    $writer->save($ruta_guardado);
+
+    // $excelFilePath = 'C:\xampp\htdocs\Inventario_TI\database\controller_excel\Baja_FO_DSP_' . $nombre_doc . '.xlsx';
+    // $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+    // $writer->save('Baja_FO_DSP' . $nombre_doc . '.xlsx');
+
+    return [
+        'result' => true,
+        'url' => $url_descarga
+    ];
+
+    // return true;
 }

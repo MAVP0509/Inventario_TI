@@ -811,8 +811,7 @@ async function imprimir_pdf() {
 }
 
 //TODO: Validación de funciones
-
-let evento = false;
+let tbl_baja = null;
 async function confirmar_eliminacion() {
 
     let data = datos.filter(el => equipo_seleccionado.includes(el.id_equipo));
@@ -853,6 +852,7 @@ async function confirmar_eliminacion() {
             selectId: 'slc-emisor',
             tabla: 'cat_usuarios',
             campo: 'nombre',
+            placeholder: 'Seleciona al usuario quien emite la baja',
             dropdownParent: '#step-3',
         })
 
@@ -860,6 +860,7 @@ async function confirmar_eliminacion() {
             selectId: 'slc-supervisor',
             tabla: 'supervisor',
             campo: 'nombre',
+            placeholder: 'Selecciona al usuario que supervisa la baja',
             dropdownParent: '#step-3',
         })
 
@@ -880,9 +881,7 @@ async function confirmar_eliminacion() {
         })
 
         // console.log(opcion)
-        $('#sh-motivo').hide();
-        $('#sh-monto, #sh-quincena').hide();
-        $('#sh-reubicacion').hide();
+        $('#inp-motivo, #inp-monto, #inp-quincena, #inp-reubicacion').prop('disabled', true);
 
         $('#smartwizard').smartWizard("reset");
         $('#smartwizard').smartWizard({
@@ -907,66 +906,99 @@ async function confirmar_eliminacion() {
 
         $('#mdl-baja').modal("show");
 
-        let tbl_baja
+        $('#slc-motivo').on('change', function () {
+            let motivo_seleccionado = $(this).val();
 
-        if (!evento) {
-            evento = true
-            $('#slc-motivo').on('change', function () {
-                let motivo_seleccionado = $(this).val();
-
-                if (motivo_seleccionado === '5') {
-                    $('#sh-motivo').show();
-                } else {
-                    $('#sh-motivo').hide();
-                }
-                if (motivo_seleccionado === '3') {
-                    $('#sh-monto, #sh-quincena').show();
-                } else {
-                    $('#sh-monto, #sh-quincena').hide();
-                }
-                if (motivo_seleccionado === '6') {
-                    $('#sh-reubicacion').show();
-                } else {
-                    $('#sh-reubicacion').hide();
-                }
+            if (motivo_seleccionado === '5') {
+                $('#inp-motivo').prop('disabled', false);
+            } else {
+                $('#inp-motivo').prop('disabled', true);
+            }
+            if (motivo_seleccionado === '3') {
+                $('#inp-monto, #inp-quincena').prop('disabled', false);
+            } else {
+                $('#inp-monto, #inp-quincena').prop('disabled', true);
+            }
+            if (motivo_seleccionado === '6') {
+                $('#inp-reubicacion').prop('disabled', false);
+            } else {
+                $('#inp-reubicacion').prop('disabled', true);
+            }
 
 
-                if (!motivo_seleccionado) {
-                    if (tbl_baja) tbl_baja.clearData();
-                    return;
-                }
+            if (!motivo_seleccionado) {
+                if (tbl_baja) tbl_baja.clearData();
+                return;
+            }
 
-                let data_motivo = data.map(item => ({ ...item, motivo_baja_id: motivo_seleccionado }));
+            let data_motivo = data.map(item => ({ ...item, motivo_baja_id: motivo_seleccionado }));
 
-                if (!tbl_baja) {
-                    tbl_baja = new Tabulator('#tbl-baja', {
-                        height: "300px",
-                        data: data_motivo,
-                        columns: [
-                            { title: "ITEM", formatter: "rownum", hozAlign: "center" },
-                            { title: "TIPO", field: "motivo_baja_id", hozAlign: "center" },
-                            {
-                                title: "DESCRIPCIÓN", hozAlign: "center",
-                                formatter: function (cell) {
-                                    let d = cell.getData();
-                                    return `${d.tipo || ''} Marca ${d.marca || ''} Serie ${d.num_serie || ''} Modelo ${d.modelo || ''}`;
-                                }
-                            },
-                            { title: "LOTE", field: "lote", hozAlign: "center", },
-                            { title: "ÁREA", field: "ubicacion", hozAlign: "center", },
-                            { title: "ACTIVO FIJO", field: "af", hozAlign: "center", },
-                        ]
-                    });
-                } else {
-                    // Actualizar datos si ya existe tabla
-                    tbl_baja.setData(data_motivo);
-                }
+            if (!tbl_baja) {
+                tbl_baja = new Tabulator('#tbl-baja', {
+                    height: "300px",
+                    data: data_motivo,
+                    columns: [
+                        { title: "ITEM", formatter: "rownum", hozAlign: "center" },
+                        { title: "TIPO", field: "motivo_baja_id", hozAlign: "center" },
+                        {
+                            title: "DESCRIPCIÓN", hozAlign: "center",
+                            formatter: function (cell) {
+                                let d = cell.getData();
+                                return `${d.tipo || ''} Marca ${d.marca || ''} Serie ${d.num_serie || ''} Modelo ${d.modelo || ''}`;
+                            }
+                        },
+                        { title: "LOTE", field: "lote", hozAlign: "center", },
+                        { title: "ÁREA", field: "ubicacion", hozAlign: "center", },
+                        { title: "ACTIVO FIJO", field: "af", hozAlign: "center", },
+                    ]
+                });
+            } else {
+                // Actualizar datos si ya existe tabla
+                tbl_baja.setData(data_motivo);
+            }
 
-            })
-        }
+        })
+
     }
 
     // mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, desactivar_registro)
+}
+
+async function generar_baja() {
+
+    if (!tbl_baja) {
+        mostrar_toast('error', 'Error', 'No hay datos en la tabla para generar la baja.');
+        return;
+    }
+    let model = {
+        accion: 2,
+        motivo: $("#slc-motivo").val(),
+        otro: $("#inp-motivo").val().trim(),
+        reubicacion: $("#inp-reubicacion").val().trim(),
+        monto: $("#inp-monto").val().trim(),
+        quincena: $("#inp-quincena").val().trim(),
+        observaciones: $("#inp-observaciones").val().trim(),
+        emisor: $("#slc-emisor").val(),
+        supervisor: $("#slc-supervisor").val(),
+        vobo: $("#slc-vobo").val(),
+        autorizo: $("#slc-autorizo").val(),
+        tabla_baja: tbl_baja.getData().map((item, index) => ({
+            ...item,
+            rownum: index + 1,
+            descripcion: `${item.tipo || ''} Marca ${item.marca || ''} Serie ${item.num_serie || ''} Modelo ${item.modelo || ''}`
+        })),
+
+    }
+
+    mostrar_toast_cargando();
+    let server = await server_excel(model);
+
+    if (server.resultado.result === true && server.resultado.url) {
+        mostrar_toast('success', '¡Baja exitosa!', 'El activo se ha dado de baja correctamente.');
+        window.location = server.resultado.url;
+    } else {
+        mostrar_toast('error', 'Error', 'No se pudo dar de baja el activo. Inténtalo nuevamente.')
+    }
 }
 
 

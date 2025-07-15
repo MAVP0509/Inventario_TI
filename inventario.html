@@ -471,7 +471,7 @@
     </div>
     <!--Modal bajas-->
     <div class="modal fade" id="mdl-baja" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Baja de activos</h5>
@@ -497,7 +497,7 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fa-solid fa-list-ul"></i></span>
                                         </div>
-                                        <select class="form-control" id="slc-motivo" style="z-index: 2000;"> </select>
+                                        <select class="form-control" id="slc-motivo" data-live-search="true" data-container="body"> </select>
                                     </div>
                                     <div id="sh-motivo">
                                         <h6>Otro motivo de baja</h6>
@@ -569,17 +569,17 @@
                                                     <span class="input-group-text"><i
                                                             class="fa-solid fa-person-circle-plus"></i></span>
                                                 </div>
-                                                <select id="slc-emisor"></select>
+                                                <select class="form-control" id="slc-emisor"></select>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
-                                            <h6>Superviso</h6>
+                                            <h6>Supervisó</h6>
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
                                                     <span class="input-group-text"><i
                                                             class="fa-solid fa-person-circle-exclamation"></i></span>
                                                 </div>
-                                                <select id="slc-supervisor"></select>
+                                                <select class="form-control" id="slc-supervisor"></select>
                                             </div>
                                         </div>
                                     </div>
@@ -591,7 +591,7 @@
                                                     <span class="input-group-text"><i
                                                             class="fa-solid fa-person-chalkboard"></i></span>
                                                 </div>
-                                                <select id="slc-vobo"></select>
+                                                <select class="form-control" id="slc-vobo"></select>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -601,7 +601,7 @@
                                                     <span class="input-group-text"><i
                                                             class="fa-solid fa-person-circle-check"></i></span>
                                                 </div>
-                                                <select id="slc-autorizo"></select>
+                                                <select class="form-control" id="slc-autorizo"></select>
                                             </div>
                                         </div>
                                     </div>
@@ -619,7 +619,7 @@
                     <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="modal-btn-his">Cancelar
                         <i class="fa-solid fa-arrow-right-from-bracket fa-lg"></i>
                     </button>
-                    <button type="button" class="btn btn-success icon" id="conf-baja">Confirmar
+                    <button type="button" class="btn btn-success icon" id="conf-baja" onclick="generar_baja()">Confirmar
                         <i class="fa-solid fa-circle-check fa-lg"></i>
                     </button>
                 </div>
