@@ -96,7 +96,7 @@ async function consultar_informacion(params) {
             //const rowElement = row.getElement();
             //const editBtn = rowElement.querySelector("button.btn-warning");
 
-            
+
             //data = row.getData()
             if (data.seleccionado === true) {
                 row.getElement().classList.add("bg-primary")
@@ -506,28 +506,50 @@ async function editar_supervisor() {
         return;
     }
 
-    let model = {
-        accion: 1,
-        id: selecreg.id,
-        nombre: $('#edi-nombre').val().trim(),
-        cargo: $('#edi-cargo').val().trim(),
-        region: $('#edi-region').val().trim(),
-    }
+    if (selecreg.region === $('#edi-region').val().trim()) {
+        let model = {
+            accion: 1,
+            id: selecreg.id,
+            nombre: $('#edi-nombre').val().trim(),
+            cargo: $('#edi-cargo').val().trim(),
+            region: $('#edi-region').val().trim(),
+        }
 
-    let server = await server_supervisor(model)
-    //let resultado = JSON.parse(respuesta)
+        let server = await server_supervisor(model)
+        //let resultado = JSON.parse(respuesta)
 
-    if (typeof server.resultado === 'string') {
-        mostrar_toast("error", "Error", resultado.resultado); // Muestra el mensaje que venga en el string
-        return;
-    } else if (server.resultado === true) {
-        mostrar_toast("success", "Éxito", "Supervisor editado exitosamente")
-        consultar_informacion()
-        $("#modalEditar").modal('hide')
+        if (server.resultado.resultado) {
+            mostrar_toast("success", "Éxito", server.resultado.resultado)
+            consultar_informacion()
+            $("#modalEditar").modal('hide')
+        } else {
+            mostrar_toast("error", "Error", "Supervisor no pudo editarse")
+            return
+        }
     } else {
-        mostrar_toast("error", "Error", "Supervisor no pudo editarse")
-        return
+        mostrar_alert('warning', `Esto deshabilitará al supervisor habilitado que tenga esa región`, false,
+            async () => {
+                let model = {
+                    accion: 1,
+                    id: selecreg.id,
+                    nombre: $('#edi-nombre').val().trim(),
+                    cargo: $('#edi-cargo').val().trim(),
+                    region: $('#edi-region').val().trim(),
+                }
+
+                let server = await server_supervisor(model);
+
+                if (server.resultado.resultado) {
+                    mostrar_toast("success", "Éxito", server.resultado.resultado);
+                    consultar_informacion();
+                    $("#modalEditar").modal('hide');
+                } else {
+                    mostrar_toast("error", "Error", "Supervisor no pudo editarse");
+                }
+            }
+        )
     }
+
 }
 
 async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags }) {

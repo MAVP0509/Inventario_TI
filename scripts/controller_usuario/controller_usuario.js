@@ -66,142 +66,7 @@ async function consultar_usuarios() {
     let server = await server_usuario({accion : 2})
 
     datos = server.resultado
-        
-    /* let table = $("#tbl-usuario").DataTable()
-    table.destroy()
-
-    $("#tbl-usuario").DataTable({
-                data: usuarios, //? Este es el array de objetos que trae el ajax, en este caso es el array de usuarios.
-    
-                columns: [ //? Aqui se definen las columnas de la tabla, el primer elemento es el id de la columna, el segundo es el nombre de la columna y el tercero es el render, que es lo que se va a mostrar en la tabla.
-                    {
-                        data: 'id',
-                        render: function (data, type, row) {
-                            let control = `<div class="form-group form-check">
-                                <input type="checkbox" class="form-check-input" 
-                                onclick="seleccionar_usuarios(${data})" value="${data}" id="check${data}">
-                            </div>`
-                            return control;
-                        }
-                    },
-                    {
-                        data: 'id',
-                        render: function (data, type, row, meta) {
-                            let control = `<label style="text-align: center">${data}</label>`
-                            return meta.row + 1;
-                        }
-                    },
-                    {
-                        data: 'nombre',
-                        render: function (data, type, row) {
-                            let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
-                            return control;
-                        }
-                    },
-                    {
-                        data: "correo",
-                        render: function (data, type, row) {
-                            let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
-                            return control;
-                        }
-    
-                    },
-                    {
-                        data: 'edad',
-                        render: function (data, type, row) {
-                            let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
-                            return control;
-                        }
-                    },
-                    {
-                        data: "telefono",
-                        render: function (data, type, row) {
-                            let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
-                            return control;
-                        }
-    
-                    },
-                    {
-                        data: 'fecha_nac',
-                        render: function (data, type, row) {
-                            let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
-                            return control;
-                        }
-                    },
-                    {
-                        data: "fecha_reg",
-                        render: function (data, type, row) {
-                            let control = `<label style="font-weight: normal; font-size: 12px;">${data ? data : "NA"}</label>`
-                            return control;
-                        }
-    
-                    },
-                    {
-                        data: "id",
-                        render: function (data, type, row) {
-                            let control = `<div class="d-flex justify-content-center align-items-center">
-                                <button type="button" style="text-align: center" class="btn btn-warning icon" id="${data}" value="${data}" onclick="seleccionar_usuario(this)">
-                                    <i class="fa-solid fa-pen-to-square fa-lg"></i>
-                                </button>
-                            </div>`
-                            return control;
-                        }
-                    }
-                ], 
-                dom: `
-                    <'row mb-2'<'col-sm-6 text-left'f><'col-sm-6 text-right'B>>
-                    <'row'<'col-sm-12 text-center'tr>>
-                    <'row mt-2'<'col-sm-3'l><'col-sm-5 text-center'i><'col-sm-4 text-right'p>>
-                `,
-                language: {
-                    url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json',
-                    paginate: {
-                        first: '<i class="fas fa-angle-double-left"></i>',
-                        previous: '<i class="fas fa-angle-left"></i>',
-                        next: '<i class="fas fa-angle-right"></i>',
-                        last: '<i class="fas fa-angle-double-right"></i>'
-                    },
-                },
-                select: {
-                    style: 'multi',
-                    selector: 'td:not(:first-child)'
-                },
-                rowCallback: function (row, data){
-                    $(row).on('click', function () {
-                        if ($(event.target).closest('.btn-warning.icon').length > 0) {
-                            return;
-                        }
-
-                        const checkbox = $(this).find('input[type="checkbox"]');
-                        const ischecked = checkbox.prop('checked');
-
-                        checkbox.prop('checked', !ischecked);
-                        if (!ischecked) {
-                            $(this).attr('style', 'background-color: #d1ecf1; color: #0c5460;');
-                        } else {
-                            $(this).removeAttr('style');
-                        }
-                        seleccionar_usuarios(data.id);
-                    });
-                },
-                buttons:[
-                    {
-                        html: `<div>
-                            <button type="button" onclick="nuevo_usuario()" class="btn btn-success icon"><i class="fa-solid fa-plus fa-lg"></i> Nuevo Usuario</button>
-                        </div>`,
-                    },
-                    {
-                        html: `<div>
-                            <button type="button" onclick="mensaje_eliminar()" class="btn btn-danger icon" style="margin-left: 10px;">
-                            <i class="fa-solid fa-trash-can fa-lg"></i> Eliminar Usuario</button>
-                        </div>`,
-                    },
-                ],
-                stateSave: true,
-                responsive: true,
-                //!Esta parte del codigo (DOM) es para que los botones, paginacion y filtros de busqueda se acomoden a sus necesidades, si quieren pueden buscar mas info en la documentacion de datatables, pero en este caso no es necesario.
-  
-    }) */   
+          
     //* Idioma Español
     Tabulator.extendModule("localize", "langs", {
         "es": {
@@ -368,7 +233,7 @@ async function mdl_editar_usuario(params) {
     $("#modalEditar").modal('show')
 }
 
-async function editar_usuario(params) {
+async function editar_usuario() {
     let model = {
         accion : 1,
         id : usuSelect.id,
@@ -402,12 +267,10 @@ async function mensaje_eliminar() {
         
     }else{
         mostrar_alert('warning', `¿Está seguro de eliminar ${usuario_seleccionado.length} usuario(s)?`, false, eliminar_usuario);
-        /* modalElim = new bootstrap.Modal(document.getElementById('modalElim'))
-        modalElim.show() */
     }
 }
 
-async function eliminar_usuario(params) {
+async function eliminar_usuario() {
         let model = {
             accion : 3,
             id : usuario_seleccionado
@@ -438,7 +301,7 @@ function deseleccionar_todos() {
 }
 
 
-async function mdl_nuevo_usuario(params) {
+async function mdl_nuevo_usuario() {
     let inputs = document.getElementsByName('insertMdl')
         for (let i = 0; i < inputs.length; i++) {
             const element = inputs[i].value = "";
@@ -447,7 +310,7 @@ async function mdl_nuevo_usuario(params) {
     $("#modalInsertar").modal('show')
 }
 
-async function insertar_usuario(params) {
+async function insertar_usuario() {
 
 
     const validacion = [

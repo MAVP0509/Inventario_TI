@@ -2,6 +2,7 @@ let respuesta
 
 function server_inventario(model) {
     return new Promise((resolve, reject) => {
+
         $.ajax({
             type: "POST",
             url: "database/controller_inventario/controller_inventario.php",
@@ -131,6 +132,7 @@ async function consultar_informacion() {
             paginationSize: 10,
             paginationSizeSelector: [10, 25, 35, true],
             movableColumns: true,              //allow column order to be changed
+            // printAsHtml: true,
             paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
                 const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
                 const end = Math.min(currentRowStart + pageSize - 1, totalRows);
@@ -191,11 +193,20 @@ async function consultar_informacion() {
             ],
 
         });
+        // console.log(datos)
+
     } catch (error) {
         console.log(error)
     }
 
+    $("#btn-excel").on("click", function () {
+        table.download("xlsx", "Inventario_TI.xlsx", {
+            sheetName: "Inventario"
+        })
+    });
 }
+
+
 
 let selecreg = ""; // No limpiar la variable
 
@@ -323,6 +334,7 @@ async function mdl_editar(params) {
     $("#mdl-inventario").modal("show");
     //console.log(selecreg)
 }
+
 async function editar_registro() {
     //deshabilitar_campo();
     const validacion = [
@@ -347,8 +359,8 @@ async function editar_registro() {
         tag: $("#inp-tag").val().trim(),
         imei: $("#inp-imei").val().trim(),
         linea: $("#inp-linea").val().trim(),
-        usuario: $("#inp-usuario").val().trim(),
-        cargo: $("#inp-cargo").val().trim(),
+        usuario: $("#inp-usuario").val(),
+        cargo: $("#inp-cargo").val(),
         //posicion: $("#edi-posicion").select2('data')[0].text,
         fecha_entrega: $("#inp-fecha-entrega").val()
     }
@@ -451,7 +463,10 @@ async function mdl_nvo_registro() {
         campo: 'nombre',
         placeholder: 'Seleccione un usuario',
         dropdownParent: '#mdl-inventario',
-        tags: true
+        tags: true,
+        popoverTitle: "Aviso",
+        popoverContent: "Si se ingresa un nuevo usuario, favor de asignarle un cargo",
+        placement: 'top'
     });
 
     await general_select2({
@@ -460,7 +475,7 @@ async function mdl_nvo_registro() {
         campo: 'cargo',
         placeholder: 'Selecione un cargo',
         dropdownParent: '#mdl-inventario',
-        tags: true
+        tags: true,
     })
 
     document.getElementById('title-mdl-inventario').textContent = "Registro de Activo"
@@ -474,6 +489,8 @@ $('#inp-usuario').off('change').on('change', function () {
     let userSelected = $(this).val()?.trim();
     let select = $(this);
     let nuevo = true;
+    const cargo = $('#inp-cargo')
+    let texto = "";
 
     select.find('option').each(function () {
         if ($(this).val() === userSelected && !$(this).attr('data-select2-tag')) {
@@ -482,12 +499,43 @@ $('#inp-usuario').off('change').on('change', function () {
     });
 
     if (userSelected && nuevo) {
-        $('#inp-cargo').prop('disabled', false); // Permitir escribir el cargo si es nuevo
+        $('#inp-cargo').prop('disabled', false);
         $('#inp-cargo').val(null).trigger('change');
+
     } else {
-        $('#inp-cargo').prop('disabled', true); // Desactiva el cargo si se eligió uno existente
-        $('#inp-cargo').val(userSelected).trigger('change'); // Puedes usar este valor si así lo deseas
+
+        cargo.prop('disabled', true);
+        // Verifica si el valor ya existe como opción
+        if (!cargo.find(userSelected).length) {
+            const vista = select.find('option:selected').text().trim();
+
+            for (let i = 0; i < datos.length; i++) {
+                const element = datos[i];
+                if (element.usuario === vista) {
+                    texto = element.posicion;
+                    // console.log(selecreg)
+                    break;
+                }
+            }
+            // Si no existe, agrégalo dinámicamente como nueva opción
+            const nueva_opcion = new Option(texto, userSelected, true, true);
+
+            cargo.append(nueva_opcion).trigger('change');
+        } else {
+            cargo.val(userSelected).trigger('change');
+        }
     }
+
+    /* if (userSelected && nuevo) {
+        $cargo.prop('disabled', false); // Permitir escribir el cargo si es nuevo
+        $cargo.val(null).trigger('change');
+    } else {
+        $cargo.prop('disabled', true); // Desactiva el cargo si se eligió uno existente
+
+            $cargo.val(userSelected).trigger('change'); // Puedes usar este valor si así lo deseas
+        }
+        
+    } */
 });
 
 async function crear_registro() {
@@ -502,9 +550,6 @@ async function crear_registro() {
         "inp-num-serie",
     ];
 
-    /* if (!$('#inp-tag').prop('disabled') || !$('#inp-imei').prop('disabled') || !$('#inp-linea').prop('disabled')) {
-        validacion.push('inp-tag', 'inp-imei', 'inp-linea');
-    } */
     const tipo_seleccionado = $('#inp-tipo').val();
 
     switch (tipo_seleccionado) {
@@ -512,14 +557,14 @@ async function crear_registro() {
         case '40':
             validacion.push("inp-tag");
             break;
-        case '85':
+        case '132':
             validacion.push('inp-imei', 'inp-linea');
         default:
             validacion
             break;
     }
-    console.log(validacion)
-    
+    // console.log(validacion)
+
     // Validar campos
     if (!validar_campos(validacion)) {
         mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
@@ -653,71 +698,337 @@ async function desactivar_registro() {
     }
 }
 
-//TODO: Validación de funciones
+function limpiarTexto(texto) {
+    if (typeof texto !== "string") return texto;
+    return texto.normalize("NFKD").replace(/[\u0300-\u036f]/g, ""); // elimina acentos
+}
 
+async function mdl_imprimir() {
+
+    const check_columnas = document.querySelector("#mdl-imprimir .modal-body");
+    const columnas_exp = table.getColumns().filter(col => col.getField() && col.getDefinition().title);
+
+    check_columnas.innerHTML = "<p>Selecciona las columnas que deseas incluir en el PDF:</p>";
+
+    columnas_exp.forEach(col => {
+        const field = col.getField();
+        const title = col.getDefinition().title;
+
+        const div = document.createElement("div");
+        div.className = "form-check";
+
+        div.innerHTML = `
+            <div class="form-check">
+                <button type="button" class="btn btn-lg toggle-select icon" data-field="${field}" data-checked="true">
+                    <i class="fa-solid fa-square-check"></i>
+                </button>
+                <span>${title}</span>
+            </div>`;
+        check_columnas.appendChild(div);
+
+
+    });
+
+    if (!check_columnas.dataset.listenerAttached) {
+        check_columnas.addEventListener("click", function (e) {
+            const button = e.target.closest(".toggle-select");
+            if (!button) return;
+
+            const checked = button.dataset.checked === "true";
+            button.dataset.checked = (!checked).toString();
+
+            button.innerHTML = checked
+                ? '<i class="fa-regular fa-square"></i>'
+                : '<i class="fa-solid fa-square-check"></i>';
+        });
+
+        check_columnas.dataset.listenerAttached = "true";
+    }
+
+    $("#mdl-imprimir").modal("show");
+
+}
+
+async function imprimir_pdf() {
+
+    let seleccionados = document.querySelectorAll("#mdl-imprimir .toggle-select[data-checked='true']");
+    let campos_selecionados = Array.from(seleccionados).map(el => el.dataset.field);
+
+    const filtrados = table.getData("active");
+
+    let campos
+    if (campos_selecionados.length >= 14) {
+        campos = Array(campos_selecionados.length).fill(40)
+
+    } else {
+        campos = Array(campos_selecionados.length).fill('auto')
+    }
+
+    let headers = campos_selecionados.map(field => {
+        const col = table.getColumn(field);
+        return col ? col.getDefinition().title : field;
+    });
+
+    let body = [
+        headers,
+        ...filtrados.map(row =>
+            campos_selecionados.map(field => row[field] || "")
+        )
+    ];
+
+    const docDefinition = {
+        pageOrientation: 'landscape',
+        pageMargins: [10, 10, 10, 10],
+        content: [
+            { text: 'Inventario de Activos', style: 'header' },
+            {
+                table: {
+                    headerRows: 1,
+                    widths: campos,
+                    body: body,
+                    dontBreakRows: true
+                },
+                layout: 'lightHorizontalLines'
+            }
+        ],
+        styles: {
+            header: {
+                fontSize: 16,
+                bold: true,
+                margin: [0, 0, 0, 10]
+            }
+        },
+        defaultStyle: {
+            fontSize: 7,
+            alignment: 'center',
+            wordBreak: 'break-word',
+        }
+    };
+
+    pdfMake.createPdf(docDefinition).download("Inventario_TI.pdf");
+
+    $('#mdl-imprimir').modal('hide'); // Cierra modal
+}
+
+//TODO: Validación de funciones
+let tbl_baja = null;
 async function confirmar_eliminacion() {
+
+    let data = datos.filter(el => equipo_seleccionado.includes(el.id_equipo));
     if (equipo_seleccionado.length === 0) {
         mostrar_toast('info', 'Información', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
+        return;
+    }
+
+    let estado = data.some(item => item.estatus === 'Asignado')
+    console.log(estado)
+    if (estado) {
+        mostrar_toast('warning', 'Alerta', 'Uno o más activos se encuentran asignados. Inténtalo nuevamente.');
+        return;
+
     } else {
 
-       /*  let data = []
-        //let data = datos.filter(element => seleccionar.includes(element.id_equipo));
-        for (let i = 0; i < datos.length; i++) {
-            const element = datos[i];
-            if (equipo_seleccionado.includes(element.id_equipo)) {
-                data.push(element);
-                //break;
+        let opcion = [
+            { id: 1, text: 'Inservible' },
+            { id: 2, text: 'Robo' },
+            { id: 3, text: 'Extravio' },
+            { id: 4, text: 'Venta' },
+            { id: 6, text: 'Reubicación de instalación o pozo' },
+            { id: 5, text: 'Otro' }
+        ]
+
+        await general_select2({
+            selectId: 'slc-motivo',
+            data: opcion,
+            placeholder: 'Selecione un motivo',
+            dropdownParent: '#step-1',
+            // popoverTitle: 'Descripción',
+            // popoverContent: 'Causa por la cual no se encuentre en condiciones óptimas para su uso y/o aprovechamiento.',
+            // placement: "right",
+
+        })
+
+        await general_select2({
+            selectId: 'slc-emisor',
+            tabla: 'cat_usuarios',
+            campo: 'nombre',
+            placeholder: 'Seleciona al usuario quien emite la baja',
+            dropdownParent: '#step-3',
+        })
+
+        await general_select2({
+            selectId: 'slc-supervisor',
+            tabla: 'supervisor',
+            campo: 'nombre',
+            placeholder: 'Selecciona al usuario que supervisa la baja',
+            dropdownParent: '#step-3',
+        })
+
+        await general_select2({
+            selectId: 'slc-vobo',
+            tabla: 'cat_usuarios',
+            campo: 'nombre',
+            placeholder: 'Seleccione un usuario',
+            dropdownParent: '#step-3',
+        })
+
+        await general_select2({
+            selectId: 'slc-autorizo',
+            tabla: 'cat_usuarios',
+            campo: 'nombre',
+            placeholder: 'Seleccione un usuario',
+            dropdownParent: '#step-3',
+        })
+
+        // console.log(opcion)
+        $('#inp-motivo, #inp-monto, #inp-quincena, #inp-reubicacion').prop('disabled', true);
+
+        $('#smartwizard').smartWizard("reset");
+        $('#smartwizard').smartWizard({
+            theme: 'dots',
+            autoAdjustHeight: true,
+            selected: 0,
+            toolbarSettings: {
+                toolbarPosition: 'top',
+                showNextButton: true,
+                showPreviousButton: true,
+            },
+            keyboard: {
+                keyNavigation: true,
+                keyLeft: [37],
+                keyRight: [39]
+            },
+            lang: {
+                next: 'Siguiente',
+                previous: 'Anterior'
             }
-        }
-        console.log(data)
-        var tblEliminar = new Tabulator("#tbl-mdl-eliminar", {
-            height: "311px",
-            data: data,
-            columns: [
-                { title: "Rubro", field: "rubro", headerHozAlign: "center", headerSort: false },
-                { title: "Tipo de dispositivo", field: "tipo", width: 150, sorter: "number", hozAlign: "left", editor: "input", editor: true, validator: ["min:0", "max:100", "numeric"] },
-                { title: "Marca", field: "marca", width: 150, editor: "input", validator: ["required", "in:male|female"] },
-                { title: "Modelo", field: "modelo", width: 150, editor: "input", hozAlign: "center", width: 100, editor: "input", validator: ["min:0", "max:5", "integer"] },
-                { title: "Número de serie", field: "num_serie", width: 150, editor: "input", validator: ["minLength:3", "maxLength:10", "string"] },
-                { title: "TAG", field: "tag", width: 150, editor: "input", validator: "required" },
-                { title: "IMEI", field: "imei", width: 150, editor: "input", validator: "required" },
-                { title: "Linea", field: "linea", width: 150, editor: "input", validator: "required" },
-                { title: "Usuario", field: "usuario", width: 150, editor: "input", validator: "required" },
-                { title: "Cargo del usuario", field: "posicion", width: 150, editor: "input", validator: "required" },
-                { title: "Estatus", field: "estatus", width: 150, editor: "input", validator: "required" },
-                { title: "Observaciones", width: 150, editor: "input", validator: "required", frozen: true },
-            ],
         });
 
-        //handle validation failure
-        table.on("validationFailed", function (cell, value, validators) {
-            //cell - cell component for the edited cell
-            //value - the value that failed validation
-            //validatiors - an array of validator objects that failed
+        $('#mdl-baja').modal("show");
 
-            //take action on validation fail
-        });
-        $("#mdl-eliminar").modal("show"); */
-        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, desactivar_registro)
+        $('#slc-motivo').on('change', function () {
+            let motivo_seleccionado = $(this).val();
+
+            if (motivo_seleccionado === '5') {
+                $('#inp-motivo').prop('disabled', false);
+            } else {
+                $('#inp-motivo').prop('disabled', true);
+            }
+            if (motivo_seleccionado === '3') {
+                $('#inp-monto, #inp-quincena').prop('disabled', false);
+            } else {
+                $('#inp-monto, #inp-quincena').prop('disabled', true);
+            }
+            if (motivo_seleccionado === '6') {
+                $('#inp-reubicacion').prop('disabled', false);
+            } else {
+                $('#inp-reubicacion').prop('disabled', true);
+            }
+
+
+            if (!motivo_seleccionado) {
+                if (tbl_baja) tbl_baja.clearData();
+                return;
+            }
+
+            let data_motivo = data.map(item => ({ ...item, motivo_baja_id: motivo_seleccionado }));
+
+            if (!tbl_baja) {
+                tbl_baja = new Tabulator('#tbl-baja', {
+                    height: "300px",
+                    data: data_motivo,
+                    columns: [
+                        { title: "ITEM", formatter: "rownum", hozAlign: "center" },
+                        { title: "TIPO", field: "motivo_baja_id", hozAlign: "center" },
+                        {
+                            title: "DESCRIPCIÓN", hozAlign: "center",
+                            formatter: function (cell) {
+                                let d = cell.getData();
+                                return `${d.tipo || ''} Marca ${d.marca || ''} Serie ${d.num_serie || ''} Modelo ${d.modelo || ''}`;
+                            }
+                        },
+                        { title: "LOTE", field: "lote", hozAlign: "center", },
+                        { title: "ÁREA", field: "ubicacion", hozAlign: "center", },
+                        { title: "ACTIVO FIJO", field: "af", hozAlign: "center", },
+                    ]
+                });
+            } else {
+                // Actualizar datos si ya existe tabla
+                tbl_baja.setData(data_motivo);
+            }
+
+        })
+
+    }
+
+    // mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, desactivar_registro)
+}
+
+async function generar_baja() {
+
+    if (!tbl_baja) {
+        mostrar_toast('error', 'Error', 'No hay datos en la tabla para generar la baja.');
+        return;
+    }
+    let model = {
+        accion: 2,
+        motivo: $("#slc-motivo").val(),
+        otro: $("#inp-motivo").val().trim(),
+        reubicacion: $("#inp-reubicacion").val().trim(),
+        monto: $("#inp-monto").val().trim(),
+        quincena: $("#inp-quincena").val().trim(),
+        observaciones: $("#inp-observaciones").val().trim(),
+        emisor: $("#slc-emisor").val(),
+        supervisor: $("#slc-supervisor").val(),
+        vobo: $("#slc-vobo").val(),
+        autorizo: $("#slc-autorizo").val(),
+        tabla_baja: tbl_baja.getData().map((item, index) => ({
+            ...item,
+            rownum: index + 1,
+            descripcion: `${item.tipo || ''} Marca ${item.marca || ''} Serie ${item.num_serie || ''} Modelo ${item.modelo || ''}`
+        })),
+
+    }
+
+    mostrar_toast_cargando();
+    let server = await server_excel(model);
+
+    if (server.resultado.result === true && server.resultado.url) {
+        mostrar_toast('success', '¡Baja exitosa!', 'El activo se ha dado de baja correctamente.');
+        window.location = server.resultado.url;
+    } else {
+        mostrar_toast('error', 'Error', 'No se pudo dar de baja el activo. Inténtalo nuevamente.')
     }
 }
 
+
 //TODO Funciones de los Select2
 
-async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags, popoverTitle, popoverContent }) {
+async function general_select2({ selectId, tabla, campo, data, placeholder, dropdownParent, tags, popoverTitle, popoverContent, placement }) {
     //try {
-    const response = await server_inventario({
-        accion: 5,
-        tabla: tabla,
-        campo: campo
-    });
+    let opciones = [];
 
-    //console.log('Respuesta del servidor para select2:', response);
+    if (data && Array.isArray(data)) {
+        // Si se pasan los datos directamente
+        opciones = data.map(item => ({
+            id: item.id ?? '',
+            text: item.text ?? ''
 
-    const opciones = response.resultado.map(item => ({
-        id: item.id || '',
-        text: item[campo] || ''
-    }));
+        }));
+
+    } else if (tabla && campo) {
+        const response = await server_inventario({
+            accion: 5,
+            tabla: tabla,
+            campo: campo
+        });
+        //console.log('Respuesta del servidor para select2:', response);
+        opciones = response.resultado.map(item => ({
+            id: item.id || '',
+            text: item[campo] || ''
+        }));
+
+    }
 
     const $select = $('#' + selectId);
     $select.empty().append(new Option('', '', false, false));
@@ -742,7 +1053,8 @@ async function general_select2({ selectId, tabla, campo, placeholder, dropdownPa
             'data-trigger': 'hover',
             'data-html': 'true',
             'title': popoverTitle,
-            'data-content': popoverContent
+            'data-content': popoverContent,
+            'data-placement': placement
         });
 
         $select2Container.popover();
@@ -776,7 +1088,7 @@ $(document).ready(function () {
             $('#sh-tag').hide();
         }
 
-        if (tipoSeleccionado === '85') {
+        if (tipoSeleccionado === '132') {
             $('#sh-imei, #sh-linea').show();
         } else {
             $('#sh-imei, #sh-linea').hide();
@@ -787,7 +1099,6 @@ $(document).ready(function () {
         });/*  */
     });
 });
-
 
 $(document).ready(function () {
     $('#mdl-estado').on('change', function () {
@@ -807,15 +1118,6 @@ let selected = false
 $('.check-button').on('click', function () {
     button_checked($(this))
 });
-
-let usuario_seleccionado = false
-$("#inp-cargo").on('change', function () {
-    usuario_seleccionado = $(this).val();
-
-    if (usuario_seleccionado) {
-        $
-    }
-})
 
 //TODO: Funciones para el resguardo
 async function resguardo(userSelect) {
@@ -923,17 +1225,20 @@ async function crear_resguardo() {
     }
     let server = await server_inventario(model)
 
+    if (server.resultado.error) {
+        mostrar_toast('warning', 'Aviso', server.resultado.error)
+    } else {
+        infoResguardo = server.resultado.datos
+        consultar_informacion();
 
-    infoResguardo = server.resultado
-    //console.log(infoResguardo)
-    consultar_informacion();
+
+        $("#mdl-res").modal('hide')
+        mostrar_toast_cargando()
+        descargar_excel()
+    }
 
 
-    $("#mdl-res").modal('hide')
-    mostrar_toast_cargando()
-    descargar_excel()
 }
-
 
 async function descargar_excel(params) {
     dominio = window.location.hostname,
@@ -1009,9 +1314,7 @@ $(document).ready(function () {
 function myCallback(start, end) {
     $("#rango-fecha span").html(start.format("MMMM D, YYYY") + " - " + end.format("MMMM D, YYYY"))
 
-
 }
-
 
 function button_checked(button) {
     selected = !selected;

@@ -18,7 +18,7 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = desactivar_supervisor($clientejson);
 } elseif ($clientejson->accion == 4) {
     $respuesta_servidor->resultado = consultar_distintos($clientejson->tabla, $clientejson->campo);
-}elseif ($clientejson->accion == 5) {
+} elseif ($clientejson->accion == 5) {
     $respuesta_servidor->resultado = eliminar_supervisor($clientejson);
 }
 print(json_encode($respuesta_servidor));
@@ -43,10 +43,54 @@ function insertar_supervisor($valores)
 function editar_supervisor($valores)
 {
     include("../conexion.php");
-    
-    $sql = "UPDATE supervisor SET nombre='$valores->nombre', cargo='$valores->cargo', region='$valores->region', habilitado = 0 WHERE id='$valores->id';";
+    $respuesta = new stdClass();
 
-    return mysqli_query($con, $sql);
+    //* Validar si el supervisor cambió de región
+    $sql_val = "SELECT * FROM supervisor WHERE id = '$valores->id'";
+    $query_val = mysqli_query($con, $sql_val);
+    $resultado_val = mysqli_fetch_assoc($query_val);
+    $region = $resultado_val['region'];
+
+    if ($region === $valores->region) {
+        $sql_update = "UPDATE supervisor SET nombre='$valores->nombre', cargo='$valores->cargo', region='$valores->region' WHERE id='$valores->id';";
+        mysqli_query($con, $sql_update);
+
+        $respuesta->resultado  = "Supervisor actualizado correctamente";
+    } else {
+        //* Si el supervisor cambia de región, validamos si en la nueva región hay uno ya habilitado
+        $sql_change_supervisor = "SELECT * FROM supervisor WHERE region = '$valores->region' AND habilitado = 1";
+        $query_change_supervisor = mysqli_query($con, $sql_change_supervisor);
+        $array = array();
+        while ($fila = mysqli_fetch_object($query_change_supervisor)) {
+            array_push($array, $fila);  
+        }
+
+         //* Validamos si la nueva region tiene supervisor habilitado, para así deshabilitar el que ya tiene y que el supervisor editado sea el habilitado
+        if(!empty($array)){
+            $id_habilitado = $array[0]->id;
+
+            $sql_update_old_supervisor = "UPDATE supervisor SET habilitado = 0 WHERE id = '$id_habilitado'";
+            mysqli_query($con, $sql_update_old_supervisor);
+
+            $sql_update_new_supervisor = "UPDATE supervisor SET nombre = '$valores->nombre', cargo = '$valores->cargo', region = '$valores->region', habilitado = 1 WHERE id = '$valores->id' ";
+            mysqli_query($con, $sql_update_new_supervisor);
+
+            $respuesta->resultado = "Supervisor actualizado correctamente";
+        }else{
+            //*si la región es nueva y no tiene supervisor o si la región existe pero no tiene habilitado un supervisor
+
+            $sql = "UPDATE supervisor SET nombre = '$valores->nombre', cargo = '$valores->cargo', region = '$valores->region', habilitado = 1 WHERE id = '$valores->id' ";
+            mysqli_query($con, $sql);
+
+            $respuesta->resultado = "Supervisor actualizado correctamente";
+        }
+        return $respuesta;
+    }
+
+
+
+    $sql_region = "SELECT region FROM supervisor WHERE region = '$valores->region' WHERE habilitado = 1";
+    return $respuesta;
 }
 
 //* Consulta los supervisores de la tabla supervisor para mostrarlos en el programa
@@ -101,7 +145,7 @@ function eliminar_supervisor($valores)
     foreach ($valores->id as $id) {
         $id = intval($id); //* Validamos que el id sea un número, al ser un arreglo, se valida cada uno
         $sql_val = "SELECT * FROM supervisor WHERE habilitado = 1 AND id = '$id'";
-        $res = mysqli_query($con, $sql_val);  
+        $res = mysqli_query($con, $sql_val);
 
         if ($res && $res->num_rows > 0) {
             $respuesta->error =  "Uno o más supervisores están habilitados, no pueden ser eliminados";
