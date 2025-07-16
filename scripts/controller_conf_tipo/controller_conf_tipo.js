@@ -157,6 +157,7 @@ function mdl_editar_tipo(params) {
     $("#mdl-tipo").modal('show');
 }
 
+//*Función para gestionar el checkbox del modal
 $("#check-editar").on('click', function () {
     selected = !selected;
 
@@ -252,7 +253,7 @@ async function mensaje_eliminar() {
     }
 }
 
-async function eliminar_tipo(params) {
+async function eliminar_tipo() {
     let model = {
         accion: 3,
         id: tipo_selecionado
@@ -278,6 +279,6 @@ function deseleccionar_todos() {
     //  Limpiar el array de tipo_selecionado
     tipo_selecionado = [];
 
-    //  Forzar re-renderizado de todas las filas para reflejar los íconos
+    //  Forzar renderizado de todas las filas para reflejar los íconos
     table.getRows().forEach(row => row.reformat());
 }

@@ -1410,8 +1410,9 @@ $('#select-ver-usu-file').on('change', async function () {
 
     if (server.resultado.documentos) {
         //console.log(server.resultado.documentos)
+        let rutas =server.resultado.documentos.reverse()
 
-        let documentos = server.resultado.documentos.map(rutaCompleta => {
+        let documentos = rutas.map(rutaCompleta => {
             // Extraer solo el nombre del archivo
             let nombreArchivoCompleto = rutaCompleta.split('/').pop();
 

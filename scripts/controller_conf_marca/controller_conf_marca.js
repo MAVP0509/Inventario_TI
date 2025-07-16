@@ -215,7 +215,7 @@ function mdl_nuevo_marca() {
     document.getElementById('marca').placeholder = "Nueva marca"
     document.getElementById('mdl-btn-conf').onclick = function () { nuevo_marca() }
     document.getElementById('mdl-btn-conf').disabled = false
-    document.getElementById('alert-edit-marca').setAttribute('style', 'display: none ;  background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;');
+    document.getElementById('alert-edit-marca').setAttribute('style', 'display: none !important;  background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;');
     $("#mdl-marca").modal('show');
 }
 
