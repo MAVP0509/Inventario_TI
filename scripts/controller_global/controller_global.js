@@ -44,33 +44,38 @@ function validar_campos(campos) {
     // Recorre cada ID de campo recibido en el array 'campos'
     campos.forEach(id => {
         // Obtiene el elemento del DOM por su ID
-        const campo = document.getElementById(id);
+        const $campo = $('#' + id);
+
+       /*  if ($campo.length === 0) {
+            valido = false
+            return;
+        } */
 
         // Si no se encuentra el elemento, se marca como inválido y se sale de la iteración
-        if (!campo) return valido = false;
+        if (!$campo) return valido = false;
 
         // Verifica si el campo tiene la clase 'is-required'
-        const requerido = $(campo).hasClass('is-required');
+        const requerido = $campo.hasClass('is-required');
 
         // Verifica si el campo está vacío (sin espacios)
-        const vacio = !campo.value.trim();
+        const vacio = !$campo.val().trim();
 
         // Si el campo está vacío (sea requerido), se marca como inválido
         if ((requerido && vacio) || vacio) {
             // Añade la clase 'is-invalid' para mostrar advertencia visual
-            campo.classList.add('is-invalid');
+            $campo.addClass('is-invalid');
             // Cambia la bandera general a falso (hay al menos un campo inválido)
             valido = false;
         } else {
             // Si el campo no está vacío, se asegura de quitar la clase de advertencia
-            campo.classList.remove('is-invalid');
+            $campo.removeClass('is-invalid');
         }
 
         // Añade un evento al campo para que, al escribir en él,
         // se quite la clase de error si el valor ya no está vacío
-        campo.addEventListener('input', () => {
-            if (campo.value.trim()) {
-                campo.classList.remove('is-invalid');
+        $campo.on('input.validacion', () => {
+            if ($campo.val().trim()) {
+                $campo.removeClass('is-invalid');
             }
         });
     });

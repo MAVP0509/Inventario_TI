@@ -690,11 +690,11 @@ async function desactivar_registro() {
     let response = await server_inventario(model);
     // console.log(response)
     if (Array.isArray(response.resultado)) {
-        await registrar_historico('Eliminación de registro', response.resultado);
-        mostrar_toast('success', '¡Eliminación exitosa!', 'El registro se ha eliminado correctamente.');
+        await registrar_historico('Baja de activo', response.resultado);
+        mostrar_toast('success', '¡Baja de activo exitosa!', 'El registro se ha eliminado correctamente.');
         consultar_informacion();
     } else {
-        mostrar_toast('error', 'Error', 'No se pudo eliminar el registro. Inténtalo nuevamente.');
+        mostrar_toast('error', 'Error', 'No se pudo realizar la baja del activo. Inténtalo nuevamente.');
     }
 }
 
@@ -811,6 +811,8 @@ async function imprimir_pdf() {
 }
 
 //TODO: Validación de funciones
+
+
 let tbl_baja = null;
 async function confirmar_eliminacion() {
 
@@ -857,10 +859,26 @@ async function confirmar_eliminacion() {
         })
 
         await general_select2({
+            selectId: 'cg-emisor',
+            tabla: 'cat_usuarios',
+            campo: 'cargo',
+            placeholder: 'Seleciona al usuario quien emite la baja',
+            dropdownParent: '#step-3',
+        })
+
+        await general_select2({
             selectId: 'slc-supervisor',
             tabla: 'supervisor',
             campo: 'nombre',
             placeholder: 'Selecciona al usuario que supervisa la baja',
+            dropdownParent: '#step-3',
+        })
+
+        await general_select2({
+            selectId: 'cg-supervisor',
+            tabla: 'supervisor',
+            campo: 'cargo',
+            placeholder: 'Seleciona al usuario quien emite la baja',
             dropdownParent: '#step-3',
         })
 
@@ -873,6 +891,14 @@ async function confirmar_eliminacion() {
         })
 
         await general_select2({
+            selectId: 'cg-vobo',
+            tabla: 'cat_usuarios',
+            campo: 'cargo',
+            placeholder: 'Seleciona al usuario quien emite la baja',
+            dropdownParent: '#step-3',
+        })
+
+        await general_select2({
             selectId: 'slc-autorizo',
             tabla: 'cat_usuarios',
             campo: 'nombre',
@@ -880,8 +906,17 @@ async function confirmar_eliminacion() {
             dropdownParent: '#step-3',
         })
 
+        await general_select2({
+            selectId: 'cg-autorizo',
+            tabla: 'cat_usuarios',
+            campo: 'cargo',
+            placeholder: 'Seleciona al usuario quien emite la baja',
+            dropdownParent: '#step-3',
+        })
+
         // console.log(opcion)
         $('#inp-motivo, #inp-monto, #inp-quincena, #inp-reubicacion').prop('disabled', true);
+        $('#cg-emisor, #cg-supervisor, #cg-vobo, #cg-autorizo').prop('disabled', true);
 
         $('#smartwizard').smartWizard("reset");
         $('#smartwizard').smartWizard({
@@ -901,10 +936,74 @@ async function confirmar_eliminacion() {
             lang: {
                 next: 'Siguiente',
                 previous: 'Anterior'
+            },
+            anchor: {
+                enableDoneState: true,
             }
         });
 
+        $('#smartwizard').on('leaveStep', function (e, anchorObject, currentStepIndex, nextStepIndex, stepDirection) {
+            // Solo valida el avance (no al retroceder)
+            if (stepDirection === 'forward') {
+                const validacion = {
+                    0: ['slc-motivo', 'inp-motivo', 'inp-monto', 'inp-quincena', 'inp-reubicacion'],    // Paso 1: Validar campo con ID
+                    1: ['inp-observaciones'],   // Paso 2: Validar campo con ID
+                    2: ['slc-emisor', 'slc-supervisor', 'slc-vobo', 'slc-autorizo'],    // Paso 3: Validar campo con ID
+                };
+
+                // Obtiene los campos del paso actual
+                const campos_v = validacion[currentStepIndex];
+                const campos_habilitados = campos_v.filter(id => !$('#' + id).prop('disabled'));
+
+                // Si hay campos definidos para este paso, se validan
+                if (campos_habilitados.length && !validar_campos(campos_habilitados)) {
+                    // Previene que el wizard avance si la validación falla
+                    return false;
+                }
+            }
+
+            // Permite avanzzar si no hay problemas
+            return true;
+        });
+
         $('#mdl-baja').modal("show");
+
+        $('#slc-emisor, #slc-supervisor, #slc-vobo, #slc-autorizo').on('change', function () {
+            let usuario_selecionado = $(this).val()?.trim();
+            let selecionado = $(this);
+            let nuevo = true;
+
+            selecionado.find('option').each(function () {
+                if ($(this).val() === usuario_selecionado && !$(this).attr('data-select2-tag')) {
+                    nuevo = false;
+                }
+            });
+
+            if (usuario_selecionado && nuevo) {
+                $('#cg-emisor').prop('disabled', false);
+                $('#cg-emisor').val(null).trigger('change');
+            } else {
+                $('#cg-emisor').prop('disabled', true);
+
+                if (!$('#cg-emisor').find(usuario_selecionado).length) {
+                    const vista = selecionado.find('option:selected').text().trim();
+
+                    for (let i = 0; i < datos.length; i++) {
+                        const element = datos[i];
+                        if (element.usuario === vista) {
+                            texto = element.posicion;
+                            // console.log(selecreg)
+                            break;
+                        }
+                    }
+                    const nueva_opcion = new Option(texto, usuario_selecionado, true, true);
+                    $('#cg-emisor').append(nueva_opcion).trigger('change');
+                } else {
+                    $('#cg-emisor').val(usuario_selecionado).trigger('change');
+                }
+            }
+
+        });
 
         $('#slc-motivo').on('change', function () {
             let motivo_seleccionado = $(this).val();
@@ -1004,7 +1103,7 @@ async function generar_baja() {
 
 //TODO Funciones de los Select2
 
-async function general_select2({ selectId, tabla, campo, data, placeholder, dropdownParent, tags, popoverTitle, popoverContent, placement }) {
+async function general_select2({ selectId, tabla, campo, data, placeholder, dropdownParent, tags, popoverTitle, popoverContent, placement, sincronizarCon, sincronizarCampo }) {
     //try {
     let opciones = [];
 
@@ -1017,7 +1116,7 @@ async function general_select2({ selectId, tabla, campo, data, placeholder, drop
         }));
 
     } else if (tabla && campo) {
-        const response = await server_inventario({
+        let response = await server_inventario({
             accion: 5,
             tabla: tabla,
             campo: campo
@@ -1027,6 +1126,17 @@ async function general_select2({ selectId, tabla, campo, data, placeholder, drop
             id: item.id || '',
             text: item[campo] || ''
         }));
+
+    } else if (tabla && campo && sincronizarCon && sincronizarCampo) {
+        let response = await server_inventario({
+            accion: 5,
+            tabla: tabla,
+            campo: campo,
+            sincronizarCon: sincronizarCon,
+            sincronizarCampo: sincronizarCampo
+        });
+
+        opciones
 
     }
 

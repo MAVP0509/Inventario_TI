@@ -102,8 +102,7 @@
                                         </button>
                                         <button type="button" style="text-align: center"
                                             class="btn btn-danger rounded icon mr-3" onclick="confirmar_eliminacion()">
-                                            <i class="fa-solid fa-desktop"><i
-                                                    class="fa-solid fa-arrow-turn-down"></i></i> Baja
+                                            <i class="fa-solid fa-desktop"><i class="fa-solid fa-arrow-turn-down"></i></i> Baja
                                         </button>
                                         <button type="button" class="btn btn-light rounded mr-3 icon"
                                             onclick="consultar_num_serie()">
@@ -497,7 +496,8 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fa-solid fa-list-ul"></i></span>
                                         </div>
-                                        <select class="form-control" id="slc-motivo" data-live-search="true" data-container="body"> </select>
+                                        <select class="form-control" id="slc-motivo" data-live-search="true" data-container="body"></select>
+                                        <div class="invalid-feedback">Por favor, seleccione un motivo</div>
                                     </div>
                                     <div id="sh-motivo">
                                         <h6>Otro motivo de baja</h6>
@@ -506,8 +506,8 @@
                                                 <span class="input-group-text"><i
                                                         class="fa-solid fa-clipboard-question"></i></span>
                                             </div>
-                                            <input type="text" class="form-control" id="inp-motivo"
-                                                placeholder="Especifique el motivo de baja">
+                                            <input type="text" class="form-control" id="inp-motivo" placeholder="Especifique el motivo de baja">
+                                            <div class="invalid-feedback">Por favor, especifique el motivo</div>
                                         </div>
                                     </div>
                                     <div id="sh-reubicacion">
@@ -517,8 +517,8 @@
                                                 <span class="input-group-text"><i
                                                         class="fa-solid fa-clipboard-question"></i></span>
                                             </div>
-                                            <input type="text" class="form-control" id="inp-reubicacion"
-                                                placeholder="Especifique la nueva ubicación del activo">
+                                            <input type="text" class="form-control" id="inp-reubicacion" placeholder="Especifique la nueva ubicación del activo">
+                                            <div class="invalid-feedback">Por favor, especifique la ubicación</div>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -529,8 +529,8 @@
                                                     <span class="input-group-text"><i
                                                             class="fa-solid fa-clipboard-question"></i></span>
                                                 </div>
-                                                <input type="text" class="form-control" id="inp-monto"
-                                                    placeholder="Especifique el monto a descontar">
+                                                <input type="text" class="form-control" id="inp-monto" placeholder="Especifique el monto a descontar">
+                                                <div class="invalid-feedback">Por favor, especifique el monto a descontar</div>
                                             </div>
                                         </div>
                                         <div class="col-md-6" id="sh-quincena">
@@ -540,8 +540,8 @@
                                                     <span class="input-group-text"><i
                                                             class="fa-solid fa-clipboard-question"></i></span>
                                                 </div>
-                                                <input type="text" class="form-control" id="inp-quincena"
-                                                    placeholder="Especifique el número de quincenas a descontar">
+                                                <input type="text" class="form-control" id="inp-quincena" placeholder="Especifique el número de quincenas a descontar">
+                                                <div class="invalid-feedback">Por favor, especifique el número de quincenas</div>
                                             </div>
                                         </div>
                                     </div>
@@ -557,8 +557,10 @@
                                         </div>
                                         <input type="text" class="form-control" id="inp-observaciones"
                                             placeholder="Observaciones de activos">
+                                            <div class="invalid-feedback">Por favor, ingrese algunas observaciones</div>
                                     </div>
                                 </div>
+                                
                                 <!-- Paso 3 -->
                                 <div id="step-3" class="tab-pane" role="tabpanel">
                                     <div class="row">
@@ -570,8 +572,19 @@
                                                             class="fa-solid fa-person-circle-plus"></i></span>
                                                 </div>
                                                 <select class="form-control" id="slc-emisor"></select>
+                                                <div class="invalid-feedback">Por favor, seleccione al emisor</div>
+                                            </div>
+                                            <h6>Cargo del emisor</h6>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i
+                                                            class="fa-solid fa-person-circle-plus"></i></span>
+                                                </div>
+                                                <select class="form-control" id="cg-emisor"></select>
+                                                <!-- <div class="invalid-feedback">Por favor, seleccione al emisor</div> -->
                                             </div>
                                         </div>
+
                                         <div class="col-md-6">
                                             <h6>Supervisó</h6>
                                             <div class="input-group mb-3">
@@ -580,6 +593,15 @@
                                                             class="fa-solid fa-person-circle-exclamation"></i></span>
                                                 </div>
                                                 <select class="form-control" id="slc-supervisor"></select>
+                                                <div class="invalid-feedback">Por favor, seleccione un supervisor</div>
+                                            </div>
+                                            <h6>Cargo del supervisor</h6>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i
+                                                            class="fa-solid fa-person-circle-plus"></i></span>
+                                                </div>
+                                                <select class="form-control" id="cg-supervisor"></select>
                                             </div>
                                         </div>
                                     </div>
@@ -592,6 +614,15 @@
                                                             class="fa-solid fa-person-chalkboard"></i></span>
                                                 </div>
                                                 <select class="form-control" id="slc-vobo"></select>
+                                                <div class="invalid-feedback">Por favor, seleccione al encargado de dar el Vo. Bo.</div>
+                                            </div>
+                                            <h6>Cargo del Vo. Bo.</h6>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i
+                                                            class="fa-solid fa-person-circle-plus"></i></span>
+                                                </div>
+                                                <select class="form-control" id="cg-vobo"></select>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -602,6 +633,15 @@
                                                             class="fa-solid fa-person-circle-check"></i></span>
                                                 </div>
                                                 <select class="form-control" id="slc-autorizo"></select>
+                                                <div class="invalid-feedback">Por favor, seleccione al encargado de autorizar</div>
+                                            </div>
+                                            <h6>Cargo del autorizador</h6>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"><i
+                                                            class="fa-solid fa-person-circle-plus"></i></span>
+                                                </div>
+                                                <select class="form-control" id="cg-autorizo"></select>
                                             </div>
                                         </div>
                                     </div>
@@ -798,10 +838,10 @@
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<script src="scripts/controller_acceso/controller_acceso.js"></script>
-<script src="scripts/controller_global/controller_global.js"></script>
-<script src="scripts/controller_inventario/controller_inventario.js"></script>
-<script src="scripts/controller_historico/controller_historico.js"></script>
-<script src="dist/js/adminlte.min.js"></script>
+<script src="scripts/controller_acceso/controller_acceso.js" defer></script>
+<script src="scripts/controller_global/controller_global.js" defer></script>
+<script src="scripts/controller_inventario/controller_inventario.js" defer></script>
+<script src="scripts/controller_historico/controller_historico.js" defer></script>
+<script src="dist/js/adminlte.min.js" defer></script>
 
 </html>

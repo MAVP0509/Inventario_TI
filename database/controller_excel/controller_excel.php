@@ -288,32 +288,40 @@ function bajas($valores)
     $pageMargins->setLeft(0.5);
     $pageMargins->setRight(0.5);
 
-    $fila = 15;
+    $fila_observaciones = 27;
+    $fila_firmas = 38;
+    $fila_inicial = 15;
+
+    $cantidad_filas = count($datos);
+    // $fila_final = $fila_inicial + $cantidad_filas - 1;
 
     foreach ($datos as $item) {
-        $worksheet->insertNewRowBefore($fila, 1);
+        if ($fila_inicial != 15) {
+            $worksheet->insertNewRowBefore($fila_inicial, 1);   // Solo inserta después de la primera
+        }
+        
+        $worksheet->mergeCells("D$fila_inicial:H$fila_inicial");
 
-        $worksheet->mergeCells("D$fila:H$fila");
+        $worksheet->duplicateStyle($worksheet->getStyle("B15:K15"), "B$fila_inicial:K$fila_inicial");
 
-        $worksheet->duplicateStyle($worksheet->getStyle("B15:K15"), "B$fila:K$fila");
+        $worksheet->getStyle("B$fila_inicial:K$fila_inicial")->getAlignment()->setWrapText(true);
+        $worksheet->getRowDimension($fila_inicial)->setRowHeight(-1);
 
-        $worksheet->getStyle("B$fila:K$fila")->getAlignment()->setWrapText(true);
-        $worksheet->getRowDimension($fila)->setRowHeight(-1);
+        $worksheet->getStyle("B$fila_inicial:K$fila_inicial")->getFont()->setBold(false);
 
-        $worksheet->getStyle("B$fila:K$fila")->getFont()->setBold(false);
+        $worksheet->setCellValue("B$fila_inicial", $item->rownum);
+        $worksheet->setCellValue("C$fila_inicial", $item->motivo_baja_id);
+        $worksheet->setCellValue("D$fila_inicial", $item->descripcion);
+        // $worksheet->setCellValue("I$fila_inicial", $item->lote);
+        $worksheet->setCellValue("J$fila_inicial", $item->ubicacion);
+        $worksheet->setCellValue("K$fila_inicial", $item->af);
 
-        $worksheet->setCellValue("B$fila", $item->rownum);
-        $worksheet->setCellValue("C$fila", $item->motivo_baja_id);
-        $worksheet->setCellValue("D$fila", $item->descripcion);
-        // $worksheet->setCellValue("I$fila", $item->lote);
-        $worksheet->setCellValue("J$fila", $item->ubicacion);
-        $worksheet->setCellValue("K$fila", $item->af);
-
-        $fila++;
+        $fila_inicial++;
     }
 
-    $worksheet->removeRow($fila);
-    $fila_final = $fila - 1;
+    if (count($datos) > 0) {
+        $worksheet->removeRow($fila_inicial);   // Elimina la fila_inicial extra
+    }
 
     if ($valores->motivo == '5') {
         $worksheet->setCellValue('F12', $valores->otro);
@@ -328,15 +336,15 @@ function bajas($valores)
         $worksheet->setCellValue('E24', $valores->reubicacion);
     }
 
-    $fila_observaciones = 16 + $fila;
-    $worksheet->setCellValue("B$fila_observaciones", $valores->observaciones);
+    $observaciones = $fila_observaciones + ($cantidad_filas - 1);
+    $worksheet->setCellValue("B$observaciones", $valores->observaciones);
 
-    $fila_superior = 22 + $fila;
+    $firmas = $fila_firmas + ($cantidad_filas - 1);
 
-    $worksheet->setCellValue("C$fila_superior", $valores->emisor);
-    $worksheet->setCellValue("E$fila_superior", $valores->supervisor);
-    $worksheet->setCellValue("G$fila_superior", $valores->vobo);
-    $worksheet->setCellValue("I$fila_superior", $valores->autorizo);
+    $worksheet->setCellValue("C$firmas", $valores->emisor);
+    $worksheet->setCellValue("E$firmas", $valores->supervisor);
+    $worksheet->setCellValue("G$firmas", $valores->vobo);
+    $worksheet->setCellValue("I$firmas", $valores->autorizo);
 
     $nombre_doc = explode(" ", $valores->motivo);
     $nombre_doc = join("_", $nombre_doc);
