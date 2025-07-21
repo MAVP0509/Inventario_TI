@@ -466,7 +466,7 @@ async function mdl_nvo_registro() {
         tags: true,
         popoverTitle: "Aviso",
         popoverContent: "Si se ingresa un nuevo usuario, favor de asignarle un cargo",
-        placement: 'top'
+        placement: 'top',
     });
 
     await general_select2({
@@ -476,6 +476,8 @@ async function mdl_nvo_registro() {
         placeholder: 'Selecione un cargo',
         dropdownParent: '#mdl-inventario',
         tags: true,
+        sincronizarCon: 'inp-usuario',
+        sincronizarCampo: 'cargo',
     })
 
     document.getElementById('title-mdl-inventario').textContent = "Registro de Activo"
@@ -485,7 +487,7 @@ async function mdl_nvo_registro() {
 
 }
 
-$('#inp-usuario').off('change').on('change', function () {
+/* $('#inp-usuario').off('change').on('change', function () {
     let userSelected = $(this).val()?.trim();
     let select = $(this);
     let nuevo = true;
@@ -525,18 +527,7 @@ $('#inp-usuario').off('change').on('change', function () {
             cargo.val(userSelected).trigger('change');
         }
     }
-
-    /* if (userSelected && nuevo) {
-        $cargo.prop('disabled', false); // Permitir escribir el cargo si es nuevo
-        $cargo.val(null).trigger('change');
-    } else {
-        $cargo.prop('disabled', true); // Desactiva el cargo si se eligió uno existente
-
-            $cargo.val(userSelected).trigger('change'); // Puedes usar este valor si así lo deseas
-        }
-        
-    } */
-});
+}); */
 
 async function crear_registro() {
     // Campos requeridos para validación
@@ -818,12 +809,33 @@ async function confirmar_eliminacion() {
 
     let data = datos.filter(el => equipo_seleccionado.includes(el.id_equipo));
     if (equipo_seleccionado.length === 0) {
+        mostrar_toast('info', 'Información', 'Selecciona al menos un activo. Inténtalo nuevamente.');
+        return;
+    }
+
+    let estado = data.some(item => item.estatus === 'Asignado')
+    // console.log(estado)
+    if (estado) {
+        mostrar_toast('warning', 'Alerta', 'Uno o más activos se encuentran asignados. Inténtalo nuevamente.');
+        return;
+
+    } else {        
+        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false)
+    }
+
+    // mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, desactivar_registro)
+}
+
+async function mostrar_baja() {
+
+    let data = datos.filter(el => equipo_seleccionado.includes(el.id_equipo));
+    if (equipo_seleccionado.length === 0) {
         mostrar_toast('info', 'Información', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
         return;
     }
 
     let estado = data.some(item => item.estatus === 'Asignado')
-    console.log(estado)
+    // console.log(estado)
     if (estado) {
         mostrar_toast('warning', 'Alerta', 'Uno o más activos se encuentran asignados. Inténtalo nuevamente.');
         return;
@@ -844,6 +856,7 @@ async function confirmar_eliminacion() {
             data: opcion,
             placeholder: 'Selecione un motivo',
             dropdownParent: '#step-1',
+            tags: true,
             // popoverTitle: 'Descripción',
             // popoverContent: 'Causa por la cual no se encuentre en condiciones óptimas para su uso y/o aprovechamiento.',
             // placement: "right",
@@ -856,6 +869,7 @@ async function confirmar_eliminacion() {
             campo: 'nombre',
             placeholder: 'Seleciona al usuario quien emite la baja',
             dropdownParent: '#step-3',
+            tags: true,
         })
 
         await general_select2({
@@ -864,6 +878,9 @@ async function confirmar_eliminacion() {
             campo: 'cargo',
             placeholder: 'Seleciona al usuario quien emite la baja',
             dropdownParent: '#step-3',
+            sincronizarCon: 'slc-emisor',
+            sincronizarCampo: 'cargo',
+            tags: true,
         })
 
         await general_select2({
@@ -872,6 +889,7 @@ async function confirmar_eliminacion() {
             campo: 'nombre',
             placeholder: 'Selecciona al usuario que supervisa la baja',
             dropdownParent: '#step-3',
+            tags: true,
         })
 
         await general_select2({
@@ -880,6 +898,9 @@ async function confirmar_eliminacion() {
             campo: 'cargo',
             placeholder: 'Seleciona al usuario quien emite la baja',
             dropdownParent: '#step-3',
+            sincronizarCon: 'slc-supervisor',
+            sincronizarCampo: 'cargo',
+            tags: true,
         })
 
         await general_select2({
@@ -888,6 +909,7 @@ async function confirmar_eliminacion() {
             campo: 'nombre',
             placeholder: 'Seleccione un usuario',
             dropdownParent: '#step-3',
+            tags: true,
         })
 
         await general_select2({
@@ -896,6 +918,9 @@ async function confirmar_eliminacion() {
             campo: 'cargo',
             placeholder: 'Seleciona al usuario quien emite la baja',
             dropdownParent: '#step-3',
+            sincronizarCon: 'slc-vobo',
+            sincronizarCampo: 'cargo',
+            tags: true,
         })
 
         await general_select2({
@@ -904,6 +929,7 @@ async function confirmar_eliminacion() {
             campo: 'nombre',
             placeholder: 'Seleccione un usuario',
             dropdownParent: '#step-3',
+            tags: true,
         })
 
         await general_select2({
@@ -912,6 +938,9 @@ async function confirmar_eliminacion() {
             campo: 'cargo',
             placeholder: 'Seleciona al usuario quien emite la baja',
             dropdownParent: '#step-3',
+            sincronizarCon: 'slc-autorizo',
+            sincronizarCampo: 'cargo',
+            tags: true,
         })
 
         // console.log(opcion)
@@ -922,7 +951,7 @@ async function confirmar_eliminacion() {
         $('#smartwizard').smartWizard({
             theme: 'dots',
             autoAdjustHeight: true,
-            selected: 0,
+            // selected: 0,
             toolbarSettings: {
                 toolbarPosition: 'top',
                 showNextButton: true,
@@ -967,43 +996,6 @@ async function confirmar_eliminacion() {
         });
 
         $('#mdl-baja').modal("show");
-
-        $('#slc-emisor, #slc-supervisor, #slc-vobo, #slc-autorizo').on('change', function () {
-            let usuario_selecionado = $(this).val()?.trim();
-            let selecionado = $(this);
-            let nuevo = true;
-
-            selecionado.find('option').each(function () {
-                if ($(this).val() === usuario_selecionado && !$(this).attr('data-select2-tag')) {
-                    nuevo = false;
-                }
-            });
-
-            if (usuario_selecionado && nuevo) {
-                $('#cg-emisor').prop('disabled', false);
-                $('#cg-emisor').val(null).trigger('change');
-            } else {
-                $('#cg-emisor').prop('disabled', true);
-
-                if (!$('#cg-emisor').find(usuario_selecionado).length) {
-                    const vista = selecionado.find('option:selected').text().trim();
-
-                    for (let i = 0; i < datos.length; i++) {
-                        const element = datos[i];
-                        if (element.usuario === vista) {
-                            texto = element.posicion;
-                            // console.log(selecreg)
-                            break;
-                        }
-                    }
-                    const nueva_opcion = new Option(texto, usuario_selecionado, true, true);
-                    $('#cg-emisor').append(nueva_opcion).trigger('change');
-                } else {
-                    $('#cg-emisor').val(usuario_selecionado).trigger('change');
-                }
-            }
-
-        });
 
         $('#slc-motivo').on('change', function () {
             let motivo_seleccionado = $(this).val();
@@ -1059,8 +1051,6 @@ async function confirmar_eliminacion() {
         })
 
     }
-
-    // mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, desactivar_registro)
 }
 
 async function generar_baja() {
@@ -1077,10 +1067,14 @@ async function generar_baja() {
         monto: $("#inp-monto").val().trim(),
         quincena: $("#inp-quincena").val().trim(),
         observaciones: $("#inp-observaciones").val().trim(),
-        emisor: $("#slc-emisor").val(),
-        supervisor: $("#slc-supervisor").val(),
-        vobo: $("#slc-vobo").val(),
-        autorizo: $("#slc-autorizo").val(),
+        emisor: $("#slc-emisor").select2('data')[0].text,
+        cg_emisor: $("#cg-emisor").select2('data')[0].text,
+        supervisor: $("#slc-supervisor").select2('data')[0].text,
+        cg_supervisor: $("#cg-supervisor").select2('data')[0].text,
+        vobo: $("#slc-vobo").select2('data')[0].text,
+        cg_vobo: $("#cg-vobo").select2('data')[0].text,
+        autorizo: $("#slc-autorizo").select2('data')[0].text,
+        cg_autorizo: $("#cg-autorizo").select2('data')[0].text,
         tabla_baja: tbl_baja.getData().map((item, index) => ({
             ...item,
             rownum: index + 1,
@@ -1093,8 +1087,10 @@ async function generar_baja() {
     let server = await server_excel(model);
 
     if (server.resultado.result === true && server.resultado.url) {
-        mostrar_toast('success', '¡Baja exitosa!', 'El activo se ha dado de baja correctamente.');
+        // mostrar_toast('success', '¡Baja exitosa!', 'El activo se ha dado de baja correctamente.');
         window.location = server.resultado.url;
+        desactivar_registro();
+        $('#mdl-baja').modal("hide");
     } else {
         mostrar_toast('error', 'Error', 'No se pudo dar de baja el activo. Inténtalo nuevamente.')
     }
@@ -1127,17 +1123,6 @@ async function general_select2({ selectId, tabla, campo, data, placeholder, drop
             text: item[campo] || ''
         }));
 
-    } else if (tabla && campo && sincronizarCon && sincronizarCampo) {
-        let response = await server_inventario({
-            accion: 5,
-            tabla: tabla,
-            campo: campo,
-            sincronizarCon: sincronizarCon,
-            sincronizarCampo: sincronizarCampo
-        });
-
-        opciones
-
     }
 
     const $select = $('#' + selectId);
@@ -1168,6 +1153,52 @@ async function general_select2({ selectId, tabla, campo, data, placeholder, drop
         });
 
         $select2Container.popover();
+    }
+
+    // Sincronización aútomatica
+    if (sincronizarCon && sincronizarCampo) {
+        const origen = $(`#${sincronizarCon}`);
+        const destino = $(`#${selectId}`);
+
+        origen.off(`change.sync-${selectId}`);  // Limpia el evento anterior
+        origen.on(`change.sync-${selectId}`, async function () {
+            const id_selecionado = $(this).val();
+            const data_seleccionada = $(this).select2('data')[0];
+            const origen_seleccionado = origen.data('select2')?.opts?.tags === true;
+            const nuevo = origen_seleccionado && data_seleccionada && data_seleccionada.element === undefined;
+
+            if (id_selecionado && nuevo) {
+                destino.prop('disabled', false);
+                destino.val(null).trigger('change');
+                // destino.focus();
+            } else {
+                destino.prop('disabled', true);
+                destino.empty();
+
+                let response = await server_inventario({
+                    accion: 5,
+                    tabla: tabla,
+                    campo: sincronizarCampo,
+                    id: id_selecionado,
+                });
+
+                const registro = response?.resultado?.[0];
+                const texto_destino = registro?.[sincronizarCampo];
+
+                // destino.prop('disabled', true);
+                // Borra opciones previas si existieran
+                // destino.empty()
+
+                if (texto_destino) {
+                    // Crea la opción sincronizada y la selecciona
+                    const nueva_opcion = new Option(texto_destino, texto_destino, true, true);
+                    destino.append(nueva_opcion).trigger('change');
+                } else {
+                    destino.val(null).trigger('change');
+                }
+            }
+
+        });
     }
 
 }

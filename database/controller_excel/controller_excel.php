@@ -289,20 +289,24 @@ function bajas($valores)
     $pageMargins->setRight(0.5);
 
     $fila_observaciones = 27;
-    $fila_firmas = 38;
+    $Fila_nombre = 38;
+    $fila_cargos = 39;
     $fila_inicial = 15;
+    $fila_monto = 18;
+    $fila_quincena = 19;
+    $fila_reubicacion = 24;
 
     $cantidad_filas = count($datos);
     // $fila_final = $fila_inicial + $cantidad_filas - 1;
 
     foreach ($datos as $item) {
-        if ($fila_inicial != 15) {
+        if ($cantidad_filas != 15) {
             $worksheet->insertNewRowBefore($fila_inicial, 1);   // Solo inserta después de la primera
         }
-        
+
         $worksheet->mergeCells("D$fila_inicial:H$fila_inicial");
 
-        $worksheet->duplicateStyle($worksheet->getStyle("B15:K15"), "B$fila_inicial:K$fila_inicial");
+        $worksheet->duplicateStyle($worksheet->getStyle("B16:K16"), "B$fila_inicial:K$fila_inicial");
 
         $worksheet->getStyle("B$fila_inicial:K$fila_inicial")->getAlignment()->setWrapText(true);
         $worksheet->getRowDimension($fila_inicial)->setRowHeight(-1);
@@ -328,23 +332,34 @@ function bajas($valores)
     }
 
     if ($valores->motivo == '3') {
-        $worksheet->setCellValue('F18', $valores->monto);
-        $worksheet->setCellValue('F19', $valores->quincena);
+        $monto = $fila_monto + ($cantidad_filas - 1);
+        $worksheet->setCellValue("F$monto", $valores->monto);
+        $quincena = $fila_quincena + ($cantidad_filas - 1);
+        $worksheet->setCellValue("F$quincena", $valores->quincena);
     }
 
     if ($valores->motivo == '6') {
-        $worksheet->setCellValue('E24', $valores->reubicacion);
+        $reubicacion = $fila_reubicacion + ($cantidad_filas - 1);
+        $worksheet->setCellValue("E$reubicacion", $valores->reubicacion);
     }
 
     $observaciones = $fila_observaciones + ($cantidad_filas - 1);
     $worksheet->setCellValue("B$observaciones", $valores->observaciones);
 
-    $firmas = $fila_firmas + ($cantidad_filas - 1);
+    $nombres = $Fila_nombre + ($cantidad_filas - 1);
+    $worksheet->setCellValue("C$nombres", $valores->emisor);
+    $worksheet->setCellValue("E$nombres", $valores->supervisor);
+    $worksheet->setCellValue("G$nombres", $valores->vobo);
+    $worksheet->setCellValue("I$nombres", $valores->autorizo);
+    $worksheet->getStyle("C$nombres")->getAlignment()->setWrapText(true);
 
-    $worksheet->setCellValue("C$firmas", $valores->emisor);
-    $worksheet->setCellValue("E$firmas", $valores->supervisor);
-    $worksheet->setCellValue("G$firmas", $valores->vobo);
-    $worksheet->setCellValue("I$firmas", $valores->autorizo);
+    $cargos = $fila_cargos + ($cantidad_filas - 1);
+
+    $worksheet->setCellValue("C$cargos", $valores->cg_emisor);
+    $worksheet->setCellValue("E$cargos", $valores->cg_supervisor);
+    $worksheet->setCellValue("G$cargos", $valores->cg_vobo);
+    $worksheet->setCellValue("I$cargos", $valores->cg_autorizo);
+    $worksheet->getStyle("C$cargos")->getAlignment()->setWrapText(true);
 
     $nombre_doc = explode(" ", $valores->motivo);
     $nombre_doc = join("_", $nombre_doc);
@@ -355,7 +370,7 @@ function bajas($valores)
     $url_descarga = "http://localhost/Inventario_TI/database/controller_excel/{$nombreArchivo}";
 
 
-     // No guardamos el archivo en disco, en vez de eso enviamos al navegador:
+    // No guardamos el archivo en disco, en vez de eso enviamos al navegador:
     /* header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     header("Content-Disposition: attachment; filename=\"$nombreArchivo\"");
     header('Cache-Control: max-age=0');
