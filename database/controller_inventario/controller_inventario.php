@@ -1,7 +1,5 @@
 <?php
 
-use Dom\Mysql;
-
 header('Content-Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
 
@@ -20,7 +18,7 @@ if ($clientejson->accion == 0) {
 } elseif ($clientejson->accion == 4) {
     $respuesta_servidor->resultado = consultar_para_resguardo($clientejson);
 } elseif ($clientejson->accion == 5) {
-    $respuesta_servidor->resultado = consultar_distintos($clientejson->tabla, $clientejson->campo);
+    $respuesta_servidor->resultado = consultar_distintos($clientejson);
 } elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = traspaso($clientejson);
 } elseif ($clientejson->accion == 7) {
@@ -393,12 +391,37 @@ function consultar_para_resguardo($valores)
     return json_decode($respuesta_raw);
 }
 
-function consultar_distintos($tabla, $campo)
+function consultar_distintos($valores)
 {
     include("../conexion.php");
     //Validación para evitar inyecciones
-    $tabla = mysqli_real_escape_string($con, $tabla);
-    $campo = mysqli_real_escape_string($con, $campo);
+    // var_dump($id);
+    $tabla = mysqli_real_escape_string($con, $valores->tabla ?? '');
+    $campo = mysqli_real_escape_string($con, $valores->campo ?? '');
+    $id = isset($valores->id) ? mysqli_real_escape_string($con, $valores->id) : null;
+    // var_dump($id);
+
+    if (isset($id) && $id !== '') {
+        $id = mysqli_real_escape_string($con, $id);
+
+        $sql = "SELECT * FROM `$tabla` WHERE id = '$id' LIMIT 1;";
+        $query = mysqli_query($con, $sql);
+        // var_dump($query);
+
+        if (!$query) {
+            return [];
+        }
+
+        $fila = mysqli_fetch_assoc($query);
+        if ($fila) {
+            return [[
+                'id' => $fila['id'],
+                $campo => $fila[$campo] ?? ''
+            ]];
+        } else {
+            return [];
+        }
+    }
 
     switch ($campo) {
         case "estatus":
@@ -413,7 +436,7 @@ function consultar_distintos($tabla, $campo)
         case "zona":
         case "ubicacion":
         case "evento":
-        case "cargo":
+        // case "cargo":
             $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE  `$campo` <> 'NA'";
             break;
         default:

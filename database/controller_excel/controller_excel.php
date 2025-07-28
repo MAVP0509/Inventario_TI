@@ -12,7 +12,7 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
-header('Content_Type: text/html; charset=UTF-8');
+header('Content-Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
 
 $clientejson = json_decode($_POST['trama']);
@@ -23,6 +23,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = resguardo($clientejson);
 } elseif ($clientejson->accion == 1) {
     $respuesta_servidor->resultado = cargar_plantilla($clientejson);
+} elseif ($clientejson->accion == 2) {
+    $respuesta_servidor->resultado = bajas($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -114,8 +116,6 @@ function resguardo($valores)
 
         //* Al copiar el estilo de la fila, el texto lo configura en negritas, asi que se le quita las negritas
         $worksheet->getStyle("A$fila:I$fila")->getFont()->setBold(false);
-
-
 
         //* Rellenamos la fila con sus datos correspondientes 
         if ($cel == 0) {
@@ -290,4 +290,129 @@ function cargar_plantilla()
     exportar_pdf($excelFilePath);
     //var_dump($excelFilePath);
     return $respuesta;
+}
+
+function bajas($valores)
+{
+    $datos = $valores->tabla_baja;
+
+    $spreadsheet = IOFactory::load('Baja FO-DSP BAJA.xlsx');
+    $worksheet = $spreadsheet->getActiveSheet();
+
+    $pageSetup = $worksheet->getPageSetup();
+    $pageSetup->setOrientation(PageSetup::ORIENTATION_PORTRAIT);
+    $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LETTER);
+    $pageSetup->setFitToPage(true);
+    $pageSetup->setFitToWidth(1);
+    $pageSetup->setFitToHeight(0);
+
+    $pageMargins = $worksheet->getPageMargins();
+    $pageMargins->setTop(0.5);
+    $pageMargins->setBottom(0.5);
+    $pageMargins->setLeft(0.5);
+    $pageMargins->setRight(0.5);
+
+    $fila_observaciones = 27;
+    $Fila_nombre = 38;
+    $fila_cargos = 39;
+    $fila_inicial = 15;
+    $fila_monto = 18;
+    $fila_quincena = 19;
+    $fila_reubicacion = 24;
+
+    $cantidad_filas = count($datos);
+    // $fila_final = $fila_inicial + $cantidad_filas - 1;
+
+    foreach ($datos as $item) {
+        if ($cantidad_filas != 15) {
+            $worksheet->insertNewRowBefore($fila_inicial, 1);   // Solo inserta después de la primera
+        }
+
+        $worksheet->mergeCells("D$fila_inicial:H$fila_inicial");
+
+        $worksheet->duplicateStyle($worksheet->getStyle("B16:K16"), "B$fila_inicial:K$fila_inicial");
+
+        $worksheet->getStyle("B$fila_inicial:K$fila_inicial")->getAlignment()->setWrapText(true);
+        $worksheet->getRowDimension($fila_inicial)->setRowHeight(-1);
+
+        $worksheet->getStyle("B$fila_inicial:K$fila_inicial")->getFont()->setBold(false);
+
+        $worksheet->setCellValue("B$fila_inicial", $item->rownum);
+        $worksheet->setCellValue("C$fila_inicial", $item->motivo_baja_id);
+        $worksheet->setCellValue("D$fila_inicial", $item->descripcion);
+        // $worksheet->setCellValue("I$fila_inicial", $item->lote);
+        $worksheet->setCellValue("J$fila_inicial", $item->ubicacion);
+        $worksheet->setCellValue("K$fila_inicial", $item->af);
+
+        $fila_inicial++;
+    }
+
+    if (count($datos) > 0) {
+        $worksheet->removeRow($fila_inicial);   // Elimina la fila_inicial extra
+    }
+
+    if ($valores->motivo == '5') {
+        $worksheet->setCellValue('F12', $valores->otro);
+    }
+
+    if ($valores->motivo == '3') {
+        $monto = $fila_monto + ($cantidad_filas - 1);
+        $worksheet->setCellValue("E$monto", $valores->monto);
+        $quincena = $fila_quincena + ($cantidad_filas - 1);
+        $worksheet->setCellValue("E$quincena", $valores->quincena);
+    }
+
+    if ($valores->motivo == '6') {
+        $reubicacion = $fila_reubicacion + ($cantidad_filas - 1);
+        $worksheet->setCellValue("E$reubicacion", $valores->reubicacion);
+    }
+
+    $observaciones = $fila_observaciones + ($cantidad_filas - 1);
+    $worksheet->setCellValue("B$observaciones", $valores->observaciones);
+
+    $nombres = $Fila_nombre + ($cantidad_filas - 1);
+    $worksheet->setCellValue("C$nombres", $valores->emisor);
+    $worksheet->setCellValue("E$nombres", $valores->supervisor);
+    $worksheet->setCellValue("G$nombres", $valores->vobo);
+    $worksheet->setCellValue("I$nombres", $valores->autorizo);
+    $worksheet->getStyle("C$nombres")->getAlignment()->setWrapText(true);
+
+    $cargos = $fila_cargos + ($cantidad_filas - 1);
+
+    $worksheet->setCellValue("C$cargos", $valores->cg_emisor);
+    $worksheet->setCellValue("E$cargos", $valores->cg_supervisor);
+    $worksheet->setCellValue("G$cargos", $valores->cg_vobo);
+    $worksheet->setCellValue("I$cargos", $valores->cg_autorizo);
+    $worksheet->getStyle("C$cargos")->getAlignment()->setWrapText(true);
+
+    $nombre_doc = explode(" ", $valores->motivo);
+    $nombre_doc = join("_", $nombre_doc);
+    $fecha = date('Ymd_His');
+    $nombreArchivo = "Baja_FO_DSP_{$nombre_doc}_{$fecha}.xlsx";
+
+    $ruta_guardado = "C:\\xampp\\htdocs\\Inventario_TI\\database\\controller_excel\\{$nombreArchivo}";
+    $url_descarga = "http://localhost/Inventario_TI/database/controller_excel/{$nombreArchivo}";
+
+
+    // No guardamos el archivo en disco, en vez de eso enviamos al navegador:
+    /* header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header("Content-Disposition: attachment; filename=\"$nombreArchivo\"");
+    header('Cache-Control: max-age=0');
+    header('Expires: 0');
+    header('Pragma: public'); */
+
+    $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+    // $writer->save('php://output');
+    $writer->save($ruta_guardado);
+
+    // $excelFilePath = 'C:\xampp\htdocs\Inventario_TI\database\controller_excel\Baja_FO_DSP_' . $nombre_doc . '.xlsx';
+    // $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+    // $writer->save('Baja_FO_DSP' . $nombre_doc . '.xlsx');
+
+    return [
+        'result' => true,
+        'url' => $url_descarga
+    ];
+
+    // return true;
 }
