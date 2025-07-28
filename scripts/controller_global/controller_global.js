@@ -1,5 +1,5 @@
 //*Función para mostrar un alert
-function mostrar_alert(tipo, mensaje, skip, funcion) {
+function mostrar_alert(tipo, mensaje, skip, funcion, denyButton, denyButtonText, denyFuction) {
     Swal.fire({
         title: 'Inventario TI',
         text: mensaje,
@@ -11,12 +11,16 @@ function mostrar_alert(tipo, mensaje, skip, funcion) {
         confirmButtonText: 'Aceptar <i class="fa-solid fa-circle-check fa-lg">',
         cancelButtonText: 'Cancelar <i class="fa-solid fa-xmark fa-lg"></i>',
         reverseButtons: true, //* 👉 Esto cambia el orden de los botones
+        showDenyButton:denyButton,
+        denyButtonText: denyButtonText,
         backdrop: `
         rgba(0,0,123,0.4)` ,
     }).then((result) => {
         if (result.isConfirmed) {
             // Si el usuario hace clic en "Aceptar", ejecutamos la función que pasamos como parámetro
             funcion();
+        } else if (result.isDenied) {
+            denyFuction();
         }
     })
 }

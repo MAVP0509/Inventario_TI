@@ -333,9 +333,9 @@ function bajas($valores)
 
     if ($valores->motivo == '3') {
         $monto = $fila_monto + ($cantidad_filas - 1);
-        $worksheet->setCellValue("F$monto", $valores->monto);
+        $worksheet->setCellValue("E$monto", $valores->monto);
         $quincena = $fila_quincena + ($cantidad_filas - 1);
-        $worksheet->setCellValue("F$quincena", $valores->quincena);
+        $worksheet->setCellValue("E$quincena", $valores->quincena);
     }
 
     if ($valores->motivo == '6') {

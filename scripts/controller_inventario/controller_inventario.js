@@ -198,12 +198,6 @@ async function consultar_informacion() {
     } catch (error) {
         console.log(error)
     }
-
-    $("#btn-excel").on("click", function () {
-        table.download("xlsx", "Inventario_TI.xlsx", {
-            sheetName: "Inventario"
-        })
-    });
 }
 
 
@@ -241,76 +235,78 @@ async function mdl_editar(params) {
 
 
     // Limpia y carga los select
-    await general_select2({
-        selectId: 'inp-rubro',
-        tabla: 'cat_rubro',
-        campo: 'rubro',
-        placeholder: 'Selecione un rubro',
-        dropdownParent: '#mdl-inventario',
-        tags: true,
-        popoverTitle: "Descripción",
-        popoverContent: "Categoría general del activo. Agrupa dispositivos por su tipo funcional, como computadoras, dispositivos móviles, etc."
-    })
+    await Promise.allSettled([
+        await general_select2({
+            selectId: 'inp-rubro',
+            tabla: 'cat_rubro',
+            campo: 'rubro',
+            placeholder: 'Selecione un rubro',
+            dropdownParent: '#mdl-inventario',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Categoría general del activo. Agrupa dispositivos por su tipo funcional, como computadoras, dispositivos móviles, etc."
+        }),
 
-    await general_select2({
-        selectId: 'inp-tipo',
-        tabla: 'cat_tipo',
-        campo: 'tipo',
-        placeholder: 'Selecione un tipo',
-        dropdownParent: '#mdl-inventario',
-        tags: true,
-        popoverTitle: "Descripción",
-        popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
-    })
+        general_select2({
+            selectId: 'inp-tipo',
+            tabla: 'cat_tipo',
+            campo: 'tipo',
+            placeholder: 'Selecione un tipo',
+            dropdownParent: '#mdl-inventario',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
+        }),
 
-    await general_select2({
-        selectId: 'inp-marca',
-        tabla: 'cat_marca',
-        campo: 'marca',
-        placeholder: 'Seleccione una marca',
-        dropdownParent: '#mdl-inventario',
-        tags: true,
-        popoverTitle: "Descripción",
-        popoverContent: "Es la marca del activo."
-    })
+        general_select2({
+            selectId: 'inp-marca',
+            tabla: 'cat_marca',
+            campo: 'marca',
+            placeholder: 'Seleccione una marca',
+            dropdownParent: '#mdl-inventario',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Es la marca del activo."
+        }),
 
-    await general_select2({
-        selectId: 'inp-zona',
-        tabla: 'inventario_ti_sur',
-        campo: 'zona',
-        placeholder: 'Selecciona una zona',
-        dropdownParent: '#mdl-inventario',
-        tags: true,
-        popoverTitle: "Descripción",
-        popoverContent: "Zona operativa donde se ubica el activo."
-    });
+        general_select2({
+            selectId: 'inp-zona',
+            tabla: 'inventario_ti_sur',
+            campo: 'zona',
+            placeholder: 'Selecciona una zona',
+            dropdownParent: '#mdl-inventario',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Zona operativa donde se ubica el activo."
+        }),
 
-    await general_select2({
-        selectId: 'inp-ubicacion',
-        tabla: 'inventario_ti_sur',
-        campo: 'ubicacion',
-        placeholder: 'Selecciona una ubicacion',
-        dropdownParent: '#mdl-inventario',
-        tags: true,
-        popoverTitle: "Descripción",
-        popoverContent: "Indica el lugar específico dentro de la zona donde se encuentra físicamente el dispositivo."
-    });
+        general_select2({
+            selectId: 'inp-ubicacion',
+            tabla: 'inventario_ti_sur',
+            campo: 'ubicacion',
+            placeholder: 'Selecciona una ubicacion',
+            dropdownParent: '#mdl-inventario',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Indica el lugar específico dentro de la zona donde se encuentra físicamente el dispositivo."
+        }),
 
-    await general_select2({
-        selectId: 'inp-usuario',
-        tabla: 'cat_usuarios',
-        campo: 'nombre',
-        placeholder: 'NA',
-        dropdownParent: '#mdl-inventario',
-    })
+        general_select2({
+            selectId: 'inp-usuario',
+            tabla: 'cat_usuarios',
+            campo: 'nombre',
+            placeholder: 'NA',
+            dropdownParent: '#mdl-inventario',
+        }),
 
-    await general_select2({
-        selectId: 'inp-cargo',
-        tabla: 'cat_usuarios',
-        campo: 'cargo',
-        placeholder: 'NA',
-        dropdownParent: '#mdl-inventario',
-    })
+        general_select2({
+            selectId: 'inp-cargo',
+            tabla: 'cat_usuarios',
+            campo: 'cargo',
+            placeholder: 'NA',
+            dropdownParent: '#mdl-inventario',
+        }),
+    ])
 
     rellenar_select(selecreg.zona, "inp-zona")
     //document.getElementById("inp-zona").value = selecreg.zona;
@@ -402,83 +398,85 @@ async function mdl_nvo_registro() {
     $('#lbl-fecha-reg').hide()
     $('#inp-fecha-reg').hide()
 
-    await general_select2({
-        selectId: 'inp-rubro',
-        tabla: 'cat_rubro',
-        campo: 'rubro',
-        placeholder: 'Seleciona un rubro',
-        dropdownParent: '#mdl-inventario',
-        tags: true,
-        popoverTitle: "Descripción",
-        popoverContent: "Categoría general del activo. Agrupa dispositivos por su tipo funcional, como computadoras, dispositivos móviles, etc."
-    });
+    await Promise.allSettled([
+        general_select2({
+            selectId: 'inp-rubro',
+            tabla: 'cat_rubro',
+            campo: 'rubro',
+            placeholder: 'Seleciona un rubro',
+            dropdownParent: '#mdl-inventario',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Categoría general del activo. Agrupa dispositivos por su tipo funcional, como computadoras, dispositivos móviles, etc."
+        }),
 
-    await general_select2({
-        selectId: 'inp-tipo',
-        tabla: 'cat_tipo',
-        campo: 'tipo',
-        placeholder: 'Seleciona un tipo',
-        dropdownParent: '#mdl-inventario',
-        tags: true,
-        popoverTitle: "Descripción",
-        popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
-    });
+        general_select2({
+            selectId: 'inp-tipo',
+            tabla: 'cat_tipo',
+            campo: 'tipo',
+            placeholder: 'Seleciona un tipo',
+            dropdownParent: '#mdl-inventario',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
+        }),
 
-    await general_select2({
-        selectId: 'inp-marca',
-        tabla: 'cat_marca',
-        campo: 'marca',
-        placeholder: 'Seleccione una marca',
-        dropdownParent: '#mdl-inventario',
-        tags: true,
-        popoverTitle: "Descripción",
-        popoverContent: "Es la marca del activo."
-    })
+        general_select2({
+            selectId: 'inp-marca',
+            tabla: 'cat_marca',
+            campo: 'marca',
+            placeholder: 'Seleccione una marca',
+            dropdownParent: '#mdl-inventario',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Es la marca del activo."
+        }),
 
-    await general_select2({
-        selectId: 'inp-zona',
-        tabla: 'inventario_ti_sur',
-        campo: 'zona',
-        placeholder: 'Selecciona una zona',
-        dropdownParent: '#mdl-inventario',
-        tags: true,
-        popoverTitle: "Descripción",
-        popoverContent: "Zona operativa donde se ubica el activo."
-    });
+        general_select2({
+            selectId: 'inp-zona',
+            tabla: 'inventario_ti_sur',
+            campo: 'zona',
+            placeholder: 'Selecciona una zona',
+            dropdownParent: '#mdl-inventario',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Zona operativa donde se ubica el activo."
+        }),
 
-    await general_select2({
-        selectId: 'inp-ubicacion',
-        tabla: 'inventario_ti_sur',
-        campo: 'ubicacion',
-        placeholder: 'Seleccione una ubicación',
-        dropdownParent: '#mdl-inventario',
-        tags: true,
-        popoverTitle: "Descripción",
-        popoverContent: "Indica el lugar específico dentro de la zona donde se encuentra físicamente el dispositivo."
-    });
+        general_select2({
+            selectId: 'inp-ubicacion',
+            tabla: 'inventario_ti_sur',
+            campo: 'ubicacion',
+            placeholder: 'Seleccione una ubicación',
+            dropdownParent: '#mdl-inventario',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Indica el lugar específico dentro de la zona donde se encuentra físicamente el dispositivo."
+        }),
 
-    await general_select2({
-        selectId: 'inp-usuario',
-        tabla: 'cat_usuarios',
-        campo: 'nombre',
-        placeholder: 'Seleccione un usuario',
-        dropdownParent: '#mdl-inventario',
-        tags: true,
-        popoverTitle: "Aviso",
-        popoverContent: "Si se ingresa un nuevo usuario, favor de asignarle un cargo",
-        placement: 'top',
-    });
+        general_select2({
+            selectId: 'inp-usuario',
+            tabla: 'cat_usuarios',
+            campo: 'nombre',
+            placeholder: 'Seleccione un usuario',
+            dropdownParent: '#mdl-inventario',
+            tags: true,
+            popoverTitle: "Aviso",
+            popoverContent: "Si se ingresa un nuevo usuario, favor de asignarle un cargo",
+            placement: 'top',
+        }),
 
-    await general_select2({
-        selectId: 'inp-cargo',
-        tabla: 'cat_usuarios',
-        campo: 'cargo',
-        placeholder: 'Selecione un cargo',
-        dropdownParent: '#mdl-inventario',
-        tags: true,
-        sincronizarCon: 'inp-usuario',
-        sincronizarCampo: 'cargo',
-    })
+        general_select2({
+            selectId: 'inp-cargo',
+            tabla: 'cat_usuarios',
+            campo: 'cargo',
+            placeholder: 'Selecione un cargo',
+            dropdownParent: '#mdl-inventario',
+            tags: true,
+            // sincronizarCon: 'inp-usuario',
+            // sincronizarCampo: 'cargo',
+        })
+    ])
 
     document.getElementById('title-mdl-inventario').textContent = "Registro de Activo"
     document.getElementById('btn-mdl-inventario').onclick = function () { crear_registro() }
@@ -487,7 +485,7 @@ async function mdl_nvo_registro() {
 
 }
 
-/* $('#inp-usuario').off('change').on('change', function () {
+$('#inp-usuario').off('change').on('change', function () {
     let userSelected = $(this).val()?.trim();
     let select = $(this);
     let nuevo = true;
@@ -527,7 +525,7 @@ async function mdl_nvo_registro() {
             cargo.val(userSelected).trigger('change');
         }
     }
-}); */
+});
 
 async function crear_registro() {
     // Campos requeridos para validación
@@ -801,6 +799,12 @@ async function imprimir_pdf() {
     $('#mdl-imprimir').modal('hide'); // Cierra modal
 }
 
+function imprimir_excel() {
+    table.download("xlsx", "Inventario_TI.xlsx", {
+        sheetName: "Inventario",
+    })
+}
+
 //TODO: Validación de funciones
 
 
@@ -819,39 +823,31 @@ async function confirmar_eliminacion() {
         mostrar_toast('warning', 'Alerta', 'Uno o más activos se encuentran asignados. Inténtalo nuevamente.');
         return;
 
-    } else {        
-        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false)
+    } else {
+        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, desactivar_registro, true, 'Generar formato <i class="fa-solid fa-file-excel"></i>', mostrar_baja)
     }
 
     // mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, desactivar_registro)
 }
 
 async function mostrar_baja() {
+    let input = $('[name="lmp-baja"]');
+
+    input.each(function () { $(this).val(''); });  // Limpia el valo de los inputs
 
     let data = datos.filter(el => equipo_seleccionado.includes(el.id_equipo));
-    if (equipo_seleccionado.length === 0) {
-        mostrar_toast('info', 'Información', 'Seleccione al menos un usuario. Inténtalo nuevamente.');
-        return;
-    }
 
-    let estado = data.some(item => item.estatus === 'Asignado')
-    // console.log(estado)
-    if (estado) {
-        mostrar_toast('warning', 'Alerta', 'Uno o más activos se encuentran asignados. Inténtalo nuevamente.');
-        return;
-
-    } else {
-
-        let opcion = [
-            { id: 1, text: 'Inservible' },
-            { id: 2, text: 'Robo' },
-            { id: 3, text: 'Extravio' },
-            { id: 4, text: 'Venta' },
-            { id: 6, text: 'Reubicación de instalación o pozo' },
-            { id: 5, text: 'Otro' }
-        ]
-
-        await general_select2({
+    let opcion = [
+        { id: 1, text: 'Inservible' },
+        { id: 2, text: 'Robo' },
+        { id: 3, text: 'Extravio' },
+        { id: 4, text: 'Venta' },
+        { id: 6, text: 'Reubicación de instalación o pozo' },
+        { id: 5, text: 'Otro' }
+    ]
+    // console.time('selects');
+    await Promise.allSettled([
+        general_select2({
             selectId: 'slc-motivo',
             data: opcion,
             placeholder: 'Selecione un motivo',
@@ -861,18 +857,18 @@ async function mostrar_baja() {
             // popoverContent: 'Causa por la cual no se encuentre en condiciones óptimas para su uso y/o aprovechamiento.',
             // placement: "right",
 
-        })
+        }),
 
-        await general_select2({
+        general_select2({
             selectId: 'slc-emisor',
             tabla: 'cat_usuarios',
             campo: 'nombre',
             placeholder: 'Seleciona al usuario quien emite la baja',
             dropdownParent: '#step-3',
             tags: true,
-        })
+        }),
 
-        await general_select2({
+        general_select2({
             selectId: 'cg-emisor',
             tabla: 'cat_usuarios',
             campo: 'cargo',
@@ -881,18 +877,18 @@ async function mostrar_baja() {
             sincronizarCon: 'slc-emisor',
             sincronizarCampo: 'cargo',
             tags: true,
-        })
+        }),
 
-        await general_select2({
+        general_select2({
             selectId: 'slc-supervisor',
             tabla: 'supervisor',
             campo: 'nombre',
             placeholder: 'Selecciona al usuario que supervisa la baja',
             dropdownParent: '#step-3',
             tags: true,
-        })
+        }),
 
-        await general_select2({
+        general_select2({
             selectId: 'cg-supervisor',
             tabla: 'supervisor',
             campo: 'cargo',
@@ -901,18 +897,18 @@ async function mostrar_baja() {
             sincronizarCon: 'slc-supervisor',
             sincronizarCampo: 'cargo',
             tags: true,
-        })
+        }),
 
-        await general_select2({
+        general_select2({
             selectId: 'slc-vobo',
             tabla: 'cat_usuarios',
             campo: 'nombre',
             placeholder: 'Seleccione un usuario',
             dropdownParent: '#step-3',
             tags: true,
-        })
+        }),
 
-        await general_select2({
+        general_select2({
             selectId: 'cg-vobo',
             tabla: 'cat_usuarios',
             campo: 'cargo',
@@ -921,18 +917,18 @@ async function mostrar_baja() {
             sincronizarCon: 'slc-vobo',
             sincronizarCampo: 'cargo',
             tags: true,
-        })
+        }),
 
-        await general_select2({
+        general_select2({
             selectId: 'slc-autorizo',
             tabla: 'cat_usuarios',
             campo: 'nombre',
             placeholder: 'Seleccione un usuario',
             dropdownParent: '#step-3',
             tags: true,
-        })
+        }),
 
-        await general_select2({
+        general_select2({
             selectId: 'cg-autorizo',
             tabla: 'cat_usuarios',
             campo: 'cargo',
@@ -942,115 +938,114 @@ async function mostrar_baja() {
             sincronizarCampo: 'cargo',
             tags: true,
         })
+    ])
+    // console.timeEnd('selects');
+    // console.log(opcion)
+    $('#inp-motivo, #inp-monto, #inp-quincena, #inp-reubicacion').prop('disabled', true);
+    $('#cg-emisor, #cg-supervisor, #cg-vobo, #cg-autorizo').prop('disabled', true);
 
-        // console.log(opcion)
-        $('#inp-motivo, #inp-monto, #inp-quincena, #inp-reubicacion').prop('disabled', true);
-        $('#cg-emisor, #cg-supervisor, #cg-vobo, #cg-autorizo').prop('disabled', true);
+    $('#smartwizard').smartWizard("reset");
+    $('#smartwizard').smartWizard({
+        theme: 'dots',
+        autoAdjustHeight: true,
+        // selected: 0,
+        toolbarSettings: {
+            toolbarPosition: 'top',
+            showNextButton: true,
+            showPreviousButton: true,
+        },
+        keyboard: {
+            keyNavigation: true,
+            keyLeft: [37],
+            keyRight: [39]
+        },
+        lang: {
+            next: 'Siguiente',
+            previous: 'Anterior'
+        },
+        anchor: {
+            enableDoneState: true,
+        }
+    });
 
-        $('#smartwizard').smartWizard("reset");
-        $('#smartwizard').smartWizard({
-            theme: 'dots',
-            autoAdjustHeight: true,
-            // selected: 0,
-            toolbarSettings: {
-                toolbarPosition: 'top',
-                showNextButton: true,
-                showPreviousButton: true,
-            },
-            keyboard: {
-                keyNavigation: true,
-                keyLeft: [37],
-                keyRight: [39]
-            },
-            lang: {
-                next: 'Siguiente',
-                previous: 'Anterior'
-            },
-            anchor: {
-                enableDoneState: true,
+    $('#smartwizard').on('leaveStep', function (e, anchorObject, currentStepIndex, nextStepIndex, stepDirection) {
+        // Solo valida el avance (no al retroceder)
+        if (stepDirection === 'forward') {
+            const validacion = {
+                0: ['slc-motivo', 'inp-motivo', 'inp-monto', 'inp-quincena', 'inp-reubicacion'],    // Paso 1: Validar campo con ID
+                1: ['inp-observaciones'],   // Paso 2: Validar campo con ID
+                2: ['slc-emisor', 'slc-supervisor', 'slc-vobo', 'slc-autorizo'],    // Paso 3: Validar campo con ID
+            };
+
+            // Obtiene los campos del paso actual
+            const campos_v = validacion[currentStepIndex];
+            const campos_habilitados = campos_v.filter(id => !$('#' + id).prop('disabled'));
+
+            // Si hay campos definidos para este paso, se validan
+            if (campos_habilitados.length && !validar_campos(campos_habilitados)) {
+                // Previene que el wizard avance si la validación falla
+                return false;
             }
-        });
+        }
 
-        $('#smartwizard').on('leaveStep', function (e, anchorObject, currentStepIndex, nextStepIndex, stepDirection) {
-            // Solo valida el avance (no al retroceder)
-            if (stepDirection === 'forward') {
-                const validacion = {
-                    0: ['slc-motivo', 'inp-motivo', 'inp-monto', 'inp-quincena', 'inp-reubicacion'],    // Paso 1: Validar campo con ID
-                    1: ['inp-observaciones'],   // Paso 2: Validar campo con ID
-                    2: ['slc-emisor', 'slc-supervisor', 'slc-vobo', 'slc-autorizo'],    // Paso 3: Validar campo con ID
-                };
+        // Permite avanzzar si no hay problemas
+        return true;
+    });
 
-                // Obtiene los campos del paso actual
-                const campos_v = validacion[currentStepIndex];
-                const campos_habilitados = campos_v.filter(id => !$('#' + id).prop('disabled'));
+    $('#mdl-baja').modal("show");
 
-                // Si hay campos definidos para este paso, se validan
-                if (campos_habilitados.length && !validar_campos(campos_habilitados)) {
-                    // Previene que el wizard avance si la validación falla
-                    return false;
-                }
-            }
+    $('#slc-motivo').on('change', function () {
+        let motivo_seleccionado = $(this).val();
 
-            // Permite avanzzar si no hay problemas
-            return true;
-        });
-
-        $('#mdl-baja').modal("show");
-
-        $('#slc-motivo').on('change', function () {
-            let motivo_seleccionado = $(this).val();
-
-            if (motivo_seleccionado === '5') {
-                $('#inp-motivo').prop('disabled', false);
-            } else {
-                $('#inp-motivo').prop('disabled', true);
-            }
-            if (motivo_seleccionado === '3') {
-                $('#inp-monto, #inp-quincena').prop('disabled', false);
-            } else {
-                $('#inp-monto, #inp-quincena').prop('disabled', true);
-            }
-            if (motivo_seleccionado === '6') {
-                $('#inp-reubicacion').prop('disabled', false);
-            } else {
-                $('#inp-reubicacion').prop('disabled', true);
-            }
+        if (motivo_seleccionado === '5') {
+            $('#inp-motivo').prop('disabled', false);
+        } else {
+            $('#inp-motivo').prop('disabled', true);
+        }
+        if (motivo_seleccionado === '3') {
+            $('#inp-monto, #inp-quincena').prop('disabled', false);
+        } else {
+            $('#inp-monto, #inp-quincena').prop('disabled', true);
+        }
+        if (motivo_seleccionado === '6') {
+            $('#inp-reubicacion').prop('disabled', false);
+        } else {
+            $('#inp-reubicacion').prop('disabled', true);
+        }
 
 
-            if (!motivo_seleccionado) {
-                if (tbl_baja) tbl_baja.clearData();
-                return;
-            }
+        if (!motivo_seleccionado) {
+            if (tbl_baja) tbl_baja.clearData();
+            return;
+        }
 
-            let data_motivo = data.map(item => ({ ...item, motivo_baja_id: motivo_seleccionado }));
+        let data_motivo = data.map(item => ({ ...item, motivo_baja_id: motivo_seleccionado }));
 
-            if (!tbl_baja) {
-                tbl_baja = new Tabulator('#tbl-baja', {
-                    height: "300px",
-                    data: data_motivo,
-                    columns: [
-                        { title: "ITEM", formatter: "rownum", hozAlign: "center" },
-                        { title: "TIPO", field: "motivo_baja_id", hozAlign: "center" },
-                        {
-                            title: "DESCRIPCIÓN", hozAlign: "center",
-                            formatter: function (cell) {
-                                let d = cell.getData();
-                                return `${d.tipo || ''} Marca ${d.marca || ''} Serie ${d.num_serie || ''} Modelo ${d.modelo || ''}`;
-                            }
-                        },
-                        { title: "LOTE", field: "lote", hozAlign: "center", },
-                        { title: "ÁREA", field: "ubicacion", hozAlign: "center", },
-                        { title: "ACTIVO FIJO", field: "af", hozAlign: "center", },
-                    ]
-                });
-            } else {
-                // Actualizar datos si ya existe tabla
-                tbl_baja.setData(data_motivo);
-            }
+        if (!tbl_baja) {
+            tbl_baja = new Tabulator('#tbl-baja', {
+                height: "300px",
+                data: data_motivo,
+                columns: [
+                    { title: "ITEM", formatter: "rownum", hozAlign: "center" },
+                    { title: "TIPO", field: "motivo_baja_id", hozAlign: "center" },
+                    {
+                        title: "DESCRIPCIÓN", hozAlign: "center",
+                        formatter: function (cell) {
+                            let d = cell.getData();
+                            return `${d.tipo || ''} Marca ${d.marca || ''} Serie ${d.num_serie || ''} Modelo ${d.modelo || ''}`;
+                        }
+                    },
+                    { title: "LOTE", field: "lote", hozAlign: "center", },
+                    { title: "ÁREA", field: "ubicacion", hozAlign: "center", },
+                    { title: "ACTIVO FIJO", field: "af", hozAlign: "center", },
+                ]
+            });
+        } else {
+            // Actualizar datos si ya existe tabla
+            tbl_baja.setData(data_motivo);
+        }
 
-        })
-
-    }
+    })
 }
 
 async function generar_baja() {
