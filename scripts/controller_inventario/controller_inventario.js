@@ -833,7 +833,7 @@ async function confirmar_eliminacion() {
 async function mostrar_baja() {
     let input = $('[name="lmp-baja"]');
 
-    input.each(function () { $(this).val(''); });  // Limpia el valo de los inputs
+    input.each(function () { $(this).val(''); });  // Limpia el valor de los inputs
 
     let data = datos.filter(el => equipo_seleccionado.includes(el.id_equipo));
 
@@ -949,10 +949,12 @@ async function mostrar_baja() {
         theme: 'dots',
         autoAdjustHeight: true,
         // selected: 0,
-        toolbarSettings: {
-            toolbarPosition: 'top',
+        toolbar: {
+            toolbarPosition: 'none',
             showNextButton: true,
             showPreviousButton: true,
+            extraHtml: `<button class="btn btn-danger" id="btnCancelar">Cancelar</button>
+                        <button class="btn btn-success" id="btn-confirmar">Confirmar</button>`,
         },
         keyboard: {
             keyNavigation: true,
