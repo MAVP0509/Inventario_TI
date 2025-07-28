@@ -953,7 +953,7 @@ async function mostrar_baja() {
             toolbarPosition: 'none',
             showNextButton: true,
             showPreviousButton: true,
-            extraHtml: `<button class="btn btn-danger" id="btnCancelar">Cancelar</button>
+            extraHtml: `<button class="btn btn-danger" id="btn-cancelar">Cancelar</button>
                         <button class="btn btn-success" id="btn-confirmar">Confirmar</button>`,
         },
         keyboard: {
@@ -970,7 +970,32 @@ async function mostrar_baja() {
         }
     });
 
-    $('#smartwizard').on('leaveStep', function (e, anchorObject, currentStepIndex, nextStepIndex, stepDirection) {
+    $(document).off('click', '#btn-confirmar').on('click', function () {
+        let pasoActual = $('#smartwizard').smartWizard("getStepIndex");
+
+        // Ejecuta validaciones de todos los pasos antes de confirmar
+        const validaciones = {
+            0: ['slc-motivo', 'inp-motivo', 'inp-monto', 'inp-quincena', 'inp-reubicacion'],
+            1: ['inp-observaciones'],
+            2: ['slc-emisor', 'slc-supervisor', 'slc-vobo', 'slc-autorizo'],
+        };
+
+        for (let i = 0; i <= 2; i++) {
+            const campos = validaciones[i].filter(id => !$('#' + id).prop('disabled'));
+            if (!validar_campos(campos)) {
+                $('#smartwizard').smartWizard("goToStep", i);
+                return;
+            }
+        }
+        $('#mdl-baja').modal("hide");
+    });
+
+    // Evento para botón Cancelar
+    $(document).off('click', '#btn-cancelar').on('click', function () {
+        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, function (){ $("#mdl-baja").modal("hide")})
+    });
+
+    /* $('#smartwizard').on('leaveStep', function (e, anchorObject, currentStepIndex, nextStepIndex, stepDirection) {
         // Solo valida el avance (no al retroceder)
         if (stepDirection === 'forward') {
             const validacion = {
@@ -992,7 +1017,7 @@ async function mostrar_baja() {
 
         // Permite avanzzar si no hay problemas
         return true;
-    });
+    }); */
 
     $('#mdl-baja').modal("show");
 
