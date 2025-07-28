@@ -256,7 +256,7 @@ async function mensaje_eliminar() {
     }
 }
 
-async function eliminar_marca(params) {
+async function eliminar_marca() {
     let model = {
         accion: 3,
         id: marca_selecionada
