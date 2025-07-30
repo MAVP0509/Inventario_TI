@@ -65,8 +65,8 @@ async function consultar_informacion(){
         data: datos,
         pagination: true,               //paginate the data
         height: "800px",
-        paginationSize: 10,                //allow 10 rows per page of data
-        paginationSizeSelector: [5, 10, 15, 20],
+        paginationSize: 15,                //allow 10 rows per page of data
+        paginationSizeSelector: [10, 15, 20],
         paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
             const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
              const end = Math.min(currentRowStart + pageSize - 1, totalRows);

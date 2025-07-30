@@ -179,7 +179,7 @@ async function consultar_informacion() {
                 { title: "Linea", field: "linea", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", width: 170 },
                 { title: "Usuario", field: "usuario", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
                 { title: "Cargo del usuario", field: "posicion", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
-                { title: "Fecha de asignación", field: "fecha_entrega", sorter: "date", headerFilter: "input", headerSort: false },
+                { title: "Fecha de asignación", field: "fecha_entrega", headerHozAlign: "center", sorter: "date", headerFilter: "input", headerSort: false, hozAlign: "center" },
                 { title: "Estatus", field: "estatus", width: 120, frozen: true, headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "Asignado": "Asignado", "Bodega": "Bodega" }, clearable: true }, headerSort: false },
                 {
                     formatter: editIcon, width: 60, hozAlign: "center",
@@ -846,7 +846,7 @@ async function mostrar_baja() {
         { id: 5, text: 'Otro' }
     ]
     // console.time('selects');
-    await Promise.allSettled([
+    await Promise.all([
         general_select2({
             selectId: 'slc-motivo',
             data: opcion,
@@ -864,7 +864,7 @@ async function mostrar_baja() {
             tabla: 'cat_usuarios',
             campo: 'nombre',
             placeholder: 'Seleciona al usuario quien emite la baja',
-            dropdownParent: '#step-3',
+            dropdownParent: '#mdl-baja',
             tags: true,
         }),
 
@@ -873,7 +873,7 @@ async function mostrar_baja() {
             tabla: 'cat_usuarios',
             campo: 'cargo',
             placeholder: 'Seleciona al usuario quien emite la baja',
-            dropdownParent: '#step-3',
+            dropdownParent: '#mdl-baja',
             sincronizarCon: 'slc-emisor',
             sincronizarCampo: 'cargo',
             tags: true,
@@ -884,7 +884,7 @@ async function mostrar_baja() {
             tabla: 'supervisor',
             campo: 'nombre',
             placeholder: 'Selecciona al usuario que supervisa la baja',
-            dropdownParent: '#step-3',
+            dropdownParent: '#mdl-baja',
             tags: true,
         }),
 
@@ -893,7 +893,7 @@ async function mostrar_baja() {
             tabla: 'supervisor',
             campo: 'cargo',
             placeholder: 'Seleciona al usuario quien emite la baja',
-            dropdownParent: '#step-3',
+            dropdownParent: '#mdl-baja',
             sincronizarCon: 'slc-supervisor',
             sincronizarCampo: 'cargo',
             tags: true,
@@ -904,7 +904,7 @@ async function mostrar_baja() {
             tabla: 'cat_usuarios',
             campo: 'nombre',
             placeholder: 'Seleccione un usuario',
-            dropdownParent: '#step-3',
+            dropdownParent: '#mdl-baja',
             tags: true,
         }),
 
@@ -913,7 +913,7 @@ async function mostrar_baja() {
             tabla: 'cat_usuarios',
             campo: 'cargo',
             placeholder: 'Seleciona al usuario quien emite la baja',
-            dropdownParent: '#step-3',
+            dropdownParent: '#mdl-baja',
             sincronizarCon: 'slc-vobo',
             sincronizarCampo: 'cargo',
             tags: true,
@@ -924,7 +924,7 @@ async function mostrar_baja() {
             tabla: 'cat_usuarios',
             campo: 'nombre',
             placeholder: 'Seleccione un usuario',
-            dropdownParent: '#step-3',
+            dropdownParent: '#mdl-baja',
             tags: true,
         }),
 
@@ -933,7 +933,7 @@ async function mostrar_baja() {
             tabla: 'cat_usuarios',
             campo: 'cargo',
             placeholder: 'Seleciona al usuario quien emite la baja',
-            dropdownParent: '#step-3',
+            dropdownParent: '#mdl-baja',
             sincronizarCon: 'slc-autorizo',
             sincronizarCampo: 'cargo',
             tags: true,
@@ -948,7 +948,8 @@ async function mostrar_baja() {
     $('#smartwizard').smartWizard({
         theme: 'dots',
         autoAdjustHeight: true,
-        // selected: 0,
+        selected: 0,
+        justified: true,
         toolbar: {
             toolbarPosition: 'none',
             showNextButton: true,
@@ -970,8 +971,8 @@ async function mostrar_baja() {
         }
     });
 
-    $(document).off('click', '#btn-confirmar').on('click', function () {
-        let pasoActual = $('#smartwizard').smartWizard("getStepIndex");
+    $('#btn-confirmar').on('click', function () {
+        // let pasoActual = $('#smartwizard').smartWizard("getStepIndex");
 
         // Ejecuta validaciones de todos los pasos antes de confirmar
         const validaciones = {
@@ -987,15 +988,16 @@ async function mostrar_baja() {
                 return;
             }
         }
-        $('#mdl-baja').modal("hide");
+        generar_baja();
+        // $('#mdl-baja').modal("hide");
     });
 
     // Evento para botón Cancelar
-    $(document).off('click', '#btn-cancelar').on('click', function () {
-        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, function (){ $("#mdl-baja").modal("hide")})
+    $('#btn-cancelar').on('click', function () {
+        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, function () { $("#mdl-baja").modal("hide") })
     });
 
-    /* $('#smartwizard').on('leaveStep', function (e, anchorObject, currentStepIndex, nextStepIndex, stepDirection) {
+    $('#smartwizard').on('leaveStep', function (e, anchorObject, currentStepIndex, nextStepIndex, stepDirection) {
         // Solo valida el avance (no al retroceder)
         if (stepDirection === 'forward') {
             const validacion = {
@@ -1017,7 +1019,7 @@ async function mostrar_baja() {
 
         // Permite avanzzar si no hay problemas
         return true;
-    }); */
+    });
 
     $('#mdl-baja').modal("show");
 
