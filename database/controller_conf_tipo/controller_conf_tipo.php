@@ -66,7 +66,7 @@ function eliminar_tipo($valores)
         $res = mysqli_query($con, $sql_val);  //*Consultamos si el rubro está en uso, si lo está, no puede ser "eliminado"
 
         if ($res && $res->num_rows > 0) {  
-            return "Uno o más rubros no pueden ser eliminados. Uno o más equipos lo tienen asignado";
+            return "Uno o más tipos no pueden ser eliminados. Uno o más equipos lo tienen asignado";
         }
     }
 

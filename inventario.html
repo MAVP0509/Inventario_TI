@@ -22,6 +22,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
     <!-- 3. Iconos y efectos visuales -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
+    <link href="https://unpkg.com/filepond-plugin-pdf-preview/dist/filepond-plugin-pdf-preview.css" rel="stylesheet" />
+
+
 
     <link href="https://cdn.jsdelivr.net/npm/smartwizard@6/dist/css/smart_wizard_all.min.css" rel="stylesheet"
         type="text/css" />
@@ -36,7 +40,8 @@
 
         <!-- Preloader -->
         <div class="preloader flex-column justify-content-center align-items-center">
-            <img src="images/diavaz.png" alt="DiavazLogo" height="60" width="60">
+            <img src="images/diavaz.png" alt="DiavazLogo" height="60" width="60"><br><i
+                class="fa-solid fa-spinner fa-spin fa-lg"></i>
         </div>
 
         <nav class="main-header navbar navbar-expand navbar-white navbar-light fixed-top">
@@ -114,6 +119,13 @@
                                             onclick="imprimir_excel()" id="btn-excel"><i
                                                 class="fa-solid fa-file-excel"></i>
                                         </button>
+                                        <button type="button" class="btn btn-lg  btn-outline-info mr-3 icon"
+                                            data-toggle="popover" data-trigger="hover" data-html="true"
+                                            data-placement="bottom" data-content="Resguardos firmados"
+                                            data-widget="control-sidebar" data-slide="true"
+                                            onclick="abrir_control_sidebar()">
+                                            <i class="fa-solid fa-file-signature"></i>
+                                        </button>
                                     </div><br>
                                 </div>
                                 <!--Card Body-->
@@ -124,9 +136,57 @@
                         </div>
                     </div>
                 </div>
+
             </section> <!--Container-->
         </div>
+        <aside class="control-sidebar control-sidebar-light" id="control-sidebar" style="width: 400px !important;">
+            <div class="p-3 control-sidebar-content d-flex flex-column h-100 overflow-hidden">
+                <h4><i class="fa-solid fa-file-invoice"></i> Resguardos firmados</h4>
+                <div class=" d-flex justify-content-center gap-2 mt-3">
+                    <button type="button" class="btn btn-lock btn-outline-dark icon mr-3 w-100" onclick="col_subir_resguardos_firmados()"
+                        id="btn-col-subir" disabled><i class="fa-solid fa-file-arrow-up"></i> Subir</button>
+                    <button type="button" class="btn btn-lock btn-outline-dark icon w-100" onclick="col_ver_resguardos_firmados()"
+                        id="btn-col-descargar"><i class="fa-solid fa-file-arrow-down"></i> Descargar</button>
+                </div>
+
+                <hr class="mb-3">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col" style="display:block;" id="col-subir">
+                            <h5><i class="fa-solid fa-file-arrow-up"></i> Subir</h5>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                                </div>
+                                <select class="form-control select" id="select-usu-file" name="inp-resg"></select>
+                                <div class="invalid-feedback">Por favor, seleccione un usuario.</div>
+                            </div>
+
+                            <input type="file" id="up-resguardo-file" name="resguardo">
+                            <button type="button" class="btn btn-lock btn-outline-dark icon" onclick="ver_pdf()"
+                                id="btn-ver-pdf" disabled><i class="fa-solid fa-eye"></i> Ver</button>
+                        </div>
+                        <div class="col " style="display: none;" id="col-descargar">
+                            <h5><i class="fa-solid fa-file-arrow-down"></i> Descargar</h5>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                                </div>
+                                <select class="form-control select" id="select-ver-usu-file" name="inp-resg"></select>
+                                <div class="invalid-feedback">Por favor, seleccione un usuario.</div>
+                            </div>
+                            <div id="lista-documentos" class="list-group mt-3 overflow-auto flex-grow-1" style="max-height: 60vh;"></div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </aside>
     </div>
+
+
 
     <!--Modal del inventario-->
     <div class="modal fade" id="mdl-inventario" data-backdrop="static" data-keyboard="false">
@@ -440,18 +500,18 @@
                                             ¿Desea generar el resguardo para PEMEX?
                                         </div>
                                     </div>
-                                    <!-- <div class="col">
-                                        <div class="alert alert-info position-relative d-flex align-items-start check-button"
+                                    <div class="col">
+                                        <div class="alert alert-info position-relative d-flex align-items-start"
                                             role="alert"
                                             style="display:none ; background-color:#e7f3fe; border-color:#b8daff; color:#004085; padding-right: 4rem;"
                                             id="alert-resguardo-cel">
-                                            <button type='button' class='btn icon toggle-select me-2'
-                                                id="check-resguardo-cel" disabled>
+                                            <button type='button' class='btn icon toggle-select me-2 check-button'
+                                                id="check-resguardo-cel">
                                                 <i class='fa-regular fa-square fa-lg' id="check-resguardo-cel-icon"></i>
                                             </button>
                                             ¿Desea generar el resguardo para celular?
                                         </div>
-                                    </div> -->
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -808,6 +868,39 @@
                             class="fa-solid fa-arrow-right-from-bracket fa-lg"></i>
                     </button>
                     <button type="button" class="btn btn-success" id="pdf" onclick="imprimir_pdf()">Exportar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal subir pdf-->
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-file-up" role="dialog" data-backdrop="static"
+        data-keyboard="false">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fa-solid fa-file-signature"></i> Resguardo firmado</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col">
+                                <embed id="pdf-viewer" src="libraries/web/viewer.html"
+                                    style="width: 100%; height: 700px; border: none; margin-top: 20px;" loading="lazy"
+                                    referrerpolicy="no-referrer"
+                                    sandbox="allow-scripts allow-same-origin allow-downloads"></embed>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
+                            class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+                    <button type="button" class="btn btn-success icon" id="mdl-btn-subir-pdf" onclick="subir_pdf()">Subir <i
+                            class="fa-solid fa-upload"></i></button>
                 </div>
             </div>
         </div>

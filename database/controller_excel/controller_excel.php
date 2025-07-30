@@ -32,8 +32,7 @@ print(json_encode($respuesta_servidor));
 //* Función para generación de resguardos
 function resguardo($valores)
 {
-    // $className = \PhpOffice\PhpSpreadsheet\Writer\Pdf\Dompdf::class;
-    // IOFactory::registerWriter('Pdf', $className);
+    
 
     //todo Desglosamos la información recibida del JS
     //* Array de los equipos del usuario seleccionado
@@ -58,6 +57,10 @@ function resguardo($valores)
 
     $userPemex = $datos[0]->userPemex ?? '';
     $userPemexCargo = $datos[0]->userPemexCargo ?? '';
+
+    //*Variable que indica si es un resguardo de celular "1" indica que si es , "0" indica que no es
+    $cel = $datos[0]->cel ?? 0;
+    //var_dump($cel);
 
 
     $spreadsheet = IOFactory::load('FO-DSP-TI-01 Resguardo de herramientas TI Rev.00.xlsx'); //*Cargando la plantilla del Excel
@@ -115,42 +118,63 @@ function resguardo($valores)
         $worksheet->getStyle("A$fila:I$fila")->getFont()->setBold(false);
 
         //* Rellenamos la fila con sus datos correspondientes 
-        $worksheet->setCellValue("B$fila", $num);
-        $worksheet->setCellValue("C$fila", $item->tipo);
-        $worksheet->setCellValue("D$fila", $item->marca);
-        $worksheet->setCellValue("E$fila", $item->modelo);
-        $worksheet->setCellValue("G$fila", $item->num_serie ?? ''); //* Si el equipo no tiene num_serie, se le pone cadena vacía
-        $worksheet->setCellValue("I$filaInicio", $comentario); // H e I combinadas
+        if ($cel == 0) {
+            $worksheet->setCellValue("B$fila", $num);
+            $worksheet->setCellValue("C$fila", $item->tipo);
+            $worksheet->setCellValue("D$fila", $item->marca);
+            $worksheet->setCellValue("E$fila", $item->modelo);
+            $worksheet->setCellValue("G$fila", $item->num_serie ?? 'NA'); //* Si el equipo no tiene num_serie, se le pone NA
+            $worksheet->setCellValue("I$filaInicio", $comentario); // H e I combinadas
 
-        $fila++; //* Aumentamos el contador para avanzar a la siguiente fila
+            $fila++; //* Aumentamos el contador para avanzar a la siguiente fila
 
-        //* Verificamos si el equipo tiene un TAG asignado
-        if ($item->tag != null && $item->tag != "NA") {
+            //* Verificamos si el equipo tiene un TAG asignado
+            if ($item->tag != null && $item->tag != "NA") {
 
-            //*Si tiene tag, se asigna una nueva fila
-            $worksheet->insertNewRowBefore($fila, 1);
+                //*Si tiene tag, se asigna una nueva fila
+                $worksheet->insertNewRowBefore($fila, 1);
 
-            //* Reaplicar las combinaciones de celdas en la nueva fila
-            $worksheet->mergeCells("E$fila:F$fila");
-            $worksheet->mergeCells("G$fila:H$fila");
-            $worksheet->mergeCells("I$fila:J$fila");
+                //* Reaplicar las combinaciones de celdas en la nueva fila
+                $worksheet->mergeCells("E$fila:F$fila");
+                $worksheet->mergeCells("G$fila:H$fila");
+                $worksheet->mergeCells("I$fila:J$fila");
 
-            //*  Copiar el estilo de la fila anterior 
-            $worksheet->duplicateStyle($worksheet->getStyle("B17:J17"), "B$fila:J$fila");
+                //*  Copiar el estilo de la fila anterior 
+                $worksheet->duplicateStyle($worksheet->getStyle("B17:J17"), "B$fila:J$fila");
 
-            //* Activar negrita solo para la celda del tag
-            $worksheet->getStyle("E$fila")->getFont()->setBold(true);
+                //* Activar negrita solo para la celda del tag
+                $worksheet->getStyle("E$fila")->getFont()->setBold(true);
 
-            //* Insertando el tag en la fila correspondiente
-            $worksheet->setCellValue("E$fila", $item->tag);
+                //* Insertando el tag en la fila correspondiente
+                $worksheet->setCellValue("E$fila", $item->tag);
+
+                $fila++; //* Aumentamos el contador para avanzar a la siguiente fila
+            }
+        } else if ($cel == 1) {
+            $worksheet->setCellValue("B$fila", $num);
+            $worksheet->setCellValue("C$fila", $item->tipo);
+            $worksheet->setCellValue("D$fila", $item->marca);
+            $worksheet->setCellValue("E$fila", $item->modelo);
+            $worksheet->setCellValue("G$fila", $item->imei);
+            $worksheet->setCellValue("I$filaInicio", $comentario); // H e I combinadas
 
             $fila++; //* Aumentamos el contador para avanzar a la siguiente fila
         }
 
 
+
         $num++; //*Aumentamos nuestro contador visual de la tabla
     }
     $worksheet->removeRow($fila); //* Elimina la fila extra insertada al final
+
+    if ($cel == 1) {
+        $worksheet->setCellValue("E$fila","Linea: $item->linea" ); //*añadiendo la linea abajo del modelo
+        $worksheet->getStyle("E$fila")->getFont()->setBold(true);
+        $worksheet->getStyle("E$fila")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+    }
+
+
+
     $filaFin = $fila - 1; //* Se guarda la fila final para hacer cálculos
 
     //* Combinando las filas generadas en la columna de Comentario

@@ -1,4 +1,5 @@
 let respuesta
+let loading = false
 
 function server_inventario(model) {
     return new Promise((resolve, reject) => {
@@ -13,6 +14,11 @@ function server_inventario(model) {
                 //console.log(response);
                 try {
                     resolve(JSON.parse(response))
+                    if (loading){
+                        Swal.close()
+                        loading = !loading
+                    }
+                   
                     console.log(resolve(JSON.parse(response)))
                     respuesta = response
                 } catch (error) {
@@ -24,7 +30,7 @@ function server_inventario(model) {
     });
 }
 
-function server_excel(model) {
+/* function server_excel(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
@@ -35,7 +41,7 @@ function server_excel(model) {
             success: function (response) {
                 try {
                     resolve(JSON.parse(response))
-                    Swal.close()
+                    
                     //console.log(resolve(JSON.parse(response)))
                     respuesta = response
                 } catch (error) {
@@ -44,7 +50,7 @@ function server_excel(model) {
             }
         })
     });
-}
+} */
 
 window.addEventListener('load', function () {
     // Leemos el mensaje del registro desde localStorage
@@ -53,6 +59,7 @@ window.addEventListener('load', function () {
     if (mensajeRegistro) {
         // Si el mensaje existe, mostramos el toast
         mostrar_toast('success', 'Bienvenido', mensajeRegistro);
+        console.log('Mensaje encontrado:', mensajeRegistro);
 
         // Eliminamos el mensaje para evitar que aparezca nuevamente
         sessionStorage.removeItem('bienvenido');
@@ -1280,6 +1287,7 @@ $(document).ready(function () {
 })
 
 let selected = false
+let celSelected = false
 $('.check-button').on('click', function () {
     button_checked($(this))
 });
@@ -1335,8 +1343,12 @@ async function resguardo(userSelect) {
     document.getElementById('col-pemex').style.display = 'none'
 
     selected = false
+    celSelected = false
     $("#check-resguardo-pemex-icon").removeClass("fa-solid fa-square-check")
     $("#check-resguardo-pemex-icon").addClass("fa-regular fa-square ")
+
+    $("#check-resguardo-cel-icon").removeClass("fa-solid fa-square-check")
+    $("#check-resguardo-cel-icon").addClass("fa-regular fa-square ")
     $("#mdl-res").modal('show')
 }
 
@@ -1359,7 +1371,7 @@ $(document).ready(function () {
     });
 });
 
-let infoResguardo
+//let infoResguardo
 async function crear_resguardo() {
 
     const validacion = [
@@ -1379,54 +1391,52 @@ async function crear_resguardo() {
     let model = {
         accion: 4,
         usuario: $('#select-usu').val().trim(),
-        //region : $('#select-region').val().trim(),
         region: $("#select-region").select2('data')[0].text,
         comentario: $('#txt-area').val().trim(),
         fecha: $('#fecha-resguardo').val(),
         area: $('#inp-area').val(),
         ubicacion: $('#inp-ubicacion-resg').val(),
         userPemex: $('#inp-user-pemex').val(),
-        userPemexCargo: $('#inp-cargo-pemex').val()
+        userPemexCargo: $('#inp-cargo-pemex').val(),
+        cel: celSelected ? 1 : 0
     }
+    loading  = true
+    mostrar_toast_cargando()
     let server = await server_inventario(model)
 
     if (server.resultado.error) {
         mostrar_toast('warning', 'Aviso', server.resultado.error)
     } else {
-        infoResguardo = server.resultado.datos
-        consultar_informacion();
-
-
         $("#mdl-res").modal('hide')
-        mostrar_toast_cargando()
-        descargar_excel()
+        abrir_resguardo(server.resultado)
+        consultar_informacion();
     }
 
 
 }
 
-async function descargar_excel(params) {
+function abrir_resguardo(datos) {
     dominio = window.location.hostname,
         puerto = location.port
-    let model = {
+    /* let model = {
         accion: 0,
         datos: infoResguardo
     }
-    let server = await server_excel(model)
+    let server = await server_excel(model) */
 
-    let ruta = JSON.parse(respuesta)
+    let ruta = datos.resultado
     // Elimina comillas si vienen así: '"C:\\ruta\\archivo.xlsx"'
-    ruta.resultado = ruta.resultado.replace(/^"|"$/g, '');
+    ruta = ruta.replace(/^"|"$/g, '');
 
     // Reemplaza las \ por /
-    ruta.resultado = ruta.resultado.replace(/\\/g, '/');
+    ruta = ruta.replace(/\\/g, '/');
 
     // Cambia la extensión
-    ruta.resultado = ruta.resultado.replace(/\.xlsx$/i, '.pdf');
+    ruta = ruta.replace(/\.xlsx$/i, '.pdf');
 
-    ruta.resultado = ruta.resultado.replace("C:/xampp/htdocs", "http://" + dominio + ":" + puerto)
+    ruta = ruta.replace("C:/xampp/htdocs", "http://" + dominio + ":" + puerto)
     // console.log(ruta.resultado)
-    window.open(ruta.resultado, '_blank');
+    window.open(ruta, '_blank');
 }
 
 function mostrar_toast_cargando() {
@@ -1482,13 +1492,327 @@ function myCallback(start, end) {
 }
 
 function button_checked(button) {
-    selected = !selected;
+    //console.log(button[0].id)
+    if (button[0].id == "check-resguardo-pemex") {
+        selected = !selected;
 
-    let icon = button.find('i')
+        let icon = button.find('i')
 
-    if (selected) {
-        icon.removeClass("fa-regular fa-square").addClass("fa-solid fa-square-check");
+        if (selected) {
+            icon.removeClass("fa-regular fa-square").addClass("fa-solid fa-square-check");
+        } else {
+            icon.removeClass("fa-solid fa-square-check").addClass("fa-regular fa-square");
+        }
+    } else if (button[0].id == "check-resguardo-cel") {
+        celSelected = !celSelected;
+
+        let icon = button.find('i')
+
+        if (celSelected) {
+            icon.removeClass("fa-regular fa-square").addClass("fa-solid fa-square-check");
+        } else {
+            icon.removeClass("fa-solid fa-square-check").addClass("fa-regular fa-square");
+        }
     } else {
-        icon.removeClass("fa-solid fa-square-check").addClass("fa-regular fa-square");
+        selected = !selected;
+
+        let icon = button.find('i')
+        if (selected) {
+            icon.removeClass("fa-regular fa-square").addClass("fa-solid fa-square-check");
+        } else {
+            icon.removeClass("fa-solid fa-square-check").addClass("fa-regular fa-square");
+        }
     }
+
 }
+
+//*Cerrando el control-sidebar con click fuera de éste
+$(".content-wrapper").click(function () {
+    if ($('body').hasClass('control-sidebar-slide-open')) {
+        //console.log('cerrando sidebar');
+        $('[data-widget="control-sidebar"]').ControlSidebar('toggle');
+    }
+});
+
+let dominio = window.location.hostname
+let puerto = location.port
+
+FilePond.registerPlugin(FilePondPluginFileValidateType);
+
+
+let fileResguardo = document.getElementById('up-resguardo-file')
+
+// Create a FilePond instance
+const pond = FilePond.create(fileResguardo, {
+    maxFiles: 1,
+    labelIdle: 'Arrastra y suelta tu archivo .pdf o <span class="filepond--label-action"> Examina </span>',
+    allowMultiple: false,
+    dropOnPage: true,
+    dropValidation: true,
+    instantUpload: false,
+    acceptedFileTypes: ['application/pdf'],
+    labelFileTypeNotAllowed: 'Archivo no válido. Solo se permiten archivos .pdf',
+    disabled: true,
+    server: {
+        process: {
+            url: "database/controller_inventario/controller_inventario.php",
+            method: 'POST',
+            name: 'resguardo',
+            withCredentials: false,
+            ondata: (formData) => {
+                const trama = {
+                    accion: 7,
+                    usuario: $('#select-usu-file').val()
+                };
+                formData.append('trama', JSON.stringify(trama));
+                return formData;
+            },
+            onload: (response) => {
+                try {
+                    const data = JSON.parse(response); // <- convierte string en objeto
+                    if (data.resultado.error) {
+                        //console.error("Error del servidor:", data.resultado.error);
+                        alert("Error: " + data.resultado.error);
+                    } else {
+                        mostrar_toast("success", "Subido", data.resultado.mensaje)
+
+                        pond.removeFile();
+                    }
+
+                } catch (e) {
+                    console.error("Error al parsear respuesta:", e);
+                }
+            },
+            onerror: (error) => {
+                console.error('Error al subir:', error);
+                alert("Error al subir archivo.");
+            }
+        },
+    }
+
+
+});
+
+
+let fileToOpen;
+
+pond.on('addfile', (error, fileItem) => {
+    if (error) {
+        console.error('Error al cargar PDF:', error);
+        return;
+    }
+
+    // Generar URL temporal para el archivo PDF
+    fileToOpen = URL.createObjectURL(fileItem.file);
+
+    const viewer = document.getElementById('pdf-viewer');
+    viewer.src = fileToOpen;
+
+});
+
+
+//* Función para abrir el sidebar para la subida y visualización de resguardos
+async function abrir_control_sidebar() {
+
+    await general_select2({
+        selectId: 'select-usu-file',
+        tabla: 'cat_usuarios',
+        campo: 'nombre',
+        placeholder: 'Seleccione un usuario',
+        dropdownParent: '#control-sidebar',
+        tags: false
+    });
+
+    await general_select2({
+        selectId: 'select-ver-usu-file',
+        tabla: 'cat_usuarios',
+        campo: 'nombre',
+        placeholder: 'Seleccione un usuario',
+        dropdownParent: '#control-sidebar',
+        tags: false
+    });
+
+    col_subir_resguardos_firmados()
+}
+
+//* Función para subir el pdf desde el modal de visualización del archivo
+function subir_pdf() {
+    $('#mdl-file-up').modal('hide');
+    pond.processFile()
+        .then(() => {
+            //* limpiar FilePond 
+            pond.removeFile();
+        })
+        .catch(error => {
+            console.error('Error al subir archivo:', error);
+            mostrar_toast("error", "Error", 'Error al subir archivo. Inténtalo de nuevo.' + error);
+        });
+}
+
+//*Habilitando el input para subir archivos
+$('#select-usu-file').on('change', function () {
+    const seleccionado = $(this).val();
+
+    if (seleccionado !== '') {
+        pond.setOptions({ disabled: false })
+    } else {
+        pond.setOptions({ disabled: true })
+        $('#btn-ver-pdf').prop('disabled', true)
+    }
+})
+
+//*Habilitando el boton de ver pdf cuando haya un archivo en el filePond
+document.addEventListener('FilePond:addfile', (e) => {
+    $('#btn-ver-pdf').prop('disabled', false)
+})
+
+//* Deshabilitando el boton de ver pdf cuando el archivo haya sido removido del filePond
+document.addEventListener('FilePond:removefile', (e) => {
+    $('#btn-ver-pdf').prop('disabled', true)
+    $('#select-usu-file').val(null).trigger('change');
+})
+
+//* Abrir modal para visualizar el pdf en la aplicación
+function ver_pdf(ruta) {
+    if (ruta) {
+        //*Si el modal se abre desde descargar archivos
+
+        const viewer = document.getElementById('pdf-viewer');
+        viewer.src = ruta;
+
+        $('#mdl-btn-subir-pdf').css('display', 'none')
+        $('#mdl-file-up').modal('show');
+    }else{
+        //* Si el modal se abre desde subir archivos
+        $('#mdl-btn-subir-pdf').css('display', 'block')
+         $('#mdl-file-up').modal('show');
+    }
+   
+}
+
+//*mostrar formulario de descarga de archivos
+function col_ver_resguardos_firmados() {
+    $('#col-subir').hide()
+    $('#btn-col-subir').prop('disabled', false)
+    $('#btn-col-descargar').prop('disabled', true)
+    $('#select-ver-usu-file').val(null).trigger('change');
+    let contenedor = document.getElementById('lista-documentos');
+    contenedor.innerHTML = '';
+    pond.removeFile();
+    $('#col-descargar').show()
+}
+
+//*mostrar formulario de carga de archivos
+function col_subir_resguardos_firmados() {
+    $('#col-descargar').hide()
+    $('#btn-col-descargar').prop('disabled', false)
+    $('#btn-col-subir').prop('disabled', true)
+    $('#select-usu-file').val(null).trigger('change');
+    $('#col-subir').show()
+}
+
+//* consultar los documentos de ese usuario
+$('#select-ver-usu-file').on('change', async function () {
+
+    if ($(this).val() === "") {
+        return
+    }
+
+    dominio = window.location.hostname
+    puerto = location.port
+
+    model = {
+        accion: 8,
+        usuario: $("#select-ver-usu-file").val()
+    }
+
+    server = await server_inventario(model)
+
+    if (server.resultado.documentos) {
+        //console.log(server.resultado.documentos)
+        let rutas =server.resultado.documentos.reverse()
+
+        let documentos = rutas.map(rutaCompleta => {
+            // Extraer solo el nombre del archivo
+            let nombreArchivoCompleto = rutaCompleta.split('/').pop();
+
+            // Dividir nombre del archivo en partes (fecha, hora, resto)
+            let [fecha, hora] = nombreArchivoCompleto.split('_');
+            let nombreArchivo = nombreArchivoCompleto.split('_').slice(2).join('_');
+
+            return {
+                fecha,
+                hora,
+                nombreArchivo,
+                ruta: rutaCompleta
+            };
+        });
+
+
+
+        let contenedor = document.getElementById('lista-documentos');
+        contenedor.innerHTML = '';
+
+        documentos.forEach(doc => {
+            // doc.ruta es la ruta completa para href/download
+            // doc.fecha, doc.hora, doc.nombreArchivo son las partes separadas
+            let ruta = dominio + ':' + puerto + doc.ruta
+
+            fecha = doc.fecha
+            // Extraemos partes de la fecha
+            const anio = fecha.substring(0, 4);
+            const mes = fecha.substring(4, 6);
+            const dia = fecha.substring(6, 8);
+
+            const fechaFormateada = `${dia}-${mes}-${anio}`; // "14-07-2025"
+
+
+            const item = `
+            <div class="list-group-item">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img src="https://static.vecteezy.com/system/resources/previews/023/234/824/non_2x/pdf-icon-red-and-white-color-for-free-png.png" alt="Imagen descriptiva" style="max-width: 100%; height: 80px;">
+                        </div>
+                        <div class="col-md-8">
+                            <strong>${fechaFormateada}</strong>
+                            <span>Resguardo_${doc.fecha}_${doc.hora}</span>
+                            <br>
+                            <button  type="button" class="btn btn-lock btn-outline-dark icon" onclick="ver_pdf('http://${ruta}')"><i class="fa-solid fa-eye"></i> Ver</button>
+                        </div>
+                    </div>
+                </div>
+                                
+            </div>`;
+
+            contenedor.innerHTML += item;
+        });
+
+
+    } else if (server.resultado.mensaje) {
+        //console.log(server.resultado.mensaje)
+        let mensaje = server.resultado.mensaje
+
+        let contenedor = document.getElementById('lista-documentos');
+        contenedor.innerHTML = '';
+
+        const item = `
+            <div class="list-group-item">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col">
+                            <strong>El usuario no cuenta con resguardos subidos</strong>
+                        </div>
+                    </div>
+                </div>
+                                
+            </div>`;
+
+        contenedor.innerHTML += item;
+
+
+
+    } else {
+        mostrar_toast("error", "Error", 'Hubo un problema con el servidor')
+    }
+})

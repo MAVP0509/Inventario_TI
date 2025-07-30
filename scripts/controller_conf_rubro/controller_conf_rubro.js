@@ -27,7 +27,7 @@ let elemento
 let table
 
 
-let rubro_selecionada = []
+let rubro_seleccionado = []
 async function consultar_informacion() {
     let server = await server_rubro({ accion: 2 })
 
@@ -113,7 +113,7 @@ async function consultar_informacion() {
                     let rowData = cell.getRow().getData();
                     rowData.seleccionado = !rowData.seleccionado;
                     cell.getRow().reformat();
-                    seleccionar_registro(rowData.id, rubro_selecionada)
+                    seleccionar_registro(rowData.id, rubro_seleccionado)
                 }, headerSort: false, frozen: true
             },
             {
@@ -122,7 +122,7 @@ async function consultar_informacion() {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
                         cell.getRow().reformat();
-                        seleccionar_registro(rowData.id, rubro_selecionada)
+                        seleccionar_registro(rowData.id, rubro_seleccionado)
                     }
             },
             {
@@ -248,18 +248,18 @@ async function nuevo_rubro() {
 
 async function mensaje_eliminar() {
 
-    if (rubro_selecionada.length === 0) {
+    if (rubro_seleccionado.length === 0) {
         mostrar_toast('warning', 'Inventario TI', 'Por favor, selecciona al menos un rubro para continuar')
 
     } else {
-        mostrar_alert('warning', `¿Está seguro de eliminar ${rubro_selecionada.length} rubro(s)?`, false, eliminar_rubro);
+        mostrar_alert('warning', `¿Está seguro de eliminar ${rubro_seleccionado.length} rubro(s)?`, false, eliminar_rubro);
     }
 }
 
-async function eliminar_rubro(params) {
+async function eliminar_rubro() {
     let model = {
         accion: 3,
-        id: rubro_selecionada
+        id: rubro_seleccionado
     }
 
     let response = await server_rubro(model);
@@ -280,8 +280,8 @@ function deseleccionar_todos() {
     //  Resetear propiedad "seleccionado"
     datos.forEach(d => d.seleccionado = false);
 
-    //  Limpiar el array de rubro_selecionada
-    rubro_selecionada = [];
+    //  Limpiar el array de rubro_seleccionado
+    rubro_seleccionado = [];
 
     //  Forzar re-renderizado de todas las filas para reflejar los íconos
     table.getRows().forEach(row => row.reformat());

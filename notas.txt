@@ -1,5 +1,5 @@
 
-ver 1.1.1 :{
+ver 1.1.0 :{
     0: Opción para resguardos de PEMEX,
     1: Nuevos campos en modal  de resguardo, área y ubicación,
     2: Nuevos campos en modal de registro de activo, IMEI y linea. Solo aparecerán cuando tipo sea Telefono celular,
@@ -15,4 +15,17 @@ ver 1.1.1 :{
     13: El programa detecta y avisa si una región no tiene supervisor habilitado,
     14: Cambio de imagen del login al logo de Diavaz,
     15: En ninguna tabla aparece el campo id,
+}
+
+VER 1.1.1 : {
+    0: Pulida de exportar a PDF la tabla inventario así como mejorar el diseño de su modal,
+    1: Opción de generar resguardo de celulares,
+}
+
+ver 1.1.2 : {
+    0: Modificación de la función general_select() EN INVENTARIO, recibe un array de datos predeterminados que no provienen de la BD,
+    1: Arreglo, del botón de generar resguardo desde traspaso, no se estaba activando,
+    2: Módulo de historial de resguardos,
+    3: Optimización de proceso de resguardos,
+    4: Aviso cuando se quiera generar un resguardo de celular y el usuario no tenga uno, 
 }

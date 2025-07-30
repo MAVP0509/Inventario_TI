@@ -21,6 +21,10 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_distintos($clientejson);
 } elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = traspaso($clientejson);
+} elseif ($clientejson->accion == 7) {
+    $respuesta_servidor->resultado = cargar_resguardo_firmado($clientejson);
+} elseif ($clientejson->accion == 8) {
+    $respuesta_servidor->resultado = consultar_resguardos_firmados($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -313,9 +317,24 @@ function consultar_para_resguardo($valores)
     $sql = "call sp_info_resguardo('$valores->usuario');";
     $query = mysqli_query($con, $sql);
 
+    $cel = $valores->cel;
+
     $datos = [];
     while ($fila = mysqli_fetch_assoc($query)) {
-        $datos[] = $fila;
+        //$datos[] = $fila;
+        if ($cel) {
+            if ($fila['tipo'] === "Teléfono Celular") {
+                $datos[] = $fila;
+            }
+        } else {
+            if ($fila['tipo'] !== "Teléfono Celular") {
+                $datos[] = $fila;
+            }
+        }
+    }
+    if (empty($datos)) {
+        $respuesta->error = "El usuario no tiene celulares asignados";
+        return $respuesta;
     }
     mysqli_free_result($query);
     mysqli_next_result($con);
@@ -326,6 +345,7 @@ function consultar_para_resguardo($valores)
     $datos[0]['ubicacion'] = $valores->ubicacion ?? '';
     $datos[0]['userPemex'] = $valores->userPemex ?? '';
     $datos[0]['userPemexCargo'] = $valores->userPemexCargo ?? '';
+    $datos[0]['cel'] = $valores->cel;
 
     $sql_supervisor = "SELECT * FROM supervisor WHERE region = '$valores->region' AND  habilitado = 1;";
     //  var_dump($sql_supervisor);
@@ -349,8 +369,26 @@ function consultar_para_resguardo($valores)
     $sql_fecha_update = "UPDATE inventario_ti_sur SET fecha_entrega = '$valores->fecha' where fk_usuario = '$valores->usuario'";
     mysqli_query($con, $sql_fecha_update);
 
-    $respuesta->datos = $datos;
-    return $respuesta;
+    //$respuesta->datos = $datos;
+    //return $respuesta;
+
+    // 👉 Enviar a segundo PHP con cURL
+    $datos_para_envio = new stdClass();
+    $datos_para_envio->accion = 0;
+    $datos_para_envio->datos = $datos;
+
+    $ch = curl_init('http://localhost/Inventario_TI/database/controller_excel/controller_excel.php'); // Reemplaza con tu URL real
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, [
+        'trama' => json_encode($datos_para_envio)
+    ]);
+
+    $respuesta_raw = curl_exec($ch);
+    curl_close($ch);
+
+    // Retornar al frontend lo que devuelva el segundo PHP
+    return json_decode($respuesta_raw);
 }
 
 function consultar_distintos($valores)
@@ -479,4 +517,79 @@ function traspaso($valores)
 
         return $datos;
     }
+}
+
+function cargar_resguardo_firmado($valores)
+{
+    $respuesta = new stdClass();
+
+    if (isset($_FILES['resguardo']) && $_FILES['resguardo']['error'] === UPLOAD_ERR_OK) {
+        $nombreOriginal = $_FILES['resguardo']['name'];
+        $tmpPath = $_FILES['resguardo']['tmp_name'];
+
+        // Validar extensión .xlsx
+        $ext = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));
+        if ($ext !== 'pdf') {
+            $respuesta->error = "Tipo de archivo no permitido. Solo .pdf";
+            return $respuesta;
+        }
+
+        //* Generar nombre único para evitar colisiones
+        $nuevoNombre = date('Ymd_His') . '_' . $nombreOriginal;
+
+
+        //* Ruta de la carpeta
+        $ruta = __DIR__ . '/../../documentos/' . $valores->usuario;
+
+        //* Validando si el usuario ya tiene su carpeta o no
+        if (is_dir($ruta)) {
+            //* Ruta destino, __DIR__ es carpeta donde está este script PHP
+            $destino = $ruta . '/' . $nuevoNombre;
+        } else {
+            //* Creación de la carpeta
+            mkdir($ruta, 0777, true);
+
+            //* Ruta destino
+            $destino = $ruta . '/' . $nuevoNombre;
+        }
+
+        if (move_uploaded_file($tmpPath, $destino)) {
+            $respuesta->mensaje = "Archivo guardado correctamente";
+            //$respuesta->ruta = 'C:\\xampp\\htdocs\\Inventario_TI\\database\\controller_inventario\\' . $nuevoNombre;
+        } else {
+            $respuesta->error = "No se pudo mover el archivo.";
+        }
+    } else {
+        $respuesta->error = "No se recibió ningún archivo válido.";
+    }
+    return $respuesta;
+}
+
+function consultar_resguardos_firmados($valores)
+{
+    $respuesta = new stdClass();
+
+    $carpeta = __DIR__ . '/../../documentos/' . $valores->usuario;
+
+    $carpetaUrl = '/Inventario_TI/documentos' . '/' . $valores->usuario;
+
+    if (is_dir($carpeta)) {
+        $archivos = array_diff(scandir($carpeta), ['.', '..']);
+
+        $ruta = [];
+
+        foreach ($archivos as $archivo) {
+            $ruta[] = $carpetaUrl . '/' . $archivo;
+        }
+        // array_reverse($ruta);
+        if (!empty($ruta)) {
+            $respuesta->documentos = $ruta;
+        } else {
+            $respuesta->mensaje = "El usuario no tiene resguardos subidos";
+        }
+    } else {
+        $respuesta->mensaje = "El usuario no tiene resguardos subidos";
+    }
+
+    return $respuesta;
 }
