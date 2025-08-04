@@ -409,7 +409,7 @@ function consultar_distintos($valores)
 
 
     if ($id !== null) {
-        $sql = "SELECT * FROM `$tabla` WHERE id = '$id' LIMIT 1;";
+        $sql = "SELECT DISTINCT * FROM `$tabla` WHERE id = '$id' LIMIT 1;";
     } else {
         switch ($campo) {
             case "estatus":
