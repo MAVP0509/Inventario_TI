@@ -480,8 +480,8 @@ async function mdl_nvo_registro() {
             placeholder: 'Selecione un cargo',
             dropdownParent: '#mdl-inventario',
             tags: true,
-            // sincronizarCon: 'inp-usuario',
-            // sincronizarCampo: 'cargo',
+            sincronizarCon: 'inp-usuario',
+            sincronizarCampo: 'cargo',
         })
     ])
 
@@ -491,48 +491,6 @@ async function mdl_nvo_registro() {
     $("#mdl-inventario").modal('show');
 
 }
-
-$('#inp-usuario').off('change').on('change', function () {
-    let userSelected = $(this).val()?.trim();
-    let select = $(this);
-    let nuevo = true;
-    const cargo = $('#inp-cargo')
-    let texto = "";
-
-    select.find('option').each(function () {
-        if ($(this).val() === userSelected && !$(this).attr('data-select2-tag')) {
-            nuevo = false; // Es un valor existente, no fue escrito por el usuario
-        }
-    });
-
-    if (userSelected && nuevo) {
-        $('#inp-cargo').prop('disabled', false);
-        $('#inp-cargo').val(null).trigger('change');
-
-    } else {
-
-        cargo.prop('disabled', true);
-        // Verifica si el valor ya existe como opción
-        if (!cargo.find(userSelected).length) {
-            const vista = select.find('option:selected').text().trim();
-
-            for (let i = 0; i < datos.length; i++) {
-                const element = datos[i];
-                if (element.usuario === vista) {
-                    texto = element.posicion;
-                    // console.log(selecreg)
-                    break;
-                }
-            }
-            // Si no existe, agrégalo dinámicamente como nueva opción
-            const nueva_opcion = new Option(texto, userSelected, true, true);
-
-            cargo.append(nueva_opcion).trigger('change');
-        } else {
-            cargo.val(userSelected).trigger('change');
-        }
-    }
-});
 
 async function crear_registro() {
     // Campos requeridos para validación
@@ -692,11 +650,6 @@ async function desactivar_registro() {
     } else {
         mostrar_toast('error', 'Error', 'No se pudo realizar la baja del activo. Inténtalo nuevamente.');
     }
-}
-
-function limpiarTexto(texto) {
-    if (typeof texto !== "string") return texto;
-    return texto.normalize("NFKD").replace(/[\u0300-\u036f]/g, ""); // elimina acentos
 }
 
 async function mdl_imprimir() {
