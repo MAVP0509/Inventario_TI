@@ -41,7 +41,7 @@ function server_excel(model) {
             success: function (response) {
                 try {
                     resolve(JSON.parse(response))
-                    
+
                     //console.log(resolve(JSON.parse(response)))
                     respuesta = response
                 } catch (error) {
@@ -951,12 +951,12 @@ async function mostrar_baja() {
     $('#inp-motivo, #inp-monto, #inp-quincena, #inp-reubicacion').prop('disabled', true);
     $('#cg-emisor, #cg-supervisor, #cg-vobo, #cg-autorizo').prop('disabled', true);
 
-    $('#smartwizard').smartWizard("reset");
+    // $('#smartwizard').smartWizard("reset");
     $('#smartwizard').smartWizard({
-        theme: 'dots',
-        autoAdjustHeight: true,
         selected: 0,
+        theme: 'dots',
         justified: true,
+        autoAdjustHeight: true,
         toolbar: {
             toolbarPosition: 'none',
             showNextButton: true,
@@ -977,9 +977,12 @@ async function mostrar_baja() {
             enableDoneState: true,
         }
     });
+    $('#smartwizard').smartWizard("goToStep", 0);
 
     $('#btn-confirmar').on('click', function () {
         // let pasoActual = $('#smartwizard').smartWizard("getStepIndex");
+        // console.log("Paso actual:", $('#smartwizard').smartWizard("getStepIndex"));
+
 
         // Ejecuta validaciones de todos los pasos antes de confirmar
         const validaciones = {
