@@ -51,7 +51,7 @@ function server_excel(model) {
         })
     });
 }
-
+ 
 window.addEventListener('load', function () {
     // Leemos el mensaje del registro desde localStorage
     const mensajeRegistro = sessionStorage.getItem('bienvenido');
