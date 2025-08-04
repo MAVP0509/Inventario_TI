@@ -22,10 +22,18 @@ VER 1.1.1 : {
     1: Opción de generar resguardo de celulares,
 }
 
-ver 1.1.2 : {
+ver 1.2.0 : {
     0: Modificación de la función general_select() EN INVENTARIO, recibe un array de datos predeterminados que no provienen de la BD,
     1: Arreglo, del botón de generar resguardo desde traspaso, no se estaba activando,
     2: Módulo de historial de resguardos,
     3: Optimización de proceso de resguardos,
     4: Aviso cuando se quiera generar un resguardo de celular y el usuario no tenga uno, 
+    5: Módulo de bajas,
+    6: Cambio del diseño del login,
+    7: Aumento del tamaño de letra de los card-tittle,
+    8: Cambio de la duración del preloader,
+    9: Arreglo del sidebar,
+    
 }
+
+

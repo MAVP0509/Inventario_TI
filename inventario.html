@@ -89,7 +89,8 @@
                             <div class="card card-tabs">
                                 <!--Card header-->
                                 <div class="card-header">
-                                    <h1 class="card-title" style="font-size: 23px;"><i class="fa-solid fa-table"></i> Inventario</h1>
+                                    <h1 class="card-title" style="font-size: 23px;"><i class="fa-solid fa-table"></i>
+                                        Inventario</h1>
                                     <div class="d-flex justify-content-end">
                                         <button type="button" class="btn bg-navy rounded mr-3 icon"
                                             onclick="mostrar_traspaso()">
@@ -139,14 +140,27 @@
 
             </section> <!--Container-->
         </div>
+
+        <!--Control-sidebar -->
         <aside class="control-sidebar control-sidebar-light" id="control-sidebar" style="width: 400px !important;">
             <div class="p-3 control-sidebar-content d-flex flex-column h-100 overflow-hidden">
-                <h4><i class="fa-solid fa-file-invoice"></i> Resguardos firmados</h4>
+                <!-- <h4><i class="fa-solid fa-file-invoice"></i> Resguardos firmados</h4>
+                <button type="button" class="btn btn-outline-danger icon"><i class="fa-solid fa-xmark"></i></button> -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">
+                        <i class="fa-solid fa-file-invoice"></i> Resguardos firmados
+                    </h4>
+                    <button type="button" class="btn btn-danger icon" data-widget="control-sidebar" data-slide="true">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
                 <div class=" d-flex justify-content-center gap-2 mt-3">
-                    <button type="button" class="btn btn-lock btn-outline-dark icon mr-3 w-100" onclick="col_subir_resguardos_firmados()"
-                        id="btn-col-subir" disabled><i class="fa-solid fa-file-arrow-up"></i> Subir</button>
-                    <button type="button" class="btn btn-lock btn-outline-dark icon w-100" onclick="col_ver_resguardos_firmados()"
-                        id="btn-col-descargar"><i class="fa-solid fa-file-arrow-down"></i> Descargar</button>
+                    <button type="button" class="btn btn-lock btn-outline-dark icon mr-3 w-100"
+                        onclick="col_subir_resguardos_firmados()" id="btn-col-subir" disabled><i
+                            class="fa-solid fa-file-arrow-up"></i> Subir</button>
+                    <button type="button" class="btn btn-lock btn-outline-dark icon w-100"
+                        onclick="col_ver_resguardos_firmados()" id="btn-col-descargar"><i
+                            class="fa-solid fa-file-arrow-down"></i> Descargar</button>
                 </div>
 
                 <hr class="mb-3">
@@ -175,7 +189,8 @@
                                 <select class="form-control select" id="select-ver-usu-file" name="inp-resg"></select>
                                 <div class="invalid-feedback">Por favor, seleccione un usuario.</div>
                             </div>
-                            <div id="lista-documentos" class="list-group mt-3 overflow-auto flex-grow-1" style="max-height: 60vh;"></div>
+                            <div id="lista-documentos" class="list-group mt-3 overflow-auto flex-grow-1"
+                                style="max-height: 60vh;"></div>
 
                         </div>
                     </div>
@@ -541,10 +556,18 @@
                     <div class="container-fluid">
                         <div id="smartwizard" class="sw-theme-dots">
                             <ul class="nav nav-progress">
-                                <li><a class="nav-link" href="#step-1">Paso 1<br /><div class="num">1</div><small>Motivo</small></a></li>
-                                <li><a class="nav-link" href="#step-2">Paso 2<br /><div class="num">2</div><small>Observaciones</small></a></li>
-                                <li><a class="nav-link" href="#step-3">Paso 3<br /><div class="num">3</div><small>Encargados</small></a></li>
-                                <li><a class="nav-link" href="#step-4">Paso 4<br /><div class="num">4</div><small>Tabla</small></a></li>
+                                <li><a class="nav-link" href="#step-1">Paso 1<br />
+                                        <div class="num">1</div><small>Motivo</small>
+                                    </a></li>
+                                <li><a class="nav-link" href="#step-2">Paso 2<br />
+                                        <div class="num">2</div><small>Observaciones</small>
+                                    </a></li>
+                                <li><a class="nav-link" href="#step-3">Paso 3<br />
+                                        <div class="num">3</div><small>Encargados</small>
+                                    </a></li>
+                                <li><a class="nav-link" href="#step-4">Paso 4<br />
+                                        <div class="num">4</div><small>Tabla</small>
+                                    </a></li>
                             </ul>
 
                             <div class="tab-content">
@@ -659,7 +682,8 @@
                                                     <span class="input-group-text"><i
                                                             class="fa-solid fa-person-circle-exclamation"></i></span>
                                                 </div>
-                                                <select class="form-control" id="slc-supervisor" name="lmp-baja"></select>
+                                                <select class="form-control" id="slc-supervisor"
+                                                    name="lmp-baja"></select>
                                                 <div class="invalid-feedback">Por favor, seleccione un supervisor</div>
                                             </div>
                                             <h6>Cargo del supervisor</h6>
@@ -668,7 +692,8 @@
                                                     <span class="input-group-text"><i
                                                             class="fa-solid fa-person-circle-plus"></i></span>
                                                 </div>
-                                                <select class="form-control" id="cg-supervisor" name="lmp-baja"></select>
+                                                <select class="form-control" id="cg-supervisor"
+                                                    name="lmp-baja"></select>
                                             </div>
                                         </div>
                                     </div>
@@ -899,8 +924,8 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
                             class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
-                    <button type="button" class="btn btn-success icon" id="mdl-btn-subir-pdf" onclick="subir_pdf()">Subir <i
-                            class="fa-solid fa-upload"></i></button>
+                    <button type="button" class="btn btn-success icon" id="mdl-btn-subir-pdf"
+                        onclick="subir_pdf()">Subir <i class="fa-solid fa-upload"></i></button>
                 </div>
             </div>
         </div>

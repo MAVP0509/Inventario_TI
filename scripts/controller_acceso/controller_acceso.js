@@ -43,7 +43,7 @@ fetch('sidebar.html')
 
     //* Activamos la opción del treeview en el sidebar
     $(function () {
-      $('[data-widget="treeview"]').Treeview('init');
+      $('[data-widget="treeview"]').Treeview();
     });
 
     //* Añadimos el nombre del usuario en el sidebar
