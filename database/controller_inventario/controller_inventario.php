@@ -463,6 +463,8 @@ function traspaso($valores)
 
     include("../conexion.php");
     $fecha = date('Y-m-d');
+    $zona = "Región Sur";
+    $ubicacion = "NA";
     $usuario = '5';
     $datos = [];
     $nuevo = [];
@@ -492,9 +494,9 @@ function traspaso($valores)
         }
 
         if ($valores->estatus == 'Bodega') {
-            $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$usuario', fecha_entrega = '$fecha' WHERE id IN ($ids)";
+            $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$usuario', zona = '$zona', ubicacion = '$ubicacion', fecha_entrega = '$fecha' WHERE id IN ($ids)";
         } else {
-            $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$valores->usuario', fecha_entrega = '$fecha' WHERE id IN ($ids)";
+            $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$valores->usuario', zona = '$valores->zona', ubicacion = '$valores->ubicacion' fecha_entrega = '$fecha' WHERE id IN ($ids)";
         }
         mysqli_query($con, $sql_datos);
 

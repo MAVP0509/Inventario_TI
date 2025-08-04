@@ -833,7 +833,7 @@
     </div>
     <!-- Modal traspaso -->
     <div class="modal fade" id="mdl-traspaso" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Traspaso de activo</h5>
@@ -842,28 +842,52 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <label for="mdl-estado">Estado del activo</label>
-                    <div class="input-group">
-                        <div class="input-group-prepend"><span class="input-group-text"><i
-                                    class="fa-solid fa-circle-info"></i></span></div>
-                        <select class="form-control select" id="mdl-estado"></select>
-                    </div>
-                    <label for="mdl-usuario">Usuario a traspasar</label>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend"><span class="input-group-text"><i
-                                    class="fa-solid fa-user"></i></span></div>
-                        <select class="form-control select" id="mdl-usuario"></select>
-                    </div>
-                    <div class="alert alert-info position-relative d-flex align-items-start" role="alert"
-                        style="display:none ; background-color:#e7f3fe; border-color:#b8daff; color:#004085; padding-right: 4rem;"
-                        id="alert-traspaso">
-                        <button type='button' class='btn icon toggle-select me-2 check-button' id="check-resguardo">
-                            <i class='fa-regular fa-square fa-lg' id="check-resguardo-icon"></i>
-                        </button>
-                        ¿Desea generar el resguardo del usuario seleccionado?
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label for="mdl-estado">Estado del activo</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i
+                                                class="fa-solid fa-circle-info"></i></span></div>
+                                    <select class="form-control" id="mdl-estado"></select>
+                                </div>
+                                <label for="mdl-usuario">Usuario a traspasar</label>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend"><span class="input-group-text"><i
+                                                class="fa-solid fa-user"></i></span></div>
+                                    <select class="form-control" id="mdl-usuario"></select>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>Zona a traspasar</label>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend"><span class="input-group-text"><i
+                                                        class="fa-solid fa-user"></i></span></div><select
+                                                class="form-control" id="mdl-zona"></select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Ubicación a traspasar</label>
+                                        <div class="input-group mb-3">
+                                            <div class="input-group-prepend"><span class="input-group-text"><i
+                                                        class="fa-solid fa-user"></i></span></div>
+                                            <select class="form-control" id="mdl-ubicacion"></select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="alert alert-info position-relative d-flex align-items-start" role="alert"
+                                    style="display:none ; background-color:#e7f3fe; border-color:#b8daff; color:#004085; padding-right: 4rem;"
+                                    id="alert-traspaso">
+                                    <button type='button' class='btn icon toggle-select me-2 check-button'
+                                        id="check-resguardo">
+                                        <i class='fa-regular fa-square fa-lg' id="check-resguardo-icon"></i>
+                                    </button>
+                                    ¿Desea generar el resguardo del usuario seleccionado?
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger icon" data-dismiss="modal">
                         Cerrar <i class="fa-solid fa-arrow-right-from-bracket fa-lg"></i>
@@ -875,6 +899,7 @@
             </div>
         </div>
     </div>
+
 
     <!--Modal pdf-->
     <div class="modal fade" id="mdl-imprimir" tabindex="-1" role="dialog" data-backdrop="static">
