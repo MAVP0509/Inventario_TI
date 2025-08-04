@@ -645,7 +645,7 @@ async function desactivar_registro() {
     // console.log(response)
     if (Array.isArray(response.resultado)) {
         await registrar_historico('Baja de activo', response.resultado);
-        mostrar_toast('success', '¡Baja de activo exitosa!', 'El registro se ha eliminado correctamente.');
+        mostrar_toast('success', '¡Baja de activo exitosa!', 'La baja se ha realizado correctamente.');
         consultar_informacion();
     } else {
         mostrar_toast('error', 'Error', 'No se pudo realizar la baja del activo. Inténtalo nuevamente.');
@@ -1546,7 +1546,6 @@ const pond = FilePond.create(fileResguardo, {
 
 });
 
-
 let fileToOpen;
 
 pond.on('addfile', (error, fileItem) => {
@@ -1562,7 +1561,6 @@ pond.on('addfile', (error, fileItem) => {
     viewer.src = fileToOpen;
 
 });
-
 
 //* Función para abrir el sidebar para la subida y visualización de resguardos
 async function abrir_control_sidebar() {

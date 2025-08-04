@@ -25,7 +25,8 @@
     <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
     <link href="https://unpkg.com/filepond-plugin-pdf-preview/dist/filepond-plugin-pdf-preview.css" rel="stylesheet" />
 
-    <link href="https://cdn.jsdelivr.net/npm/smartwizard@6/dist/css/smart_wizard_all.min.css" rel="stylesheet" type="text/css" />
+    <link href="https://cdn.jsdelivr.net/npm/smartwizard@6/dist/css/smart_wizard_all.min.css" rel="stylesheet"
+        type="text/css" />
 
 
 
@@ -86,33 +87,48 @@
                             <div class="card card-tabs">
                                 <!--Card header-->
                                 <div class="card-header">
-                                    <h1 class="card-title" style="font-size: 23px;"><i class="fa-solid fa-table"></i> Inventario</h1>
+                                    <h1 class="card-title" style="font-size: 23px;"><i class="fa-solid fa-table"></i>
+                                        Inventario</h1>
                                     <div class="d-flex justify-content-end">
                                         <button type="button" class="btn bg-navy rounded mr-3 icon"
+                                            data-toggle="popover" data-trigger="hover" data-html="true"
+                                            data-placement="bottom" data-content="Traspaso de activo"
                                             onclick="mostrar_traspaso()">
                                             <i class="fa-solid fa-boxes-packing"></i> Traspaso
                                         </button>
-                                        <button type="button" onclick="resguardo()"
-                                            class="btn btn-info icon rounded mr-3" href="#"><i
+                                        <button type="button" onclick="resguardo()" data-toggle="popover"
+                                            data-trigger="hover" data-html="true" data-placement="bottom"
+                                            data-content="Generación de resguardo"
+                                            class="btn btn-info icon rounded mr-3"><i
                                                 class="fa-solid fa-file-export fa-lg"></i> Resguardo
                                         </button>
                                         <button type="button" class="btn btn-success rounded mr-3 icon"
+                                            data-toggle="popover" data-trigger="hover" data-html="true"
+                                            data-placement="bottom" data-content="Registro de activo"
                                             onclick="mdl_nvo_registro()"><i class="fa-solid fa-plus fa-lg"></i> Nuevo
                                         </button>
-                                        <button type="button" style="text-align: center"
-                                            class="btn btn-danger rounded icon mr-3" onclick="confirmar_eliminacion()">
+                                        <button type="button" style="text-align: center" data-toggle="popover"
+                                            data-trigger="hover" data-html="true" data-placement="bottom"
+                                            data-content="Baja de activo" class="btn btn-danger rounded icon mr-3"
+                                            onclick="confirmar_eliminacion()">
                                             <i class="fa-solid fa-desktop"><i
                                                     class="fa-solid fa-arrow-turn-down"></i></i> Baja
                                         </button>
                                         <button type="button" class="btn bg-gray rounded mr-3 icon"
+                                            data-toggle="popover" data-trigger="hover" data-html="true"
+                                            data-placement="bottom" data-content="Historial de activo"
                                             onclick="consultar_num_serie()">
                                             <i class="fa-solid fa-clock-rotate-left"></i> Historial
                                         </button>
                                         <button type="button" class="btn btn-lg btn-outline-danger mr-3 icon"
+                                            data-toggle="popover" data-trigger="hover" data-html="true"
+                                            data-placement="bottom" data-content="Exportación a PDF"
                                             onclick="mdl_imprimir()" id="btn-imprimir"><i
                                                 class="fa-solid fa-file-pdf"></i>
                                         </button>
                                         <button type="button" class="btn btn-lg btn-outline-success mr-3 icon"
+                                            data-toggle="popover" data-trigger="hover" data-html="true"
+                                            data-placement="bottom" data-content="Exportación a Excel"
                                             onclick="imprimir_excel()" id="btn-excel"><i
                                                 class="fa-solid fa-file-excel"></i>
                                         </button>
@@ -140,10 +156,12 @@
             <div class="p-3 control-sidebar-content d-flex flex-column h-100 overflow-hidden">
                 <h4><i class="fa-solid fa-file-invoice"></i> Resguardos firmados</h4>
                 <div class=" d-flex justify-content-center gap-2 mt-3">
-                    <button type="button" class="btn btn-lock btn-outline-dark icon mr-3 w-100" onclick="col_subir_resguardos_firmados()"
-                        id="btn-col-subir" disabled><i class="fa-solid fa-file-arrow-up"></i> Subir</button>
-                    <button type="button" class="btn btn-lock btn-outline-dark icon w-100" onclick="col_ver_resguardos_firmados()"
-                        id="btn-col-descargar"><i class="fa-solid fa-file-arrow-down"></i> Descargar</button>
+                    <button type="button" class="btn btn-lock btn-outline-dark icon mr-3 w-100"
+                        onclick="col_subir_resguardos_firmados()" id="btn-col-subir" disabled><i
+                            class="fa-solid fa-file-arrow-up"></i> Subir</button>
+                    <button type="button" class="btn btn-lock btn-outline-dark icon w-100"
+                        onclick="col_ver_resguardos_firmados()" id="btn-col-descargar"><i
+                            class="fa-solid fa-file-arrow-down"></i> Descargar</button>
                 </div>
 
                 <hr class="mb-3">
@@ -172,7 +190,8 @@
                                 <select class="form-control select" id="select-ver-usu-file" name="inp-resg"></select>
                                 <div class="invalid-feedback">Por favor, seleccione un usuario.</div>
                             </div>
-                            <div id="lista-documentos" class="list-group mt-3 overflow-auto flex-grow-1" style="max-height: 60vh;"></div>
+                            <div id="lista-documentos" class="list-group mt-3 overflow-auto flex-grow-1"
+                                style="max-height: 60vh;"></div>
 
                         </div>
                     </div>
@@ -538,10 +557,18 @@
                     <div class="container-fluid">
                         <div id="smartwizard" class="sw-theme-dots">
                             <ul class="nav nav-progress">
-                                <li><a class="nav-link" href="#step-1">Paso 1<br /><div class="num">1</div><small>Motivo</small></a></li>
-                                <li><a class="nav-link" href="#step-2">Paso 2<br /><div class="num">2</div><small>Observaciones</small></a></li>
-                                <li><a class="nav-link" href="#step-3">Paso 3<br /><div class="num">3</div><small>Encargados</small></a></li>
-                                <li><a class="nav-link" href="#step-4">Paso 4<br /><div class="num">4</div><small>Tabla</small></a></li>
+                                <li><a class="nav-link" href="#step-1">Paso 1<br />
+                                        <div class="num">1</div><small>Motivo</small>
+                                    </a></li>
+                                <li><a class="nav-link" href="#step-2">Paso 2<br />
+                                        <div class="num">2</div><small>Observaciones</small>
+                                    </a></li>
+                                <li><a class="nav-link" href="#step-3">Paso 3<br />
+                                        <div class="num">3</div><small>Encargados</small>
+                                    </a></li>
+                                <li><a class="nav-link" href="#step-4">Paso 4<br />
+                                        <div class="num">4</div><small>Tabla</small>
+                                    </a></li>
                             </ul>
 
                             <div class="tab-content">
@@ -656,7 +683,8 @@
                                                     <span class="input-group-text"><i
                                                             class="fa-solid fa-person-circle-exclamation"></i></span>
                                                 </div>
-                                                <select class="form-control" id="slc-supervisor" name="lmp-baja"></select>
+                                                <select class="form-control" id="slc-supervisor"
+                                                    name="lmp-baja"></select>
                                                 <div class="invalid-feedback">Por favor, seleccione un supervisor</div>
                                             </div>
                                             <h6>Cargo del supervisor</h6>
@@ -665,7 +693,8 @@
                                                     <span class="input-group-text"><i
                                                             class="fa-solid fa-person-circle-plus"></i></span>
                                                 </div>
-                                                <select class="form-control" id="cg-supervisor" name="lmp-baja"></select>
+                                                <select class="form-control" id="cg-supervisor"
+                                                    name="lmp-baja"></select>
                                             </div>
                                         </div>
                                     </div>
@@ -896,8 +925,8 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
                             class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
-                    <button type="button" class="btn btn-success icon" id="mdl-btn-subir-pdf" onclick="subir_pdf()">Subir <i
-                            class="fa-solid fa-upload"></i></button>
+                    <button type="button" class="btn btn-success icon" id="mdl-btn-subir-pdf"
+                        onclick="subir_pdf()">Subir <i class="fa-solid fa-upload"></i></button>
                 </div>
             </div>
         </div>
@@ -925,7 +954,8 @@
     integrity="sha512-k6/Bkb8Fxf/c1Tkyl39yJwcOZ1P4cRrJu77p83zJjN2Z55prbFHxPs9vN7q3l3+tSMGPDdoH51AEU8Vgo1cgAA=="
     crossorigin="anonymous"></script>
 <!-- Smart Wizard -->
-<script src="https://cdn.jsdelivr.net/npm/smartwizard@6/dist/js/jquery.smartWizard.min.js" type="text/javascript"></script>
+<script src="https://cdn.jsdelivr.net/npm/smartwizard@6/dist/js/jquery.smartWizard.min.js"
+    type="text/javascript"></script>
 <!-- Select2 -->
 <script src="libraries/select2/js/select2.min.js"></script>
 <!-- Tabulator -->
