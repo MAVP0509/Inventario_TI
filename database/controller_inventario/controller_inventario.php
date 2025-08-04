@@ -333,8 +333,13 @@ function consultar_para_resguardo($valores)
         }
     }
     if (empty($datos)) {
-        $respuesta->error = "El usuario no tiene celulares asignados";
-        return $respuesta;
+        if ($cel) {
+            $respuesta->error = "El usuario no tiene celulares asignados";
+            return $respuesta;
+        } else {
+            $respuesta->error = "El usuario no tiene equipos asignados";
+            return $respuesta;
+        }
     }
     mysqli_free_result($query);
     mysqli_next_result($con);

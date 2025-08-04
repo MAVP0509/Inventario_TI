@@ -33,7 +33,7 @@ ver 1.2.0 : {
     7: Aumento del tamaño de letra de los card-tittle,
     8: Cambio de la duración del preloader,
     9: Arreglo del sidebar,
-    
+    10: Validación si el usuario tiene o no equipos asignados a la hora de generar un resguardo,
 }
 
 
