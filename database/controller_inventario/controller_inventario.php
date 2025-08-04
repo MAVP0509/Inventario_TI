@@ -401,47 +401,31 @@ function consultar_distintos($valores)
     $id = isset($valores->id) ? mysqli_real_escape_string($con, $valores->id) : null;
     // var_dump($id);
 
-    if (isset($id) && $id !== '') {
-        $id = mysqli_real_escape_string($con, $id);
 
+
+    if ($id !== null) {
         $sql = "SELECT * FROM `$tabla` WHERE id = '$id' LIMIT 1;";
-        $query = mysqli_query($con, $sql);
-        // var_dump($query);
-
-        if (!$query) {
-            return [];
+    } else {
+        switch ($campo) {
+            case "estatus":
+                $datos = [
+                    ['id' => 'Asignado', 'estatus' => 'Asignado'],
+                    ['id' => 'Bodega', 'estatus' => 'Bodega']
+                ];
+                return $datos;
+            case "region":
+                $sql = "SELECT DISTINCT `$campo` from `$tabla` WHERE `$campo` <> 'Baja';";
+                break;
+            case "zona":
+            case "ubicacion":
+            case "evento":
+                // case "cargo":
+                $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE  `$campo` <> 'NA'";
+                break;
+            default:
+                $sql = "SELECT DISTINCT `$campo`,id FROM `$tabla` WHERE  `$campo` <> 'NA' AND habilitado <> 0;";
+                break;
         }
-
-        $fila = mysqli_fetch_assoc($query);
-        if ($fila) {
-            return [[
-                'id' => $fila['id'],
-                $campo => $fila[$campo] ?? ''
-            ]];
-        } else {
-            return [];
-        }
-    }
-
-    switch ($campo) {
-        case "estatus":
-            $datos = [
-                ['id' => 'Asignado', 'estatus' => 'Asignado'],
-                ['id' => 'Bodega', 'estatus' => 'Bodega']
-            ];
-            return $datos;
-        case "region":
-            $sql = "SELECT DISTINCT `$campo` from `$tabla` WHERE `$campo` <> 'Baja';";
-            break;
-        case "zona":
-        case "ubicacion":
-        case "evento":
-        // case "cargo":
-            $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE  `$campo` <> 'NA'";
-            break;
-        default:
-            $sql = "SELECT DISTINCT `$campo`,id FROM `$tabla` WHERE  `$campo` <> 'NA' AND habilitado <> 0;";
-            break;
     }
 
     $query = mysqli_query($con, $sql);
@@ -451,10 +435,10 @@ function consultar_distintos($valores)
 
     $datos = [];
     while ($fila = mysqli_fetch_assoc($query)) {
-        $id = $fila['id'] ?? $fila[$campo]; // fallback por si no hay 'id'
+        $id_valor = $fila['id'] ?? $fila[$campo]; // fallback por si no hay 'id'
         $valor = $fila[$campo];
         $datos[] = [
-            'id' => $id,
+            'id' => $id_valor,
             $campo => $valor
         ];
     }

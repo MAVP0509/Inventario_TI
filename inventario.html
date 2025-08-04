@@ -57,9 +57,7 @@
                     <a class="nav-link" href="#" role="button" onclick="cerrar_sesionmsg()" id="log-out"><i
                             class="fa-solid fa-door-closed fa-xl"></i></a>
                 </li>
-
             </ul>
-
         </nav>
 
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
@@ -67,7 +65,6 @@
                 <img src="images/diavaz.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-light">Inventario TI</span>
             </a>
-
             <div id="sidebar-container"></div>
         </aside>
 
@@ -99,8 +96,8 @@
                                             <i class="fa-solid fa-boxes-packing"></i> Traspaso
                                         </button>
                                         <button type="button" onclick="resguardo()"
-                                            class="btn btn-info icon rounded mr-3"
-                                            href="#"><i class="fa-solid fa-file-export fa-lg"></i> Resguardo
+                                            class="btn btn-info icon rounded mr-3" href="#"><i
+                                                class="fa-solid fa-file-export fa-lg"></i> Resguardo
                                         </button>
                                         <button type="button" class="btn btn-success rounded mr-3 icon"
                                             onclick="mdl_nvo_registro()"><i class="fa-solid fa-plus fa-lg"></i> Nuevo
@@ -111,7 +108,7 @@
                                                     class="fa-solid fa-arrow-turn-down"></i></i> Baja
                                         </button>
                                         <button type="button" class="btn btn-light rounded mr-3 icon"
-                                            onclick="consultar_num_sserie()">
+                                            onclick="consultar_num_serie()">
                                             <i class="fa-solid fa-clock-rotate-left"></i> Historial
                                         </button>
                                         <button type="button" class="btn btn-lg btn-outline-danger mr-3 icon"
@@ -543,11 +540,11 @@
                 <div class="modal-body">
                     <div class="container-fluid">
                         <div id="smartwizard" class="sw-theme-dots">
-                            <ul class="nav">
-                                <li><a class="nav-link" href="#step-1">Paso 1<br /><small>Motivo</small></a></li>
-                                <li><a class="nav-link" href="#step-2">Paso 2<br /><small>Observaciones</small></a></li>
-                                <li><a class="nav-link" href="#step-3">Paso 3<br /><small>Encargados</small></a></li>
-                                <li><a class="nav-link" href="#step-4">Paso 4<br /><small>Tabla</small></a></li>
+                            <ul class="nav nav-progress">
+                                <li><a class="nav-link" href="#step-1">Paso 1<br /><div class="num">1</div><small>Motivo</small></a></li>
+                                <li><a class="nav-link" href="#step-2">Paso 2<br /><div class="num">2</div><small>Observaciones</small></a></li>
+                                <li><a class="nav-link" href="#step-3">Paso 3<br /><div class="num">3</div><small>Encargados</small></a></li>
+                                <li><a class="nav-link" href="#step-4">Paso 4<br /><div class="num">4</div><small>Tabla</small></a></li>
                             </ul>
 
                             <div class="tab-content">
@@ -558,7 +555,7 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fa-solid fa-list-ul"></i></span>
                                         </div>
-                                        <select class="form-control" id="slc-motivo" data-live-search="true"
+                                        <select class="form-control" id="slc-motivo" data-live-search="true" name="slct"
                                             data-container="body"></select>
                                         <div class="invalid-feedback">Por favor, seleccione un motivo</div>
                                     </div>
@@ -607,7 +604,8 @@
                                                     <span class="input-group-text"><i
                                                             class="fa-solid fa-clipboard-question"></i></span>
                                                 </div>
-                                                <input type="text" class="form-control" id="inp-quincena" name="lmp-baja"
+                                                <input type="text" class="form-control" id="inp-quincena"
+                                                    name="lmp-baja"
                                                     placeholder="Especifique el número de quincenas a descontar">
                                                 <div class="invalid-feedback">Por favor, especifique el número de
                                                     quincenas</div>
@@ -649,7 +647,7 @@
                                                     <span class="input-group-text"><i
                                                             class="fa-solid fa-person-circle-plus"></i></span>
                                                 </div>
-                                                <select class="form-control" id="cg-emisor"></select>
+                                                <select class="form-control" id="cg-emisor" name="lmp-baja"></select>
                                                 <!-- <div class="invalid-feedback">Por favor, seleccione al emisor</div> -->
                                             </div>
                                         </div>
@@ -661,7 +659,7 @@
                                                     <span class="input-group-text"><i
                                                             class="fa-solid fa-person-circle-exclamation"></i></span>
                                                 </div>
-                                                <select class="form-control" id="slc-supervisor"></select>
+                                                <select class="form-control" id="slc-supervisor" name="lmp-baja"></select>
                                                 <div class="invalid-feedback">Por favor, seleccione un supervisor</div>
                                             </div>
                                             <h6>Cargo del supervisor</h6>
@@ -670,7 +668,7 @@
                                                     <span class="input-group-text"><i
                                                             class="fa-solid fa-person-circle-plus"></i></span>
                                                 </div>
-                                                <select class="form-control" id="cg-supervisor"></select>
+                                                <select class="form-control" id="cg-supervisor" name="lmp-baja"></select>
                                             </div>
                                         </div>
                                     </div>
@@ -682,7 +680,7 @@
                                                     <span class="input-group-text"><i
                                                             class="fa-solid fa-person-chalkboard"></i></span>
                                                 </div>
-                                                <select class="form-control" id="slc-vobo"></select>
+                                                <select class="form-control" id="slc-vobo" name="lmp-baja"></select>
                                                 <div class="invalid-feedback">Por favor, seleccione al encargado de dar
                                                     el Vo. Bo.</div>
                                             </div>
@@ -692,7 +690,7 @@
                                                     <span class="input-group-text"><i
                                                             class="fa-solid fa-person-circle-plus"></i></span>
                                                 </div>
-                                                <select class="form-control" id="cg-vobo"></select>
+                                                <select class="form-control" id="cg-vobo" name="lmp-baja"></select>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
@@ -702,7 +700,7 @@
                                                     <span class="input-group-text"><i
                                                             class="fa-solid fa-person-circle-check"></i></span>
                                                 </div>
-                                                <select class="form-control" id="slc-autorizo"></select>
+                                                <select class="form-control" id="slc-autorizo" name="lmp-baja"></select>
                                                 <div class="invalid-feedback">Por favor, seleccione al encargado de
                                                     autorizar</div>
                                             </div>
@@ -712,7 +710,7 @@
                                                     <span class="input-group-text"><i
                                                             class="fa-solid fa-person-circle-plus"></i></span>
                                                 </div>
-                                                <select class="form-control" id="cg-autorizo"></select>
+                                                <select class="form-control" id="cg-autorizo" name="lmp-baja"></select>
                                             </div>
                                         </div>
                                     </div>
@@ -720,20 +718,20 @@
                                 <!-- Paso 4 -->
                                 <div id="step-4" class="tab-pane" role="tabpanel">
                                     <div id="tbl-baja"></div>
-                                </div>
+                                </div> <!--Step content 4-->
                             </div>
 
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
+                <!-- <div class="modal-footer">
                     <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="modal-btn-his">Cancelar
                         <i class="fa-solid fa-arrow-right-from-bracket fa-lg"></i>
                     </button>
                     <button type="button" class="btn btn-success icon" id="conf-baja" onclick="generar_baja()">Confirmar
                         <i class="fa-solid fa-circle-check fa-lg"></i>
                     </button>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>

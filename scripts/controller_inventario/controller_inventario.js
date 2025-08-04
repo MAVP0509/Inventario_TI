@@ -14,11 +14,11 @@ function server_inventario(model) {
                 //console.log(response);
                 try {
                     resolve(JSON.parse(response))
-                    if (loading){
+                    if (loading) {
                         Swal.close()
                         loading = !loading
                     }
-                   
+
                     console.log(resolve(JSON.parse(response)))
                     respuesta = response
                 } catch (error) {
@@ -30,7 +30,7 @@ function server_inventario(model) {
     });
 }
 
-/* function server_excel(model) {
+function server_excel(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
@@ -50,7 +50,7 @@ function server_inventario(model) {
             }
         })
     });
-} */
+}
 
 window.addEventListener('load', function () {
     // Leemos el mensaje del registro desde localStorage
@@ -186,7 +186,7 @@ async function consultar_informacion() {
                 { title: "Linea", field: "linea", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", width: 170 },
                 { title: "Usuario", field: "usuario", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
                 { title: "Cargo del usuario", field: "posicion", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
-                { title: "Fecha de asignación", field: "fecha_entrega", sorter: "date", headerFilter: "input", headerSort: false },
+                { title: "Fecha de asignación", field: "fecha_entrega", headerHozAlign: "center", sorter: "date", headerFilter: "input", headerSort: false, hozAlign: "center" },
                 { title: "Estatus", field: "estatus", width: 120, frozen: true, headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "Asignado": "Asignado", "Bodega": "Bodega" }, clearable: true }, headerSort: false },
                 {
                     formatter: editIcon, width: 60, hozAlign: "center",
@@ -840,7 +840,7 @@ async function confirmar_eliminacion() {
 async function mostrar_baja() {
     let input = $('[name="lmp-baja"]');
 
-    input.each(function () { $(this).val(''); });  // Limpia el valo de los inputs
+    input.each(function () { $(this).val(''); });  // Limpia el valor de los inputs
 
     let data = datos.filter(el => equipo_seleccionado.includes(el.id_equipo));
 
@@ -853,7 +853,7 @@ async function mostrar_baja() {
         { id: 5, text: 'Otro' }
     ]
     // console.time('selects');
-    await Promise.allSettled([
+    await Promise.all([
         general_select2({
             selectId: 'slc-motivo',
             data: opcion,
@@ -871,7 +871,7 @@ async function mostrar_baja() {
             tabla: 'cat_usuarios',
             campo: 'nombre',
             placeholder: 'Seleciona al usuario quien emite la baja',
-            dropdownParent: '#step-3',
+            dropdownParent: '#mdl-baja',
             tags: true,
         }),
 
@@ -880,7 +880,7 @@ async function mostrar_baja() {
             tabla: 'cat_usuarios',
             campo: 'cargo',
             placeholder: 'Seleciona al usuario quien emite la baja',
-            dropdownParent: '#step-3',
+            dropdownParent: '#mdl-baja',
             sincronizarCon: 'slc-emisor',
             sincronizarCampo: 'cargo',
             tags: true,
@@ -891,7 +891,7 @@ async function mostrar_baja() {
             tabla: 'supervisor',
             campo: 'nombre',
             placeholder: 'Selecciona al usuario que supervisa la baja',
-            dropdownParent: '#step-3',
+            dropdownParent: '#mdl-baja',
             tags: true,
         }),
 
@@ -900,7 +900,7 @@ async function mostrar_baja() {
             tabla: 'supervisor',
             campo: 'cargo',
             placeholder: 'Seleciona al usuario quien emite la baja',
-            dropdownParent: '#step-3',
+            dropdownParent: '#mdl-baja',
             sincronizarCon: 'slc-supervisor',
             sincronizarCampo: 'cargo',
             tags: true,
@@ -911,7 +911,7 @@ async function mostrar_baja() {
             tabla: 'cat_usuarios',
             campo: 'nombre',
             placeholder: 'Seleccione un usuario',
-            dropdownParent: '#step-3',
+            dropdownParent: '#mdl-baja',
             tags: true,
         }),
 
@@ -920,7 +920,7 @@ async function mostrar_baja() {
             tabla: 'cat_usuarios',
             campo: 'cargo',
             placeholder: 'Seleciona al usuario quien emite la baja',
-            dropdownParent: '#step-3',
+            dropdownParent: '#mdl-baja',
             sincronizarCon: 'slc-vobo',
             sincronizarCampo: 'cargo',
             tags: true,
@@ -931,7 +931,7 @@ async function mostrar_baja() {
             tabla: 'cat_usuarios',
             campo: 'nombre',
             placeholder: 'Seleccione un usuario',
-            dropdownParent: '#step-3',
+            dropdownParent: '#mdl-baja',
             tags: true,
         }),
 
@@ -940,7 +940,7 @@ async function mostrar_baja() {
             tabla: 'cat_usuarios',
             campo: 'cargo',
             placeholder: 'Seleciona al usuario quien emite la baja',
-            dropdownParent: '#step-3',
+            dropdownParent: '#mdl-baja',
             sincronizarCon: 'slc-autorizo',
             sincronizarCampo: 'cargo',
             tags: true,
@@ -955,11 +955,14 @@ async function mostrar_baja() {
     $('#smartwizard').smartWizard({
         theme: 'dots',
         autoAdjustHeight: true,
-        // selected: 0,
-        toolbarSettings: {
-            toolbarPosition: 'top',
+        selected: 0,
+        justified: true,
+        toolbar: {
+            toolbarPosition: 'none',
             showNextButton: true,
             showPreviousButton: true,
+            extraHtml: `<button class="btn btn-danger" id="btn-cancelar">Cancelar</button>
+                        <button class="btn btn-success" id="btn-confirmar">Confirmar</button>`,
         },
         keyboard: {
             keyNavigation: true,
@@ -973,6 +976,32 @@ async function mostrar_baja() {
         anchor: {
             enableDoneState: true,
         }
+    });
+
+    $('#btn-confirmar').on('click', function () {
+        // let pasoActual = $('#smartwizard').smartWizard("getStepIndex");
+
+        // Ejecuta validaciones de todos los pasos antes de confirmar
+        const validaciones = {
+            0: ['slc-motivo', 'inp-motivo', 'inp-monto', 'inp-quincena', 'inp-reubicacion'],
+            1: ['inp-observaciones'],
+            2: ['slc-emisor', 'slc-supervisor', 'slc-vobo', 'slc-autorizo'],
+        };
+
+        for (let i = 0; i <= 2; i++) {
+            const campos = validaciones[i].filter(id => !$('#' + id).prop('disabled'));
+            if (!validar_campos(campos)) {
+                $('#smartwizard').smartWizard("goToStep", i);
+                return;
+            }
+        }
+        generar_baja();
+        // $('#mdl-baja').modal("hide");
+    });
+
+    // Evento para botón Cancelar
+    $('#btn-cancelar').on('click', function () {
+        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, function () { $("#mdl-baja").modal("hide") })
     });
 
     $('#smartwizard').on('leaveStep', function (e, anchorObject, currentStepIndex, nextStepIndex, stepDirection) {
@@ -1162,44 +1191,41 @@ async function general_select2({ selectId, tabla, campo, data, placeholder, drop
         const origen = $(`#${sincronizarCon}`);
         const destino = $(`#${selectId}`);
 
-        origen.off(`change.sync-${selectId}`);  // Limpia el evento anterior
+        // Limpia eventos anteriores
+        origen.off(`change.sync-${selectId}`);
+
+        // Evento para habilitar/deshabilitar el destino según si es un tag (nuevo valor)
         origen.on(`change.sync-${selectId}`, async function () {
-            const id_selecionado = $(this).val();
-            const data_seleccionada = $(this).select2('data')[0];
-            const origen_seleccionado = origen.data('select2')?.opts?.tags === true;
-            const nuevo = origen_seleccionado && data_seleccionada && data_seleccionada.element === undefined;
+            const selectedOption = origen.find('option:selected');
+            const isTag = selectedOption.length && selectedOption.attr('data-select2-tag');
+            const valor = origen.val();
 
-            if (id_selecionado && nuevo) {
-                destino.prop('disabled', false);
-                destino.val(null).trigger('change');
-                // destino.focus();
+            if (valor && isTag) {
+                destino.prop('disabled', false).val(null).trigger('change');
             } else {
-                destino.prop('disabled', true);
-                destino.empty();
+                destino.prop('disabled', true).val(null).trigger('change');
 
-                let response = await server_inventario({
-                    accion: 5,
-                    tabla: tabla,
-                    campo: sincronizarCampo,
-                    id: id_selecionado,
-                });
+                // Si quieres que además se sincronice el valor del destino con el origen (cuando no es tag):
+                if (valor && !isTag) {
+                    // Buscar el cargo relacionado y ponerlo como opción seleccionada
+                    let response = await server_inventario({
+                        accion: 5,
+                        tabla: tabla,
+                        campo: sincronizarCampo,
+                        id: valor,
+                    });
 
-                const registro = response?.resultado?.[0];
-                const texto_destino = registro?.[sincronizarCampo];
+                    const registro = response?.resultado?.[0];
+                    const texto_destino = registro?.[sincronizarCampo];
 
-                // destino.prop('disabled', true);
-                // Borra opciones previas si existieran
-                // destino.empty()
-
-                if (texto_destino) {
-                    // Crea la opción sincronizada y la selecciona
-                    const nueva_opcion = new Option(texto_destino, texto_destino, true, true);
-                    destino.append(nueva_opcion).trigger('change');
-                } else {
-                    destino.val(null).trigger('change');
+                    if (texto_destino) {
+                        const nueva_opcion = new Option(texto_destino, texto_destino, true, true);
+                        destino.append(nueva_opcion).trigger('change');
+                    } else {
+                        destino.val(null).trigger('change');
+                    }
                 }
             }
-
         });
     }
 
@@ -1371,7 +1397,7 @@ async function crear_resguardo() {
         userPemexCargo: $('#inp-cargo-pemex').val(),
         cel: celSelected ? 1 : 0
     }
-    loading  = true
+    loading = true
     mostrar_toast_cargando()
     let server = await server_inventario(model)
 
@@ -1653,12 +1679,12 @@ function ver_pdf(ruta) {
 
         $('#mdl-btn-subir-pdf').css('display', 'none')
         $('#mdl-file-up').modal('show');
-    }else{
+    } else {
         //* Si el modal se abre desde subir archivos
         $('#mdl-btn-subir-pdf').css('display', 'block')
-         $('#mdl-file-up').modal('show');
+        $('#mdl-file-up').modal('show');
     }
-   
+
 }
 
 //*mostrar formulario de descarga de archivos
@@ -1701,7 +1727,7 @@ $('#select-ver-usu-file').on('change', async function () {
 
     if (server.resultado.documentos) {
         //console.log(server.resultado.documentos)
-        let rutas =server.resultado.documentos.reverse()
+        let rutas = server.resultado.documentos.reverse()
 
         let documentos = rutas.map(rutaCompleta => {
             // Extraer solo el nombre del archivo
