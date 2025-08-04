@@ -296,7 +296,7 @@ async function mensaje_eliminar() {
     }
 }
 
-async function eliminar_usuario(params) {
+async function eliminar_usuario() {
     let model = {
         accion: 3,
         id: usuarios_seleccionados
