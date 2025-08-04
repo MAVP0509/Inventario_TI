@@ -5,7 +5,7 @@ body {
 }
 
 body {
-    /* background-image: url('../images/fondo-login-4.jfif'); */
+    background-image: url('../images/fondo-login-4.jfif');
     /* ruta a tu imagen */
     background-size: cover;
     /* hace que la imagen cubra todo */
