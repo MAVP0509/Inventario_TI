@@ -30,7 +30,7 @@ function server_inventario(model) {
     });
 }
 
-/* function server_excel(model) {
+function server_excel(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
@@ -50,7 +50,7 @@ function server_inventario(model) {
             }
         })
     });
-} */
+}
 
 window.addEventListener('load', function () {
     // Leemos el mensaje del registro desde localStorage
@@ -949,7 +949,7 @@ async function mostrar_baja() {
     // console.timeEnd('selects');
     // console.log(opcion)
     $('#inp-motivo, #inp-monto, #inp-quincena, #inp-reubicacion').prop('disabled', true);
-    // $('#cg-emisor, #cg-supervisor, #cg-vobo, #cg-autorizo').prop('disabled', true);
+    $('#cg-emisor, #cg-supervisor, #cg-vobo, #cg-autorizo').prop('disabled', true);
 
     $('#smartwizard').smartWizard("reset");
     $('#smartwizard').smartWizard({
