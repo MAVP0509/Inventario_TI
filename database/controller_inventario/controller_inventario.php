@@ -273,7 +273,7 @@ function consultar_datos()
 function desactivar_datos($valores)
 {
     include("../conexion.php");
-    //var_dump($valores);
+    
     $registro = date("Y-m-d");
 
     if (is_array($valores->id)) { // Verifica si $valores->id es un array
@@ -395,7 +395,6 @@ function consultar_distintos($valores)
 {
     include("../conexion.php");
     //Validación para evitar inyecciones
-    // var_dump($id);
     $tabla = mysqli_real_escape_string($con, $valores->tabla ?? '');
     $campo = mysqli_real_escape_string($con, $valores->campo ?? '');
     $id = isset($valores->id) ? mysqli_real_escape_string($con, $valores->id) : null;
@@ -496,9 +495,11 @@ function traspaso($valores)
         if ($valores->estatus == 'Bodega') {
             $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$usuario', zona = '$zona', ubicacion = '$ubicacion', fecha_entrega = '$fecha' WHERE id IN ($ids)";
         } else {
-            $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$valores->usuario', zona = '$valores->zona', ubicacion = '$valores->ubicacion' fecha_entrega = '$fecha' WHERE id IN ($ids)";
+            $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$valores->usuario', zona = '$valores->zona', ubicacion = '$valores->ubicacion', fecha_entrega = '$fecha' WHERE id IN ($ids)";
         }
+        // var_dump($sql_datos);
         mysqli_query($con, $sql_datos);
+        
 
         $query_nuevo = mysqli_query($con, $sql);
         while ($fila = mysqli_fetch_assoc($query_nuevo)) {

@@ -207,23 +207,23 @@ async function consultar_informacion() {
     }
 }
 
-let selecreg = ""; // No limpiar la variable
+let selecreg = ""; // Variable global para almacenar el registro seleccionado
 
+// Función principal para mostrar el modal de edición de activos
 async function mdl_editar(params) {
+    // Obtiene todos los inputs del formulario de edición con nombre 'mdl-reg'
     let inputs = document.getElementsByName('mdl-reg');
+    // Itera sobre cada input para limpiar su estado de error
     for (let i = 0; i < inputs.length; i++) {
-        //inputs[i].value = ""; // Limpia el valor del input
+        
         inputs[i].classList.remove('is-invalid'); // Elimina la clase de validación
     }
-
-    $('.select').each(function () {
-        $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
-        $(this).removeClass('is-invalid'); // Elimina la clase de validación
-    });
-
+    
+    // Busca en el arreglo 'datos' el registro con el mismo id_equipo
     for (let i = 0; i < datos.length; i++) {
         const element = datos[i];
         if (element.id_equipo === params.id_equipo) {
+            // Guarda el registro completo en una variable global
             selecreg = element;
             // console.log(selecreg)
             break;
@@ -233,13 +233,13 @@ async function mdl_editar(params) {
     $('#lbl-fecha-reg').show()
     $('#inp-fecha-reg').show()
 
-    //* Deshabilitando los input de usuario y fecha
+    //* Deshabilitando los campos que no deben editarse directamente
     $('#inp-usuario').prop('disabled', true)
     $('#inp-fecha-entrega').prop('disabled', true)
     $('#inp-cargo').prop('disabled', true)
 
 
-    // Limpia y carga los select
+    // Llama a varias funciones para cargar los selects con datos dinámicos
     await Promise.all([
         await general_select2({
             selectId: 'inp-rubro',
@@ -313,8 +313,8 @@ async function mdl_editar(params) {
         }),
     ])
 
+    // Rellenar campos del formulario con los valores actuales del activo
     rellenar_select(selecreg.zona, "inp-zona")
-    //document.getElementById("inp-zona").value = selecreg.zona;
     rellenar_select(selecreg.rubro, "inp-rubro")
     document.getElementById("inp-af").value = selecreg.af;
     rellenar_select(selecreg.tipo, "inp-tipo")
@@ -328,54 +328,67 @@ async function mdl_editar(params) {
     rellenar_select(selecreg.usuario, "inp-usuario")
     rellenar_select(selecreg.cargo, "inp-cargo")
     document.getElementById("inp-fecha-entrega").value = selecreg.fecha_entrega;
-
+    // Actualiza el título del modal
     document.getElementById('title-mdl-inventario').textContent = "Edición de Activo"
+    // Asigna la función que se ejecutará al presionar el botón de guardar
     document.getElementById('btn-mdl-inventario').onclick = function () { editar_registro() }
-
+    // Muestra el modal en pantalla
     $("#mdl-inventario").modal("show");
     //console.log(selecreg)
 }
-
+// Función para guardar los cambios de un activo editado
 async function editar_registro() {
-    //deshabilitar_campo();
-    const validacion = [
+    // Define un arreglo con los IDs de los campos que deben ser validados
+    let validacion = [
         "inp-zona",
         "inp-rubro",
         "inp-tipo",
         "inp-ubicacion",
+        "inp-marca",
+        "inp-modelo",
+        "inp-num-serie",
     ];
 
+    // Validar los campos indicados; si falla, mostrar error y salir
+    if (!validar_campos(validacion)) {
+        mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
+        return; // Termina función si no es válido
+    }
+    // Construye un objeto 'model' que contiene todos los datos actualizados del formulario
     let model = {
         accion: 1,
         id: selecreg.id_equipo,
-        zona: $("#inp-zona").select2('data')[0].text,
-        //zona: $("#inp-zona").val().trim(),
+        zona: $("#inp-zona").select2('data')[0].text,   // Obtiene texto visible del select2 (no el value) para zona
         rubro: $("#inp-rubro").val().trim(),
         af: $("#inp-af").val().trim(),
         tipo: $("#inp-tipo").val().trim(),
         marca: $("#inp-marca").val().trim(),
         modelo: $("#inp-modelo").val().trim(),
-        num_serie: $("#inp-num-serie").val().trim().toUpperCase(),
+        num_serie: $("#inp-num-serie").val().trim().toUpperCase(),  // Convierte serie a mayúsculas
         ubicacion: $("#inp-ubicacion").select2('data')[0].text,
         tag: $("#inp-tag").val().trim(),
         imei: $("#inp-imei").val().trim(),
         linea: $("#inp-linea").val().trim(),
-        usuario: $("#inp-usuario").val(),
+        usuario: $("#inp-usuario").val(),   // Valor del select
         cargo: $("#inp-cargo").val(),
         //posicion: $("#edi-posicion").select2('data')[0].text,
         fecha_entrega: $("#inp-fecha-entrega").val()
     }
-
+    // Llama a la función asincrónica que envía los datos al servidor
     let server = await server_inventario(model);
-    //let response = JSON.parse(respuesta);
-    //console.log(server);
+    
+    // Evalúa la respuesta del servidor
     if (server.resultado.exito === true) {
+        // Si fue exitosa, registra el estado anterior del registro en el histórico
         await registrar_historico('Anterior edición de registro', server.resultado.anterior);
+        // Registra el nuevo estado del registro editado
         await registrar_historico('Edición de registro', server.resultado.nuevo);
+        // Muestra un mensaje toast de éxito al usuario
         mostrar_toast('success', '¡Edición exitosa!', 'El registro se ha actualizado correctamente.');
     } else {
+        // Si hubo un error en la operación, muestra un mensaje toast de error
         mostrar_toast('error', 'Error', 'No se pudo editar el registro. Inténtalo nuevamente.');
-        return
+        return  // Sale de la función
     }
 
     consultar_informacion();
