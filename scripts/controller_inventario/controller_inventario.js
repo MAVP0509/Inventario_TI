@@ -131,7 +131,7 @@ async function consultar_informacion() {
 
     try {
         table = new Tabulator("#tbl01", {
-            //layout: "fitColumns",
+            //layout: "fitData",
             locale: "es",
             data: datos,
             pagination: true,
@@ -1403,8 +1403,9 @@ function mostrar_toast_cargando() {
         background: '#fff',
         html: `
             <div style="display: flex; align-items: center;">
-                <i class="fas fa-spinner fa-spin fa-lg" style="margin-right: 10px; color: #007bff;"></i>
-                <span style="font-weight: 500;">Cargando...</span>
+                <!--<i class="fas fa-spinner fa-spin fa-lg" style="margin-right: 10px; color: #007bff;"></i>-->
+                <img src="images/gooey-balls-1.svg" alt="Icono" height="30" width="30">
+                <span style="font-weight: 500; margin-left: 8px;">Cargando...</span>
             </div>
         `,
         didOpen: () => {
