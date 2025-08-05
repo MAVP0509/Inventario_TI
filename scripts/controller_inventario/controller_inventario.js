@@ -207,8 +207,6 @@ async function consultar_informacion() {
     }
 }
 
-
-
 let selecreg = ""; // No limpiar la variable
 
 async function mdl_editar(params) {
@@ -242,7 +240,7 @@ async function mdl_editar(params) {
 
 
     // Limpia y carga los select
-    await Promise.allSettled([
+    await Promise.all([
         await general_select2({
             selectId: 'inp-rubro',
             tabla: 'cat_rubro',
@@ -386,26 +384,28 @@ async function editar_registro() {
 }
 
 async function mdl_nvo_registro() {
+    // Selecciona todos los inputs con el nombre 'mdl-reg'
     let inputs = document.getElementsByName('mdl-reg');
+    // Limpia los valores de todos los inputs y quita clases de error
     for (let i = 0; i < inputs.length; i++) {
         inputs[i].value = ""; // Limpia el valor del input
         inputs[i].classList.remove('is-invalid'); // Elimina la clase de validación
     }
-
+    // Restablece los selects con Select2
     $('.select').each(function () {
         $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
         $(this).removeClass('is-invalid'); // Elimina la clase de validación
     });
 
-    //* Habilitando los inputs de usuario y fecha
+    //* Habilita los campos de usuario y fecha de entrega
     $('#inp-usuario').prop('disabled', false)
     $('#inp-fecha-entrega').prop('disabled', false)
 
-    //*Escondiendo la fecha
+    //* Oculta los elementos de fecha de registro
     $('#lbl-fecha-reg').hide()
     $('#inp-fecha-reg').hide()
-
-    await Promise.allSettled([
+    // Carga asincrónicamente los datos para los select2 desde distintas tablas
+    await Promise.all([
         general_select2({
             selectId: 'inp-rubro',
             tabla: 'cat_rubro',
@@ -484,10 +484,11 @@ async function mdl_nvo_registro() {
             sincronizarCampo: 'cargo',
         })
     ])
-
+    // Establece el título del moda
     document.getElementById('title-mdl-inventario').textContent = "Registro de Activo"
+    //  Asigna la función crear_registro al botón del modal
     document.getElementById('btn-mdl-inventario').onclick = function () { crear_registro() }
-
+    // Muestra el modal al usuario
     $("#mdl-inventario").modal('show');
 
 }
@@ -503,26 +504,26 @@ async function crear_registro() {
         "inp-modelo",
         "inp-num-serie",
     ];
-
+    // Obtener el tipo seleccionado para agregar validaciones específicas
     const tipo_seleccionado = $('#inp-tipo').val();
-
+    // Obtener el tipo seleccionado para agregar validaciones específicas
     switch (tipo_seleccionado) {
         case '58':
         case '40':
-            validacion.push("inp-tag");
+            validacion.push("inp-tag"); // Añadir validación de tag para estos tipos
             break;
         case '132':
-            validacion.push('inp-imei', 'inp-linea');
+            validacion.push('inp-imei', 'inp-linea'); // Añadir IMEI y línea para tipo 132
         default:
-            validacion
+            validacion // No hace nada, mantiene validacion igual
             break;
     }
     // console.log(validacion)
 
-    // Validar campos
+    // Validar los campos indicados; si falla, mostrar error y salir
     if (!validar_campos(validacion)) {
         mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
-        return;
+        return; // Termina función si no es válido
     }
 
     // Crear el modelo con los datos del formulario
@@ -550,20 +551,23 @@ async function crear_registro() {
     // Validar respuesta del servidor
     const serie = document.getElementById('inp-num-serie');
     serie.classList.remove('is-invalid'); // Remover clase de error si existía
-
+    // Manejar respuesta del servidor
     if (server.resultado.exitoso === true) {
         consultar_informacion();
         $("#mdl-inventario").modal('hide');
         await registrar_historico('Nuevo registro', server.resultado.insercion);
         mostrar_toast('success', '¡Registro exitoso!', 'El registro se ha creado correctamente.');
     } else if (server.resultado.resultado === false) {
+        // Error en servidor: verificar si es por número de serie duplicado
         if (server.resultado.mensaje === "Número de serie duplicado") {
             serie.classList.add('is-invalid'); // Marcar el campo como inválido si hay un número de serie duplicado
             mostrar_toast('warning', 'Número de serie duplicado', 'Este número de serie ya está registrado.');
         } else {
+            // Otro error general
             mostrar_toast('error', 'Error', 'No se pudo crear el registro. Inténtalo nuevamente.');
         }
     } else {
+        // Error genérico si no cumple ninguna condición anterior
         mostrar_toast('error', 'Error', 'No se pudo crear el registro. Inténtalo nuevamente.');
     }
 
@@ -571,7 +575,13 @@ async function crear_registro() {
 
 async function traspasos() {
 
-    const validacion = ['mdl-estado']
+    let validacion = ['mdl-estado']
+
+    const tipo_seleccionado = $('#mdl-estado').val();
+
+    if (tipo_seleccionado === 'Asignado') {
+        validacion.push("mdl-zona", "mdl-ubicacion");
+    }
 
     if (!validar_campos(validacion)) {
         mostrar_toast('error', 'Error', 'Rellene los campos. Inténtalo nuevamente');
@@ -583,6 +593,8 @@ async function traspasos() {
         id: equipo_seleccionado,
         estatus: $('#mdl-estado').val(),
         usuario: $('#mdl-usuario').val(),
+        zona: $('#mdl-zona').val(),
+        ubicacion: $('#mdl-ubicacion').val(),
     }
 
     let server = await server_inventario(model);
@@ -627,6 +639,24 @@ async function mostrar_traspaso() {
             tags: false,
         })
 
+        await general_select2({
+            selectId: 'mdl-zona',
+            tabla: 'inventario_ti_sur',
+            campo: 'zona',
+            placeholder: 'Seleccione una zona',
+            dropdownParent: '#mdl-traspaso',
+            tags: false,
+        })
+
+        await general_select2({
+            selectId: 'mdl-ubicacion',
+            tabla: 'inventario_ti_sur',
+            campo: 'ubicacion',
+            placeholder: 'Seleccione una ubicación',
+            dropdownParent: '#mdl-traspaso',
+            tags: false,
+        })
+
         selected = false
         $("#check-resguardo-icon").removeClass("fa-solid fa-square-check")
         $("#check-resguardo-icon").addClass("fa-regular fa-square ")
@@ -645,7 +675,7 @@ async function desactivar_registro() {
     // console.log(response)
     if (Array.isArray(response.resultado)) {
         await registrar_historico('Baja de activo', response.resultado);
-        mostrar_toast('success', '¡Baja de activo exitosa!', 'El registro se ha eliminado correctamente.');
+        mostrar_toast('success', '¡Baja de activo exitosa!', 'La baja se ha realizado correctamente.');
         consultar_informacion();
     } else {
         mostrar_toast('error', 'Error', 'No se pudo realizar la baja del activo. Inténtalo nuevamente.');
@@ -1230,10 +1260,10 @@ $(document).ready(function () {
         const seleccionado = $(this).val();
 
         if (seleccionado === 'Asignado') {
-            $('#mdl-usuario').prop('disabled', false).addClass('is-requerid');
+            $('#mdl-usuario, #mdl-zona, #mdl-ubicacion').prop('disabled', false).addClass('is-requerid');
             document.getElementById('alert-traspaso').style.display = 'block'
         } else {
-            $('#mdl-usuario').prop('disabled', true).removeClass('is-requerid').val('')
+            $('#mdl-usuario, #mdl-zona, #mdl-ubicacion').prop('disabled', true).removeClass('is-requerid').val('')
             document.getElementById('alert-traspaso').setAttribute('style', 'display:none !important; background-color:#e7f3fe; border-color:#b8daff; color:#004085; padding-right: 4rem;');
         }
     })
@@ -1547,7 +1577,6 @@ const pond = FilePond.create(fileResguardo, {
 
 });
 
-
 let fileToOpen;
 
 pond.on('addfile', (error, fileItem) => {
@@ -1563,7 +1592,6 @@ pond.on('addfile', (error, fileItem) => {
     viewer.src = fileToOpen;
 
 });
-
 
 //* Función para abrir el sidebar para la subida y visualización de resguardos
 async function abrir_control_sidebar() {
