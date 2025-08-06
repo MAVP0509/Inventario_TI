@@ -61,6 +61,7 @@ async function consultar_informacion(){
 
 
      table = new Tabulator('#tbl', {
+        layout:"fitData",
         locale: "es",
         data: datos,
         pagination: true,               //paginate the data

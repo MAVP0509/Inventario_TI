@@ -194,7 +194,11 @@ async function consultar_usuarios() {
                         cell.getRow().reformat();
                         seleccionar_registro(rowData.id, usuario_seleccionado)
                     }
-            },{
+            },
+            {
+                title: "Rol", field: "rol"
+            },
+            {
                 formatter: editIcon, width: 60, hozAlign: "center",
                 cellClick: function (e, cell) {
                     elemento = cell.getRow().getData();
