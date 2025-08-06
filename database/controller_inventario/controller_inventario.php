@@ -168,8 +168,8 @@ function insertar_datos($valores)
 
 function editar_datos($valores)
 {
-    include("../conexion.php");
-    //$zona = 'Base Operativa Región Sur';
+    include("../conexion.php"); // Incluye la conexión a la base de datos
+    // Consulta para obtener el estado actual del registro (antes de editar)
     $sql_select = "SELECT num_serie, 
                     fk_usuario, 
                     zona, 
@@ -187,21 +187,23 @@ function editar_datos($valores)
                 WHERE 
                     id = '$valores->id'";
 
-    $query_select = mysqli_query($con, $sql_select);
-    $antes =  mysqli_fetch_assoc($query_select);
-
+    $query_select = mysqli_query($con, $sql_select);    // Ejecuta la consulta
+    $antes =  mysqli_fetch_assoc($query_select);    // Obtiene el resultado en formato asociativo (registro anterior)
+    // Verifica si el rubro ya existe o si debe insertarse uno nuevo
     $rubro = verificar_nuevos_id($valores->rubro);
     $val_rubro;
     if ($rubro === true) {
         $val_rubro = $valores->rubro;
     } else {
+        // Si el rubro es nuevo, lo inserta en la tabla correspondiente
         $sql_rubro = "INSERT INTO cat_rubro(rubro) VALUES ('$rubro');";
         mysqli_query($con, $sql_rubro);
+        // Obtiene el ID del nuevo rubro insertado
         $sql_ver_id_rubro = "SELECT id FROM cat_rubro WHERE rubro = '$rubro';";
         $idRub = mysqli_fetch_assoc(mysqli_query($con, $sql_ver_id_rubro));
         $val_rubro = $idRub['id'];
     }
-
+    // Verificación para tipo (igual que con rubro)
     $tipo = verificar_nuevos_id($valores->tipo);
     $val_tipo;
     if ($tipo === true) {
@@ -213,7 +215,7 @@ function editar_datos($valores)
         $idTip = mysqli_fetch_assoc(mysqli_query($con, $sql_ver_id_tipo));
         $val_tipo = $idTip['id'];
     }
-
+    // Verificación para marca (igual que con tipo y rubro)
     $marca = verificar_nuevos_id($valores->marca);
     $val_marca;
     if ($marca === true) {
@@ -225,32 +227,27 @@ function editar_datos($valores)
         $idMarca = mysqli_fetch_assoc(mysqli_query($con, $sql_ver_id_marca));
         $val_marca = $idMarca['id'];
     }
-
+    // Verifica si el usuario está definido, de lo contrario asigna ID 5 por defecto
     $val_usuario = empty($valores->usuario) ? '5' : $valores->usuario;
-
-    $sql = "UPDATE inventario_ti_sur SET zona = '$valores->zona', fk_rubro = '$val_rubro', af = '$valores->af', fk_tipo ='$val_tipo', fk_marca = '$val_marca', modelo = '$valores->modelo',
-    num_serie = '$valores->num_serie', ubicacion = '$valores->ubicacion', tag = '$valores->tag', imei = '$valores->imei', linea = '$valores->linea', fk_usuario = '$val_usuario' WHERE id = '$valores->id';";
+    // Sentencia UPDATE para modificar el registro con los nuevos valores
+    $sql = "UPDATE inventario_ti_sur 
+            SET zona = '$valores->zona', fk_rubro = '$val_rubro', af = '$valores->af', fk_tipo ='$val_tipo', fk_marca = '$val_marca', modelo = '$valores->modelo', 
+            num_serie = '$valores->num_serie', ubicacion = '$valores->ubicacion', tag = '$valores->tag', imei = $valores->imei', linea = '$valores->linea', fk_usuario = '$val_usuario' 
+            WHERE 
+                id = '$valores->id';";
     //var_dump($sql);
-    $result = mysqli_query($con, $sql);
-
-    $sql_select_nuevo = "SELECT num_serie, 
-                                fk_usuario, 
-                                zona, 
-                                ubicacion, 
-                                af, 
-                                fk_rubro, 
-                                fk_tipo, 
-                                fk_marca, 
-                                modelo, 
-                                tag, 
-                                imei, 
-                                linea, 
-                                fecha_entrega 
-                         FROM inventario_ti_sur 
-                         WHERE id = '$valores->id'";
+    $result = mysqli_query($con, $sql); // Ejecuta la actualización
+    // Consulta nuevamente el estado actualizado del registro
+    $sql_select_nuevo = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro,
+                            fk_tipo, fk_marca, modelo, tag, imei, linea, fecha_entrega 
+                        FROM
+                            inventario_ti_sur 
+                        WHERE
+                            id = '$valores->id'";
+    // Ejecuta la consulta y obtiene el nuevo estado
     $query_select_nuevo = mysqli_query($con, $sql_select_nuevo);
     $nuevo = mysqli_fetch_assoc($query_select_nuevo);
-
+    // Devuelve el resultado del UPDATE y los registros antes/después
     return [
         'exito' => $result,
         'anterior' => $antes,
@@ -273,7 +270,7 @@ function consultar_datos()
 function desactivar_datos($valores)
 {
     include("../conexion.php");
-    
+
     $registro = date("Y-m-d");
 
     if (is_array($valores->id)) { // Verifica si $valores->id es un array
@@ -499,7 +496,7 @@ function traspaso($valores)
         }
         // var_dump($sql_datos);
         mysqli_query($con, $sql_datos);
-        
+
 
         $query_nuevo = mysqli_query($con, $sql);
         while ($fila = mysqli_fetch_assoc($query_nuevo)) {

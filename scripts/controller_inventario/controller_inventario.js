@@ -390,8 +390,9 @@ async function editar_registro() {
         mostrar_toast('error', 'Error', 'No se pudo editar el registro. Inténtalo nuevamente.');
         return  // Sale de la función
     }
-
+    // Si todo fue exitoso, actualiza la información general mostrada en pantalla
     consultar_informacion();
+    // Cierra el modal de edición
     $("#mdl-inventario").modal("hide");
 
 }
