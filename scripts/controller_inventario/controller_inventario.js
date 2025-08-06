@@ -19,7 +19,7 @@ function server_inventario(model) {
                         loading = !loading
                     }
 
-                    console.log(resolve(JSON.parse(response)))
+                    //console.log(resolve(JSON.parse(response)))
                     respuesta = response
                 } catch (error) {
                     reject(error)
@@ -1521,8 +1521,9 @@ $(".content-wrapper").click(function () {
 let dominio = window.location.hostname
 let puerto = location.port
 
-FilePond.registerPlugin(FilePondPluginFileValidateType);
+console.log(window.FilePond);
 
+FilePond.registerPlugin(FilePondPluginFileValidateType);
 
 let fileResguardo = document.getElementById('up-resguardo-file')
 
