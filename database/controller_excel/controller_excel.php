@@ -340,7 +340,7 @@ function bajas($valores)
         $worksheet->setCellValue("B$fila_inicial", $item->rownum);
         $worksheet->setCellValue("C$fila_inicial", $item->motivo_baja_id);
         $worksheet->setCellValue("D$fila_inicial", $item->descripcion);
-        $worksheet->setCellValue("I$fila_inicial", $item->lote);
+        $worksheet->setCellValue("I$fila_inicial", !empty($item->lote) ? $item->lote : '');
         $worksheet->setCellValue("J$fila_inicial", $item->ubicacion);
         $worksheet->setCellValue("K$fila_inicial", $item->af);
 
