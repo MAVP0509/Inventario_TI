@@ -9,7 +9,7 @@ function server_historico(model) {
                 trama: JSON.stringify(model)
             },
             success: function (response) {
-                console.log(response);
+                //console.log(response);
                 try {
                     resolve(JSON.parse(response))
                     console.log(resolve(JSON.parse(response)))
