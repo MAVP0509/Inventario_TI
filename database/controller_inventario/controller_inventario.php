@@ -35,8 +35,8 @@ function insertar_datos($valores)
 {
     include("../conexion.php");
 
-    $registro = date("Y-m-d");
-
+    $registro = date("Y-m-d");  // Fecha actual para registrar
+    // Validación/inserción del rubro
     $rubro = verificar_nuevos_id($valores->rubro);
     $val_rubro;
     if ($rubro === true) {
@@ -49,7 +49,7 @@ function insertar_datos($valores)
         $idRub = mysqli_fetch_assoc(mysqli_query($con, $sql_ver_id_rubro));
         $val_rubro = $idRub['id'];
     }
-
+    // Validación/inserción del tipo
     $tipo = verificar_nuevos_id($valores->tipo);
     $val_tipo;
     if ($tipo === true) {
@@ -61,7 +61,7 @@ function insertar_datos($valores)
         $idTip = mysqli_fetch_assoc(mysqli_query($con, $sql_ver_id_tipo));
         $val_tipo = $idTip['id'];
     }
-
+    // Validación/inserción de la marca
     $marca = verificar_nuevos_id($valores->marca);
     $val_marca;
     if ($marca === true) {
@@ -74,7 +74,7 @@ function insertar_datos($valores)
         $val_marca = $idMarca['id'];
     }
 
-    // $usuario = verificar_nuevos_id($valores->usuario);
+    // Validación/inserción del usuario
     $val_usuario;
     // Verifica si se proporcionó un usuario
     if (empty($valores->usuario)) {
@@ -105,18 +105,18 @@ function insertar_datos($valores)
         // Asignar valor final a $usuario
         $usuario = $val_usuario;
     }
-
+    // Asignación de valores por defecto
     $val_estatus = empty($valores->usuario) ? 'Bodega' : 'Asignado';
     $val_imei = empty($valores->imei) ? 'NA' : $valores->imei;
     $val_linea = empty($valores->linea) ? 'NA' : $valores->linea;
     // $usuario = empty($valores->usuario) ? '5' : $val_usuario;
     $val_tag = empty($valores->tag) ? 'NA' : $valores->tag;
     $val_af = empty($valores->af) ? 'NA' : $valores->af;
-
+    // Validación de duplicado de número de serie
     if ($valores->num_serie != "") {
         $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$valores->num_serie'";
         //var_dump($sql_num);
-        //$query_num = mysqli_query($con, $sql_num);
+        $query_num = mysqli_query($con, $sql_num);
 
         /* $sql = "INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, imei,estatus) 
         VALUES ('$valores->zona', '$val_rubro','$val_af','$val_tipo','$val_marca','$valores->modelo', '$valores->num_serie', 
@@ -128,23 +128,15 @@ function insertar_datos($valores)
         //var_dump($sql);
         //$query = mysqli_query($con, $sql);
 
-        $sql_select = "SELECT num_serie, 
-                    fk_usuario, zona, ubicacion, af,
-                    fk_rubro,
-                    fk_tipo, 
-                    fk_marca, 
-                    modelo,
-                    tag,
-                    imei,
-                    linea, 
-                    fecha_entrega 
-                FROM inventario_ti_sur 
-                WHERE 
-                    num_serie = '$valores->num_serie'";
+        $sql_select = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, 
+                        modelo, tag, imei, linea,  fecha_entrega 
+                    FROM inventario_ti_sur 
+                    WHERE 
+                        num_serie = '$valores->num_serie'";
         //$query_select = mysqli_query($con, $sql_select);
         //$resultado = mysqli_fetch_assoc($query_select);
         //$SQLStatement = "CALL pInsertarCatalogo('$sql','Insrt_Inventario')";
-        if (mysqli_query($con, $sql_num)->num_rows > 0) {
+        if ($query_num->num_rows > 0) {
             return ["resultado" => false, "mensaje" => "Número de serie duplicado"];
         } else {
             $query = mysqli_query($con, $sql);
@@ -305,7 +297,6 @@ function desactivar_datos($valores)
     }
 }
 
-
 function consultar_para_resguardo($valores)
 {
     include("../conexion.php");
@@ -330,13 +321,8 @@ function consultar_para_resguardo($valores)
         }
     }
     if (empty($datos)) {
-        if ($cel) {
-            $respuesta->error = "El usuario no tiene celulares asignados";
-            return $respuesta;
-        } else {
-            $respuesta->error = "El usuario no tiene equipos asignados";
-            return $respuesta;
-        }
+        $respuesta->error = "El usuario no tiene celulares asignados";
+        return $respuesta;
     }
     mysqli_free_result($query);
     mysqli_next_result($con);

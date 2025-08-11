@@ -814,33 +814,42 @@ function imprimir_excel() {
 
 let tbl_baja = null;
 async function confirmar_eliminacion() {
-
+    // Filtra los activos cuyos IDs están en equipo_seleccionado
     let data = datos.filter(el => equipo_seleccionado.includes(el.id_equipo));
+    // Verifica que al menos un activo esté seleccionado
     if (equipo_seleccionado.length === 0) {
         mostrar_toast('info', 'Información', 'Selecciona al menos un activo. Inténtalo nuevamente.');
         return;
     }
-
+    // Comprueba si alguno de los activos seleccionados está en estado "Asignafo"
     let estado = data.some(item => item.estatus === 'Asignado')
     // console.log(estado)
+    // Si alguno está asignado, muestra advertencia y no continúa
     if (estado) {
         mostrar_toast('warning', 'Alerta', 'Uno o más activos se encuentran asignados. Inténtalo nuevamente.');
-        return;
+        return; // Termina ejecuación
 
     } else {
-        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, desactivar_registro, true, 'Generar formato <i class="fa-solid fa-file-excel"></i>', mostrar_baja)
+        // Si están en estado "Bodega", muestra una alerta con opciones:
+        // Confirmar baja directa o genera formato excel antes de continuar
+        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, 
+            desactivar_registro,    // Función para baja directa
+            true,   // Muestra dos botones
+            'Generar formato <i class="fa-solid fa-file-excel"></i>',   // Segundo botón
+            mostrar_baja    // Función para abrir formulario de baja
+        );
     }
-
-    // mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, desactivar_registro)
 }
 
 async function mostrar_baja() {
     let input = $('[name="lmp-baja"]');
+    // Limpia el valor de todos los inpust
+    input.each(function () { $(this).val(''); });
 
-    input.each(function () { $(this).val(''); });  // Limpia el valor de los inputs
-
+    // Filtra los datos globales para obtener los equipo seleccionados
     let data = datos.filter(el => equipo_seleccionado.includes(el.id_equipo));
 
+    // Lista de motivos posible para la baja
     let opcion = [
         { id: 1, text: 'Inservible' },
         { id: 2, text: 'Robo' },
@@ -850,6 +859,7 @@ async function mostrar_baja() {
         { id: 5, text: 'Otro' }
     ]
     // console.time('selects');
+    // Carga múltiples campos select2 en paralelo
     await Promise.all([
         general_select2({
             selectId: 'slc-motivo',
@@ -945,10 +955,12 @@ async function mostrar_baja() {
     ])
     // console.timeEnd('selects');
     // console.log(opcion)
+    // Deshabilita inputs específicos por defecto
     $('#inp-motivo, #inp-monto, #inp-quincena, #inp-reubicacion').prop('disabled', true);
     $('#cg-emisor, #cg-supervisor, #cg-vobo, #cg-autorizo').prop('disabled', true);
 
     // $('#smartwizard').smartWizard("reset");
+    // Configura el asistente visual de pasos
     $('#smartwizard').smartWizard({
         selected: 0,
         theme: 'dots',
@@ -974,20 +986,19 @@ async function mostrar_baja() {
             enableDoneState: true,
         }
     });
+
+    // Resetea el paso actual del wizard
     $('#smartwizard').smartWizard("goToStep", 0);
 
+    // Asigna evento para botón confirmació
     $('#btn-confirmar').on('click', function () {
-        // let pasoActual = $('#smartwizard').smartWizard("getStepIndex");
-        // console.log("Paso actual:", $('#smartwizard').smartWizard("getStepIndex"));
-
-
         // Ejecuta validaciones de todos los pasos antes de confirmar
         const validaciones = {
             0: ['slc-motivo', 'inp-motivo', 'inp-monto', 'inp-quincena', 'inp-reubicacion'],
             1: ['inp-observaciones'],
             2: ['slc-emisor', 'slc-supervisor', 'slc-vobo', 'slc-autorizo'],
         };
-
+        // Valida los campos en cada paso antes de generar la baja
         for (let i = 0; i <= 2; i++) {
             const campos = validaciones[i].filter(id => !$('#' + id).prop('disabled'));
             if (!validar_campos(campos)) {
@@ -996,14 +1007,16 @@ async function mostrar_baja() {
             }
         }
         generar_baja();
-        // $('#mdl-baja').modal("hide");
     });
 
     // Evento para botón Cancelar
     $('#btn-cancelar').on('click', function () {
-        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, function () { $("#mdl-baja").modal("hide") })
+        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, function () { 
+            $("#mdl-baja").modal("hide") 
+        });
     });
 
+    // Validación dinámica por paso en el wizard
     $('#smartwizard').on('leaveStep', function (e, anchorObject, currentStepIndex, nextStepIndex, stepDirection) {
         // Solo valida el avance (no al retroceder)
         if (stepDirection === 'forward') {
@@ -1028,52 +1041,43 @@ async function mostrar_baja() {
         return true;
     });
 
+    // Muestra el modal de baja
     $('#mdl-baja').modal("show");
-
+    // Evento para cambio de motivo de baja
     $('#slc-motivo').on('change', function () {
         let motivo_seleccionado = $(this).val();
 
-        if (motivo_seleccionado === '5') {
-            $('#inp-motivo').prop('disabled', false);
-        } else {
-            $('#inp-motivo').prop('disabled', true);
-        }
-        if (motivo_seleccionado === '3') {
-            $('#inp-monto, #inp-quincena').prop('disabled', false);
-        } else {
-            $('#inp-monto, #inp-quincena').prop('disabled', true);
-        }
-        if (motivo_seleccionado === '6') {
-            $('#inp-reubicacion').prop('disabled', false);
-        } else {
-            $('#inp-reubicacion').prop('disabled', true);
-        }
+        // Habilita campos según el motivo
+        $('#inp-motivo').prop('disabled', motivo_seleccionado !== '5');
+        $('#inp-monto, #inp-quincena').prop('disabled', motivo_seleccionado !== '3');
+        $('#inp-reubicacion').prop('disabled', motivo_seleccionado !== '6');
 
 
         if (!motivo_seleccionado) {
             if (tbl_baja) tbl_baja.clearData();
             return;
         }
-
+        // Prepara los datos de la tabla con el motivo seleccionado
         let data_motivo = data.map(item => ({ ...item, motivo_baja_id: motivo_seleccionado }));
-
+        // Crea o actualiza la tabla interactiva
         if (!tbl_baja) {
             tbl_baja = new Tabulator('#tbl-baja', {
+                layout : "fitDataFill",
                 height: "300px",
                 data: data_motivo,
                 columns: [
-                    { title: "ITEM", formatter: "rownum", hozAlign: "center" },
-                    { title: "TIPO", field: "motivo_baja_id", hozAlign: "center" },
+                    { title: "ITEM", formatter: "rownum", hozAlign: "center", headerHozAlign: "center" },
+                    { title: "TIPO", field: "motivo_baja_id", hozAlign: "center", headerHozAlign: "center" },
                     {
-                        title: "DESCRIPCIÓN", hozAlign: "center",
+                        title: "DESCRIPCIÓN", hozAlign: "center", headerHozAlign: "center",
                         formatter: function (cell) {
                             let d = cell.getData();
                             return `${d.tipo || ''} Marca ${d.marca || ''} Serie ${d.num_serie || ''} Modelo ${d.modelo || ''}`;
                         }
                     },
-                    { title: "LOTE", field: "lote", hozAlign: "center", },
-                    { title: "ÁREA", field: "ubicacion", hozAlign: "center", },
-                    { title: "ACTIVO FIJO", field: "af", hozAlign: "center", },
+                    { title: "LOTE", field: "lote", hozAlign: "center", sorter:"number", editor:"input", validator:["min:0", "numeric"] },
+                    { title: "ÁREA", field: "ubicacion", hozAlign: "center", headerHozAlign: "center" },
+                    { title: "ACTIVO FIJO", field: "af", hozAlign: "center", headerHozAlign: "center" },
                 ]
             });
         } else {
