@@ -81,12 +81,18 @@ function consultar_informacion() {
             }
         },
         groupBy: function (data) {
-            // Convertir la fecha al nombre de mes o formato deseado
-            let fecha = new Date(data.fecha);
-            let opciones = { year: 'numeric', month: 'long' }; // Ej: "agosto de 2025"
+            // Asegura que tenga formato YYYY-MM
+            const [año, mes] = data.fecha.split("-");
+            // Creamos una fecha con día explícito
+            const fecha = new Date(`${año}-${mes}-01T00:00:00`);
+            const opciones = { year: 'numeric', month: 'long' };
             return fecha.toLocaleDateString('es-ES', opciones);
         },
-        headerVisible:false,
+        groupHeader: function (value, count, data, group) {
+            return `${value} (${count} elementos)`;
+        },
+        height: "800px",
+        headerVisible: false,
         columns: [
             {
                 formatter: squareIcon, width: 70, hozAlign: "center",
