@@ -1062,7 +1062,7 @@ async function mostrar_baja() {
         // Crea o actualiza la tabla interactiva
         if (!tbl_baja) {
             tbl_baja = new Tabulator('#tbl-baja', {
-                layout : "fitDataFill",
+                layout : "fitColumns",
                 height: "300px",
                 data: data_motivo,
                 columns: [
@@ -1075,7 +1075,7 @@ async function mostrar_baja() {
                             return `${d.tipo || ''} Marca ${d.marca || ''} Serie ${d.num_serie || ''} Modelo ${d.modelo || ''}`;
                         }
                     },
-                    { title: "LOTE", field: "lote", hozAlign: "center", sorter:"number", editor:"input", validator:["min:0", "numeric"] },
+                    { title: "LOTE", field: "lote", hozAlign: "center", headerHozAlign: "center", sorter:"number", editor:"input", validator:["min:0", "numeric"] },
                     { title: "ÁREA", field: "ubicacion", hozAlign: "center", headerHozAlign: "center" },
                     { title: "ACTIVO FIJO", field: "af", hozAlign: "center", headerHozAlign: "center" },
                 ]
