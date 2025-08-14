@@ -1,8 +1,8 @@
 <?php 
     //*Archivo de conección a la base de datos
-    $user="janny";
+    $user="root";
     // $user="root";
-    $pass="janny789";
+    $pass="root";
     //$pass = "root";
     $server="10.11.134.211";
     //$server="localhost";
