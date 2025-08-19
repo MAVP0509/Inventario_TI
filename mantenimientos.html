@@ -34,14 +34,14 @@
             /* tamaño pequeño, ajusta según quieras */
         }
 
-        .card {
+        /* .card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
+        } */
 
         .card-header {
             border-bottom: 1.5px solid rgba(0, 123, 255, 0.5);
@@ -113,13 +113,14 @@
                                             <i class="fa-solid fa-screwdriver-wrench fa-stack-1x"></i>
                                             <!-- ícono arriba, tamaño normal -->
                                         </span>
-                                        Mantenimientos</h1>
+                                        Mantenimientos
+                                    </h1>
                                     <div class="d-flex justify-content-end">
 
                                         <button type="button" style="text-align: center" data-toggle="popover"
                                             data-trigger="hover" data-html="true" data-placement="bottom"
-                                            data-content="Baja de activo" class="btn btn-success rounded icon mr-3"
-                                            onclick=""><i class="fa-solid fa-plus"></i> Nuevo
+                                            data-content="Baja de activo" class="btn bg-gray-dark rounded icon mr-3"
+                                            onclick="mdl_programar_mantenimiento()"><i class="fa-solid fa-file-invoice"></i> Programar Mantenimiento
                                         </button>
                                     </div>
                                 </div>
@@ -141,7 +142,53 @@
 
 
 
-
+    <!--Modal programar mantenimiento -->
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-prog-mant" role="dialog" data-backdrop="static"
+        data-keyboard="false">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Programar mantenimiento</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <h6>Elaboró</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                                    </div>
+                                    <select class="form-control select" id="select-elaboro" name="inp-prog-mant"></select>
+                                    <div class="invalid-feedback">Por favor, seleccione una persona.</div>
+                                </div>
+                                <h6>Autorizó</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                                    </div>
+                                    <select class="form-control select" id="select-autorizo" name="inp-prog-mant"></select>
+                                    <div class="invalid-feedback">Por favor, seleccione una persona.</div>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cancelar <i
+                            class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+                    <button type="button" class="btn btn-success icon" id="mdl-btn-conf"
+                        onclick="">Confirmar <i class="fa-solid fa-circle-check fa-lg"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 <!--JQuery-->

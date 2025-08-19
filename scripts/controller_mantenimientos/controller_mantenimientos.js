@@ -1,10 +1,12 @@
-let datos = [{
-    fecha: "2025-08", estatus: "Pediente", equipos: [{ tipo: "PC", usuario: "Juan Pablo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "123456789" },
-    { tipo: "PC", usuario: "Jose Manuel", ubicacion: "Base Operativa", equipo: "Monitor", num_serie: "987654321" }]
-},
-{ fecha: "2025-09", estatus: "Pendiente", equipos: [{ tipo: "PC", usuario: "Francisco", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" }] },
-{ fecha: "2025-09", estatus: "Pendiente", equipos: [{ tipo: "PC", usuario: "Francisco", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" }] },
-{ fecha: "2025-12", estatus: "Pendiente", equipos: [{ tipo: "PC", usuario: "Francisco", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" }] }]
+let datos = [
+    { fecha: "2025-01", estatus: "Pendiente", tipo: "PC", usuario: "Juan Pablo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "123456789" },
+    { fecha: "2025-02", estatus: "Pendiente", tipo: "PC", usuario: "Jose Manuel", ubicacion: "Base Operativa", equipo: "Monitor", num_serie: "987654321" },
+    { fecha: "2025-03", estatus: "Pendiente", tipo: "PC", usuario: "Francisco", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-04", estatus: "Pendiente", tipo: "PC", usuario: "Ricardo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-04", estatus: "Pendiente", tipo: "PC", usuario: "Roberto", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-05", estatus: "Pendiente", tipo: "PC", usuario: "Rubén", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-05", estatus: "Pendiente", tipo: "PC", usuario: "Huichzilopotztli", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-06", estatus: "Pendiente", tipo: "PC", usuario: "Fulanito", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" }] 
 let elemento
 let table
 let supervisor_seleccionado = []
@@ -81,12 +83,19 @@ function consultar_informacion() {
             }
         },
         groupBy: function (data) {
-            // Convertir la fecha al nombre de mes o formato deseado
-            let fecha = new Date(data.fecha);
-            let opciones = { year: 'numeric', month: 'long' }; // Ej: "agosto de 2025"
+            // Asegura que tenga formato YYYY-MM
+            const [año, mes] = data.fecha.split("-");
+            // Creamos una fecha con día explícito
+            const fecha = new Date(`${año}-${mes}-01T00:00:00`);
+            const opciones = { year: 'numeric', month: 'long' };
             return fecha.toLocaleDateString('es-ES', opciones);
         },
-        headerVisible:false,
+        groupHeader: function (value, count, data, group) {
+            return `${value} (${count} elementos)`;
+        },
+        groupStartOpen:false,
+        height: "800px",
+        headerVisible: false,
         columns: [
             {
                 formatter: squareIcon, width: 70, hozAlign: "center",
@@ -108,6 +117,36 @@ function consultar_informacion() {
                 }
             },
             {
+                title: "Tipo",
+                field: "tipo", headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "1": "Activo", "0": "Inactivo" }, clearable: true },
+                 hozAlign: "center", headerSort: false,
+
+            },
+            {
+                title: "Usuario",
+                field: "usuario", headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "1": "Activo", "0": "Inactivo" }, clearable: true },
+                 hozAlign: "center", headerSort: false,
+
+            },
+            {
+                title: "Ubicación",
+                field: "ubicacion", headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "1": "Activo", "0": "Inactivo" }, clearable: true },
+                 hozAlign: "center", headerSort: false,
+
+            },
+            {
+                title: "Equipo",
+                field: "equipo", headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "1": "Activo", "0": "Inactivo" }, clearable: true },
+                 hozAlign: "center", headerSort: false,
+
+            },
+            {
+                title: "Número de serie",
+                field: "num_serie", headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "1": "Activo", "0": "Inactivo" }, clearable: true },
+                 hozAlign: "center", headerSort: false,
+
+            },
+            {
                 title: "Estatus",
                 field: "estatus", headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "1": "Activo", "0": "Inactivo" }, clearable: true },
                 width: 100, hozAlign: "center", headerSort: false,
@@ -122,38 +161,13 @@ function consultar_informacion() {
                 headerSort: false, frozen: true
             },
         ],
-        rowFormatter: function (row) {
-            //create and style holder elements
-            var holderEl = document.createElement("div");
-            var tableEl = document.createElement("div");
-
-            holderEl.style.boxSizing = "border-box";
-            holderEl.style.padding = "10px 30px 10px 10px";
-            holderEl.style.borderTop = "1px solid #333";
-            holderEl.style.borderBotom = "1px solid #333";
-
-
-            tableEl.style.border = "1px solid #333";
-
-            holderEl.appendChild(tableEl);
-
-            row.getElement().appendChild(holderEl);
-
-            var subTable = new Tabulator(tableEl, {
-                layout: "fitColumns",
-                data: row.getData().equipos,
-                columns: [
-                    { title: "Tipo", field: "tipo" },
-                    { title: "Usuario", field: "usuario" },
-                    { title: "Ubicación", field: "ubicacion" },
-                    { title: "Equipo", field: "equipo" },
-                    { title: "Número de serie", field: "num_serie" }
-                ]
-            })
-        },
 
     })
 
 }
 
 consultar_informacion()
+
+function mdl_programar_mantenimiento(){
+    $('#mdl-prog-mant').modal("show")
+}
