@@ -343,7 +343,7 @@ function bajas($valores)
         $worksheet->setCellValue("B$fila_inicial", $item->rownum);
         $worksheet->setCellValue("C$fila_inicial", $item->motivo_baja_id);
         $worksheet->setCellValue("D$fila_inicial", $item->descripcion);
-        // $worksheet->setCellValue("I$fila_inicial", $item->lote);
+        $worksheet->setCellValue("I$fila_inicial", !empty($item->lote) ? $item->lote : '');
         $worksheet->setCellValue("J$fila_inicial", $item->ubicacion);
         $worksheet->setCellValue("K$fila_inicial", $item->af);
 
@@ -416,6 +416,51 @@ function bajas($valores)
         'result' => true,
         'url' => $url_descarga
     ];
+}
 
-    // return true;
+function programa_mantenimiento ($valores) {
+    $datos = $valores;
+
+    $spreadsheet = IOFactory::load('FO-DSP-TI-03 Programa de Mantenimiento Preventivo Infraestructura TI Región XX Rev.00');
+    $worksheet = $spreadsheet->getActiveSheet();
+
+    $pageSetup = $worksheet->getPageSetup();
+    $pageSetup->setOrientation(PageSetup::ORIENTATION_PORTRAIT);
+    $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LETTER);
+    $pageSetup->setFitToPage(true);
+    $pageSetup->setFitToWidth(1);
+    $pageSetup->setFitToHeight(0);
+
+    $pageMargins = $worksheet->getPageMargins();
+    $pageMargins->setTop(0.5);
+    $pageMargins->setBottom(0.5);
+    $pageMargins->setLeft(0.5);
+    $pageMargins->setRight(0.5);
+    
+    $inicio = 13;
+    $filas = count($datos);
+
+    foreach ($datos as $item) {
+        if ($filas != $inicio) {
+            $worksheet->insertNewColumnBefore($$inicio, 1);
+        }
+
+    $worksheet->mergeCells("D$inicio:H$inicio");
+
+        $worksheet->duplicateStyle($worksheet->getStyle("B16:K16"), "B$inicio:K$inicio");
+
+        $worksheet->getStyle("B$inicio:K$inicio")->getAlignment()->setWrapText(true);
+        $worksheet->getRowDimension($inicio)->setRowHeight(-1);
+
+        $worksheet->getStyle("B$inicio:K$inicio")->getFont()->setBold(false);
+
+        $worksheet->setCellValue("B$inicio", $item->rownum);
+        $worksheet->setCellValue("C$inicio", $item->motivo_baja_id);
+        $worksheet->setCellValue("D$inicio", $item->descripcion);
+        $worksheet->setCellValue("I$inicio", !empty($item->lote) ? $item->lote : '');
+        $worksheet->setCellValue("J$inicio", $item->ubicacion);
+        $worksheet->setCellValue("K$inicio", $item->af);
+
+        $inicio++;
+    }
 }
