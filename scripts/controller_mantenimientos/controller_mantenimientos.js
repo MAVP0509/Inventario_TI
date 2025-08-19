@@ -1,3 +1,22 @@
+function server_mantenimiento(model) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: "POST",
+            url: "database/controller_excel/controller_excel.php",
+            data: {
+                trama: JSON.stringify(model)
+            },
+            success: function (respose) {
+                try {
+                    resolve(JSON.parse(respose))
+                } catch (error) {
+                    reject(error)
+                }
+            }
+        })
+    })
+}
+
 let datos = [
     { fecha: "2025-01", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodajhgfdgjkhdtryuiyjhfgdftryuikgyjfhgdtsrytsodyhjhhjggfgiuydsd", usuario: "Juan Pablo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "123456789" },
     { fecha: "2025-02", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Jose Manuel", ubicacion: "Base Operativa", equipo: "Monitor", num_serie: "987654321" },
@@ -143,7 +162,7 @@ function consultar_informacion() {
 
             },
             {
-                title: "Observaciones", field: "observaciones", hozAlign: "center", width: 290, formatter:"textarea"
+                title: "Observaciones", field: "observaciones", hozAlign: "center", width: 290, formatter: "textarea"
             },
             {
                 title: "Estatus",
@@ -167,8 +186,51 @@ function consultar_informacion() {
 consultar_informacion()
 
 async function mdl_programar_mantenimiento() {
-    
-        $('#mdl-prog-mant').modal("show")
+    await general_select2({
+        selectId: 'select-elaboro',
+        tabla: 'supervisor',
+        campo: 'nombre',
+        placeholder: 'Selecione un usuario',
+        dropdownParent: '#mdl-prog-mant',
+        tags: false,
+        // popoverTitle: "Descripción",
+        // popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
+    })
+
+    await general_select2({
+        selectId: 'select-autorizo',
+        tabla: 'cat_usuarios',
+        campo: 'nombre',
+        placeholder: 'Selecione un usuario',
+        dropdownParent: '#mdl-prog-mant',
+        tags: false,
+        // popoverTitle: "Descripción",
+        // popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
+    })
+
+    $('#mdl-prog-mant').modal("show")
+}
+
+async function programar_mantenimiento() {
+
+    const validar = ['select-elaboro', 'select-autorizo']
+
+    if (!validar_campos(validar)) {
+        mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
+        return;
+    }
+
+    let model = { accion: 3 , elaboro: $('#select-elaboro').select2('data')[0].text, autorizo: $('#select-autorizo').select2('data')[0].text }
+
+    let server = await server_global(model);
+
+    if (server.resultado === true) {
+        window.location = server.resultado.url;
+        mostrar_toast('success', '¡Programa de mantenimiento exitosa!', 'Rellena los campos. Inténtelo nuevamente.');
+        $('#mdl-prog-mant').modal("hide");
+    } else {
+        mostrar_toast('error', 'Error', 'No se pudo realizar el programa de mantenimiento. Inténtalo nuevamente.');
+    }
 }
 
 //? Inicializar popover

@@ -25,6 +25,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = cargar_plantilla($clientejson);
 } elseif ($clientejson->accion == 2) {
     $respuesta_servidor->resultado = bajas($clientejson);
+} elseif ($clientejson->accion == 3) {
+    $respuesta_servidor->resultado = programa_mantenimiento($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -420,6 +422,7 @@ function bajas($valores)
 
 function programa_mantenimiento($valores)
 {
+    var_dump($valores);
     include('../conexion.php');
 
     $sql = "SELECT fk_tipo, fk_usuario, ubicación, modelo, num_serie FROM inventario_ti_sur WHERE fk_tipo IN (40,41,58,55,22,23,25,1,2,78,79,80,81,82,73,74,75,76,46,51)";
@@ -446,30 +449,55 @@ function programa_mantenimiento($valores)
     $pageMargins->setLeft(0.5);
     $pageMargins->setRight(0.5);
 
-    $inicio = 13;
+    $fila_inicio = 13;
+    $fila_cargo = 20;
+    $fila_fecha = 24;
     $filas = count($datos);
 
     foreach ($datos as $index => $item) {
         if ($filas > 15) {
-            $worksheet->insertNewRowBefore($inicio, 1);
+            $worksheet->insertNewRowBefore($fila_inicio, 1);
         }
 
-        $worksheet->mergeCells("B$inicio:S$inicio");
+        $worksheet->mergeCells("B$fila_inicio:S$fila_inicio");
 
-        $worksheet->duplicateStyle($worksheet->getStyle("B13:S13"), "B$inicio:S$inicio");
+        $worksheet->duplicateStyle($worksheet->getStyle("B13:S13"), "B$fila_inicio:S$fila_inicio");
 
-        $worksheet->getStyle("B$inicio:S$inicio")->getAlignment()->setWrapText(true);
-        $worksheet->getRowDimension($inicio)->setRowHeight(-1);
+        $worksheet->getStyle("B$fila_inicio:S$fila_inicio")->getAlignment()->setWrapText(true);
+        $worksheet->getRowDimension($fila_inicio)->setRowHeight(-1);
 
-        $worksheet->getStyle("B$inicio:S$inicio")->getFont()->setBold(false);
+        $worksheet->getStyle("B$fila_inicio:S$fila_inicio")->getFont()->setBold(false);
 
-        $worksheet->setCellValue("B$inicio", $index + 1);
-        $worksheet->setCellValue("C{$fila}", $item['fk_tipo']);
-        $worksheet->setCellValue("D{$fila}", $item['fk_usuario']);
-        $worksheet->setCellValue("E{$fila}", $item['ubicación']);
-        $worksheet->setCellValue("F{$fila}", $item['modelo']);
-        $worksheet->setCellValue("G{$fila}", $item['num_serie']);
+        $worksheet->setCellValue("B$fila_inicio", $index + 1);
+        $worksheet->setCellValue("C{$fila_inicio}", $item['fk_tipo']);
+        $worksheet->setCellValue("D{$fila_inicio}", $item['fk_usuario']);
+        $worksheet->setCellValue("E{$fila_inicio}", $item['ubicación']);
+        $worksheet->setCellValue("F{$fila_inicio}", $item['modelo']);
+        $worksheet->setCellValue("G{$fila_inicio}", $item['num_serie']);
 
-        $inicio++;
+        $fila_inicio++;
     }
+
+    $cargos = $fila_cargo + ($filas - 1);
+
+    $worksheet->setCellValue("C$cargos", $valores->elaboro);
+    $worksheet->setCellValue("G$cargos", $valores->autorizo);
+    
+    $fechas = $fila_fecha + ($filas - 1);
+    $worksheet->setCellValue("D$fechas", date('Y-m-d'));
+
+    // $doc = join("_", $doc);
+    $fecha = date('Ymd_His');
+    $nombre_doc = "FO-DSP-TI-03_Programa de Mantenimiento Preventivo TI Región Sur_{$fecha}.xlsx";
+
+    $ruta_guardar = "C:\\xampp\\htdocs\\Inventario_TI\\database\\controller_excel\\{$nombre_doc}";
+    $url_descarga = "http://localhost/Inventario_TI/database/controller_excel/{$nombre_doc}";
+
+    $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+    $writer->save($ruta_guardar);
+
+    return array(
+        'result' => true,
+        'url' => $url_descarga
+    );
 }
