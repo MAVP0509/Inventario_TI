@@ -42,4 +42,6 @@ ver 1.2.1 : {
     0: Arreglo del sidebar que llegaban momentos que no se abrian los treeview,
     1: Versionando scripts,
     2: Acomodando scripts en los HTML
+    3: Arreglo en el resguardo de celulares,
+    4: Arreglo de filtros de tabulator tenian autocompletado
 }

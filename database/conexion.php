@@ -4,7 +4,7 @@
     // $user="root";
     $pass="janny789";
     //$pass = "root";
-    $server="10.11.134.211";
+    $server="localhost";
     //$server="localhost";
     $db="inventario_ti";
     $con= mysqli_connect($server,$user,$pass) or die("Error al conectar");

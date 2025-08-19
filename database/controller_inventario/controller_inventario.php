@@ -310,7 +310,7 @@ function consultar_para_resguardo($valores)
     $datos = [];
     while ($fila = mysqli_fetch_assoc($query)) {
         //$datos[] = $fila;
-        if ($cel) {
+        if ($cel === 1) {
             if ($fila['tipo'] === "Teléfono celular") {
                 $datos[] = $fila;
             }
@@ -321,8 +321,13 @@ function consultar_para_resguardo($valores)
         }
     }
     if (empty($datos)) {
-        $respuesta->error = "El usuario no tiene celulares asignados";
-        return $respuesta;
+        if ($cel == 1) {
+            $respuesta->error = "El usuario no tiene celulares asignados";
+            return $respuesta;
+        } else {
+            $respuesta->error = "El usuario no tiene equipos asignados";
+            return $respuesta;
+        }
     }
     mysqli_free_result($query);
     mysqli_next_result($con);

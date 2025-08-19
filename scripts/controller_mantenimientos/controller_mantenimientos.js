@@ -1,12 +1,12 @@
 let datos = [
-    { fecha: "2025-01", estatus: "Pendiente", tipo: "PC", usuario: "Juan Pablo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "123456789" },
-    { fecha: "2025-02", estatus: "Pendiente", tipo: "PC", usuario: "Jose Manuel", ubicacion: "Base Operativa", equipo: "Monitor", num_serie: "987654321" },
-    { fecha: "2025-03", estatus: "Pendiente", tipo: "PC", usuario: "Francisco", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-04", estatus: "Pendiente", tipo: "PC", usuario: "Ricardo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-04", estatus: "Pendiente", tipo: "PC", usuario: "Roberto", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-05", estatus: "Pendiente", tipo: "PC", usuario: "Rubén", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-05", estatus: "Pendiente", tipo: "PC", usuario: "Huichzilopotztli", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-06", estatus: "Pendiente", tipo: "PC", usuario: "Fulanito", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" }] 
+    { fecha: "2025-01", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodajhgfdgjkhdtryuiyjhfgdftryuikgyjfhgdtsrytsodyhjhhjggfgiuydsd", usuario: "Juan Pablo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "123456789" },
+    { fecha: "2025-02", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Jose Manuel", ubicacion: "Base Operativa", equipo: "Monitor", num_serie: "987654321" },
+    { fecha: "2025-03", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Francisco", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-04", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Ricardo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-04", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Roberto", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-05", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Rubén", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-05", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Huichzilopotztli", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-06", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Fulanito", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" }]
 let elemento
 let table
 let supervisor_seleccionado = []
@@ -51,8 +51,11 @@ function consultar_informacion() {
     };
 
 
-    let editIcon = function (cell, formatterParams, onRendered) { //plain text value
-        return "<button type='button' class='btn btn-warning icon' onclick=''><i class='fa-solid fa-pen-to-square fa-lg'></i></button>";
+    let fileIcon = function (cell, formatterParams, onRendered) { //plain text value
+        onRendered(function () {
+            $(cell.getElement()).find('[data-toggle="popover"]').popover()
+        })
+        return "<button type='button' class='btn btn-outline-success icon' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Reporte de mantenimiento' onclick=''><i class='fa-solid fa-file-excel fa-lg'></i></button>";
     };
 
     table = new Tabulator('#tbl01', {
@@ -93,7 +96,7 @@ function consultar_informacion() {
         groupHeader: function (value, count, data, group) {
             return `${value} (${count} elementos)`;
         },
-        groupStartOpen:false,
+        groupStartOpen: false,
         height: "800px",
         headerVisible: false,
         columns: [
@@ -118,45 +121,40 @@ function consultar_informacion() {
             },
             {
                 title: "Tipo",
-                field: "tipo", headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "1": "Activo", "0": "Inactivo" }, clearable: true },
-                 hozAlign: "center", headerSort: false,
-
+                field: "tipo", hozAlign: "center",
             },
             {
                 title: "Usuario",
-                field: "usuario", headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "1": "Activo", "0": "Inactivo" }, clearable: true },
-                 hozAlign: "center", headerSort: false,
+                field: "usuario", hozAlign: "center"
 
             },
             {
                 title: "Ubicación",
-                field: "ubicacion", headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "1": "Activo", "0": "Inactivo" }, clearable: true },
-                 hozAlign: "center", headerSort: false,
+                field: "ubicacion", hozAlign: "center"
 
             },
             {
                 title: "Equipo",
-                field: "equipo", headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "1": "Activo", "0": "Inactivo" }, clearable: true },
-                 hozAlign: "center", headerSort: false,
-
+                field: "equipo", hozAlign: "center"
             },
             {
                 title: "Número de serie",
-                field: "num_serie", headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "1": "Activo", "0": "Inactivo" }, clearable: true },
-                 hozAlign: "center", headerSort: false,
+                field: "num_serie", hozAlign: "center"
 
+            },
+            {
+                title: "Observaciones", field: "observaciones", hozAlign: "center", width: 290, formatter:"textarea"
             },
             {
                 title: "Estatus",
-                field: "estatus", headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "1": "Activo", "0": "Inactivo" }, clearable: true },
-                width: 100, hozAlign: "center", headerSort: false,
+                field: "estatus", width: 100, hozAlign: "center"
 
             },
             {
-                formatter: editIcon, width: 60, hozAlign: "center",
+                formatter: fileIcon, width: 70, hozAlign: "center",
                 cellClick: function (e, cell) {
                     elemento = cell.getRow().getData();
-                    mdl_editar_supervisor(elemento);
+                    //mdl_editar_supervisor(elemento);
                 },
                 headerSort: false, frozen: true
             },
@@ -168,6 +166,12 @@ function consultar_informacion() {
 
 consultar_informacion()
 
-function mdl_programar_mantenimiento(){
-    $('#mdl-prog-mant').modal("show")
+async function mdl_programar_mantenimiento() {
+    
+        $('#mdl-prog-mant').modal("show")
 }
+
+//? Inicializar popover
+$(function () {
+    $('[data-toggle="popover"]').tooltip()
+})

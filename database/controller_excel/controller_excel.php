@@ -162,6 +162,9 @@ function resguardo($valores)
         }
 
 
+        // Activar el ajuste de texto para el rango de celdas (por ejemplo, toda la fila)
+        /* $worksheet->getStyle("B$fila:J$fila")->getAlignment()->setWrapText(true);
+        $worksheet->getRowDimension($fila)->setRowHeight(-1); */
 
         $num++; //*Aumentamos nuestro contador visual de la tabla
     }
