@@ -322,18 +322,18 @@ function consultar_para_resguardo($valores)
     $datos = [];
     while ($fila = mysqli_fetch_assoc($query)) {
         //$datos[] = $fila;
-        if ($cel) {
-            if ($fila['tipo'] === "Teléfono Celular") {
+        if ($cel === 1) {
+            if ($fila['tipo'] === "Teléfono celular") {
                 $datos[] = $fila;
             }
         } else {
-            if ($fila['tipo'] !== "Teléfono Celular") {
+            if ($fila['tipo'] !== "Teléfono celular") {
                 $datos[] = $fila;
             }
         }
     }
     if (empty($datos)) {
-        if ($cel) {
+        if ($cel == 1) {
             $respuesta->error = "El usuario no tiene celulares asignados";
             return $respuesta;
         } else {

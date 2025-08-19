@@ -32,7 +32,7 @@ print(json_encode($respuesta_servidor));
 //* Función para generación de resguardos
 function resguardo($valores)
 {
-    
+
 
     //todo Desglosamos la información recibida del JS
     //* Array de los equipos del usuario seleccionado
@@ -162,13 +162,16 @@ function resguardo($valores)
         }
 
 
+        // Activar el ajuste de texto para el rango de celdas (por ejemplo, toda la fila)
+        /* $worksheet->getStyle("B$fila:J$fila")->getAlignment()->setWrapText(true);
+        $worksheet->getRowDimension($fila)->setRowHeight(-1); */
 
         $num++; //*Aumentamos nuestro contador visual de la tabla
     }
     $worksheet->removeRow($fila); //* Elimina la fila extra insertada al final
 
     if ($cel == 1) {
-        $worksheet->setCellValue("E$fila","Linea: $item->linea" ); //*añadiendo la linea abajo del modelo
+        $worksheet->setCellValue("E$fila", "Linea: $item->linea"); //*añadiendo la linea abajo del modelo
         $worksheet->getStyle("E$fila")->getFont()->setBold(true);
         $worksheet->getStyle("E$fila")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
     }
