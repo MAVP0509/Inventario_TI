@@ -166,28 +166,139 @@ async function consultar_informacion() {
                 {
                     title: "Zona", field: "zona", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "list",
                     headerFilterParams: {
-                        valuesLookup: true, clearable: true // se auto genera a partir de los valores únicos de la columna
+                        valuesLookup: true, clearable: true, // se auto genera a partir de los valores únicos de la columna
+                        elementAttributes: {
+                            autocomplete: "off",
+                            type: "text"
+                        }
                     },
                 },
-                { title: "Rubro", field: "rubro", headerHozAlign: "center", headerFilter: "input", headerSort: false },
-                { title: "Activo fijo", field: "af", headerSort: false, headerHozAlign: "center", hozAlign: "center", headerFilter: "input" },
-                { title: "Tipo de dispositivo", field: "tipo", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
-                { title: "Marca", field: "marca", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
-                { title: "Modelo", field: "modelo", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
-                { title: "Numero de serie", field: "num_serie", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
+                {
+                    title: "Rubro", field: "rubro", headerHozAlign: "center", headerFilter: "input", headerSort: false,
+                    headerFilterParams: {
+                        elementAttributes: {
+                            autocomplete: "off",
+                            type: "text"
+                        }
+                    }
+                },
+                {
+                    title: "Activo fijo", field: "af", headerSort: false, headerHozAlign: "center", hozAlign: "center", headerFilter: "input",
+                    headerFilterParams: {
+                        elementAttributes: {
+                            autocomplete: "off",
+                            type: "text"
+                        }
+                    }
+                },
+                {
+                    title: "Tipo de dispositivo", field: "tipo", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center",
+                    headerFilterParams: {
+                        elementAttributes: {
+                            autocomplete: "off",
+                            type: "text"
+                        }
+                    }
+                },
+                {
+                    title: "Marca", field: "marca", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center",
+                    headerFilterParams: {
+                        elementAttributes: {
+                            autocomplete: "off",
+                            type: "text"
+                        }
+                    }
+                },
+                {
+                    title: "Modelo", field: "modelo", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center",
+                    headerFilterParams: {
+                        elementAttributes: {
+                            autocomplete: "off",
+                            type: "text"
+                        }
+                    }
+                },
+                {
+                    title: "Numero de serie", field: "num_serie", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center",
+                    headerFilterParams: {
+                        elementAttributes: {
+                            autocomplete: "off",
+                            type: "text"
+                        }
+                    }
+                },
                 {
                     title: "Ubicación", field: "ubicacion", headerHozAlign: "center", headerFilter: "list", headerSort: false, hozAlign: "center",
                     headerFilterParams: {
-                        valuesLookup: true, clearable: true // se auto genera a partir de los valores únicos de la columna
+                        valuesLookup: true, clearable: true, // se auto genera a partir de los valores únicos de la columna
+                        elementAttributes: {
+                            autocomplete: "off",
+                            type: "text"
+                        }
                     },
                 },
-                { title: "TAG", field: "tag", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", width: 170 },
-                { title: "IMEI", field: "imei", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", width: 170 },
-                { title: "Linea", field: "linea", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", width: 170 },
-                { title: "Usuario", field: "usuario", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
-                { title: "Cargo del usuario", field: "posicion", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center" },
-                { title: "Fecha de asignación", field: "fecha_entrega", headerHozAlign: "center", sorter: "date", headerFilter: "input", headerSort: false, hozAlign: "center" },
-                { title: "Estatus", field: "estatus", width: 120, frozen: true, headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "Asignado": "Asignado", "Bodega": "Bodega" }, clearable: true }, headerSort: false },
+                {
+                    title: "TAG", field: "tag", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", width: 170,
+                    headerFilterParams: {
+                        elementAttributes: {
+                            autocomplete: "off",
+                            type: "text"
+                        }
+                    }
+                },
+                {
+                    title: "IMEI", field: "imei", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", width: 170,
+                    headerFilterParams: {
+                        elementAttributes: {
+                            autocomplete: "off",
+                            type: "text"
+                        }
+                    }
+                },
+                {
+                    title: "Linea", field: "linea", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", width: 170,
+                    headerFilterParams: {
+                        elementAttributes: {
+                            autocomplete: "off",
+                            type: "text"
+                        }
+                    }
+                },
+                {
+                    title: "Usuario", field: "usuario", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center",
+                    headerFilterParams: {
+                        elementAttributes: {
+                            autocomplete: "off",
+                            type: "text"
+                        }
+                    }
+                },
+                {
+                    title: "Cargo del usuario", field: "posicion", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center",
+                    headerFilterParams: {
+                        elementAttributes: {
+                            autocomplete: "off",
+                            type: "text"
+                        }
+                    }
+                },
+                {
+                    title: "Fecha de asignación", field: "fecha_entrega", headerHozAlign: "center", sorter: "date", headerFilter: "input", headerSort: false, hozAlign: "center",
+                    headerFilterParams: {
+                        elementAttributes: {
+                            autocomplete: "off",
+                            type: "text"
+                        }
+                    }
+                },
+                {
+                    title: "Estatus", field: "estatus", width: 120, frozen: true, headerHozAlign: "center", headerFilter: "list", headerFilterParams: {
+                        values: { "Asignado": "Asignado", "Bodega": "Bodega" }, clearable: true,
+                        elementAttributes: {
+                            type: "text"
+                        }
+                    }, headerSort: false
+                },
                 {
                     formatter: editIcon, width: 60, hozAlign: "center",
                     cellClick: function (e, cell) {
@@ -205,6 +316,12 @@ async function consultar_informacion() {
     } catch (error) {
         console.log(error)
     }
+    table.on("tableBuilt", () => {
+        document.querySelectorAll(".tabulator-header input").forEach(input => {
+            input.setAttribute("autocomplete", "off");
+            input.setAttribute("type", "text"); // por si Tabulator vuelve a poner "search"
+        });
+    });
 }
 
 let selecreg = ""; // Variable global para almacenar el registro seleccionado
@@ -215,10 +332,10 @@ async function mdl_editar(params) {
     let inputs = document.getElementsByName('mdl-reg');
     // Itera sobre cada input para limpiar su estado de error
     for (let i = 0; i < inputs.length; i++) {
-        
+
         inputs[i].classList.remove('is-invalid'); // Elimina la clase de validación
     }
-    
+
     // Busca en el arreglo 'datos' el registro con el mismo id_equipo
     for (let i = 0; i < datos.length; i++) {
         const element = datos[i];
@@ -241,7 +358,7 @@ async function mdl_editar(params) {
 
     // Llama a varias funciones para cargar los selects con datos dinámicos
     await Promise.all([
-        await general_select2({
+        general_select2({
             selectId: 'inp-rubro',
             tabla: 'cat_rubro',
             campo: 'rubro',
@@ -376,7 +493,7 @@ async function editar_registro() {
     }
     // Llama a la función asincrónica que envía los datos al servidor
     let server = await server_inventario(model);
-    
+
     // Evalúa la respuesta del servidor
     if (server.resultado.exito === true) {
         // Si fue exitosa, registra el estado anterior del registro en el histórico
@@ -832,7 +949,7 @@ async function confirmar_eliminacion() {
     } else {
         // Si están en estado "Bodega", muestra una alerta con opciones:
         // Confirmar baja directa o genera formato excel antes de continuar
-        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, 
+        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false,
             desactivar_registro,    // Función para baja directa
             true,   // Muestra dos botones
             'Generar formato <i class="fa-solid fa-file-excel"></i>',   // Segundo botón
@@ -1011,8 +1128,8 @@ async function mostrar_baja() {
 
     // Evento para botón Cancelar
     $('#btn-cancelar').on('click', function () {
-        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, function () { 
-            $("#mdl-baja").modal("hide") 
+        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, function () {
+            $("#mdl-baja").modal("hide")
         });
     });
 
@@ -1062,7 +1179,7 @@ async function mostrar_baja() {
         // Crea o actualiza la tabla interactiva
         if (!tbl_baja) {
             tbl_baja = new Tabulator('#tbl-baja', {
-                layout : "fitColumns",
+                layout: "fitColumns",
                 height: "300px",
                 data: data_motivo,
                 columns: [
@@ -1075,7 +1192,7 @@ async function mostrar_baja() {
                             return `${d.tipo || ''} Marca ${d.marca || ''} Serie ${d.num_serie || ''} Modelo ${d.modelo || ''}`;
                         }
                     },
-                    { title: "LOTE", field: "lote", hozAlign: "center", headerHozAlign: "center", sorter:"number", editor:"input", validator:["min:0", "numeric"] },
+                    { title: "LOTE", field: "lote", hozAlign: "center", headerHozAlign: "center", sorter: "number", editor: "input", validator: ["min:0", "numeric"] },
                     { title: "ÁREA", field: "ubicacion", hozAlign: "center", headerHozAlign: "center" },
                     { title: "ACTIVO FIJO", field: "af", hozAlign: "center", headerHozAlign: "center" },
                 ]
