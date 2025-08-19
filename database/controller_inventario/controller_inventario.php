@@ -311,11 +311,11 @@ function consultar_para_resguardo($valores)
     while ($fila = mysqli_fetch_assoc($query)) {
         //$datos[] = $fila;
         if ($cel) {
-            if ($fila['tipo'] === "Teléfono Celular") {
+            if ($fila['tipo'] === "Teléfono celular") {
                 $datos[] = $fila;
             }
         } else {
-            if ($fila['tipo'] !== "Teléfono Celular") {
+            if ($fila['tipo'] !== "Teléfono celular") {
                 $datos[] = $fila;
             }
         }
