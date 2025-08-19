@@ -17,9 +17,9 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = desactivar_datos($clientejson);
 } elseif ($clientejson->accion == 4) {
     $respuesta_servidor->resultado = consultar_para_resguardo($clientejson);
-} elseif ($clientejson->accion == 5) {
+} /* elseif ($clientejson->accion == 5) {
     $respuesta_servidor->resultado = consultar_distintos($clientejson);
-} elseif ($clientejson->accion == 6) {
+} */ elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = traspaso($clientejson);
 } elseif ($clientejson->accion == 7) {
     $respuesta_servidor->resultado = cargar_resguardo_firmado($clientejson);
@@ -379,7 +379,7 @@ function consultar_para_resguardo($valores)
     return json_decode($respuesta_raw);
 }
 
-function consultar_distintos($valores)
+/* function consultar_distintos($valores)
 {
     include("../conexion.php");
     //Validación para evitar inyecciones
@@ -432,7 +432,7 @@ function consultar_distintos($valores)
 
     return $datos;
 }
-
+ */
 function verificar_nuevos_id($valor)
 {
     if (ctype_digit($valor)) {

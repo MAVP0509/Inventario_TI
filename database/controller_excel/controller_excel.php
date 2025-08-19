@@ -32,7 +32,7 @@ print(json_encode($respuesta_servidor));
 //* Función para generación de resguardos
 function resguardo($valores)
 {
-    
+
 
     //todo Desglosamos la información recibida del JS
     //* Array de los equipos del usuario seleccionado
@@ -168,7 +168,7 @@ function resguardo($valores)
     $worksheet->removeRow($fila); //* Elimina la fila extra insertada al final
 
     if ($cel == 1) {
-        $worksheet->setCellValue("E$fila","Linea: $item->linea" ); //*añadiendo la linea abajo del modelo
+        $worksheet->setCellValue("E$fila", "Linea: $item->linea"); //*añadiendo la linea abajo del modelo
         $worksheet->getStyle("E$fila")->getFont()->setBold(true);
         $worksheet->getStyle("E$fila")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
     }
@@ -415,8 +415,17 @@ function bajas($valores)
     ];
 }
 
-function programa_mantenimiento ($valores) {
-    $datos = $valores;
+function programa_mantenimiento($valores)
+{
+    include('../conexion.php');
+
+    $sql = "SELECT fk_tipo, fk_usuario, ubicación, modelo, num_serie FROM inventario_ti_sur WHERE fk_tipo IN (40,41,58,55,22,23,25,1,2,78,79,80,81,82,73,74,75,76,46,51)";
+    $query = mysqli_query($con, $sql);
+
+    $datos = [];
+    while ($fila =  mysqli_fetch_assoc($query)) {
+        $datos[] = $fila;
+    }
 
     $spreadsheet = IOFactory::load('FO-DSP-TI-03 Programa de Mantenimiento Preventivo Infraestructura TI Región XX Rev.00');
     $worksheet = $spreadsheet->getActiveSheet();
@@ -433,30 +442,30 @@ function programa_mantenimiento ($valores) {
     $pageMargins->setBottom(0.5);
     $pageMargins->setLeft(0.5);
     $pageMargins->setRight(0.5);
-    
+
     $inicio = 13;
     $filas = count($datos);
 
-    foreach ($datos as $item) {
-        if ($filas != $inicio) {
-            $worksheet->insertNewColumnBefore($$inicio, 1);
+    foreach ($datos as $index => $item) {
+        if ($filas > 15) {
+            $worksheet->insertNewRowBefore($inicio, 1);
         }
 
-    $worksheet->mergeCells("D$inicio:H$inicio");
+        $worksheet->mergeCells("B$inicio:S$inicio");
 
-        $worksheet->duplicateStyle($worksheet->getStyle("B16:K16"), "B$inicio:K$inicio");
+        $worksheet->duplicateStyle($worksheet->getStyle("B13:S13"), "B$inicio:S$inicio");
 
-        $worksheet->getStyle("B$inicio:K$inicio")->getAlignment()->setWrapText(true);
+        $worksheet->getStyle("B$inicio:S$inicio")->getAlignment()->setWrapText(true);
         $worksheet->getRowDimension($inicio)->setRowHeight(-1);
 
-        $worksheet->getStyle("B$inicio:K$inicio")->getFont()->setBold(false);
+        $worksheet->getStyle("B$inicio:S$inicio")->getFont()->setBold(false);
 
-        $worksheet->setCellValue("B$inicio", $item->rownum);
-        $worksheet->setCellValue("C$inicio", $item->motivo_baja_id);
-        $worksheet->setCellValue("D$inicio", $item->descripcion);
-        $worksheet->setCellValue("I$inicio", !empty($item->lote) ? $item->lote : '');
-        $worksheet->setCellValue("J$inicio", $item->ubicacion);
-        $worksheet->setCellValue("K$inicio", $item->af);
+        $worksheet->setCellValue("B$inicio", $index + 1);
+        $worksheet->setCellValue("C{$fila}", $item['fk_tipo']);
+        $worksheet->setCellValue("D{$fila}", $item['fk_usuario']);
+        $worksheet->setCellValue("E{$fila}", $item['ubicación']);
+        $worksheet->setCellValue("F{$fila}", $item['modelo']);
+        $worksheet->setCellValue("G{$fila}", $item['num_serie']);
 
         $inicio++;
     }

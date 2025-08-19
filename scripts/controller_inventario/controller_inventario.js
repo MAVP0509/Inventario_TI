@@ -1134,7 +1134,7 @@ async function generar_baja() {
 
 //TODO Funciones de los Select2
 
-async function general_select2({ selectId, tabla, campo, data, placeholder, dropdownParent, tags, popoverTitle, popoverContent, placement, sincronizarCon, sincronizarCampo }) {
+/* async function general_select2({ selectId, tabla, campo, data, placeholder, dropdownParent, tags, popoverTitle, popoverContent, placement, sincronizarCon, sincronizarCampo }) {
     //try {
     let opciones = [];
 
@@ -1233,7 +1233,7 @@ async function general_select2({ selectId, tabla, campo, data, placeholder, drop
         });
     }
 
-}
+} */
 
 function rellenar_select(texto, select) {
     let textoBuscado = texto;
@@ -1722,7 +1722,7 @@ $('#select-ver-usu-file').on('change', async function () {
     dominio = window.location.hostname
     puerto = location.port
 
-    model = {
+    let model = {
         accion: 8,
         usuario: $("#select-ver-usu-file").val()
     }
