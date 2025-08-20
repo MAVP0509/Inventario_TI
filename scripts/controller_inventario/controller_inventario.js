@@ -1251,107 +1251,6 @@ async function generar_baja() {
 
 //TODO Funciones de los Select2
 
-/* async function general_select2({ selectId, tabla, campo, data, placeholder, dropdownParent, tags, popoverTitle, popoverContent, placement, sincronizarCon, sincronizarCampo }) {
-    //try {
-    let opciones = [];
-
-    if (data && Array.isArray(data)) {
-        // Si se pasan los datos directamente
-        opciones = data.map(item => ({
-            id: item.id ?? '',
-            text: item.text ?? ''
-
-        }));
-
-    } else if (tabla && campo) {
-        let response = await server_inventario({
-            accion: 5,
-            tabla: tabla,
-            campo: campo
-        });
-        //console.log('Respuesta del servidor para select2:', response);
-        opciones = response.resultado.map(item => ({
-            id: item.id || '',
-            text: item[campo] || ''
-        }));
-
-    }
-
-    const $select = $('#' + selectId);
-    $select.empty().append(new Option('', '', false, false));
-
-    $select.select2({
-        theme: 'bootstrap4',
-        allowClear: true,
-        placeholder: placeholder,
-        tags: tags,
-        dropdownParent: $(dropdownParent),
-        data: opciones
-    });
-
-    $select.val(null).trigger('change');
-
-    //  Si se pasan datos de popover, aplicarlo
-    if (popoverTitle && popoverContent) {
-        const $select2Container = $select.next('.select2-container');
-
-        $select2Container.attr({
-            'data-toggle': 'popover',
-            'data-trigger': 'hover',
-            'data-html': 'true',
-            'title': popoverTitle,
-            'data-content': popoverContent,
-            'data-placement': placement
-        });
-
-        $select2Container.popover();
-    }
-
-    // Sincronización aútomatica
-    if (sincronizarCon && sincronizarCampo) {
-        const origen = $(`#${sincronizarCon}`);
-        const destino = $(`#${selectId}`);
-
-        // Limpia eventos anteriores
-        origen.off(`change.sync-${selectId}`);
-
-        // Evento para habilitar/deshabilitar el destino según si es un tag (nuevo valor)
-        origen.on(`change.sync-${selectId}`, async function () {
-            const selectedOption = origen.find('option:selected');
-            const isTag = selectedOption.length && selectedOption.attr('data-select2-tag');
-            const valor = origen.val();
-
-            if (valor && isTag) {
-                destino.prop('disabled', false).val(null).trigger('change');
-            } else {
-                destino.prop('disabled', true).val(null).trigger('change');
-
-                // Si quieres que además se sincronice el valor del destino con el origen (cuando no es tag):
-                if (valor && !isTag) {
-                    // Buscar el cargo relacionado y ponerlo como opción seleccionada
-                    let response = await server_inventario({
-                        accion: 5,
-                        tabla: tabla,
-                        campo: sincronizarCampo,
-                        id: valor,
-                    });
-
-                    const registro = response?.resultado?.[0];
-                    const texto_destino = registro?.[sincronizarCampo];
-
-                    if (texto_destino) {
-                        const nueva_opcion = new Option(texto_destino, texto_destino, true, true);
-                        destino.append(nueva_opcion).trigger('change');
-                    } else {
-                        destino.val(null).trigger('change');
-                    }
-                }
-            }
-        });
-    }
-
-} */
-
 function rellenar_select(texto, select) {
     let textoBuscado = texto;
     let $select = $('#' + select);
@@ -1555,28 +1454,6 @@ function abrir_resguardo(datos) {
     ruta = ruta.replace("C:/xampp/htdocs", "http://" + dominio + ":" + puerto)
     // console.log(ruta.resultado)
     window.open(ruta, '_blank');
-}
-
-function mostrar_toast_cargando() {
-    Swal.fire({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        showCloseButton: false,
-        timer: undefined, // No cerrar automáticamente
-        allowOutsideClick: false,
-        background: '#fff',
-        html: `
-            <div style="display: flex; align-items: center;">
-                <!--<i class="fas fa-spinner fa-spin fa-lg" style="margin-right: 10px; color: #007bff;"></i>-->
-                <img src="images/gooey-balls-1.svg" alt="Icono" height="30" width="30">
-                <span style="font-weight: 500; margin-left: 8px;">Cargando...</span>
-            </div>
-        `,
-        didOpen: () => {
-            //Swal.showLoading(); Esto muestra el spinner por default de SweetAlert, pero ya no es necesario, ya que se usa uno de fontAwesome
-        }
-    });
 }
 
 $(document).ready(function () {

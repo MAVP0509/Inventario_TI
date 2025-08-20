@@ -422,69 +422,103 @@ function bajas($valores)
 
 function programa_mantenimiento($valores)
 {
-    var_dump($valores);
+    // set_time_limit(300);
+    // var_dump($valores);
     include('../conexion.php');
 
-    $sql = "SELECT fk_tipo, fk_usuario, ubicación, modelo, num_serie FROM inventario_ti_sur WHERE fk_tipo IN (40,41,58,55,22,23,25,1,2,78,79,80,81,82,73,74,75,76,46,51)";
-    $query = mysqli_query($con, $sql);
+    $sql_inv = "SELECT * FROM vmantenimiento";
+    $query = mysqli_query($con, $sql_inv);
 
     $datos = [];
     while ($fila =  mysqli_fetch_assoc($query)) {
         $datos[] = $fila;
     }
 
-    $spreadsheet = IOFactory::load('FO-DSP-TI-03 Programa de Mantenimiento Preventivo Infraestructura TI Región XX Rev.00');
+    // Orden de columnas correspondientes
+    $meses_columnas = ['H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'];
+
+    //  Se recorre cada dispositivo del arreglo $datos
+    foreach ($datos as $i => &$dispositivo) {   
+        //  Se saca el residuo al dividir $i entre 12, 
+        //  a su vez añadiendo un nuevo campo al $dispositivo llamado mes_index,
+        //  indicando en qué mes le tocará mantenimiento.
+        $dispositivo['mes_index'] = $i % 12;
+    }
+
+    unset($dispositivo);
+
+    // usort() ordena unarreglo en base a una función de comparación definida
+    // fuction($a, $b) es la función a usar que recibe dos parámetros; son dos elementos del arreglo $datos a comparar entre sí.
+    usort($datos, function ($a, $b) {
+        return $a['mes_index'] <=> $b['mes_index'];
+    });
+
+    $spreadsheet = IOFactory::load('FO-DSP-TI-03 Programa de Mantenimiento Preventivo Infraestructura TI Región XX Rev.00.xlsx');
     $worksheet = $spreadsheet->getActiveSheet();
 
     $pageSetup = $worksheet->getPageSetup();
-    $pageSetup->setOrientation(PageSetup::ORIENTATION_PORTRAIT);
-    $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LETTER);
-    $pageSetup->setFitToPage(true);
-    $pageSetup->setFitToWidth(1);
-    $pageSetup->setFitToHeight(0);
+    $pageSetup->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);   //  Orientación horizontal
+    $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LETTER);  //  Establece el tamaño del papel
+    $pageSetup->setFitToPage(true); //  Ajusta el contenido a una sola página
+    $pageSetup->setFitToWidth(1);   //  Ajusta el contenido al ancho de una página.
+    $pageSetup->setFitToHeight(0);  //  Permite que la altura no esté limitada (varias páginas verticales)
 
     $pageMargins = $worksheet->getPageMargins();
-    $pageMargins->setTop(0.5);
-    $pageMargins->setBottom(0.5);
-    $pageMargins->setLeft(0.5);
-    $pageMargins->setRight(0.5);
+    $pageMargins->setTop(0.3);
+    $pageMargins->setBottom(0.3);
+    $pageMargins->setLeft(0.2);
+    $pageMargins->setRight(0.2);
 
     $fila_inicio = 13;
-    $fila_cargo = 20;
+    $fila_nombre = 21;
+    $fila_cargo = 22;
     $fila_fecha = 24;
     $filas = count($datos);
 
     foreach ($datos as $index => $item) {
-        if ($filas > 15) {
+        // var_dump($item);
+        // $fila_actual = $fila_inicio + $index;
+        if ($index >= 3) {
             $worksheet->insertNewRowBefore($fila_inicio, 1);
+
+            $worksheet->duplicateStyle($worksheet->getStyle("B14:S14"), "B{$fila_inicio}:S{$fila_inicio}");
         }
 
-        $worksheet->mergeCells("B$fila_inicio:S$fila_inicio");
-
-        $worksheet->duplicateStyle($worksheet->getStyle("B13:S13"), "B$fila_inicio:S$fila_inicio");
-
-        $worksheet->getStyle("B$fila_inicio:S$fila_inicio")->getAlignment()->setWrapText(true);
+        $worksheet->getStyle("B{$fila_inicio}:S{$fila_inicio}")->getAlignment()->setWrapText(true);
         $worksheet->getRowDimension($fila_inicio)->setRowHeight(-1);
 
-        $worksheet->getStyle("B$fila_inicio:S$fila_inicio")->getFont()->setBold(false);
 
-        $worksheet->setCellValue("B$fila_inicio", $index + 1);
-        $worksheet->setCellValue("C{$fila_inicio}", $item['fk_tipo']);
-        $worksheet->setCellValue("D{$fila_inicio}", $item['fk_usuario']);
-        $worksheet->setCellValue("E{$fila_inicio}", $item['ubicación']);
+        // $worksheet->getStyle("B$fila_inicio:S$fila_inicio")->getFont()->setBold(false);
+
+        $worksheet->setCellValue("B{$fila_inicio}", $index + 1);
+        $worksheet->setCellValue("C{$fila_inicio}", $item['tipo']);
+        $worksheet->setCellValue("D{$fila_inicio}", $item['nombre']);
+        $worksheet->setCellValue("E{$fila_inicio}", $item['ubicacion']);
         $worksheet->setCellValue("F{$fila_inicio}", $item['modelo']);
         $worksheet->setCellValue("G{$fila_inicio}", $item['num_serie']);
+
+        $mes_index = $item['mes_index'];
+        $columna_mes = $meses_columnas[$mes_index];
+        $worksheet->setCellValue("{$columna_mes}{$fila_inicio}", 'x');
 
         $fila_inicio++;
     }
 
-    $cargos = $fila_cargo + ($filas - 1);
+    $nombres = $fila_nombre + ($filas - 3);
 
-    $worksheet->setCellValue("C$cargos", $valores->elaboro);
-    $worksheet->setCellValue("G$cargos", $valores->autorizo);
-    
-    $fechas = $fila_fecha + ($filas - 1);
+    $worksheet->setCellValue("C$nombres", $valores->elaboro);
+    $worksheet->setCellValue("G$nombres", $valores->autorizo);
+    $worksheet->getStyle("C$nombres")->getAlignment()->setWrapText(true);
+
+    $cargos = $fila_cargo + ($filas - 3);
+
+    $worksheet->setCellValue("C$cargos", $valores->cg_elaboro);
+    $worksheet->setCellValue("G$cargos", $valores->cg_autorizo);
+    $worksheet->getStyle("C$cargos")->getAlignment()->setWrapText(true);
+
+    $fechas = $fila_fecha + ($filas - 3);
     $worksheet->setCellValue("D$fechas", date('Y-m-d'));
+    $worksheet->getStyle("C$fechas")->getAlignment()->setWrapText(true);
 
     // $doc = join("_", $doc);
     $fecha = date('Ymd_His');

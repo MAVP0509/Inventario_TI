@@ -186,6 +186,8 @@ function consultar_informacion() {
 consultar_informacion()
 
 async function mdl_programar_mantenimiento() {
+
+
     await general_select2({
         selectId: 'select-elaboro',
         tabla: 'supervisor',
@@ -195,6 +197,17 @@ async function mdl_programar_mantenimiento() {
         tags: false,
         // popoverTitle: "Descripción",
         // popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
+    })
+
+    await general_select2({
+        selectId: 'select-cg-elaboro',
+        tabla: 'supervisor',
+        campo: 'cargo',
+        placeholder: 'Seleccione un cargo',
+        dropdownParent: '#mdl-prog-mant',
+        tags: false,
+        sincronizarCon: 'select-elaboro',
+        sincronizarCampo: 'cargo'
     })
 
     await general_select2({
@@ -208,6 +221,19 @@ async function mdl_programar_mantenimiento() {
         // popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
     })
 
+    await general_select2({
+        selectId: 'select-cg-autorizo',
+        tabla: 'cat_usuarios',
+        campo: 'cargo',
+        placeholder: 'Seleccione un cargo',
+        dropdownParent: '#mdl-prog-mant',
+        tags: false,
+        sincronizarCon: 'select-autorizo',
+        sincronizarCampo: 'cargo'
+    })
+
+    $('#select-cg-elaboro, #select-cg-autorizo').prop('disabled', true)
+
     $('#mdl-prog-mant').modal("show")
 }
 
@@ -220,11 +246,19 @@ async function programar_mantenimiento() {
         return;
     }
 
-    let model = { accion: 3 , elaboro: $('#select-elaboro').select2('data')[0].text, autorizo: $('#select-autorizo').select2('data')[0].text }
+    let model = {
+        accion: 3,
+        elaboro: $('#select-elaboro').select2('data')[0].text,
+        cg_elaboro: $('#select-cg-elaboro').select2('data')[0].text,
+        autorizo: $('#select-autorizo').select2('data')[0].text,
+        cg_autorizo: $('#select-cg-autorizo').select2('data')[0].text,
+    }
 
-    let server = await server_global(model);
+    mostrar_toast_cargando()
 
-    if (server.resultado === true) {
+    let server = await server_mantenimiento(model);
+
+    if (server.resultado.result === true && server.resultado.url) {
         window.location = server.resultado.url;
         mostrar_toast('success', '¡Programa de mantenimiento exitosa!', 'Rellena los campos. Inténtelo nuevamente.');
         $('#mdl-prog-mant').modal("hide");

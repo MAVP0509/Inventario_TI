@@ -30,7 +30,7 @@ function mostrar_alert(tipo, mensaje, skip, funcion, denyButton, denyButtonText,
         confirmButtonText: 'Aceptar <i class="fa-solid fa-circle-check fa-lg">',
         cancelButtonText: 'Cancelar <i class="fa-solid fa-xmark fa-lg"></i>',
         reverseButtons: true, //* 👉 Esto cambia el orden de los botones
-        showDenyButton:denyButton,
+        showDenyButton: denyButton,
         denyButtonText: denyButtonText,
         backdrop: `
         rgba(0,0,123,0.4)` ,
@@ -59,6 +59,28 @@ function mostrar_toast(tipo, titulo, mensaje, tiempo) {
     });
 }
 
+function mostrar_toast_cargando() {
+    Swal.fire({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        showCloseButton: false,
+        timer: undefined, // No cerrar automáticamente
+        allowOutsideClick: false,
+        background: '#fff',
+        html: `
+            <div style="display: flex; align-items: center;">
+                <!--<i class="fas fa-spinner fa-spin fa-lg" style="margin-right: 10px; color: #007bff;"></i>-->
+                <img src="images/gooey-balls-1.svg" alt="Icono" height="30" width="30">
+                <span style="font-weight: 500; margin-left: 8px;">Cargando...</span>
+            </div>
+        `,
+        didOpen: () => {
+            //Swal.showLoading(); Esto muestra el spinner por default de SweetAlert, pero ya no es necesario, ya que se usa uno de fontAwesome
+        }
+    });
+}
+
 //* Función para validar que los campos no estén vacios (los vuelve obligatorios)
 function validar_campos(campos) {
     // Inicializa una variable booleana que indica si todos los campos son válidos
@@ -69,10 +91,10 @@ function validar_campos(campos) {
         // Obtiene el elemento del DOM por su ID
         const $campo = $('#' + id);
 
-       /*  if ($campo.length === 0) {
-            valido = false
-            return;
-        } */
+        /*  if ($campo.length === 0) {
+             valido = false
+             return;
+         } */
 
         // Si no se encuentra el elemento, se marca como inválido y se sale de la iteración
         if (!$campo) return valido = false;
@@ -110,7 +132,7 @@ function validar_campos(campos) {
 //* Función para seleccionar/desceccionar uno o varios elementos
 function seleccionar_registro(id, lista) {
     // Retorna el primer índice en el que se puede encontrar un elemento dado en el array.
-    let index = lista.indexOf(id); 
+    let index = lista.indexOf(id);
     // ó retorna -1 si el elemento no está presente.
     if (index === -1) {
         lista.push(id); // Añade uno o más elementos al final de un array
