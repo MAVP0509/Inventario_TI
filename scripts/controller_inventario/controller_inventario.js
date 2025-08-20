@@ -178,7 +178,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -187,7 +188,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -196,7 +198,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -205,7 +208,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -214,7 +218,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -223,7 +228,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -242,7 +248,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -251,7 +258,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -260,7 +268,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -269,7 +278,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -278,7 +288,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -287,7 +298,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -295,7 +307,8 @@ async function consultar_informacion() {
                     title: "Estatus", field: "estatus", width: 120, frozen: true, headerHozAlign: "center", headerFilter: "list", headerFilterParams: {
                         values: { "Asignado": "Asignado", "Bodega": "Bodega" }, clearable: true,
                         elementAttributes: {
-                            type: "text"
+                            type: "text",
+                            autocomplete: "off"
                         }
                     }, headerSort: false
                 },
@@ -316,10 +329,16 @@ async function consultar_informacion() {
     } catch (error) {
         console.log(error)
     }
-    table.on("tableBuilt", () => {
+    /* table.on("tableBuilt", () => {
         document.querySelectorAll(".tabulator-header input").forEach(input => {
             input.setAttribute("autocomplete", "off");
             input.setAttribute("type", "text"); // por si Tabulator vuelve a poner "search"
+        });
+    }); */
+    table.on("tableBuilt", () => {
+        Array.from(document.getElementsByName("tbtor-filter")).forEach(input => {
+            input.setAttribute("autocomplete", "off");
+            input.setAttribute("type", "text");
         });
     });
 }

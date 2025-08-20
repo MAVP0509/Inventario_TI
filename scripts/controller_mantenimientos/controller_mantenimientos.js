@@ -1,12 +1,12 @@
 let datos = [
-    { fecha: "2025-01", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodajhgfdgjkhdtryuiyjhfgdftryuikgyjfhgdtsrytsodyhjhhjggfgiuydsd", usuario: "Juan Pablo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "123456789" },
-    { fecha: "2025-02", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Jose Manuel", ubicacion: "Base Operativa", equipo: "Monitor", num_serie: "987654321" },
-    { fecha: "2025-03", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Francisco", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-04", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Ricardo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-04", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Roberto", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-05", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Rubén", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-05", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Huichzilopotztli", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-06", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Fulanito", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" }]
+    { fecha: "2025-01", estatus: "Pendiente", tipo: "PC",  usuario: "Juan Pablo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "123456789" },
+    { fecha: "2025-02", estatus: "Pendiente", tipo: "PC",  usuario: "Jose Manuel", ubicacion: "Base Operativa", equipo: "Monitor", num_serie: "987654321" },
+    { fecha: "2025-03", estatus: "Pendiente", tipo: "PC",  usuario: "Francisco", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-04", estatus: "Pendiente", tipo: "PC",  usuario: "Ricardo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-04", estatus: "Pendiente", tipo: "PC",  usuario: "Roberto", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-05", estatus: "Pendiente", tipo: "PC",  usuario: "Rubén", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-05", estatus: "Pendiente", tipo: "PC",  usuario: "Huichzilopotztli", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-06", estatus: "Pendiente", tipo: "PC",  usuario: "Fulanito", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" }]
 let elemento
 let table
 let supervisor_seleccionado = []
@@ -41,21 +41,26 @@ function consultar_informacion() {
     // Inicializar cada fila con "seleccionado: false"
     datos.forEach(d => d.seleccionado = false);
 
-    // Formatter del ícono tipo checkbox
-    let squareIcon = function (cell, formatterParams, onRendered) {
-        const seleccionado = cell.getRow().getData().seleccionado;
-        const iconClass = seleccionado ? "fa-solid fa-square-check" : "fa-regular fa-square";
-        return `<button type='button' class='btn icon    toggle-select'>
-                    <i class='${iconClass} fa-lg'></i>
-                </button>`;
-    };
+    let editIcon = function (cell, formatterParams, onRendered) {
+        onRendered(function(){
+            $(cell.getElement()).find('[data-toggle="popover"]').popover()
+        })
+        return `<button type='button' class='btn btn-warning icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Editar' onclick=''><i class='fa-solid fa-pen-to-square fa-lg'></i></button>`;
+    }
+
+    let uploadIcon = function (cell, formatterParams, onRendered) {
+        onRendered(function(){
+            $(cell.getElement()).find('[data-toggle="popover"]').popover()
+        })
+        return `<button type='button' class='btn btn-info icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' onclick=''><i class='fa-solid fa-upload fa-lg'></i></button>`;
+    }
 
 
     let fileIcon = function (cell, formatterParams, onRendered) { //plain text value
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
-        return "<button type='button' class='btn btn-outline-success icon' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Reporte de mantenimiento' onclick=''><i class='fa-solid fa-file-excel fa-lg'></i></button>";
+        return "<button type='button' class='btn btn-success icon' data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Reporte de mantenimiento' onclick=''><i class='fa-solid fa-file-excel fa-lg'></i></button>";
     };
 
     table = new Tabulator('#tbl01', {
@@ -101,23 +106,7 @@ function consultar_informacion() {
         headerVisible: false,
         columns: [
             {
-                formatter: squareIcon, width: 70, hozAlign: "center",
-                cellClick: function (e, cell) {
-                    // Alternar estado de seleccionado
-                    let rowData = cell.getRow().getData();
-                    rowData.seleccionado = !rowData.seleccionado;
-                    cell.getRow().reformat();
-                    seleccionar_registro(rowData.id, supervisor_seleccionado)
-                }, headerSort: false, frozen: true
-            },
-            {
-                title: "Fecha", field: "fecha", headerHozAlign: "center", headerFilter: "input", headerSort: false, cellClick: function (e, cell) {
-                    // Alternar estado de seleccionado
-                    let rowData = cell.getRow().getData();
-                    rowData.seleccionado = !rowData.seleccionado;
-                    cell.getRow().reformat();
-                    seleccionar_registro(rowData.id, supervisor_seleccionado)
-                }
+                title: "Fecha", field: "fecha", hozAlign: "center"
             },
             {
                 title: "Tipo",
@@ -143,11 +132,8 @@ function consultar_informacion() {
 
             },
             {
-                title: "Observaciones", field: "observaciones", hozAlign: "center", width: 290, formatter:"textarea"
-            },
-            {
                 title: "Estatus",
-                field: "estatus", width: 100, hozAlign: "center"
+                field: "estatus", hozAlign: "center"
 
             },
             {
@@ -155,8 +141,21 @@ function consultar_informacion() {
                 cellClick: function (e, cell) {
                     elemento = cell.getRow().getData();
                     //mdl_editar_supervisor(elemento);
-                },
-                headerSort: false, frozen: true
+                }
+            },
+            {
+                formatter: uploadIcon, width: 70, hozAlign: "center",
+                cellClick: function (e, cell) {
+                    elemento = cell.getRow().getData();
+                    //mdl_editar_supervisor(elemento);
+                }
+            },
+            {
+                formatter: editIcon, width: 70, hozAlign: "center",
+                cellClick: function (e, cell) {
+                    elemento = cell.getRow().getData();
+                    //mdl_editar_supervisor(elemento);
+                }
             },
         ],
 
