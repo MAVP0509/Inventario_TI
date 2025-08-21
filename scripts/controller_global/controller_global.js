@@ -1,3 +1,22 @@
+function server_global(model) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: "POST",
+            url: "database/controller_global/controller_global.php",
+            data: {
+                trama: JSON.stringify(model)
+            },
+            success: function (respose) {
+                try {
+                    resolve(JSON.parse(respose))
+                } catch (error) {
+                    reject(error)
+                }
+            }
+        })
+    })
+}
+
 //*Función para mostrar un alert
 function mostrar_alert(tipo, mensaje, skip, funcion, denyButton, denyButtonText, denyFuction) {
     Swal.fire({
@@ -11,7 +30,7 @@ function mostrar_alert(tipo, mensaje, skip, funcion, denyButton, denyButtonText,
         confirmButtonText: 'Aceptar <i class="fa-solid fa-circle-check fa-lg">',
         cancelButtonText: 'Cancelar <i class="fa-solid fa-xmark fa-lg"></i>',
         reverseButtons: true, //* 👉 Esto cambia el orden de los botones
-        showDenyButton:denyButton,
+        showDenyButton: denyButton,
         denyButtonText: denyButtonText,
         backdrop: `
         rgba(0,0,123,0.4)` ,
@@ -40,6 +59,28 @@ function mostrar_toast(tipo, titulo, mensaje, tiempo) {
     });
 }
 
+function mostrar_toast_cargando() {
+    Swal.fire({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        showCloseButton: false,
+        timer: undefined, // No cerrar automáticamente
+        allowOutsideClick: false,
+        background: '#fff',
+        html: `
+            <div style="display: flex; align-items: center;">
+                <!--<i class="fas fa-spinner fa-spin fa-lg" style="margin-right: 10px; color: #007bff;"></i>-->
+                <img src="images/gooey-balls-1.svg" alt="Icono" height="30" width="30">
+                <span style="font-weight: 500; margin-left: 8px;">Cargando...</span>
+            </div>
+        `,
+        didOpen: () => {
+            //Swal.showLoading(); Esto muestra el spinner por default de SweetAlert, pero ya no es necesario, ya que se usa uno de fontAwesome
+        }
+    });
+}
+
 //* Función para validar que los campos no estén vacios (los vuelve obligatorios)
 function validar_campos(campos) {
     // Inicializa una variable booleana que indica si todos los campos son válidos
@@ -50,10 +91,10 @@ function validar_campos(campos) {
         // Obtiene el elemento del DOM por su ID
         const $campo = $('#' + id);
 
-       /*  if ($campo.length === 0) {
-            valido = false
-            return;
-        } */
+        /*  if ($campo.length === 0) {
+             valido = false
+             return;
+         } */
 
         // Si no se encuentra el elemento, se marca como inválido y se sale de la iteración
         if (!$campo) return valido = false;
@@ -91,7 +132,7 @@ function validar_campos(campos) {
 //* Función para seleccionar/desceccionar uno o varios elementos
 function seleccionar_registro(id, lista) {
     // Retorna el primer índice en el que se puede encontrar un elemento dado en el array.
-    let index = lista.indexOf(id); 
+    let index = lista.indexOf(id);
     // ó retorna -1 si el elemento no está presente.
     if (index === -1) {
         lista.push(id); // Añade uno o más elementos al final de un array
@@ -100,6 +141,107 @@ function seleccionar_registro(id, lista) {
     }
     // Nota: Esta función no devuelve valor, modifica la lista directamente
     // console.log(lista)
+}
+
+async function general_select2({ selectId, tabla, campo, data, placeholder, dropdownParent, tags, popoverTitle, popoverContent, placement, sincronizarCon, sincronizarCampo }) {
+    //try {
+    let opciones = [];
+
+    if (data && Array.isArray(data)) {
+        // Si se pasan los datos directamente
+        opciones = data.map(item => ({
+            id: item.id ?? '',
+            text: item.text ?? ''
+
+        }));
+
+    } else if (tabla && campo) {
+        let response = await server_global({
+            accion: 0,
+            tabla: tabla,
+            campo: campo
+        });
+        //console.log('Respuesta del servidor para select2:', response);
+        opciones = response.resultado.map(item => ({
+            id: item.id || '',
+            text: item[campo] || ''
+        }));
+
+    }
+
+    const $select = $('#' + selectId);
+    $select.empty().append(new Option('', '', false, false));
+
+    $select.select2({
+        theme: 'bootstrap4',
+        allowClear: true,
+        placeholder: placeholder,
+        tags: tags,
+        dropdownParent: $(dropdownParent),
+        data: opciones
+    });
+
+    $select.val(null).trigger('change');
+
+    //  Si se pasan datos de popover, aplicarlo
+    if (popoverTitle && popoverContent) {
+        const $select2Container = $select.next('.select2-container');
+
+        $select2Container.attr({
+            'data-toggle': 'popover',
+            'data-trigger': 'hover',
+            'data-html': 'true',
+            'title': popoverTitle,
+            'data-content': popoverContent,
+            'data-placement': placement
+        });
+
+        $select2Container.popover();
+    }
+
+    // Sincronización aútomatica
+    if (sincronizarCon && sincronizarCampo) {
+        const origen = $(`#${sincronizarCon}`);
+        const destino = $(`#${selectId}`);
+
+        // Limpia eventos anteriores
+        origen.off(`change.sync-${selectId}`);
+
+        // Evento para habilitar/deshabilitar el destino según si es un tag (nuevo valor)
+        origen.on(`change.sync-${selectId}`, async function () {
+            const selectedOption = origen.find('option:selected');
+            const isTag = selectedOption.length && selectedOption.attr('data-select2-tag');
+            const valor = origen.val();
+
+            if (valor && isTag) {
+                destino.prop('disabled', false).val(null).trigger('change');
+            } else {
+                destino.prop('disabled', true).val(null).trigger('change');
+
+                // Si quieres que además se sincronice el valor del destino con el origen (cuando no es tag):
+                if (valor && !isTag) {
+                    // Buscar el cargo relacionado y ponerlo como opción seleccionada
+                    let response = await server_global({
+                        accion: 0,
+                        tabla: tabla,
+                        campo: sincronizarCampo,
+                        id: valor,
+                    });
+
+                    const registro = response?.resultado?.[0];
+                    const texto_destino = registro?.[sincronizarCampo];
+
+                    if (texto_destino) {
+                        const nueva_opcion = new Option(texto_destino, texto_destino, true, true);
+                        destino.append(nueva_opcion).trigger('change');
+                    } else {
+                        destino.val(null).trigger('change');
+                    }
+                }
+            }
+        });
+    }
+
 }
 
 //TODO animando iconos 

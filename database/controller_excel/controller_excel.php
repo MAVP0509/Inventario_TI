@@ -25,6 +25,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = cargar_plantilla($clientejson);
 } elseif ($clientejson->accion == 2) {
     $respuesta_servidor->resultado = bajas($clientejson);
+} elseif ($clientejson->accion == 3) {
+    $respuesta_servidor->resultado = programa_mantenimiento($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -418,49 +420,118 @@ function bajas($valores)
     ];
 }
 
-function programa_mantenimiento ($valores) {
-    $datos = $valores;
+function programa_mantenimiento($valores)
+{
+    // set_time_limit(300);
+    // var_dump($valores);
+    include('../conexion.php');
 
-    $spreadsheet = IOFactory::load('FO-DSP-TI-03 Programa de Mantenimiento Preventivo Infraestructura TI Región XX Rev.00');
+    $sql_inv = "SELECT * FROM vmantenimiento";
+    $query = mysqli_query($con, $sql_inv);
+
+    $datos = [];
+    while ($fila =  mysqli_fetch_assoc($query)) {
+        $datos[] = $fila;
+    }
+
+    // Orden de columnas correspondientes
+    $meses_columnas = ['H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'];
+
+    //  Se recorre cada dispositivo del arreglo $datos
+    foreach ($datos as $i => &$dispositivo) {   
+        //  Se saca el residuo al dividir $i entre 12, 
+        //  a su vez añadiendo un nuevo campo al $dispositivo llamado mes_index,
+        //  indicando en qué mes le tocará mantenimiento.
+        $dispositivo['mes_index'] = $i % 12;
+    }
+
+    unset($dispositivo);
+
+    // usort() ordena unarreglo en base a una función de comparación definida
+    // fuction($a, $b) es la función a usar que recibe dos parámetros; son dos elementos del arreglo $datos a comparar entre sí.
+    usort($datos, function ($a, $b) {
+        return $a['mes_index'] <=> $b['mes_index'];
+    });
+
+    $spreadsheet = IOFactory::load('FO-DSP-TI-03 Programa de Mantenimiento Preventivo Infraestructura TI Región XX Rev.00.xlsx');
     $worksheet = $spreadsheet->getActiveSheet();
 
     $pageSetup = $worksheet->getPageSetup();
-    $pageSetup->setOrientation(PageSetup::ORIENTATION_PORTRAIT);
-    $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LETTER);
-    $pageSetup->setFitToPage(true);
-    $pageSetup->setFitToWidth(1);
-    $pageSetup->setFitToHeight(0);
+    $pageSetup->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);   //  Orientación horizontal
+    $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LETTER);  //  Establece el tamaño del papel
+    $pageSetup->setFitToPage(true); //  Ajusta el contenido a una sola página
+    $pageSetup->setFitToWidth(1);   //  Ajusta el contenido al ancho de una página.
+    $pageSetup->setFitToHeight(0);  //  Permite que la altura no esté limitada (varias páginas verticales)
 
     $pageMargins = $worksheet->getPageMargins();
-    $pageMargins->setTop(0.5);
-    $pageMargins->setBottom(0.5);
-    $pageMargins->setLeft(0.5);
-    $pageMargins->setRight(0.5);
-    
-    $inicio = 13;
+    $pageMargins->setTop(0.3);
+    $pageMargins->setBottom(0.3);
+    $pageMargins->setLeft(0.2);
+    $pageMargins->setRight(0.2);
+
+    $fila_inicio = 13;
+    $fila_nombre = 21;
+    $fila_cargo = 22;
+    $fila_fecha = 24;
     $filas = count($datos);
 
-    foreach ($datos as $item) {
-        if ($filas != $inicio) {
-            $worksheet->insertNewColumnBefore($$inicio, 1);
+    foreach ($datos as $index => $item) {
+        // var_dump($item);
+        // $fila_actual = $fila_inicio + $index;
+        if ($index >= 3) {
+            $worksheet->insertNewRowBefore($fila_inicio, 1);
+
+            $worksheet->duplicateStyle($worksheet->getStyle("B14:S14"), "B{$fila_inicio}:S{$fila_inicio}");
         }
 
-    $worksheet->mergeCells("D$inicio:H$inicio");
+        $worksheet->getStyle("B{$fila_inicio}:S{$fila_inicio}")->getAlignment()->setWrapText(true);
+        $worksheet->getRowDimension($fila_inicio)->setRowHeight(-1);
 
-        $worksheet->duplicateStyle($worksheet->getStyle("B16:K16"), "B$inicio:K$inicio");
 
-        $worksheet->getStyle("B$inicio:K$inicio")->getAlignment()->setWrapText(true);
-        $worksheet->getRowDimension($inicio)->setRowHeight(-1);
+        // $worksheet->getStyle("B$fila_inicio:S$fila_inicio")->getFont()->setBold(false);
 
-        $worksheet->getStyle("B$inicio:K$inicio")->getFont()->setBold(false);
+        $worksheet->setCellValue("B{$fila_inicio}", $index + 1);
+        $worksheet->setCellValue("C{$fila_inicio}", $item['tipo']);
+        $worksheet->setCellValue("D{$fila_inicio}", $item['nombre']);
+        $worksheet->setCellValue("E{$fila_inicio}", $item['ubicacion']);
+        $worksheet->setCellValue("F{$fila_inicio}", $item['modelo']);
+        $worksheet->setCellValue("G{$fila_inicio}", $item['num_serie']);
 
-        $worksheet->setCellValue("B$inicio", $item->rownum);
-        $worksheet->setCellValue("C$inicio", $item->motivo_baja_id);
-        $worksheet->setCellValue("D$inicio", $item->descripcion);
-        $worksheet->setCellValue("I$inicio", !empty($item->lote) ? $item->lote : '');
-        $worksheet->setCellValue("J$inicio", $item->ubicacion);
-        $worksheet->setCellValue("K$inicio", $item->af);
+        $mes_index = $item['mes_index'];
+        $columna_mes = $meses_columnas[$mes_index];
+        $worksheet->setCellValue("{$columna_mes}{$fila_inicio}", 'x');
 
-        $inicio++;
+        $fila_inicio++;
     }
+
+    $nombres = $fila_nombre + ($filas - 3);
+
+    $worksheet->setCellValue("C$nombres", $valores->elaboro);
+    $worksheet->setCellValue("G$nombres", $valores->autorizo);
+    $worksheet->getStyle("C$nombres")->getAlignment()->setWrapText(true);
+
+    $cargos = $fila_cargo + ($filas - 3);
+
+    $worksheet->setCellValue("C$cargos", $valores->cg_elaboro);
+    $worksheet->setCellValue("G$cargos", $valores->cg_autorizo);
+    $worksheet->getStyle("C$cargos")->getAlignment()->setWrapText(true);
+
+    $fechas = $fila_fecha + ($filas - 3);
+    $worksheet->setCellValue("D$fechas", date('Y-m-d'));
+    $worksheet->getStyle("C$fechas")->getAlignment()->setWrapText(true);
+
+    // $doc = join("_", $doc);
+    $fecha = date('Ymd_His');
+    $nombre_doc = "FO-DSP-TI-03_Programa de Mantenimiento Preventivo TI Región Sur_{$fecha}.xlsx";
+
+    $ruta_guardar = "C:\\xampp\\htdocs\\Inventario_TI\\database\\controller_excel\\{$nombre_doc}";
+    $url_descarga = "http://localhost/Inventario_TI/database/controller_excel/{$nombre_doc}";
+
+    $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+    $writer->save($ruta_guardar);
+
+    return array(
+        'result' => true,
+        'url' => $url_descarga
+    );
 }
