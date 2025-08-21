@@ -18,14 +18,14 @@ function server_mantenimiento(model) {
 }
 
 let datos = [
-    { fecha: "2025-01", estatus: "Pendiente", tipo: "PC",  usuario: "Juan Pablo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "123456789" },
-    { fecha: "2025-02", estatus: "Pendiente", tipo: "PC",  usuario: "Jose Manuel", ubicacion: "Base Operativa", equipo: "Monitor", num_serie: "987654321" },
-    { fecha: "2025-03", estatus: "Pendiente", tipo: "PC",  usuario: "Francisco", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-04", estatus: "Pendiente", tipo: "PC",  usuario: "Ricardo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-04", estatus: "Pendiente", tipo: "PC",  usuario: "Roberto", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-05", estatus: "Pendiente", tipo: "PC",  usuario: "Rubén", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-05", estatus: "Pendiente", tipo: "PC",  usuario: "Huichzilopotztli", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-06", estatus: "Pendiente", tipo: "PC",  usuario: "Fulanito", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" }]
+    { fecha: "2025-01", estatus: "Pendiente", tipo: "PC", usuario: "Juan Pablo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "123456789" },
+    { fecha: "2025-02", estatus: "Pendiente", tipo: "PC", usuario: "Jose Manuel", ubicacion: "Base Operativa", equipo: "Monitor", num_serie: "987654321" },
+    { fecha: "2025-03", estatus: "Cancelado", tipo: "PC", usuario: "Francisco", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-04", estatus: "Realizado", tipo: "PC", usuario: "Ricardo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-04", estatus: "Pendiente", tipo: "PC", usuario: "Roberto", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-05", estatus: "Pendiente", tipo: "PC", usuario: "Rubén", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-05", estatus: "Pendiente", tipo: "PC", usuario: "Huichzilopotztli", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-06", estatus: "Pendiente", tipo: "PC", usuario: "Fulanito", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" }]
 let elemento
 let table
 let supervisor_seleccionado = []
@@ -61,14 +61,14 @@ function consultar_informacion() {
     datos.forEach(d => d.seleccionado = false);
 
     let editIcon = function (cell, formatterParams, onRendered) {
-        onRendered(function(){
+        onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
         return `<button type='button' class='btn btn-warning icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Editar' onclick=''><i class='fa-solid fa-pen-to-square fa-lg'></i></button>`;
     }
 
     let uploadIcon = function (cell, formatterParams, onRendered) {
-        onRendered(function(){
+        onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
         return `<button type='button' class='btn btn-info icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' onclick=''><i class='fa-solid fa-upload fa-lg'></i></button>`;
@@ -117,10 +117,8 @@ function consultar_informacion() {
             const opciones = { year: 'numeric', month: 'long' };
             return fecha.toLocaleDateString('es-ES', opciones);
         },
-        groupHeader: function (value, count, data, group) {
-            return `${value} (${count} elementos)`;
-        },
         groupStartOpen: false,
+        groupToggleElement: "header", //* Permite que dando click en cualquier parte del header group, éste se despliegue
         height: "800px",
         headerVisible: false,
         columns: [
@@ -152,7 +150,12 @@ function consultar_informacion() {
             },
             {
                 title: "Estatus",
-                field: "estatus", hozAlign: "center"
+                field: "estatus", hozAlign: "center", formatter: "lookup",
+                formatterParams: {
+                    "Pendiente": `<i class="fa-solid fa-circle fa-beat-fade" style="color: #ff7300;"></i> Pendiente`,
+                    "Realizado": `<i class="fa-solid fa-circle fa-beat" style="color: #28a745;"></i> Realizado`,
+                    "Cancelado": `<i class="fa-solid fa-circle fa-beat" style="color: #dc3545;"></i> Cancelado`
+                }
 
             },
             {

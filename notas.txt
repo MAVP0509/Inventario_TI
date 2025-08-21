@@ -32,16 +32,19 @@ ver 1.2.0 : {
     6: Cambio del diseño del login,
     7: Aumento del tamaño de letra de los card-tittle,
     8: Cambio de la duración del preloader,
-    9: Arreglo del sidebar,
+    9: Arreglo del sidebar(en ocasiones no se desplegaba),
     10: Validación si el usuario tiene o no equipos asignados a la hora de generar un resguardo,
-    11: Cambio de diseño en el preloader y spinner de toast cargando
+    11: Cambio de diseño en el preloader y spinner de toast cargando,
 }
 
 
 ver 1.2.1 : {
-    0: Arreglo del sidebar que llegaban momentos que no se abrian los treeview,
-    1: Versionando scripts,
-    2: Acomodando scripts en los HTML
-    3: Arreglo en el resguardo de celulares,
-    4: Arreglo de filtros de tabulator tenian autocompletado
+    0: Versionando scripts,
+    1: Acomodando scripts en los HTML,
+    2: Arreglo en el resguardo de celulares,
+    3: Arreglo de filtros de tabulator, tenian autocompletado en la máquina del usuario final,
+    4: Arreglo del traspaso, no lo generaba,
+    5: Cambios en el formulario de registro de activos, deshabilitar que el número de serie e IMEI ya no sean campos requeridos,
+    6: Añadido de botón para cerrar el control sidebar,
+    
 }
