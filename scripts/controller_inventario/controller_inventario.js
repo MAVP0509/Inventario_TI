@@ -616,15 +616,16 @@ async function mdl_nvo_registro() {
         })
     ])
     // Establece el título del moda
-    document.getElementById('title-mdl-inventario').textContent = "Registro de Activo"
+    $('#title-mdl-inventario').text('Registro de Activo');
     //  Asigna la función crear_registro al botón del modal
-    document.getElementById('btn-mdl-inventario').onclick = function () { crear_registro() }
+    $('#btn-mdl-inventario').on('click', function () { crear_registro(); })
     // Muestra el modal al usuario
     $("#mdl-inventario").modal('show');
 
 }
 
 async function crear_registro() {
+    const check_num = $('#check-num').is(':checked');
     // Campos requeridos para validación
     let validacion = [
         "inp-zona",
@@ -633,8 +634,11 @@ async function crear_registro() {
         "inp-ubicacion",
         "inp-marca",
         "inp-modelo",
-        "inp-num-serie",
     ];
+
+    if (check_num) {
+        validacion = validacion.filter(item => item !== 'inp-num-serie');
+    }
     // Obtener el tipo seleccionado para agregar validaciones específicas
     const tipo_seleccionado = $('#inp-tipo').val();
     // Obtener el tipo seleccionado para agregar validaciones específicas
@@ -644,7 +648,7 @@ async function crear_registro() {
             validacion.push("inp-tag"); // Añadir validación de tag para estos tipos
             break;
         case '132':
-            validacion.push('inp-imei', 'inp-linea'); // Añadir IMEI y línea para tipo 132
+            validacion.push('inp-linea'); // Añadir IMEI y línea para tipo 132
         default:
             validacion // No hace nada, mantiene validacion igual
             break;
@@ -657,6 +661,11 @@ async function crear_registro() {
         return; // Termina función si no es válido
     }
 
+    let num_serie = $("#inp-num-serie").val().trim().toUpperCase();
+    if (check_num || num_serie === '') {
+        num_serie = 'NA';
+    }
+
     // Crear el modelo con los datos del formulario
     let model = {
         accion: 0,
@@ -666,7 +675,7 @@ async function crear_registro() {
         tipo: $("#inp-tipo").val().trim(),
         marca: $("#inp-marca").val().trim(),
         modelo: $("#inp-modelo").val().trim(),
-        num_serie: $("#inp-num-serie").val().trim().toUpperCase(),
+        num_serie: num_serie,
         ubicacion: $("#inp-ubicacion").select2('data')[0].text,
         tag: $("#inp-tag").val().trim(),
         imei: $("#inp-imei").val().trim(),
@@ -1287,6 +1296,31 @@ $(document).ready(function () {
             this.value = this.value.replace(/\D/g, ''); // Elimina todo lo que no sea dígito
         });/*  */
     });
+});
+
+$(document).ready(function () {
+    $('#check-num').on('change', function () {
+        if ($(this).is(':checked')) {
+            $('#inp-num-serie')
+                .val('NA')
+                .prop('readonly', true)
+                .addClass('text-muted');
+        } else {
+            $('#inp-num-serie')
+                .val('')
+                .prop('readonly', false)
+                .removeClass('text-muted');
+        }
+    });
+
+    $('#mdl-inventario').on('hidden.bs.modal', function () {
+        $('#check-num').prop('checked', false);
+        $('#inp-num-serie')
+            .val('')
+            .prop('readonly', false)
+            .removeClass('text-muted');
+    });
+    
 });
 
 $(document).ready(function () {

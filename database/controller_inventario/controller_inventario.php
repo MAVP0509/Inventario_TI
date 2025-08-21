@@ -109,53 +109,39 @@ function insertar_datos($valores)
     $val_estatus = empty($valores->usuario) ? 'Bodega' : 'Asignado';
     $val_imei = empty($valores->imei) ? 'NA' : $valores->imei;
     $val_linea = empty($valores->linea) ? 'NA' : $valores->linea;
-    // $usuario = empty($valores->usuario) ? '5' : $val_usuario;
     $val_tag = empty($valores->tag) ? 'NA' : $valores->tag;
     $val_af = empty($valores->af) ? 'NA' : $valores->af;
+    $val_num_serie = empty($valores->num_serie) ? 'NA' : $valores->num_serie;
+
     // Validación de duplicado de número de serie
-    if ($valores->num_serie != "") {
-        $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$valores->num_serie'";
-        //var_dump($sql_num);
+    if ($val_num_serie !== 'NA') {
+        $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$val_num_serie'";
         $query_num = mysqli_query($con, $sql_num);
 
-        /* $sql = "INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, imei,estatus) 
-        VALUES ('$valores->zona', '$val_rubro','$val_af','$val_tipo','$val_marca','$valores->modelo', '$valores->num_serie', 
-        '$valores->ubicacion', '$val_tag', '$valores->usuario', '$registro', 'NA', '$val_estatus');"; */
+        if ($query_num->num_rows > 0) {
+            return ["resultado" => false, "mensaje" => "Número de serie duplicado"];
+        }
+    }
 
-        $sql = 'INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, imei, linea, estatus) 
-        VALUES ("' . $valores->zona . '","' . $val_rubro . '","' . $val_af . '","' . $val_tipo . '","' . $val_marca . '","' . $valores->modelo . '","' . $valores->num_serie . '","' . $valores->ubicacion . '",
+    $sql = 'INSERT INTO inventario_ti_sur(zona, fk_rubro, af, fk_tipo, fk_marca, modelo, num_serie, ubicacion, tag, fk_usuario, fecha_entrega, imei, linea, estatus) 
+        VALUES ("' . $valores->zona . '","' . $val_rubro . '","' . $val_af . '","' . $val_tipo . '","' . $val_marca . '","' . $valores->modelo . '","' . $val_num_serie . '","' . $valores->ubicacion . '",
         "' . $val_tag . '","' . $usuario . '", "' . $registro . '", "' . $val_imei . '", "' . $val_linea . '", "' . $val_estatus . '")';
-        //var_dump($sql);
-        //$query = mysqli_query($con, $sql);
+    //var_dump($sql);
+    $query = mysqli_query($con, $sql);
 
-        $sql_select = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, 
+    $sql_select = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, 
                         modelo, tag, imei, linea,  fecha_entrega 
                     FROM inventario_ti_sur 
                     WHERE 
-                        num_serie = '$valores->num_serie'";
-        //$query_select = mysqli_query($con, $sql_select);
-        //$resultado = mysqli_fetch_assoc($query_select);
-        //$SQLStatement = "CALL pInsertarCatalogo('$sql','Insrt_Inventario')";
-        if ($query_num->num_rows > 0) {
-            return ["resultado" => false, "mensaje" => "Número de serie duplicado"];
-        } else {
-            $query = mysqli_query($con, $sql);
-            $query_select = mysqli_query($con, $sql_select);
-            $resultado = mysqli_fetch_assoc($query_select);
-            return [
-                'exitoso' => $query,
-                'insercion' => $resultado,
-            ];
-        }
-    } else {
-        $query = mysqli_query($con, $sql);
-        $query_select = mysqli_query($con, $sql_select);
-        $resultado = mysqli_fetch_assoc($query_select);
-        return [
-            'exitoso' => $query,
-            'inserción' => $resultado,
-        ];
-    }
+                        num_serie = '$val_num_serie'";
+
+    //$SQLStatement = "CALL pInsertarCatalogo('$sql','Insrt_Inventario')";
+    $query_select = mysqli_query($con, $sql_select);
+    $resultado = mysqli_fetch_assoc($query_select);
+    return [
+        'exitoso' => $query,
+        'insercion' => $resultado,
+    ];
 }
 
 function editar_datos($valores)
@@ -224,7 +210,7 @@ function editar_datos($valores)
     // Sentencia UPDATE para modificar el registro con los nuevos valores
     $sql = "UPDATE inventario_ti_sur 
             SET zona = '$valores->zona', fk_rubro = '$val_rubro', af = '$valores->af', fk_tipo ='$val_tipo', fk_marca = '$val_marca', modelo = '$valores->modelo', 
-            num_serie = '$valores->num_serie', ubicacion = '$valores->ubicacion', tag = '$valores->tag', imei = $valores->imei', linea = '$valores->linea', fk_usuario = '$val_usuario' 
+            num_serie = '$val_num_serie', ubicacion = '$valores->ubicacion', tag = '$valores->tag', imei = $valores->imei', linea = '$valores->linea', fk_usuario = '$val_usuario' 
             WHERE 
                 id = '$valores->id';";
     //var_dump($sql);
