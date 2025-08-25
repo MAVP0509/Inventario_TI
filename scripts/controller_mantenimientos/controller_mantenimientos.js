@@ -28,7 +28,39 @@ let datos = [
     { fecha: "2025-06", estatus: "Pendiente", tipo: "PC", usuario: "Fulanito", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" }]
 let elemento
 let table
-let supervisor_seleccionado = []
+let gruposAbiertosKey = "grupos_abiertos_tbl01";
+let gruposRestaurados = false;
+
+function guardarEstadoDeGrupos() {
+    const abiertos = table.getGroups()
+        .filter(group => group.isVisible())
+        .map(group => group.getKey());
+    localStorage.setItem(gruposAbiertosKey, JSON.stringify(abiertos));
+}
+
+function restaurarEstadoDeGrupos() {
+    if (gruposRestaurados) return;
+
+    const abiertos = JSON.parse(localStorage.getItem(gruposAbiertosKey) || "[]");
+
+    // Esperar a que los grupos estén disponibles
+    const esperarGrupos = setInterval(() => {
+        const grupos = table.getGroups();
+
+        if (grupos.length === 0) return;
+
+        grupos.forEach(group => {
+            if (abiertos.includes(group.getKey())) {
+                group.show(); // abrir
+            } else {
+                group.hide(); // cerrar
+            }
+        });
+
+        gruposRestaurados = true;
+        clearInterval(esperarGrupos);
+    }, 100); // cada 100ms
+}
 
 function consultar_informacion() {
 
@@ -57,9 +89,6 @@ function consultar_informacion() {
         }
     });
 
-    // Inicializar cada fila con "seleccionado: false"
-    datos.forEach(d => d.seleccionado = false);
-
     let editIcon = function (cell, formatterParams, onRendered) {
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
@@ -86,29 +115,8 @@ function consultar_informacion() {
         locale: "es",
         data: datos,
         layout: "fitColumns",              //fit columns to width of table
-        pagination: true,               //paginate the data
-        paginationSize: 12,                //allow 10 rows per page of data
-        paginationSizeSelector: [12, 15, 20],
-        paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
-            const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
-            const end = Math.min(currentRowStart + pageSize - 1, totalRows);
-            return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
-        },
         movableColumns: true,              //allow column order to be changed
         paginationButtonCount: 3,
-        rowFormatter: function (row) {
-            const data = row.getData();
-            //const rowElement = row.getElement();
-            //const editBtn = rowElement.querySelector("button.btn-warning");
-
-
-            //data = row.getData()
-            if (data.seleccionado === true) {
-                row.getElement().classList.add("bg-primary")
-            } else if (data.seleccionado === false) {
-                row.getElement().classList.remove("bg-primary")
-            }
-        },
         groupBy: function (data) {
             // Asegura que tenga formato YYYY-MM
             const [año, mes] = data.fecha.split("-");
@@ -119,8 +127,13 @@ function consultar_informacion() {
         },
         groupStartOpen: false,
         groupToggleElement: "header", //* Permite que dando click en cualquier parte del header group, éste se despliegue
-        height: "800px",
         headerVisible: false,
+        dataGrouped: function (groups) {
+            restaurarEstadoDeGrupos();
+        },
+        renderComplete: function () {
+            restaurarEstadoDeGrupos()
+        },
         columns: [
             {
                 title: "Fecha", field: "fecha", hozAlign: "center"
@@ -181,7 +194,24 @@ function consultar_informacion() {
             },
         ],
 
+
+
     })
+    // Guarda cuando se expande o colapsa un grupo
+    table.on("groupVisibilityChanged", guardarEstadoDeGrupos);
+
+    // Verificar cada 100ms hasta que los grupos existan, máximo por 3 segundos
+    const intentoMax = 30;
+    let intento = 0;
+    const timer = setInterval(() => {
+        intento++;
+        if (!gruposRestaurados) {
+            restaurarEstadoDeGrupos();
+        }
+        if (gruposRestaurados || intento >= intentoMax) {
+            clearInterval(timer);
+        }
+    }, 100);
 
 }
 

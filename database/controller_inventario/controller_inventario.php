@@ -535,7 +535,7 @@ function cargar_resguardo_firmado($valores)
 
 
         //* Ruta de la carpeta
-        $ruta = __DIR__ . '/../../documentos/' . $valores->usuario;
+        $ruta = __DIR__ . '/../../documentos/resguardos/' . $valores->usuario;
 
         //* Validando si el usuario ya tiene su carpeta o no
         if (is_dir($ruta)) {
@@ -565,9 +565,9 @@ function consultar_resguardos_firmados($valores)
 {
     $respuesta = new stdClass();
 
-    $carpeta = __DIR__ . '/../../documentos/' . $valores->usuario;
+    $carpeta = __DIR__ . '/../../documentos/resguardos/' . $valores->usuario;
 
-    $carpetaUrl = '/Inventario_TI/documentos' . '/' . $valores->usuario;
+    $carpetaUrl = '/Inventario_TI/documentos/resguardos' . '/' . $valores->usuario;
 
     if (is_dir($carpeta)) {
         $archivos = array_diff(scandir($carpeta), ['.', '..']);

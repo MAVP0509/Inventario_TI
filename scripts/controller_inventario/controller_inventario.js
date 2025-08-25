@@ -1786,7 +1786,7 @@ $('#select-ver-usu-file').on('change', async function () {
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-md-4">
-                            <img src="https://static.vecteezy.com/system/resources/previews/023/234/824/non_2x/pdf-icon-red-and-white-color-for-free-png.png" alt="Imagen descriptiva" style="max-width: 100%; height: 80px;">
+                            <img src="images/pdf-icon.webp" alt="Imagen descriptiva" style="max-width: 100%; height: 80px;">
                         </div>
                         <div class="col-md-8">
                             <strong>${fechaFormateada}</strong>
