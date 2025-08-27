@@ -115,7 +115,7 @@ function insertar_datos($valores)
 
     // Validación de duplicado de número de serie
     if ($val_num_serie !== 'NA') {
-        $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$val_num_serie'";
+        $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$val_num_serie' AND estatus <> 'Baja'";
         $query_num = mysqli_query($con, $sql_num);
 
         if ($query_num->num_rows > 0) {
