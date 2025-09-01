@@ -37,42 +37,10 @@ function insertar_datos($valores)
 
     $registro = date("Y-m-d");  // Fecha actual para registrar
     // Validación/inserción del rubro
-    $rubro = verificar_nuevos_id($valores->rubro);
-    $val_rubro;
-    if ($rubro === true) {
-        $val_rubro = $valores->rubro;
-    } else {
-        $sql_rubro = "INSERT INTO cat_rubro(rubro) VALUES ('$rubro');";
-        //$SQLStatement = "CALL pInsertarCatalogo('$sql_rubro','CAT_Rubro')";
-        mysqli_query($con, $sql_rubro);
-        $sql_ver_id_rubro = "SELECT id FROM cat_rubro WHERE rubro = '$rubro';";
-        $idRub = mysqli_fetch_assoc(mysqli_query($con, $sql_ver_id_rubro));
-        $val_rubro = $idRub['id'];
-    }
-    // Validación/inserción del tipo
-    $tipo = verificar_nuevos_id($valores->tipo);
-    $val_tipo;
-    if ($tipo === true) {
-        $val_tipo = $valores->tipo;
-    } else {
-        $sql_tipo = "INSERT INTO cat_tipo(tipo) VALUES ('$tipo');";
-        mysqli_query($con, $sql_tipo);
-        $sql_ver_id_tipo = "SELECT id FROM cat_tipo WHERE tipo = '$tipo';";
-        $idTip = mysqli_fetch_assoc(mysqli_query($con, $sql_ver_id_tipo));
-        $val_tipo = $idTip['id'];
-    }
-    // Validación/inserción de la marca
-    $marca = verificar_nuevos_id($valores->marca);
-    $val_marca;
-    if ($marca === true) {
-        $val_marca = $valores->marca;
-    } else {
-        $sql_marca = "INSERT INTO cat_marca(marca) VALUES ('$marca');";
-        mysqli_query($con, $sql_marca);
-        $sql_ver_id_marca = "SELECT id FROM cat_marca WHERE marca = '$marca';";
-        $idMarca = mysqli_fetch_assoc(mysqli_query($con, $sql_ver_id_marca));
-        $val_marca = $idMarca['id'];
-    }
+
+    $val_rubro = insertar_o_obtener_id($con, 'cat_rubro', 'rubro', $valores->rubro);
+    $val_tipo = insertar_o_obtener_id($con, 'cat_tipo', 'tipo', $valores->tipo);
+    $val_marca = insertar_o_obtener_id($con, 'cat_marca', 'marca', $valores->marca);
 
     // Validación/inserción del usuario
     $val_usuario;
@@ -370,60 +338,35 @@ function consultar_para_resguardo($valores)
     return json_decode($respuesta_raw);
 }
 
-/* function consultar_distintos($valores)
+function insertar_o_obtener_id($con, $tabla, $campo, $valor)
 {
-    include("../conexion.php");
-    //Validación para evitar inyecciones
-    $tabla = mysqli_real_escape_string($con, $valores->tabla ?? '');
-    $campo = mysqli_real_escape_string($con, $valores->campo ?? '');
-    $id = isset($valores->id) ? mysqli_real_escape_string($con, $valores->id) : null;
-    // var_dump($id);
-
-
-
-    if ($id !== null) {
-        $sql = "SELECT DISTINCT * FROM `$tabla` WHERE id = '$id' LIMIT 1;";
-    } else {
-        switch ($campo) {
-            case "estatus":
-                $datos = [
-                    ['id' => 'Asignado', 'estatus' => 'Asignado'],
-                    ['id' => 'Bodega', 'estatus' => 'Bodega']
-                ];
-                return $datos;
-            case "region":
-                $sql = "SELECT DISTINCT `$campo` from `$tabla` WHERE `$campo` <> 'Baja';";
-                break;
-            case "zona":
-            case "ubicacion":
-            case "evento":
-                // case "cargo":
-                $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE  `$campo` <> 'NA'";
-                break;
-            default:
-                $sql = "SELECT DISTINCT `$campo`,id FROM `$tabla` WHERE  `$campo` <> 'NA' AND habilitado <> 0;";
-                break;
-        }
+    if (ctype_digit($valor)) {
+        // Ya es un ID
+        return (int)$valor;
     }
 
-    $query = mysqli_query($con, $sql);
-    if (!$query) {
-        throw new Exception("Error en la consulta: " . mysqli_error($con));
+    $valor_limpio = mysqli_real_escape_string($con, trim($valor));
+
+    // Verificar si ya existe el valor en la tabla
+    $sql_check = "SELECT id FROM $tabla WHERE $campo = '$valor_limpio' LIMIT 1;";
+    $result_check = mysqli_query($con, $sql_check);
+
+    if ($row = mysqli_fetch_assoc($result_check)) {
+        return (int)$row['id'];
     }
 
-    $datos = [];
-    while ($fila = mysqli_fetch_assoc($query)) {
-        $id_valor = $fila['id'] ?? $fila[$campo]; // fallback por si no hay 'id'
-        $valor = $fila[$campo];
-        $datos[] = [
-            'id' => $id_valor,
-            $campo => $valor
-        ];
-    }
+    // Insertar el nuevo valor
+    $sql_insert = "INSERT INTO $tabla($campo) VALUES ('$valor_limpio');";
+    mysqli_query($con, $sql_insert);
 
-    return $datos;
+    // Obtener el ID insertado
+    $sql_id = "SELECT id FROM $tabla WHERE $campo = '$valor_limpio' LIMIT 1;";
+    $result_id = mysqli_query($con, $sql_id);
+    $row_id = mysqli_fetch_assoc($result_id);
+
+    return (int)$row_id['id'];
 }
- */
+
 function verificar_nuevos_id($valor)
 {
     if (ctype_digit($valor)) {
