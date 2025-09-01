@@ -48,3 +48,11 @@ ver 1.2.1 : {
     6: Añadido de botón para cerrar el control sidebar,
     
 }
+
+ver 1.2.2 : {
+    0: permitir duplicacion de num_serie cuando el activo esta en baja
+} 
+
+ver 1.2.3 : {
+    0: Arreglo del error de doble inserción cuando se crea un nuevo activo en inventario
+}
