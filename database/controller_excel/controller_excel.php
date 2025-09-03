@@ -426,7 +426,7 @@ function programa_mantenimiento($valores)
     // var_dump($valores);
     include('../conexion.php');
 
-    $sql_inv = "SELECT * FROM vmantenimiento";
+    $sql_inv = "SELECT * FROM vprograma_mantenimiento ORDER BY FIELD(ID,40,41,58,55,22,23,25,1,2,78,79,80,81,82,73,74,75,76,46,51)";
     $query = mysqli_query($con, $sql_inv);
 
     $datos = [];

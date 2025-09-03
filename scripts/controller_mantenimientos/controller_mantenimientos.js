@@ -237,50 +237,51 @@ consultar_informacion()
 
 async function mdl_programar_mantenimiento() {
 
+    await Promise.all([
+        general_select2({
+            selectId: 'select-elaboro',
+            tabla: 'supervisor',
+            campo: 'nombre',
+            placeholder: 'Selecione un usuario',
+            dropdownParent: '#mdl-prog-mant',
+            tags: false,
+            // popoverTitle: "Descripción",
+            // popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
+        }),
 
-    await general_select2({
-        selectId: 'select-elaboro',
-        tabla: 'supervisor',
-        campo: 'nombre',
-        placeholder: 'Selecione un usuario',
-        dropdownParent: '#mdl-prog-mant',
-        tags: false,
-        // popoverTitle: "Descripción",
-        // popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
-    })
+        general_select2({
+            selectId: 'select-cg-elaboro',
+            tabla: 'supervisor',
+            campo: 'cargo',
+            placeholder: 'Seleccione un cargo',
+            dropdownParent: '#mdl-prog-mant',
+            tags: false,
+            sincronizarCon: 'select-elaboro',
+            sincronizarCampo: 'cargo'
+        }),
 
-    await general_select2({
-        selectId: 'select-cg-elaboro',
-        tabla: 'supervisor',
-        campo: 'cargo',
-        placeholder: 'Seleccione un cargo',
-        dropdownParent: '#mdl-prog-mant',
-        tags: false,
-        sincronizarCon: 'select-elaboro',
-        sincronizarCampo: 'cargo'
-    })
+        general_select2({
+            selectId: 'select-autorizo',
+            tabla: 'cat_usuarios',
+            campo: 'nombre',
+            placeholder: 'Selecione un usuario',
+            dropdownParent: '#mdl-prog-mant',
+            tags: false,
+            // popoverTitle: "Descripción",
+            // popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
+        }),
 
-    await general_select2({
-        selectId: 'select-autorizo',
-        tabla: 'cat_usuarios',
-        campo: 'nombre',
-        placeholder: 'Selecione un usuario',
-        dropdownParent: '#mdl-prog-mant',
-        tags: false,
-        // popoverTitle: "Descripción",
-        // popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
-    })
-
-    await general_select2({
-        selectId: 'select-cg-autorizo',
-        tabla: 'cat_usuarios',
-        campo: 'cargo',
-        placeholder: 'Seleccione un cargo',
-        dropdownParent: '#mdl-prog-mant',
-        tags: false,
-        sincronizarCon: 'select-autorizo',
-        sincronizarCampo: 'cargo'
-    })
+        general_select2({
+            selectId: 'select-cg-autorizo',
+            tabla: 'cat_usuarios',
+            campo: 'cargo',
+            placeholder: 'Seleccione un cargo',
+            dropdownParent: '#mdl-prog-mant',
+            tags: false,
+            sincronizarCon: 'select-autorizo',
+            sincronizarCampo: 'cargo'
+        }),
+    ])
 
     $('#select-cg-elaboro, #select-cg-autorizo').prop('disabled', true)
 
