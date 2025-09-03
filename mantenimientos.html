@@ -205,6 +205,74 @@
             </div>
         </div>
     </div>
+
+    <!--Modal info mantenimiento -->
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-mant-info" role="dialog" data-backdrop="static"
+        data-keyboard="false">
+        <div class="modal-dialog ">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Información</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col">
+                                <!--Rubro-->
+                                <h6>Rubro</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-desktop"></i></span>
+                                    </div>
+                                    <select class="form-control select" id="select-rubro"
+                                        name="mdl-mant-info-inputs" disabled></select>
+                                    <div class="invalid-feedback">Por favor, seleccione un rubro.</div>
+                                </div>
+                                <!--Tag-->
+                                <h6>Tipo</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-computer"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="tag" name="mdl-mant-info-inputs" disabled></select>
+                                    <div class="invalid-feedback">Por favor, ingrese un tag.</div>
+                                </div>
+                                <!--Número de serie-->
+                                <h6>Número de serie</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-square-binary"></i></span>
+                                    </div>
+                                    <input type="text" class=" form-control" id="num-serie" name="mdl-mant-info-inputs" disabled>
+                                    <div class="invalid-feedback">Por favor, seleccione un número de serie.</div>
+                                </div>
+                                <h6>Cargo del autorizador</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                                    </div>
+                                    <select class="form-control select" id="select-cg-autorizo" name="inp-prog-mant"></select>
+                                    <div class="invalid-feedback">Por favor, seleccione una persona.</div>
+                                </div>
+                            </div>
+                            <div class="col">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cancelar <i
+                            class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+                    <button type="button" class="btn btn-success icon" id="mdl-btn-conf"
+                        onclick="programar_mantenimiento()">Confirmar <i class="fa-solid fa-circle-check fa-lg"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 <!--JQuery-->

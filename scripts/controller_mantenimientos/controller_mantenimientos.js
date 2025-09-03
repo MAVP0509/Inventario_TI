@@ -80,7 +80,9 @@ function restaurarEstadoDeGrupos() {
     }, 100); // cada 100ms
 }
 
-function consultar_informacion() {
+async function consultar_informacion() {
+
+    let server = await server_mantenimiento({ accion: 0 })
 
     Tabulator.extendModule("localize", "langs", {
         "es": {
@@ -111,7 +113,7 @@ function consultar_informacion() {
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
-        return `<button type='button' class='btn btn-warning icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Editar' onclick=''><i class='fa-solid fa-pen-to-square fa-lg'></i></button>`;
+        return `<button type='button' class='btn btn-warning icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Información' onclick=''><i class='fa-solid fa-circle-info fa-lg'></i></button>`;
     }
 
     let uploadIcon = function (cell, formatterParams, onRendered) {
@@ -131,7 +133,7 @@ function consultar_informacion() {
 
     table = new Tabulator('#tbl01', {
         locale: "es",
-        data: datos,
+        data: server.resultado,
         layout: "fitColumns",              //fit columns to width of table
         movableColumns: true,              //allow column order to be changed
         paginationButtonCount: 3,
@@ -154,60 +156,64 @@ function consultar_informacion() {
         },
         columns: [
             {
-                title: "Fecha", field: "fecha", hozAlign: "center"
+                title: "Fecha", field: "fecha", hozAlign: "center", width: 106
             },
             {
-                title: "Tipo",
-                field: "tipo", hozAlign: "center",
+                title: "Rubro",
+                field: "rubro", hozAlign: "center", width: 120
+            },
+            {
+                title: "Tag",
+                field: "tag", hozAlign: "center", 
+            },
+            {
+                title: "Número de serie",
+                field: "num_serie", hozAlign: "center", 
+
             },
             {
                 title: "Usuario",
-                field: "usuario", hozAlign: "center"
+                field: "usuario", hozAlign: "center", width: 220,
+                formatter: function (cell, formatterParams, onRendered) {
+                    let data = cell.getData(); // Obtiene toda la fila
+                    return `${data.usuario}<br><small>${data.cargo}</small>`;
+                }
 
             },
             {
                 title: "Ubicación",
-                field: "ubicacion", hozAlign: "center"
-
-            },
-            {
-                title: "Equipo",
-                field: "equipo", hozAlign: "center"
-            },
-            {
-                title: "Número de serie",
-                field: "num_serie", hozAlign: "center"
+                field: "ubicacion", hozAlign: "center",width: 170
 
             },
             {
                 title: "Estatus",
-                field: "estatus", hozAlign: "center", formatter: "lookup",
+                field: "estado", hozAlign: "center", formatter: "lookup",
                 formatterParams: {
                     "Pendiente": `<i class="fa-solid fa-circle fa-beat-fade" style="color: #ff7300;"></i> Pendiente`,
                     "Realizado": `<i class="fa-solid fa-circle fa-beat" style="color: #28a745;"></i> Realizado`,
                     "Cancelado": `<i class="fa-solid fa-circle fa-beat" style="color: #dc3545;"></i> Cancelado`
-                }
+                }, width: 130
 
             },
             {
-                formatter: fileIcon, width: 70, hozAlign: "center",
+                formatter: fileIcon, width: 70, hozAlign: "center",frozen: true,
                 cellClick: function (e, cell) {
                     elemento = cell.getRow().getData();
                     //mdl_editar_supervisor(elemento);
                 }
             },
             {
-                formatter: uploadIcon, width: 70, hozAlign: "center",
+                formatter: uploadIcon, width: 70, hozAlign: "center",frozen: true,
                 cellClick: function (e, cell) {
                     elemento = cell.getRow().getData();
                     //mdl_editar_supervisor(elemento);
                 }
             },
             {
-                formatter: editIcon, width: 70, hozAlign: "center",
+                formatter: editIcon, width: 70, hozAlign: "center",frozen: true,
                 cellClick: function (e, cell) {
                     elemento = cell.getRow().getData();
-                    //mdl_editar_supervisor(elemento);
+                    mdl_mantenimiento_info(elemento);
                 }
             },
         ],
@@ -233,7 +239,6 @@ function consultar_informacion() {
 
 }
 
-consultar_informacion()
 
 async function mdl_programar_mantenimiento() {
 
@@ -316,6 +321,10 @@ async function programar_mantenimiento() {
     } else {
         mostrar_toast('error', 'Error', 'No se pudo realizar el programa de mantenimiento. Inténtalo nuevamente.');
     }
+}
+
+function mdl_mantenimiento_info(id){
+    $('#mdl-mant-info').modal("show")
 }
 
 //? Inicializar popover
