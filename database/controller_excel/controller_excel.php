@@ -535,3 +535,35 @@ function programa_mantenimiento($valores)
         'url' => $url_descarga
     );
 }
+
+
+function reporte_mantenimiento($valores){
+    include('../conexion.php');
+    
+    $datos = $valores->datos;
+
+    $spreadsheet = IOFactory::load('FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.01.xlsx'); //*Cargando la plantilla del Excel
+    $worksheet = $spreadsheet->getActiveSheet();
+
+    /* 
+    TODO Configuración de impresión
+    * Es necesario para dar un formato, delimitar márgenes para cuando se exporte a pdf, el pdf no este descuadrado
+    */
+    $pageSetup = $worksheet->getPageSetup();
+    $pageSetup->setOrientation(PageSetup::ORIENTATION_PORTRAIT);
+    $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LETTER);
+    $pageSetup->setFitToPage(true);
+    $pageSetup->setFitToWidth(1);
+    $pageSetup->setFitToHeight(0);
+
+    //* ajustando márgenes
+    $pageMargins = $worksheet->getPageMargins();
+    $pageMargins->setTop(0.5);
+    $pageMargins->setBottom(0.5);
+    $pageMargins->setLeft(0.5);
+    $pageMargins->setRight(0.5);
+
+
+    //* Configuramos la ruta donde se guarda el excel
+    $excelFilePath = 'C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_' . $UserName . '.xlsx';
+}
