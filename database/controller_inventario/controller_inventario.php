@@ -83,7 +83,7 @@ function insertar_datos($valores)
 
     // Validación de duplicado de número de serie
     if ($val_num_serie !== 'NA') {
-        $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$val_num_serie'";
+        $sql_num = "SELECT * FROM inventario_ti_sur WHERE num_serie = '$val_num_serie' AND estatus <> 'Baja'";
         $query_num = mysqli_query($con, $sql_num);
 
         if ($query_num->num_rows > 0) {
@@ -464,7 +464,7 @@ function cargar_resguardo_firmado($valores)
 
 
         //* Ruta de la carpeta
-        $ruta = __DIR__ . '/../../documentos/' . $valores->usuario;
+        $ruta = __DIR__ . '/../../documentos/resguardos/' . $valores->usuario;
 
         //* Validando si el usuario ya tiene su carpeta o no
         if (is_dir($ruta)) {
@@ -494,9 +494,9 @@ function consultar_resguardos_firmados($valores)
 {
     $respuesta = new stdClass();
 
-    $carpeta = __DIR__ . '/../../documentos/' . $valores->usuario;
+    $carpeta = __DIR__ . '/../../documentos/resguardos/' . $valores->usuario;
 
-    $carpetaUrl = '/Inventario_TI/documentos' . '/' . $valores->usuario;
+    $carpetaUrl = '/Inventario_TI/documentos/resguardos' . '/' . $valores->usuario;
 
     if (is_dir($carpeta)) {
         $archivos = array_diff(scandir($carpeta), ['.', '..']);

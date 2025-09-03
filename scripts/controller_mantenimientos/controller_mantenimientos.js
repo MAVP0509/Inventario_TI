@@ -18,17 +18,49 @@ function server_mantenimiento(model) {
 }
 
 let datos = [
-    { fecha: "2025-01", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodajhgfdgjkhdtryuiyjhfgdftryuikgyjfhgdtsrytsodyhjhhjggfgiuydsd", usuario: "Juan Pablo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "123456789" },
-    { fecha: "2025-02", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Jose Manuel", ubicacion: "Base Operativa", equipo: "Monitor", num_serie: "987654321" },
-    { fecha: "2025-03", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Francisco", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-04", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Ricardo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-04", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Roberto", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-05", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Rubén", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-05", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Huichzilopotztli", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-06", estatus: "Pendiente", tipo: "PC", observaciones: "Roreoafdodasod", usuario: "Fulanito", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" }]
+    { fecha: "2025-01", estatus: "Pendiente", tipo: "PC", usuario: "Juan Pablo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "123456789" },
+    { fecha: "2025-02", estatus: "Pendiente", tipo: "PC", usuario: "Jose Manuel", ubicacion: "Base Operativa", equipo: "Monitor", num_serie: "987654321" },
+    { fecha: "2025-03", estatus: "Cancelado", tipo: "PC", usuario: "Francisco", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-04", estatus: "Realizado", tipo: "PC", usuario: "Ricardo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-04", estatus: "Pendiente", tipo: "PC", usuario: "Roberto", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-05", estatus: "Pendiente", tipo: "PC", usuario: "Rubén", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-05", estatus: "Pendiente", tipo: "PC", usuario: "Huichzilopotztli", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-06", estatus: "Pendiente", tipo: "PC", usuario: "Fulanito", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" }]
 let elemento
 let table
-let supervisor_seleccionado = []
+let gruposAbiertosKey = "grupos_abiertos_tbl01";
+let gruposRestaurados = false;
+
+function guardarEstadoDeGrupos() {
+    const abiertos = table.getGroups()
+        .filter(group => group.isVisible())
+        .map(group => group.getKey());
+    localStorage.setItem(gruposAbiertosKey, JSON.stringify(abiertos));
+}
+
+function restaurarEstadoDeGrupos() {
+    if (gruposRestaurados) return;
+
+    const abiertos = JSON.parse(localStorage.getItem(gruposAbiertosKey) || "[]");
+
+    // Esperar a que los grupos estén disponibles
+    const esperarGrupos = setInterval(() => {
+        const grupos = table.getGroups();
+
+        if (grupos.length === 0) return;
+
+        grupos.forEach(group => {
+            if (abiertos.includes(group.getKey())) {
+                group.show(); // abrir
+            } else {
+                group.hide(); // cerrar
+            }
+        });
+
+        gruposRestaurados = true;
+        clearInterval(esperarGrupos);
+    }, 100); // cada 100ms
+}
 
 function consultar_informacion() {
 
@@ -57,53 +89,34 @@ function consultar_informacion() {
         }
     });
 
-    // Inicializar cada fila con "seleccionado: false"
-    datos.forEach(d => d.seleccionado = false);
+    let editIcon = function (cell, formatterParams, onRendered) {
+        onRendered(function () {
+            $(cell.getElement()).find('[data-toggle="popover"]').popover()
+        })
+        return `<button type='button' class='btn btn-warning icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Editar' onclick=''><i class='fa-solid fa-pen-to-square fa-lg'></i></button>`;
+    }
 
-    // Formatter del ícono tipo checkbox
-    let squareIcon = function (cell, formatterParams, onRendered) {
-        const seleccionado = cell.getRow().getData().seleccionado;
-        const iconClass = seleccionado ? "fa-solid fa-square-check" : "fa-regular fa-square";
-        return `<button type='button' class='btn icon    toggle-select'>
-                    <i class='${iconClass} fa-lg'></i>
-                </button>`;
-    };
+    let uploadIcon = function (cell, formatterParams, onRendered) {
+        onRendered(function () {
+            $(cell.getElement()).find('[data-toggle="popover"]').popover()
+        })
+        return `<button type='button' class='btn btn-info icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' onclick=''><i class='fa-solid fa-upload fa-lg'></i></button>`;
+    }
 
 
     let fileIcon = function (cell, formatterParams, onRendered) { //plain text value
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
-        return "<button type='button' class='btn btn-outline-success icon' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Reporte de mantenimiento' onclick=''><i class='fa-solid fa-file-excel fa-lg'></i></button>";
+        return "<button type='button' class='btn btn-success icon' data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Reporte de mantenimiento' onclick=''><i class='fa-solid fa-file-excel fa-lg'></i></button>";
     };
 
     table = new Tabulator('#tbl01', {
         locale: "es",
         data: datos,
         layout: "fitColumns",              //fit columns to width of table
-        pagination: true,               //paginate the data
-        paginationSize: 12,                //allow 10 rows per page of data
-        paginationSizeSelector: [12, 15, 20],
-        paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
-            const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
-            const end = Math.min(currentRowStart + pageSize - 1, totalRows);
-            return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
-        },
         movableColumns: true,              //allow column order to be changed
         paginationButtonCount: 3,
-        rowFormatter: function (row) {
-            const data = row.getData();
-            //const rowElement = row.getElement();
-            //const editBtn = rowElement.querySelector("button.btn-warning");
-
-
-            //data = row.getData()
-            if (data.seleccionado === true) {
-                row.getElement().classList.add("bg-primary")
-            } else if (data.seleccionado === false) {
-                row.getElement().classList.remove("bg-primary")
-            }
-        },
         groupBy: function (data) {
             // Asegura que tenga formato YYYY-MM
             const [año, mes] = data.fecha.split("-");
@@ -112,31 +125,18 @@ function consultar_informacion() {
             const opciones = { year: 'numeric', month: 'long' };
             return fecha.toLocaleDateString('es-ES', opciones);
         },
-        groupHeader: function (value, count, data, group) {
-            return `${value} (${count} elementos)`;
-        },
         groupStartOpen: false,
-        height: "800px",
+        groupToggleElement: "header", //* Permite que dando click en cualquier parte del header group, éste se despliegue
         headerVisible: false,
+        dataGrouped: function (groups) {
+            restaurarEstadoDeGrupos();
+        },
+        renderComplete: function () {
+            restaurarEstadoDeGrupos()
+        },
         columns: [
             {
-                formatter: squareIcon, width: 70, hozAlign: "center",
-                cellClick: function (e, cell) {
-                    // Alternar estado de seleccionado
-                    let rowData = cell.getRow().getData();
-                    rowData.seleccionado = !rowData.seleccionado;
-                    cell.getRow().reformat();
-                    seleccionar_registro(rowData.id, supervisor_seleccionado)
-                }, headerSort: false, frozen: true
-            },
-            {
-                title: "Fecha", field: "fecha", headerHozAlign: "center", headerFilter: "input", headerSort: false, cellClick: function (e, cell) {
-                    // Alternar estado de seleccionado
-                    let rowData = cell.getRow().getData();
-                    rowData.seleccionado = !rowData.seleccionado;
-                    cell.getRow().reformat();
-                    seleccionar_registro(rowData.id, supervisor_seleccionado)
-                }
+                title: "Fecha", field: "fecha", hozAlign: "center"
             },
             {
                 title: "Tipo",
@@ -162,11 +162,13 @@ function consultar_informacion() {
 
             },
             {
-                title: "Observaciones", field: "observaciones", hozAlign: "center", width: 290, formatter: "textarea"
-            },
-            {
                 title: "Estatus",
-                field: "estatus", width: 100, hozAlign: "center"
+                field: "estatus", hozAlign: "center", formatter: "lookup",
+                formatterParams: {
+                    "Pendiente": `<i class="fa-solid fa-circle fa-beat-fade" style="color: #ff7300;"></i> Pendiente`,
+                    "Realizado": `<i class="fa-solid fa-circle fa-beat" style="color: #28a745;"></i> Realizado`,
+                    "Cancelado": `<i class="fa-solid fa-circle fa-beat" style="color: #dc3545;"></i> Cancelado`
+                }
 
             },
             {
@@ -174,12 +176,42 @@ function consultar_informacion() {
                 cellClick: function (e, cell) {
                     elemento = cell.getRow().getData();
                     //mdl_editar_supervisor(elemento);
-                },
-                headerSort: false, frozen: true
+                }
+            },
+            {
+                formatter: uploadIcon, width: 70, hozAlign: "center",
+                cellClick: function (e, cell) {
+                    elemento = cell.getRow().getData();
+                    //mdl_editar_supervisor(elemento);
+                }
+            },
+            {
+                formatter: editIcon, width: 70, hozAlign: "center",
+                cellClick: function (e, cell) {
+                    elemento = cell.getRow().getData();
+                    //mdl_editar_supervisor(elemento);
+                }
             },
         ],
 
+
+
     })
+    // Guarda cuando se expande o colapsa un grupo
+    table.on("groupVisibilityChanged", guardarEstadoDeGrupos);
+
+    // Verificar cada 100ms hasta que los grupos existan, máximo por 3 segundos
+    const intentoMax = 30;
+    let intento = 0;
+    const timer = setInterval(() => {
+        intento++;
+        if (!gruposRestaurados) {
+            restaurarEstadoDeGrupos();
+        }
+        if (gruposRestaurados || intento >= intentoMax) {
+            clearInterval(timer);
+        }
+    }, 100);
 
 }
 

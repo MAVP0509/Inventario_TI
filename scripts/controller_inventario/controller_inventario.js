@@ -178,7 +178,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -187,7 +188,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -196,7 +198,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -205,7 +208,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -214,7 +218,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -223,7 +228,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -242,7 +248,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -251,7 +258,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -260,7 +268,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -269,7 +278,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -278,7 +288,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -287,7 +298,8 @@ async function consultar_informacion() {
                     headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
-                            type: "text"
+                            type: "text",
+                            name: "tbtor-filter"
                         }
                     }
                 },
@@ -295,7 +307,8 @@ async function consultar_informacion() {
                     title: "Estatus", field: "estatus", width: 120, frozen: true, headerHozAlign: "center", headerFilter: "list", headerFilterParams: {
                         values: { "Asignado": "Asignado", "Bodega": "Bodega" }, clearable: true,
                         elementAttributes: {
-                            type: "text"
+                            type: "text",
+                            autocomplete: "off"
                         }
                     }, headerSort: false
                 },
@@ -316,10 +329,16 @@ async function consultar_informacion() {
     } catch (error) {
         console.log(error)
     }
-    table.on("tableBuilt", () => {
+    /* table.on("tableBuilt", () => {
         document.querySelectorAll(".tabulator-header input").forEach(input => {
             input.setAttribute("autocomplete", "off");
             input.setAttribute("type", "text"); // por si Tabulator vuelve a poner "search"
+        });
+    }); */
+    table.on("tableBuilt", () => {
+        Array.from(document.getElementsByName("tbtor-filter")).forEach(input => {
+            input.setAttribute("autocomplete", "off");
+            input.setAttribute("type", "text");
         });
     });
 }
@@ -618,7 +637,7 @@ async function mdl_nvo_registro() {
     // Establece el título del moda
     $('#title-mdl-inventario').text('Registro de Activo');
     //  Asigna la función crear_registro al botón del modal
-    $('#btn-mdl-inventario').on('click', function () { crear_registro(); })
+    $('#btn-mdl-inventario').off('click').on('click', function () { crear_registro(); })
     // Muestra el modal al usuario
     $("#mdl-inventario").modal('show');
 
@@ -1801,7 +1820,7 @@ $('#select-ver-usu-file').on('change', async function () {
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-md-4">
-                            <img src="https://static.vecteezy.com/system/resources/previews/023/234/824/non_2x/pdf-icon-red-and-white-color-for-free-png.png" alt="Imagen descriptiva" style="max-width: 100%; height: 80px;">
+                            <img src="images/pdf-icon.webp" alt="Imagen descriptiva" style="max-width: 100%; height: 80px;">
                         </div>
                         <div class="col-md-8">
                             <strong>${fechaFormateada}</strong>
