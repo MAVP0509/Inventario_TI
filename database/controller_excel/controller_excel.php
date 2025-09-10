@@ -422,39 +422,45 @@ function bajas($valores)
 
 function programa_mantenimiento($valores)
 {
-    // set_time_limit(300);
-    // var_dump($valores);
     include('../conexion.php');
 
-    $sql_inv = "SELECT * FROM vprograma_mantenimiento ORDER BY FIELD(ID,40,41,58,55,22,23,25,1,2,78,79,80,81,82,73,74,75,76,46,51)";
+    $anio_actual = date('Y');
+    $dia = 15;
+    // $mes = $mes_index + 1;
+
+    // Consulta SQL que obtiene todos los registros de la vista, en un orden específico según ID
+    $sql_inv = "SELECT * FROM vprograma_mantenimiento ORDER BY FIELD(ID,40,41,58,55,22,23,+25,1,2,78,79,80,81,82,73,74,75,76,46,51)";
     $query = mysqli_query($con, $sql_inv);
 
-    $datos = [];
-    while ($fila =  mysqli_fetch_assoc($query)) {
-        $datos[] = $fila;
+    $datos = []; // Crea un arreglo vacío para almacenar los datos
+    while ($fila =  mysqli_fetch_assoc($query)) { // Recorre los resultados fila por fila
+        $datos[] = $fila; // Agrega cada fila al arreglo $datos
     }
 
-    // Orden de columnas correspondientes
+    // Define las columnas de Excel correspondientes a los meses del año
     $meses_columnas = ['H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'];
 
-    //  Se recorre cada dispositivo del arreglo $datos
-    foreach ($datos as $i => &$dispositivo) {   
+    // Recorre cada dispositivo y le asigna un índice de mes basado en su posición
+    foreach ($datos as $i => &$dispositivo) {
         //  Se saca el residuo al dividir $i entre 12, 
         //  a su vez añadiendo un nuevo campo al $dispositivo llamado mes_index,
         //  indicando en qué mes le tocará mantenimiento.
         $dispositivo['mes_index'] = $i % 12;
     }
 
-    unset($dispositivo);
+    unset($dispositivo); // Libera la variable de referencia
 
-    // usort() ordena unarreglo en base a una función de comparación definida
+    // usort() ordena un arreglo en base a una función de comparación definida
     // fuction($a, $b) es la función a usar que recibe dos parámetros; son dos elementos del arreglo $datos a comparar entre sí.
     usort($datos, function ($a, $b) {
         return $a['mes_index'] <=> $b['mes_index'];
     });
 
+    $sql_insert = "INSERT INTO mantenimiento(fk_equipo, fecha_programada, estado)"; 
+
+    // Carga la plantilla Excel base del programa de mantenimiento
     $spreadsheet = IOFactory::load('FO-DSP-TI-03 Programa de Mantenimiento Preventivo Infraestructura TI Región XX Rev.00.xlsx');
-    $worksheet = $spreadsheet->getActiveSheet();
+    $worksheet = $spreadsheet->getActiveSheet(); // Obtiene la hoja activa
 
     $pageSetup = $worksheet->getPageSetup();
     $pageSetup->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);   //  Orientación horizontal
@@ -469,27 +475,27 @@ function programa_mantenimiento($valores)
     $pageMargins->setLeft(0.2);
     $pageMargins->setRight(0.2);
 
+    // Define las filas base donde se empezará a escribir la tabla
     $fila_inicio = 13;
     $fila_nombre = 21;
     $fila_cargo = 22;
     $fila_fecha = 24;
-    $filas = count($datos);
+    $filas = count($datos); // Cuenta cuántos dispositivos hay
 
-    foreach ($datos as $index => $item) {
+    foreach ($datos as $index => $item) { // Recorre cada dispositivo
         // var_dump($item);
         // $fila_actual = $fila_inicio + $index;
-        if ($index >= 3) {
-            $worksheet->insertNewRowBefore($fila_inicio, 1);
+        if ($index >= 3) { // A partir del cuarto dispositivo, inserta una nueva fila
+            $worksheet->insertNewRowBefore($fila_inicio, 1); // Inserta nueva fila antes de la actual
 
             $worksheet->duplicateStyle($worksheet->getStyle("B14:S14"), "B{$fila_inicio}:S{$fila_inicio}");
         }
 
+        // Configura el estilo de texto para que se ajuste automáticamente
         $worksheet->getStyle("B{$fila_inicio}:S{$fila_inicio}")->getAlignment()->setWrapText(true);
         $worksheet->getRowDimension($fila_inicio)->setRowHeight(-1);
 
-
-        // $worksheet->getStyle("B$fila_inicio:S$fila_inicio")->getFont()->setBold(false);
-
+        // Escribe los valores de cada campo en las tablas correspondientes
         $worksheet->setCellValue("B{$fila_inicio}", $index + 1);
         $worksheet->setCellValue("C{$fila_inicio}", $item['tipo']);
         $worksheet->setCellValue("D{$fila_inicio}", $item['nombre']);
@@ -497,39 +503,53 @@ function programa_mantenimiento($valores)
         $worksheet->setCellValue("F{$fila_inicio}", $item['modelo']);
         $worksheet->setCellValue("G{$fila_inicio}", $item['num_serie']);
 
+        // Marca con una 'x' el mes correspondiente al mantenimiento
         $mes_index = $item['mes_index'];
         $columna_mes = $meses_columnas[$mes_index];
         $worksheet->setCellValue("{$columna_mes}{$fila_inicio}", 'x');
 
-        $fila_inicio++;
+        $fila_inicio++; // Pasa a la siguiente fila
     }
 
+    // Calcula la fila donde se pondrán los nombres (según cuántos registros hay)
     $nombres = $fila_nombre + ($filas - 3);
 
+    // Escribe los nombres de quien elaboró y autorizó
     $worksheet->setCellValue("C$nombres", $valores->elaboro);
     $worksheet->setCellValue("G$nombres", $valores->autorizo);
-    $worksheet->getStyle("C$nombres")->getAlignment()->setWrapText(true);
+    $worksheet->getStyle("C$nombres")->getAlignment()->setWrapText(true); // Ajuste de texto
 
+    // Calcula la fila donde van los cargos
     $cargos = $fila_cargo + ($filas - 3);
 
+    // Escribe los cargos correspondientes
     $worksheet->setCellValue("C$cargos", $valores->cg_elaboro);
     $worksheet->setCellValue("G$cargos", $valores->cg_autorizo);
     $worksheet->getStyle("C$cargos")->getAlignment()->setWrapText(true);
 
+    // Calcula la fila de la fecha
     $fechas = $fila_fecha + ($filas - 3);
     $worksheet->setCellValue("D$fechas", date('Y-m-d'));
     $worksheet->getStyle("C$fechas")->getAlignment()->setWrapText(true);
 
-    // $doc = join("_", $doc);
-    $fecha = date('Ymd_His');
-    $nombre_doc = "FO-DSP-TI-03_Programa de Mantenimiento Preventivo TI Región Sur_{$fecha}.xlsx";
+    $fecha = date('Ymd_His'); // Genera una marca de tiempo para el nombre del archivo
+    $nombre_doc = "FO-DSP-TI-03_Programa de Mantenimiento Preventivo TI Región Sur_{$fecha}.xlsx"; // Nombre del archivo generado
 
-    $ruta_guardar = "C:\\xampp\\htdocs\\Inventario_TI\\database\\controller_excel\\{$nombre_doc}";
-    $url_descarga = "http://localhost/Inventario_TI/database/controller_excel/{$nombre_doc}";
+    // $url = filter_var($valores->url, FILTER_SANITIZE_URL); // Sanitiza la URL recibida desde el frontend 
+    
+    // Define la ruta física donde se guardará el archivo, basada en la estructura del proyecto
+    $ruta_guardar = realpath(__DIR__ . '/../../../') . "\\Inventario_TI\\database\\controller_excel\\{$nombre_doc}";
+    // Construye la URL de descarga del archivo generado
+    $host = $_SERVER['HTTP_HOST'];
+    // $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 
+    $url_descarga = "http://{$host}/Inventario_TI/database/controller_excel/{$nombre_doc}";
+
+    // Crea y guarda el archivo Excel
     $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-    $writer->save($ruta_guardar);
+    $writer->save($ruta_guardar); // Guarda el archivo en la ruta definida
 
+    // Retorna un arreglo con el resultado y la URL para descargar el archivo
     return array(
         'result' => true,
         'url' => $url_descarga
