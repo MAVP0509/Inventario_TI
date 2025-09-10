@@ -395,41 +395,56 @@ function bajas($valores)
     $fecha = date('Ymd_His');
     $nombreArchivo = "Baja_FO_DSP_{$nombre_doc}_{$fecha}.xlsx";
 
-    $ruta_guardado = "C:\\xampp\\htdocs\\Inventario_TI\\database\\controller_excel\\{$nombreArchivo}";
-    $url_descarga = "http://localhost/Inventario_TI/database/controller_excel/{$nombreArchivo}";
+    // Define la ruta física donde se guardará el archivo
+    $base = realpath(__DIR__ . '/../../../');
+    $host = $_SERVER['HTTP_HOST'];
+    $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTTPS'] !== 'off') ? 'https' : 'http';
 
+    if ($base !== false) {
+        // DIRECTORY_SEPARATOR para compatibilidad entre SO
+        $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . $nombreArchivo;
+        $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/{$nombreArchivo}";
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        // $writer->save('php://output');
+        $writer->save($ruta_guardar);
+        return [
+            'result' => true,
+            'url' => $url_descarga
+        ];
+    } else {
+        return array(
+            'result' => false,
+            'error' => 'No se pudo resolver la ruta base.'
+        );
+    }
+}
 
-    // No guardamos el archivo en disco, en vez de eso enviamos al navegador:
-    /* header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    header("Content-Disposition: attachment; filename=\"$nombreArchivo\"");
-    header('Cache-Control: max-age=0');
-    header('Expires: 0');
-    header('Pragma: public'); */
+function fecha_programa($anio, $mes)
+{
+    // Primer día del mes
+    $fecha  = date_create("{$anio}-{$mes}-01");
+    // Dia de la semana (0 = domingo, 0= sábado)
+    $dia_semana = (int)$fecha->format('w');
 
-    $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-    // $writer->save('php://output');
-    $writer->save($ruta_guardado);
+    // Si es sábado (6), sumamos dos días. Si es domingo (0) sumamos un día
+    if ($dia_semana == 6) {
+        $fecha->modify('+2 days');
+    } elseif ($dia_semana == 0) {
+        $fecha->modify('+1 day');
+    }
 
-    // $excelFilePath = 'C:\xampp\htdocs\Inventario_TI\database\controller_excel\Baja_FO_DSP_' . $nombre_doc . '.xlsx';
-    // $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-    // $writer->save('Baja_FO_DSP' . $nombre_doc . '.xlsx');
-
-    return [
-        'result' => true,
-        'url' => $url_descarga
-    ];
+    return $fecha->format('Y-m-d');
 }
 
 function programa_mantenimiento($valores)
 {
     include('../conexion.php');
 
-    $anio_actual = date('Y');
-    $dia = 15;
+    $anio_actual = date("Y") + 1;
     // $mes = $mes_index + 1;
 
     // Consulta SQL que obtiene todos los registros de la vista, en un orden específico según ID
-    $sql_inv = "SELECT * FROM vprograma_mantenimiento ORDER BY FIELD(ID,40,41,58,55,22,23,+25,1,2,78,79,80,81,82,73,74,75,76,46,51)";
+    $sql_inv = "SELECT * FROM vprograma_mantenimiento ORDER BY FIELD(equipo,40,41,58,55,22,23,25,1,2,78,79,80,81,82,73,74,75,76,46,51)";
     $query = mysqli_query($con, $sql_inv);
 
     $datos = []; // Crea un arreglo vacío para almacenar los datos
@@ -442,10 +457,19 @@ function programa_mantenimiento($valores)
 
     // Recorre cada dispositivo y le asigna un índice de mes basado en su posición
     foreach ($datos as $i => &$dispositivo) {
+        $mes_index = $i % 12;
+        $mes = $mes_index + 1;
+        $fecha_programada = fecha_programa($anio_actual, $mes);
         //  Se saca el residuo al dividir $i entre 12, 
         //  a su vez añadiendo un nuevo campo al $dispositivo llamado mes_index,
         //  indicando en qué mes le tocará mantenimiento.
         $dispositivo['mes_index'] = $i % 12;
+        $id_equipo = $dispositivo['id_equipo'];
+        $estado = 'Pendiente';
+
+        $sql_insert = "INSERT INTO mantenimiento(id_equipo, anio, fecha_programada, estado)
+                        VALUES ('$id_equipo','$anio_actual', '$fecha_programada', '$estado')";
+        mysqli_query($con, $sql_insert);
     }
 
     unset($dispositivo); // Libera la variable de referencia
@@ -455,8 +479,6 @@ function programa_mantenimiento($valores)
     usort($datos, function ($a, $b) {
         return $a['mes_index'] <=> $b['mes_index'];
     });
-
-    $sql_insert = "INSERT INTO mantenimiento(fk_equipo, fecha_programada, estado)"; 
 
     // Carga la plantilla Excel base del programa de mantenimiento
     $spreadsheet = IOFactory::load('FO-DSP-TI-03 Programa de Mantenimiento Preventivo Infraestructura TI Región XX Rev.00.xlsx');
@@ -535,15 +557,16 @@ function programa_mantenimiento($valores)
     $fecha = date('Ymd_His'); // Genera una marca de tiempo para el nombre del archivo
     $nombre_doc = "FO-DSP-TI-03_Programa de Mantenimiento Preventivo TI Región Sur_{$fecha}.xlsx"; // Nombre del archivo generado
 
-    // $url = filter_var($valores->url, FILTER_SANITIZE_URL); // Sanitiza la URL recibida desde el frontend 
-    
-    // Define la ruta física donde se guardará el archivo, basada en la estructura del proyecto
-    $ruta_guardar = realpath(__DIR__ . '/../../../') . "\\Inventario_TI\\database\\controller_excel\\{$nombre_doc}";
-    // Construye la URL de descarga del archivo generado
+    $base = realpath(__DIR__ . '/../../../');
     $host = $_SERVER['HTTP_HOST'];
-    // $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 
-    $url_descarga = "http://{$host}/Inventario_TI/database/controller_excel/{$nombre_doc}";
+    if ($base !== false) {
+        // Define la ruta física donde se guardará el archivo, basada en la estructura del proyecto
+        $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR. 'controller_excel' . DIRECTORY_SEPARATOR . $nombre_doc;
+        // Construye la URL de descarga del archivo generado
+        $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/{$nombre_doc}";
+    }    
 
     // Crea y guarda el archivo Excel
     $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
