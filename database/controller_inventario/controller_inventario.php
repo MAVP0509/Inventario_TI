@@ -178,7 +178,7 @@ function editar_datos($valores)
     // Sentencia UPDATE para modificar el registro con los nuevos valores
     $sql = "UPDATE inventario_ti_sur 
             SET zona = '$valores->zona', fk_rubro = '$val_rubro', af = '$valores->af', fk_tipo ='$val_tipo', fk_marca = '$val_marca', modelo = '$valores->modelo', 
-            num_serie = '$val_num_serie', ubicacion = '$valores->ubicacion', tag = '$valores->tag', imei = $valores->imei', linea = '$valores->linea', fk_usuario = '$val_usuario' 
+            num_serie = '$valores->num_serie', ubicacion = '$valores->ubicacion', tag = '$valores->tag', imei = '$valores->imei', linea = '$valores->linea', fk_usuario = '$val_usuario' 
             WHERE 
                 id = '$valores->id';";
     //var_dump($sql);

@@ -2,6 +2,24 @@ function server_mantenimiento(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
+            url: "database/controller_mantenimientos/controller_mantenimientos.php",
+            data: {
+                trama: JSON.stringify(model)
+            },
+            success: function (respose) {
+                try {
+                    resolve(JSON.parse(respose))
+                } catch (error) {
+                    reject(error)
+                }
+            }
+        })
+    })
+}
+function server_excel(model) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: "POST",
             url: "database/controller_excel/controller_excel.php",
             data: {
                 trama: JSON.stringify(model)
@@ -18,14 +36,14 @@ function server_mantenimiento(model) {
 }
 
 let datos = [
-    { fecha: "2025-01", estatus: "Pendiente", tipo: "PC", usuario: "Juan Pablo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "123456789" },
-    { fecha: "2025-02", estatus: "Pendiente", tipo: "PC", usuario: "Jose Manuel", ubicacion: "Base Operativa", equipo: "Monitor", num_serie: "987654321" },
-    { fecha: "2025-03", estatus: "Cancelado", tipo: "PC", usuario: "Francisco", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-04", estatus: "Realizado", tipo: "PC", usuario: "Ricardo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-04", estatus: "Pendiente", tipo: "PC", usuario: "Roberto", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-05", estatus: "Pendiente", tipo: "PC", usuario: "Rubén", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-05", estatus: "Pendiente", tipo: "PC", usuario: "Huichzilopotztli", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-06", estatus: "Pendiente", tipo: "PC", usuario: "Fulanito", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" }]
+    { fecha: "2025-01-02", estatus: "Pendiente", tipo: "PC", usuario: "Juan Pablo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "123456789" },
+    { fecha: "2025-02-02", estatus: "Pendiente", tipo: "PC", usuario: "Jose Manuel", ubicacion: "Base Operativa", equipo: "Monitor", num_serie: "987654321" },
+    { fecha: "2025-03-02", estatus: "Cancelado", tipo: "PC", usuario: "Francisco", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-04-02", estatus: "Realizado", tipo: "PC", usuario: "Ricardo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-04-01", estatus: "Pendiente", tipo: "PC", usuario: "Roberto", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-05-02", estatus: "Pendiente", tipo: "PC", usuario: "Rubén", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-05-01", estatus: "Pendiente", tipo: "PC", usuario: "Huichzilopotztli", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
+    { fecha: "2025-06-01", estatus: "Pendiente", tipo: "PC", usuario: "Fulanito", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" }]
 let elemento
 let table
 let gruposAbiertosKey = "grupos_abiertos_tbl01";
@@ -62,7 +80,9 @@ function restaurarEstadoDeGrupos() {
     }, 100); // cada 100ms
 }
 
-function consultar_informacion() {
+async function consultar_informacion() {
+
+    let server = await server_mantenimiento({ accion: 0 })
 
     Tabulator.extendModule("localize", "langs", {
         "es": {
@@ -93,7 +113,7 @@ function consultar_informacion() {
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
-        return `<button type='button' class='btn btn-warning icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Editar' onclick=''><i class='fa-solid fa-pen-to-square fa-lg'></i></button>`;
+        return `<button type='button' class='btn btn-warning icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Información' onclick=''><i class='fa-solid fa-circle-info fa-lg'></i></button>`;
     }
 
     let uploadIcon = function (cell, formatterParams, onRendered) {
@@ -113,7 +133,7 @@ function consultar_informacion() {
 
     table = new Tabulator('#tbl01', {
         locale: "es",
-        data: datos,
+        data: server.resultado,
         layout: "fitColumns",              //fit columns to width of table
         movableColumns: true,              //allow column order to be changed
         paginationButtonCount: 3,
@@ -136,60 +156,64 @@ function consultar_informacion() {
         },
         columns: [
             {
-                title: "Fecha", field: "fecha", hozAlign: "center"
+                title: "Fecha", field: "fecha", hozAlign: "center", width: 106
             },
             {
-                title: "Tipo",
-                field: "tipo", hozAlign: "center",
+                title: "Rubro",
+                field: "rubro", hozAlign: "center", width: 120
+            },
+            {
+                title: "Tag",
+                field: "tag", hozAlign: "center", 
+            },
+            {
+                title: "Número de serie",
+                field: "num_serie", hozAlign: "center", 
+
             },
             {
                 title: "Usuario",
-                field: "usuario", hozAlign: "center"
+                field: "usuario", hozAlign: "center", width: 220,
+                formatter: function (cell, formatterParams, onRendered) {
+                    let data = cell.getData(); // Obtiene toda la fila
+                    return `${data.usuario}<br><small>${data.cargo}</small>`;
+                }
 
             },
             {
                 title: "Ubicación",
-                field: "ubicacion", hozAlign: "center"
-
-            },
-            {
-                title: "Equipo",
-                field: "equipo", hozAlign: "center"
-            },
-            {
-                title: "Número de serie",
-                field: "num_serie", hozAlign: "center"
+                field: "ubicacion", hozAlign: "center",width: 170
 
             },
             {
                 title: "Estatus",
-                field: "estatus", hozAlign: "center", formatter: "lookup",
+                field: "estado", hozAlign: "center", formatter: "lookup",
                 formatterParams: {
                     "Pendiente": `<i class="fa-solid fa-circle fa-beat-fade" style="color: #ff7300;"></i> Pendiente`,
                     "Realizado": `<i class="fa-solid fa-circle fa-beat" style="color: #28a745;"></i> Realizado`,
                     "Cancelado": `<i class="fa-solid fa-circle fa-beat" style="color: #dc3545;"></i> Cancelado`
-                }
+                }, width: 130
 
             },
             {
-                formatter: fileIcon, width: 70, hozAlign: "center",
+                formatter: fileIcon, width: 70, hozAlign: "center",frozen: true,
                 cellClick: function (e, cell) {
                     elemento = cell.getRow().getData();
                     //mdl_editar_supervisor(elemento);
                 }
             },
             {
-                formatter: uploadIcon, width: 70, hozAlign: "center",
+                formatter: uploadIcon, width: 70, hozAlign: "center",frozen: true,
                 cellClick: function (e, cell) {
                     elemento = cell.getRow().getData();
                     //mdl_editar_supervisor(elemento);
                 }
             },
             {
-                formatter: editIcon, width: 70, hozAlign: "center",
+                formatter: editIcon, width: 70, hozAlign: "center",frozen: true,
                 cellClick: function (e, cell) {
                     elemento = cell.getRow().getData();
-                    //mdl_editar_supervisor(elemento);
+                    mdl_mantenimiento_info(elemento);
                 }
             },
         ],
@@ -215,7 +239,6 @@ function consultar_informacion() {
 
 }
 
-consultar_informacion()
 
 async function mdl_programar_mantenimiento() {
 
@@ -289,7 +312,7 @@ async function programar_mantenimiento() {
 
     mostrar_toast_cargando()
 
-    let server = await server_mantenimiento(model);
+    let server = await server_excel(model);
 
     if (server.resultado.result === true && server.resultado.url) {
         window.location = server.resultado.url;
@@ -298,6 +321,10 @@ async function programar_mantenimiento() {
     } else {
         mostrar_toast('error', 'Error', 'No se pudo realizar el programa de mantenimiento. Inténtalo nuevamente.');
     }
+}
+
+function mdl_mantenimiento_info(id){
+    $('#mdl-mant-info').modal("show")
 }
 
 //? Inicializar popover
