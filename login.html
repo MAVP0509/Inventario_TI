@@ -47,7 +47,7 @@
                             <span class="input-group-text verContraseña"><i id="toggle-password-icon-log"
                                     class="fa-solid fa-eye-slash" style="cursor: pointer;"></i></span>
                         </div>
-                        <input type="password" class="form-control" id="logcontraseña" placeholder="Contraseña" name="inputInit">
+                        <input type="password" class="form-control" id="logcontraseña" placeholder="Contraseña" name="inputInit" autocomplete="off">
                     </div>
                     <span id="caps-lock-msg" style="display: none;"><i class="fa-solid fa-triangle-exclamation fa-shake fa-lg"></i> Bloq Mayús está activado</span><br>
 
@@ -114,14 +114,14 @@
                                                 <li class='list-group-item' id='lestrasmm'>Que incluya letras mayúsculas y minúsculas.</li>
                                                 <li class='list-group-item' id='numeros'>Que incluya números.</li>
                                                 <li class='list-group-item' id='caracteresp'>Que incluya caracteres especiales como * () # @, etc.</li>
-                                            </ul>" placeholder="Crea tu contraseña" required name="inputReg">
+                                            </ul>" placeholder="Crea tu contraseña" required name="inputReg" autocomplete="off">
                     </div>
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
                         </div>
                         <input type="password" class="form-control ComprobarContraseña" id="conf-contraseña"
-                            placeholder="Confirma tu contraseña" name="inputReg" required>
+                            placeholder="Confirma tu contraseña" name="inputReg" required autocomplete="off">
                     </div>
                     <div id="error-mensaje" style="display: none; color:red;"></div>
                     <button class="btn btn-primary icon" id="btn-reg" onclick="registrarUsu()">Registrate <i

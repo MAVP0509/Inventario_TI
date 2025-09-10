@@ -446,6 +446,8 @@ async function mdl_editar(params) {
             campo: 'cargo',
             placeholder: 'NA',
             dropdownParent: '#mdl-inventario',
+            sincronizarCampo: 'cargo',
+            sincronizarCon: 'inp-usuario'
         }),
     ])
 
@@ -1472,14 +1474,17 @@ async function crear_resguardo() {
     }
     loading = true
     mostrar_toast_cargando()
+    $("#mdl-res").modal('hide')
     let server = await server_inventario(model)
 
     if (server.resultado.error) {
         mostrar_toast('warning', 'Aviso', server.resultado.error)
-    } else {
-        $("#mdl-res").modal('hide')
+    } else if(server.resultado){
+        
         abrir_resguardo(server.resultado)
         consultar_informacion();
+    }else{
+        mostrar_toast('error', 'Aviso', "Hubo un error")
     }
 
 
