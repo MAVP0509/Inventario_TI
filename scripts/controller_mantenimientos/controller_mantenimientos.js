@@ -376,7 +376,7 @@ async function mdl_mantenimiento_info(elemento) {
     // Llama a varias funciones para cargar los selects con datos dinámicos
     await Promise.all([
         general_select2({
-            selectId: 'iselect-rubro',
+            selectId: 'select-rubro',
             tabla: 'cat_rubro',
             campo: 'rubro',
             placeholder: 'Selecione un rubro',
@@ -437,6 +437,10 @@ async function mdl_mantenimiento_info(elemento) {
             sincronizarCon: 'select-usuario'
         }),
     ])
+
+    rellenar_select(selecreg.zona, "select-zona")
+    rellenar_select(selecreg.rubro, "slect-rubro")
+
     $('#mdl-mant-info').modal("show")
 }
 
@@ -444,3 +448,14 @@ async function mdl_mantenimiento_info(elemento) {
 $(function () {
     $('[data-toggle="popover"]').tooltip()
 })
+
+function rellenar_select(texto, select) {
+    let textoBuscado = texto;
+    let $select = $('#' + select);
+
+    $select.find('option').filter(function () {
+        return $(this).text().trim() === textoBuscado;
+    }).prop('selected', true);
+
+    $select.trigger('change');
+}
