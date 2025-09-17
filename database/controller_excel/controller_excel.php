@@ -604,7 +604,7 @@ function reporte_mantenimiento($valores){
     $pageMargins->setLeft(0.5);
     $pageMargins->setRight(0.5);
 
-    $fecha = 'Ymd:';
+    
 
     $worksheet->setCellValue("G11", $valores->usuario);
     $worksheet->setCellValue("G12", $valores->cargo);
@@ -622,6 +622,7 @@ function reporte_mantenimiento($valores){
     $worksheet->setCellValue("G21", !empty($valores->docking) ? $valores->docking : 'NA');
     $worksheet->setCellValue("G21", !empty($valores->otros) ? $valores->otros : 'NA');
 
-    $nombre_doc = "FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.{$fecha}.xlsx"
+    $fecha_doc = date('Ymd_His');
+    $nombre_doc = "FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.{$fecha_doc}.xlsx";
 
 }
