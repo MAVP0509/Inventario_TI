@@ -330,6 +330,8 @@ async function mdl_programar_mantenimiento() {
         }),
     ])
 
+    rellenar_select("Alejandro Cancino Arguello", "select-elaboro")
+
     $('#select-cg-elaboro, #select-cg-autorizo').prop('disabled', true)
 
     $('#mdl-prog-mant').modal("show")
