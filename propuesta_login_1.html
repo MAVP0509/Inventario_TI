@@ -20,7 +20,7 @@
 
         .container {
             height: 200vh;
-            background-image: url(https://images.unsplash.com/photo-1538137524007-21e48fa42f3f?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=ac9fa0975bd2ebad7afd906c5a3a15ab&auto=format&fit=crop&w=1834&q=80);
+            background-image: url(propuesta_login_1_1.png); /* https://images.unsplash.com/photo-1538137524007-21e48fa42f3f?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=ac9fa0975bd2ebad7afd906c5a3a15ab&auto=format&fit=crop&w=1834&q=80*/
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -258,42 +258,8 @@
 </head>
 
 <body>
-    <script>
-        const body = document.querySelector("body");
-        const modal = document.querySelector(".modal");
-        const modalButton = document.querySelector(".modal-button");
-        const closeButton = document.querySelector(".close-button");
-        const scrollDown = document.querySelector(".scroll-down");
-        let isOpened = false;
 
-        const openModal = () => {
-            modal.classList.add("is-open");
-            body.style.overflow = "hidden";
-        };
-
-        const closeModal = () => {
-            modal.classList.remove("is-open");
-            body.style.overflow = "initial";
-        };
-
-        window.addEventListener("scroll", () => {
-            if (window.scrollY > window.innerHeight / 3 && !isOpened) {
-                isOpened = true;
-                scrollDown.style.display = "none";
-                openModal();
-            }
-        });
-
-        modalButton.addEventListener("click", openModal);
-        closeButton.addEventListener("click", closeModal);
-
-        document.onkeydown = evt => {
-            evt = evt || window.event;
-            evt.keyCode === 27 ? closeModal() : false;
-        };
-
-    </script>
-    <div class="scroll-down">SCROLL DOWN
+    <div class="scroll-down">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
             <path
                 d="M16 3C8.832031 3 3 8.832031 3 16s5.832031 13 13 13 13-5.832031 13-13S23.167969 3 16 3zm0 2c6.085938 0 11 4.914063 11 11 0 6.085938-4.914062 11-11 11-6.085937 0-11-4.914062-11-11C5 9.914063 9.914063 5 16 5zm-1 4v10.28125l-4-4-1.40625 1.4375L16 23.125l6.40625-6.40625L21 15.28125l-4 4V9z" />
@@ -333,6 +299,42 @@
         </div>
         <button class="modal-button">Click here to login</button>
     </div>
+
+    <script>
+        const body = document.querySelector("body");
+        const modal = document.querySelector(".modal");
+        const modalButton = document.querySelector(".modal-button");
+        const closeButton = document.querySelector(".close-button");
+        const scrollDown = document.querySelector(".scroll-down");
+        let isOpened = false;
+
+        const openModal = () => {
+            modal.classList.add("is-open");
+            body.style.overflow = "hidden";
+        };
+
+        const closeModal = () => {
+            modal.classList.remove("is-open");
+            body.style.overflow = "initial";
+        };
+
+        window.addEventListener("scroll", () => {
+            if (window.scrollY > window.innerHeight / 3 && !isOpened) {
+                isOpened = true;
+                scrollDown.style.display = "none";
+                openModal();
+            }
+        });
+
+        modalButton.addEventListener("click", openModal);
+        closeButton.addEventListener("click", closeModal);
+
+        document.onkeydown = evt => {
+            evt = evt || window.event;
+            evt.keyCode === 27 ? closeModal() : false;
+        };
+
+    </script>
 </body>
 
 
