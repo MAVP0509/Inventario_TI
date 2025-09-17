@@ -232,6 +232,7 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <h5>Detalles del dispositivo</h5>
+                                        <!--Rubro-->
                                         <h6>Rubro</h6>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
@@ -241,6 +242,7 @@
                                             <select class="form-control select" id="inp-rubro"></select>
                                             <div class="invalid-feedback">Por favor, seleccione un rubro</div>
                                         </div>
+                                        <!--Tipo-->
                                         <h6>Tipo de dispositivo</h6>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
@@ -251,6 +253,7 @@
                                             <div class="invalid-feedback">Por favor, seleccione un tipo de dispositivo.
                                             </div>
                                         </div>
+                                        <!--Marca-->
                                         <h6>Marca del dispositivo</h6>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
@@ -263,11 +266,12 @@
                                             <div class="invalid-feedback">Por favor, ingrese una marca de dispositivo.
                                             </div>
                                         </div>
+                                        <!--Modelo-->
                                         <h6>Modelo del dispositivo</h6>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text"><i
-                                                        class="fa-solid fa-user-large"></i></span>
+                                                        class="fa-solid fa-pager"></i></span>
                                             </div>
                                             <input type="text" class="form-control" id="inp-modelo" name="mdl-reg"
                                                 placeholder="Modelo del dispositivo" autocomplete="off"
@@ -324,8 +328,7 @@
                                         <h6>Activo Fijo</h6>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text"><i
-                                                        class="fa-solid fa-user-large"></i></span>
+                                                <span class="input-group-text"><i class="fa-solid fa-a"></i><i class="fa-solid fa-f"></i></span>
                                             </div>
                                             <input type="text" class="form-control" id="inp-af" name="mdl-reg"
                                                 placeholder="AF" autocomplete="off" data-toggle="popover"
@@ -499,6 +502,7 @@
                                             <input type="date" class="form-control" id="fecha-resguardo">
                                         </div>
                                     </div>
+                                    <!--Usuario PEMEX-->
                                     <div class="col" style="display: none;" id="col-pemex">
                                         <label>Usuario de PEMEX</label>
                                         <div class="input-group mb-3">
@@ -506,7 +510,7 @@
                                                 <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
                                             </div>
                                             <input class="form-control select" id="inp-user-pemex" name="inp-resg"
-                                                placeholder="Ingrese el nombre completo del usuario">
+                                                placeholder="Ingrese el nombre completo del usuario" autocomplete="off">
                                             <div class="invalid-feedback">Por favor, ingrese un usuario.</div>
                                         </div>
                                         <div class="input-group mb-3">
@@ -515,7 +519,7 @@
                                                         class="fa-solid fa-suitcase"></i></span>
                                             </div>
                                             <input class="form-control select" id="inp-cargo-pemex" name="inp-resg"
-                                                placeholder="Ingrese el cargo del usuario">
+                                                placeholder="Ingrese el cargo del usuario" autocomplete="off">
                                             <div class="invalid-feedback">Por favor, ingrese un cargo.</div>
                                         </div>
                                     </div>
@@ -612,7 +616,7 @@
                                                         class="fa-solid fa-clipboard-question"></i></span>
                                             </div>
                                             <input type="text" class="form-control" id="inp-motivo" name="lmp-baja"
-                                                placeholder="Especifique el motivo de baja">
+                                                placeholder="Especifique el motivo de baja" autocomplete="off">
                                             <div class="invalid-feedback">Por favor, especifique el motivo</div>
                                         </div>
                                     </div>
@@ -624,7 +628,7 @@
                                                         class="fa-solid fa-clipboard-question"></i></span>
                                             </div>
                                             <input type="text" class="form-control" id="inp-reubicacion" name="lmp-baja"
-                                                placeholder="Especifique la nueva ubicación del activo">
+                                                placeholder="Especifique la nueva ubicación del activo" autocomplete="off">
                                             <div class="invalid-feedback">Por favor, especifique la ubicación</div>
                                         </div>
                                     </div>
@@ -637,7 +641,7 @@
                                                             class="fa-solid fa-clipboard-question"></i></span>
                                                 </div>
                                                 <input type="text" class="form-control" id="inp-monto" name="lmp-baja"
-                                                    placeholder="Especifique el monto a descontar">
+                                                    placeholder="Especifique el monto a descontar" autocomplete="off">
                                                 <div class="invalid-feedback">Por favor, especifique el monto a
                                                     descontar</div>
                                             </div>
@@ -651,7 +655,7 @@
                                                 </div>
                                                 <input type="text" class="form-control" id="inp-quincena"
                                                     name="lmp-baja"
-                                                    placeholder="Especifique el número de quincenas a descontar">
+                                                    placeholder="Especifique el número de quincenas a descontar" autocomplete="off">
                                                 <div class="invalid-feedback">Por favor, especifique el número de
                                                     quincenas</div>
                                             </div>
@@ -668,7 +672,7 @@
                                                     class="fa-solid fa-clipboard-question"></i></span>
                                         </div>
                                         <input type="text" class="form-control" id="inp-observaciones" name="lmp-baja"
-                                            placeholder="Observaciones de activos">
+                                            placeholder="Observaciones de activos" autocomplete="off">
                                         <div class="invalid-feedback">Por favor, ingrese algunas observaciones</div>
                                     </div>
                                 </div>
@@ -806,7 +810,7 @@
                                                     class="fa-solid fa-square-binary"></i></span>
                                         </div>
                                         <input type="text" class="form-control" id="his-num-serie" name="mdl-hst"
-                                            placeholder="Ingrese un número de serie">
+                                            placeholder="Ingrese un número de serie" autocomplete="off">
                                     </div>
                                     <label for="rango-fecha">Rango de fecha</label>
                                     <div class="input-group">
@@ -1023,10 +1027,10 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
 
 <!--File pond-->
-
+<script src="https://unpkg.com/filepond@^4/dist/filepond.js" defer></script>
 <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"
     defer></script>
-<script src="https://unpkg.com/filepond@^4/dist/filepond.js" defer></script>
+
 
 <!--Admin LTE-->
 <script src="dist/js/adminlte.min.js" defer></script>

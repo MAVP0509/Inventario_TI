@@ -35,18 +35,10 @@ function server_excel(model) {
     })
 }
 
-let datos = [
-    { fecha: "2025-01-02", estatus: "Pendiente", tipo: "PC", usuario: "Juan Pablo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "123456789" },
-    { fecha: "2025-02-02", estatus: "Pendiente", tipo: "PC", usuario: "Jose Manuel", ubicacion: "Base Operativa", equipo: "Monitor", num_serie: "987654321" },
-    { fecha: "2025-03-02", estatus: "Cancelado", tipo: "PC", usuario: "Francisco", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-04-02", estatus: "Realizado", tipo: "PC", usuario: "Ricardo", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-04-01", estatus: "Pendiente", tipo: "PC", usuario: "Roberto", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-05-02", estatus: "Pendiente", tipo: "PC", usuario: "Rubén", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-05-01", estatus: "Pendiente", tipo: "PC", usuario: "Huichzilopotztli", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" },
-    { fecha: "2025-06-01", estatus: "Pendiente", tipo: "PC", usuario: "Fulanito", ubicacion: "Base Operativa", equipo: "Laptop", num_serie: "192837645" }]
+let datos
 let elemento
 let table
-let gruposAbiertosKey = "grupos_abiertos_tbl01";
+let gruposAbiertosKey = "grupos_abiertos_mantenimientos";
 let gruposRestaurados = false;
 
 function guardarEstadoDeGrupos() {
@@ -60,30 +52,41 @@ function restaurarEstadoDeGrupos() {
     if (gruposRestaurados) return;
 
     const abiertos = JSON.parse(localStorage.getItem(gruposAbiertosKey) || "[]");
+    let intentos = 0;
+    const maxIntentos = 30;
 
-    // Esperar a que los grupos estén disponibles
-    const esperarGrupos = setInterval(() => {
+    const intervalo = setInterval(() => {
+        intentos++;
         const grupos = table.getGroups();
 
-        if (grupos.length === 0) return;
+        if (grupos.length === 0) return; // no hay grupos todavía
 
-        grupos.forEach(group => {
-            if (abiertos.includes(group.getKey())) {
-                group.show(); // abrir
-            } else {
-                group.hide(); // cerrar
+        // Intentar abrir todos los grupos que están en 'abiertos'
+        abiertos.forEach(key => {
+            const grupo = grupos.find(g => g.getKey() === key);
+            if (grupo) {
+                grupo.show();
             }
         });
 
-        gruposRestaurados = true;
-        clearInterval(esperarGrupos);
-    }, 100); // cada 100ms
+        // Verificar si todos los grupos ya están abiertos
+        const todosAbiertos = abiertos.every(key => {
+            const grupo = grupos.find(g => g.getKey() === key);
+            return grupo && grupo.isVisible();
+        });
+
+        if (todosAbiertos || intentos >= maxIntentos) {
+            gruposRestaurados = true;
+            clearInterval(intervalo);
+        }
+
+    }, 100);
 }
 
 async function consultar_informacion() {
 
     let server = await server_mantenimiento({ accion: 0 })
-
+    datos = server.resultado
     Tabulator.extendModule("localize", "langs", {
         "es": {
             "pagination": {
@@ -123,17 +126,36 @@ async function consultar_informacion() {
         return `<button type='button' class='btn btn-info icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' onclick=''><i class='fa-solid fa-upload fa-lg'></i></button>`;
     }
 
-
     let fileIcon = function (cell, formatterParams, onRendered) { //plain text value
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
         return "<button type='button' class='btn btn-success icon' data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Reporte de mantenimiento' onclick=''><i class='fa-solid fa-file-excel fa-lg'></i></button>";
-    };
+    }
+
+    let eyeIcon = function (cell, formatterParams, onRendered) { //plain text value
+        onRendered(function () {
+            $(cell.getElement()).find('[data-toggle="popover"]').popover()
+        })
+        return "<button type='button' class='btn btn-lock btn-outline-dark icon' onclick=''><i class='fa-solid fa-eye '></i></button>";
+    }
+
+    let menuEstatus = [
+        {
+            label: `<i class="fa-solid fa-circle" style="color: #28a745;"></i> Realizado`
+        },
+        { label: `<i class="fa-solid fa-circle" style="color: #0385ffff;"></i> En proceso` },
+        {
+            label: `<i class="fa-solid fa-circle" style="color: #ff7300;"></i> Pendiente`
+        },
+        {
+            label: `<i class="fa-solid fa-circle fa-beat-fade" style="color: #dc3545;"></i> Vencido`
+        },
+    ]
 
     table = new Tabulator('#tbl01', {
         locale: "es",
-        data: server.resultado,
+        data: datos,
         layout: "fitColumns",              //fit columns to width of table
         movableColumns: true,              //allow column order to be changed
         paginationButtonCount: 3,
@@ -147,7 +169,7 @@ async function consultar_informacion() {
         },
         groupStartOpen: false,
         groupToggleElement: "header", //* Permite que dando click en cualquier parte del header group, éste se despliegue
-        headerVisible: false,
+        //headerVisible: false,
         dataGrouped: function (groups) {
             restaurarEstadoDeGrupos();
         },
@@ -156,24 +178,20 @@ async function consultar_informacion() {
         },
         columns: [
             {
-                title: "Fecha", field: "fecha", hozAlign: "center", width: 106
+                title: "Fecha", field: "fecha", width: 115, headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input", sorter: "date",
             },
             {
                 title: "Rubro",
-                field: "rubro", hozAlign: "center", width: 120
-            },
-            {
-                title: "Tag",
-                field: "tag", hozAlign: "center", 
+                field: "rubro", width: 130, headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input"
             },
             {
                 title: "Número de serie",
-                field: "num_serie", hozAlign: "center", 
+                field: "num_serie", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input"
 
             },
             {
                 title: "Usuario",
-                field: "usuario", hozAlign: "center", width: 220,
+                field: "usuario", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input",
                 formatter: function (cell, formatterParams, onRendered) {
                     let data = cell.getData(); // Obtiene toda la fila
                     return `${data.usuario}<br><small>${data.cargo}</small>`;
@@ -182,38 +200,58 @@ async function consultar_informacion() {
             },
             {
                 title: "Ubicación",
-                field: "ubicacion", hozAlign: "center",width: 170
+                field: "ubicacion", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "list",
+                headerFilterParams: {
+                    valuesLookup: true, clearable: true,
+                }
 
             },
             {
                 title: "Estatus",
-                field: "estado", hozAlign: "center", formatter: "lookup",
+                field: "estado", hozAlign: "center", formatter: "lookup", headerHozAlign: "center", formatter: "lookup", width: 150,
+                headerFilterParams: {
+                    valuesLookup: true, clearable: true,
+                },
+                headerMenu: menuEstatus,
+                headerMenuIcon: '<i class="fa-solid fa-circle-question"></i>',
                 formatterParams: {
-                    "Pendiente": `<i class="fa-solid fa-circle fa-beat-fade" style="color: #ff7300;"></i> Pendiente`,
-                    "Realizado": `<i class="fa-solid fa-circle fa-beat" style="color: #28a745;"></i> Realizado`,
-                    "Cancelado": `<i class="fa-solid fa-circle fa-beat" style="color: #dc3545;"></i> Cancelado`
-                }, width: 130
+                    "Pendiente": `<i class="fa-solid fa-circle" style="color: #ff7300;"></i> Pendiente`,
+                    "En proceso": `<i class="fa-solid fa-circle" style="color: #0385ffff;"></i> En proceso`,
+                    "Realizado": `<i class="fa-solid fa-circle" style="color: #28a745;"></i> Realizado`,
+                    "Vencido": `<i class="fa-solid fa-circle fa-beat-fade" style="color: #dc3545;"></i> Vencido`,
+                },
+                headerFilter: "list",
+                headerFilterParams: {
+                    valuesLookup: true, clearable: true,
+                }, headerSort: false,
 
             },
             {
-                formatter: fileIcon, width: 70, hozAlign: "center",frozen: true,
+                formatter: fileIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
                 cellClick: function (e, cell) {
                     elemento = cell.getRow().getData();
                     //mdl_editar_supervisor(elemento);
                 }
             },
             {
-                formatter: uploadIcon, width: 70, hozAlign: "center",frozen: true,
+                formatter: uploadIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
                 cellClick: function (e, cell) {
                     elemento = cell.getRow().getData();
                     //mdl_editar_supervisor(elemento);
                 }
             },
             {
-                formatter: editIcon, width: 70, hozAlign: "center",frozen: true,
+                formatter: editIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
                 cellClick: function (e, cell) {
                     elemento = cell.getRow().getData();
                     mdl_mantenimiento_info(elemento);
+                }
+            },
+            {
+                formatter: eyeIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
+                cellClick: function (e, cell) {
+                    elemento = cell.getRow().getData();
+                    //mdl_mantenimiento_info(elemento);
                 }
             },
         ],
@@ -323,7 +361,86 @@ async function programar_mantenimiento() {
     }
 }
 
-function mdl_mantenimiento_info(id){
+let selecreg 
+async function mdl_mantenimiento_info(elemento) {
+    // Busca en el arreglo 'datos' el registro con el mismo id_equipo
+    for (let i = 0; i < datos.length; i++) {
+        const element = datos[i];
+        if (element.id_equipo === elemento.id_equipo && element.anio === elemento.anio ) {
+            // Guarda el registro completo en una variable global
+            selecreg = element;
+            // console.log(selecreg)
+            break;
+        }
+    }
+    // Llama a varias funciones para cargar los selects con datos dinámicos
+    await Promise.all([
+        general_select2({
+            selectId: 'select-rubro',
+            tabla: 'cat_rubro',
+            campo: 'rubro',
+            placeholder: 'Selecione un rubro',
+            dropdownParent: '#mdl-mant-info',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Categoría general del activo. Agrupa dispositivos por su tipo funcional, como computadoras, dispositivos móviles, etc."
+        }),
+
+        general_select2({
+            selectId: 'select-tipo',
+            tabla: 'cat_tipo',
+            campo: 'tipo',
+            placeholder: 'Selecione un tipo',
+            dropdownParent: '#mdl-mant-info',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
+        }),
+
+        general_select2({
+            selectId: 'select-marca',
+            tabla: 'cat_marca',
+            campo: 'marca',
+            placeholder: 'Seleccione una marca',
+            dropdownParent: '#mdl-mant-info',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Es la marca del activo."
+        }),
+
+        general_select2({
+            selectId: 'select-ubicacion',
+            tabla: 'inventario_ti_sur',
+            campo: 'ubicacion',
+            placeholder: 'Selecciona una ubicacion',
+            dropdownParent: '#mdl-mant-info',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Indica el lugar específico dentro de la zona donde se encuentra físicamente el dispositivo."
+        }),
+
+        general_select2({
+            selectId: 'select-usuario',
+            tabla: 'cat_usuarios',
+            campo: 'nombre',
+            placeholder: 'NA',
+            dropdownParent: '#mdl-mant-info',
+        }),
+
+        general_select2({
+            selectId: 'inp-cargo',
+            tabla: 'cat_usuarios',
+            campo: 'cargo',
+            placeholder: 'NA',
+            dropdownParent: '#mdl-mant-info',
+            sincronizarCampo: 'cargo',
+            sincronizarCon: 'select-usuario'
+        }),
+    ])
+
+    rellenar_select(selecreg.zona, "select-zona")
+    rellenar_select(selecreg.rubro, "slect-rubro")
+
     $('#mdl-mant-info').modal("show")
 }
 
@@ -331,3 +448,14 @@ function mdl_mantenimiento_info(id){
 $(function () {
     $('[data-toggle="popover"]').tooltip()
 })
+
+function rellenar_select(texto, select) {
+    let textoBuscado = texto;
+    let $select = $('#' + select);
+
+    $select.find('option').filter(function () {
+        return $(this).text().trim() === textoBuscado;
+    }).prop('selected', true);
+
+    $select.trigger('change');
+}
