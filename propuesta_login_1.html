@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <!-- <link rel="stylesheet" href="libraries/bootstrap-4.6.2-dist/css/bootstrap-grid.min.css"> -->
     <link rel="stylesheet" href="libraries/fontawesome-free-6.7.2-web/css/all.min.css">
 
     <style>
@@ -20,13 +21,14 @@
         }
 
         .container {
+            /* height: 100vh; */
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -1;
-            background-image: url(img_propuesta_login_1_1.png);
+            background-image: url(fondo_login_propuesta_1.png);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -282,6 +284,13 @@
             height: auto;
             display: block;
         }
+
+        html,
+        body {
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
     </style>
 </head>
 
@@ -306,16 +315,16 @@
                     <input type="password" name="password" id="password" placeholder="">
                 </div>
                 <div class="modal-buttons">
-                    <a href="#" >¿Olvidaste tu contraseña?</a>
+                    <a href="#">¿Olvidaste tu contraseña?</a>
                     <button class="input-button">Iniciar sesión</button>
                 </div>
-                <p class="sign-up">Diavaz servicios de produccion terrestres Telemetria</p>
+                <p class="sign-up">Diavaz servicios de producción terrestres Telemetría</p>
             </div>
             <div class="modal-right">
-                <img src="img_propuesta_login_1_2.jpg" 
-                    alt=""> 
+                <img src="img_propuesta_login_1_1.png" alt="">
             </div>
-            <button class="icon-button close-button"><i class="fa-regular fa-2xl fa-circle-xmark"  style="color: #ffffff;"></i></button>
+            <button class="icon-button close-button"><i class="fa-regular fa-2xl fa-circle-xmark"
+                    style="color: #ffffff;"></i></button>
         </div>
         <button class="modal-button">Iniciar sesión</button>
     </div>
@@ -347,7 +356,7 @@
         };
         setTimeout(() => {
             openModal();
-        }, 300);
+        }, 200);
 
 
     </script>
