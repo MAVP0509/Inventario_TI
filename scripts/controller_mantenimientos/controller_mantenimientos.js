@@ -277,8 +277,12 @@ async function consultar_informacion() {
 
 }
 
-
+let tabla_tipos
 async function mdl_programar_mantenimiento() {
+
+    tabla_tipos = new Tabulator('#tbl-tipos', {
+        movableRows: true,
+    })
 
     await Promise.all([
         general_select2({
