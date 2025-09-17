@@ -11,6 +11,7 @@ use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Writer\Ods\WriterPart;
 
 header('Content-Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
@@ -27,6 +28,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = bajas($clientejson);
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = programa_mantenimiento($clientejson);
+} elseif ($clientejson->accion == 4) {
+    $respuesta_servidor->resultado = reporte_mantenimiento($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -563,10 +566,10 @@ function programa_mantenimiento($valores)
 
     if ($base !== false) {
         // Define la ruta física donde se guardará el archivo, basada en la estructura del proyecto
-        $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR. 'controller_excel' . DIRECTORY_SEPARATOR . $nombre_doc;
+        $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . 'documentos_descarga' . DIRECTORY_SEPARATOR . 'mantenimiento' . DIRECTORY_SEPARATOR . 'programa' . DIRECTORY_SEPARATOR . $nombre_doc;
         // Construye la URL de descarga del archivo generado
         $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/matenimiento/programa/{$nombre_doc}";
-    }    
+    }
 
     // Crea y guarda el archivo Excel
     $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
@@ -580,7 +583,8 @@ function programa_mantenimiento($valores)
 }
 
 
-function reporte_mantenimiento($valores){
+function reporte_mantenimiento($valores)
+{
     include('../conexion.php');
 
     $spreadsheet = IOFactory::load('FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.01.xlsx'); //*Cargando la plantilla del Excel
@@ -604,25 +608,79 @@ function reporte_mantenimiento($valores){
     $pageMargins->setLeft(0.5);
     $pageMargins->setRight(0.5);
 
-    
+    $worksheet->setCellValue("G11", !empty($valores->usuario) ? $valores->usuario : 'NA');
+    $worksheet->setCellValue("G12", !empty($valores->cargo) ? $valores->cargo : 'NA');
+    $worksheet->setCellValue("G13", !empty($valores->region) ? $valores->region : 'NA');
+    // $worksheet->setCellValue("G14", !empty($valores->id) ? $valores->id : 'NA');
 
-    $worksheet->setCellValue("G11", $valores->usuario);
-    $worksheet->setCellValue("G12", $valores->cargo);
-    $worksheet->setCellValue("G13", $valores->region);
-    
-    $worksheet->setCellValue("G20", $valores->pc);
+    // Mapeo de tipo -> fila
+    $mapa_filas = [
+        'Laptop' => 20,
+        'Desktop' => 20,
+        'Monitor' => 21,
+        'Teclado' => 22,
+        'Mouse' => 23,
+        'Impresora' => 24,
+        'Docking' => 25,
+        'Docking Station' => 25,
+    ];
 
-    if ($valores->monitor == '40') {
-        $worksheet->setCellValue("G21", !empty($valores->monitor) ? $valores->monitor : 'NA');
+    // Inicializar filas con 'NA'
+    for ($fila = 20; $fila <= 27; $fila++) {
+        $worksheet->setCellValue("G{$fila}", 'NA'); // Marca
+        $worksheet->setCellValue("L{$fila}", 'NA'); // Modelo
+        $worksheet->setCellValue("Q{$fila}", 'NA'); // Serie
+        $worksheet->setCellValue("W{$fila}", 'NA'); // Observaciones
     }
-    
-    $worksheet->setCellValue("G22", !empty($valores->teclado) ? $valores->teclado : 'NA');
-    $worksheet->setCellValue("G23", !empty($valores->mouse) ? $valores->mouse : 'NA');
-    $worksheet->setCellValue("G24", !empty($valores->impresora) ? $valores->impresora : 'NA');
-    $worksheet->setCellValue("G21", !empty($valores->docking) ? $valores->docking : 'NA');
-    $worksheet->setCellValue("G21", !empty($valores->otros) ? $valores->otros : 'NA');
+
+    // Determinar fila a llenar según tipo
+    $tipo = !empty($valores->tipo) ? $valores->tipo : 'Otros';
+    $fila = $mapa_filas[$tipo] ?? 26; // 26 = Otros
+
+    // Rellenar datos
+    $marca = !empty($valores->marca) ? $valores->marca : 'NA';
+    $modelo = !empty($valores->modelo) ? $valores->modelo : 'NA';
+    $serie = !empty($valores->num_serie) ? $valores->num_serie : 'NA';
+    // $observaciones = !empty($valores->ubicacion) ? $valores->ubicacion : 'NA';
+    $observaciones = false;
+    if ($marca !== 'NA' || $modelo !== 'NA' || $serie !== 'NA') {
+        $worksheet->setCellValue("W{$fila}", '');
+        $observaciones = true;
+    }
+
+    if ($observaciones) {
+        for ($f = 20; $f <= 27; $f++); {
+            $worksheet->setCellValue("W{$f}", '');
+        }
+    }
+
+    $worksheet->setCellValue("G{$fila}", $marca);
+    $worksheet->setCellValue("L{$fila}", $modelo);
+    $worksheet->setCellValue("Q{$fila}", $serie);
+
+    $worksheet->setCellValue("U69", !empty($valores->usuario) ? $valores->usuario : '');
+    $worksheet->setCellValue("D69", !empty($valores->usuario) ? $valores->usuario : '');
+
+    // $workskheet->setCellValue("W{$fila}", $observaciones);
+
 
     $fecha_doc = date('Ymd_His');
     $nombre_doc = "FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.{$fecha_doc}.xlsx";
 
+    $base = realpath(__DIR__ . '/../../../');
+    $host = $_SERVER['HTTP_HOST'];
+    $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+
+    if ($base !== false) {
+        $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . 'documentos_descarga' . DIRECTORY_SEPARATOR . 'mantenimiento' . DIRECTORY_SEPARATOR . 'reporte' . DIRECTORY_SEPARATOR . $nombre_doc;
+        $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/mantenimiento/reporte/{$nombre_doc}";
+    }
+
+    $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+    $writer->save($ruta_guardar);
+
+    return array(
+        'result' => true,
+        'url' => $url_descarga
+    );
 }

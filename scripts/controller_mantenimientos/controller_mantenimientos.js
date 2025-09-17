@@ -36,7 +36,7 @@ function server_excel(model) {
 }
 
 let datos
-let elemento
+let elemento_mnt
 let table
 let gruposAbiertosKey = "grupos_abiertos_mantenimientos";
 let gruposRestaurados = false;
@@ -185,6 +185,14 @@ async function consultar_informacion() {
                 field: "rubro", width: 130, headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input"
             },
             {
+                title: "Tipo",
+                field: "tipo", width: 130, headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input",
+                formatter: function (cell, formatterParams, onRendered) {
+                    let data = cell.getData();
+                    return `${data.tipo}<br><small>${data.marca}<br><small>${data.modelo}`;
+                }
+            },
+            {
                 title: "Número de serie",
                 field: "num_serie", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input"
 
@@ -196,6 +204,11 @@ async function consultar_informacion() {
                     let data = cell.getData(); // Obtiene toda la fila
                     return `${data.usuario}<br><small>${data.cargo}</small>`;
                 }
+
+            },
+            {
+                title: "Región",
+                field: "region", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input",
 
             },
             {
@@ -229,29 +242,29 @@ async function consultar_informacion() {
             {
                 formatter: fileIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
                 cellClick: function (e, cell) {
-                    elemento = cell.getRow().getData();
-                    //mdl_editar_supervisor(elemento);
+                    elemento_mnt = cell.getRow().getData();
+                    reporte_mantenimiento(elemento_mnt);
                 }
             },
             {
                 formatter: uploadIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
                 cellClick: function (e, cell) {
-                    elemento = cell.getRow().getData();
-                    //mdl_editar_supervisor(elemento);
+                    elemento_mnt = cell.getRow().getData();
+                    //mdl_editar_supervisor(elemento_mnt);
                 }
             },
             {
                 formatter: editIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
                 cellClick: function (e, cell) {
-                    elemento = cell.getRow().getData();
-                    mdl_mantenimiento_info(elemento);
+                    elemento_mnt = cell.getRow().getData();
+                    mdl_mantenimiento_info(elemento_mnt);
                 }
             },
             {
                 formatter: eyeIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
                 cellClick: function (e, cell) {
-                    elemento = cell.getRow().getData();
-                    //mdl_mantenimiento_info(elemento);
+                    elemento_mnt = cell.getRow().getData();
+                    //mdl_mantenimiento_info(elemento_mnt);
                 }
             },
         ],
@@ -368,11 +381,11 @@ async function programar_mantenimiento() {
 }
 
 let selecreg 
-async function mdl_mantenimiento_info(elemento) {
+async function mdl_mantenimiento_info(elemento_mnt) {
     // Busca en el arreglo 'datos' el registro con el mismo id_equipo
     for (let i = 0; i < datos.length; i++) {
         const element = datos[i];
-        if (element.id_equipo === elemento.id_equipo && element.anio === elemento.anio ) {
+        if (element.id_equipo === elemento_mnt.id_equipo && element.anio === elemento_mnt.anio ) {
             // Guarda el registro completo en una variable global
             selecreg = element;
             // console.log(selecreg)
@@ -444,10 +457,27 @@ async function mdl_mantenimiento_info(elemento) {
         }),
     ])
 
+    rellenar_select(selecreg.usuario, "select-usuario");
+
     rellenar_select(selecreg.zona, "select-zona")
     rellenar_select(selecreg.rubro, "slect-rubro")
 
     $('#mdl-mant-info').modal("show")
+}
+
+async function reporte_mantenimiento(elemento_mnt) {
+    // console.log(elemento_mnt)
+    elemento_mnt.accion = 4;
+
+    let server = await server_excel(elemento_mnt);
+
+    if (server.resultado.result === true && server.resultado.url) {
+        window.location = server.resultado.url;
+        mostrar_toast('success', '¡Generación de reporte exitoso!', 'La generación de reporte de mantenimiento se ha realizado correctamente.');
+    } else {
+        mostrar_toast('error', '¡Error!', 'No se pudo generar el reporte de mantenimiento. Inténtelo nuevamente.');
+    }
+
 }
 
 //? Inicializar popover
