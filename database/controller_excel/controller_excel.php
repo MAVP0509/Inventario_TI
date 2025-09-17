@@ -565,7 +565,7 @@ function programa_mantenimiento($valores)
         // Define la ruta física donde se guardará el archivo, basada en la estructura del proyecto
         $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR. 'controller_excel' . DIRECTORY_SEPARATOR . $nombre_doc;
         // Construye la URL de descarga del archivo generado
-        $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/{$nombre_doc}";
+        $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/matenimiento/programa/{$nombre_doc}";
     }    
 
     // Crea y guarda el archivo Excel
@@ -582,8 +582,6 @@ function programa_mantenimiento($valores)
 
 function reporte_mantenimiento($valores){
     include('../conexion.php');
-    
-    $datos = $valores->datos;
 
     $spreadsheet = IOFactory::load('FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.01.xlsx'); //*Cargando la plantilla del Excel
     $worksheet = $spreadsheet->getActiveSheet();
@@ -606,7 +604,24 @@ function reporte_mantenimiento($valores){
     $pageMargins->setLeft(0.5);
     $pageMargins->setRight(0.5);
 
+    $fecha = 'Ymd:';
 
-    //* Configuramos la ruta donde se guarda el excel
-    $excelFilePath = 'C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_' . $UserName . '.xlsx';
+    $worksheet->setCellValue("G11", $valores->usuario);
+    $worksheet->setCellValue("G12", $valores->cargo);
+    $worksheet->setCellValue("G13", $valores->region);
+    
+    $worksheet->setCellValue("G20", $valores->pc);
+
+    if ($valores->monitor == '40') {
+        $worksheet->setCellValue("G21", !empty($valores->monitor) ? $valores->monitor : 'NA');
+    }
+    
+    $worksheet->setCellValue("G22", !empty($valores->teclado) ? $valores->teclado : 'NA');
+    $worksheet->setCellValue("G23", !empty($valores->mouse) ? $valores->mouse : 'NA');
+    $worksheet->setCellValue("G24", !empty($valores->impresora) ? $valores->impresora : 'NA');
+    $worksheet->setCellValue("G21", !empty($valores->docking) ? $valores->docking : 'NA');
+    $worksheet->setCellValue("G21", !empty($valores->otros) ? $valores->otros : 'NA');
+
+    $nombre_doc = "FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.{$fecha}.xlsx"
+
 }
