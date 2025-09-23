@@ -10,6 +10,8 @@ $respuesta_servidor = new stdClass();
 
 if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_datos($clientejson);
+}elseif ($clientejson->accion == 1){
+    $respuesta_servidor->resultado = guardar_reportes($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -31,3 +33,50 @@ function consultar_datos()
 
     return $array;
 }
+
+function guardar_reportes($valores)
+{
+    $respuesta = new stdClass();
+    //var_dump($_FILES['reporte_mantenimiento']);
+    if (isset($_FILES['reporte_mantenimiento']) && $_FILES['reporte_mantenimiento']['error'] === UPLOAD_ERR_OK) {
+        $nombreOriginal = $_FILES['reporte_mantenimiento']['name'];
+        $tmpPath = $_FILES['reporte_mantenimiento']['tmp_name'];
+
+        // Validar extensión .xlsx
+        $ext = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));
+        if ($ext !== 'pdf') {
+            $respuesta->error = "Tipo de archivo no permitido. Solo .pdf";
+            return $respuesta;
+        }
+
+        //* Generar nombre único para evitar colisiones
+        $nuevoNombre = date('Y-m-d') . '_' . $nombreOriginal;
+
+
+        //* Ruta de la carpeta
+        $ruta = __DIR__ . '/../../Documentos/mantenimiento/reporte/' . $valores->id_equipo;
+
+        //* Validando si el usuario ya tiene su carpeta o no
+        if (is_dir($ruta)) {
+            //* Ruta destino, __DIR__ es carpeta donde está este script PHP
+            $destino = $ruta . '/' . $nuevoNombre;
+        } else {
+            //* Creación de la carpeta
+            mkdir($ruta, 0777, true);
+
+            //* Ruta destino
+            $destino = $ruta . '/' . $nuevoNombre;
+        }
+
+        if (move_uploaded_file($tmpPath, $destino)) {
+            $respuesta->mensaje = "Archivo guardado correctamente";
+            //$respuesta->ruta = 'C:\\xampp\\htdocs\\Inventario_TI\\database\\controller_inventario\\' . $nuevoNombre;
+        } else {
+            $respuesta->error = "No se pudo mover el archivo.";
+        }
+    } else {
+        $respuesta->error = "No se recibió ningún archivo válido.";
+    }
+    return $respuesta;
+}
+

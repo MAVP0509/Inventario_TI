@@ -1580,7 +1580,7 @@ function button_checked(button) {
 
 }
 
-//*Cerrando el control-sidebar con click fuera de éste
+//todo Cerrando el control-sidebar con click fuera de éste
 $(".content-wrapper").click(function () {
     if ($('body').hasClass('control-sidebar-slide-open')) {
         //console.log('cerrando sidebar');
@@ -1591,7 +1591,7 @@ $(".content-wrapper").click(function () {
 let dominio = window.location.hostname
 let puerto = location.port
 
-console.log(window.FilePond);
+//console.log(window.FilePond);
 
 FilePond.registerPlugin(FilePondPluginFileValidateType);
 
