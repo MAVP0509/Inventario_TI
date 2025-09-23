@@ -123,7 +123,7 @@ async function consultar_informacion() {
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
-        return `<button type='button' class='btn btn-info icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' onclick=''><i class='fa-solid fa-upload fa-lg'></i></button>`;
+        return `<button type='button' class='btn btn-info icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' data-widget="control-sidebar" data-slide="true" ><i class='fa-solid fa-upload fa-lg'></i></button>`;
     }
 
     let fileIcon = function (cell, formatterParams, onRendered) { //plain text value
@@ -138,6 +138,13 @@ async function consultar_informacion() {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
         return "<button type='button' class='btn btn-lock btn-outline-dark icon' onclick=''><i class='fa-solid fa-eye '></i></button>";
+    }
+
+    let mailIcon = function (cell, formatterParams, onRendered) { //plain text value
+        onRendered(function () {
+            $(cell.getElement()).find('[data-toggle="popover"]').popover()
+        })
+        return "<button type='button' class='btn btn-lock btn-danger envelope' data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Enviar correo'><i class='fa-solid fa-envelope '></i></button>";
     }
 
     let menuEstatus = [
@@ -181,10 +188,6 @@ async function consultar_informacion() {
                 title: "Fecha", field: "fecha", width: 115, headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input", sorter: "date",
             },
             {
-                title: "Rubro",
-                field: "rubro", width: 130, headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input"
-            },
-            {
                 title: "Tipo",
                 field: "tipo", width: 130, headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input",
                 formatter: function (cell, formatterParams, onRendered) {
@@ -204,11 +207,6 @@ async function consultar_informacion() {
                     let data = cell.getData(); // Obtiene toda la fila
                     return `${data.usuario}<br><small>${data.cargo}</small>`;
                 }
-
-            },
-            {
-                title: "Región",
-                field: "region", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input",
 
             },
             {
@@ -240,6 +238,13 @@ async function consultar_informacion() {
 
             },
             {
+                formatter: mailIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
+                cellClick: function (e, cell) {
+                    elemento_mnt = cell.getRow().getData();
+
+                },
+            },
+            {
                 formatter: fileIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
                 cellClick: function (e, cell) {
                     elemento_mnt = cell.getRow().getData();
@@ -250,7 +255,15 @@ async function consultar_informacion() {
                 formatter: uploadIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
                 cellClick: function (e, cell) {
                     elemento_mnt = cell.getRow().getData();
-                    //mdl_editar_supervisor(elemento_mnt);
+                    abrir_subir_reporte(elemento_mnt.id)
+                }
+            },
+
+            {
+                formatter: eyeIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
+                cellClick: function (e, cell) {
+                    elemento_mnt = cell.getRow().getData();
+                    //mdl_mantenimiento_info(elemento_mnt);
                 }
             },
             {
@@ -258,13 +271,6 @@ async function consultar_informacion() {
                 cellClick: function (e, cell) {
                     elemento_mnt = cell.getRow().getData();
                     mdl_mantenimiento_info(elemento_mnt);
-                }
-            },
-            {
-                formatter: eyeIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
-                cellClick: function (e, cell) {
-                    elemento_mnt = cell.getRow().getData();
-                    //mdl_mantenimiento_info(elemento_mnt);
                 }
             },
         ],
@@ -380,12 +386,12 @@ async function programar_mantenimiento() {
     }
 }
 
-let selecreg 
+let selecreg
 async function mdl_mantenimiento_info(elemento_mnt) {
     // Busca en el arreglo 'datos' el registro con el mismo id_equipo
     for (let i = 0; i < datos.length; i++) {
         const element = datos[i];
-        if (element.id_equipo === elemento_mnt.id_equipo && element.anio === elemento_mnt.anio ) {
+        if (element.id === elemento_mnt.id && element.anio === elemento_mnt.anio) {
             // Guarda el registro completo en una variable global
             selecreg = element;
             // console.log(selecreg)
@@ -447,7 +453,7 @@ async function mdl_mantenimiento_info(elemento_mnt) {
         }),
 
         general_select2({
-            selectId: 'inp-cargo',
+            selectId: 'select-cargo',
             tabla: 'cat_usuarios',
             campo: 'cargo',
             placeholder: 'NA',
@@ -458,9 +464,33 @@ async function mdl_mantenimiento_info(elemento_mnt) {
     ])
 
     rellenar_select(selecreg.usuario, "select-usuario");
+    rellenar_select(selecreg.cargo, 'select-cargo')
+    rellenar_select(selecreg.tipo, "select-tipo");
+    rellenar_select(selecreg.marca, "select-marca");
+    rellenar_select(selecreg.ubicacion, "select-ubicacion");
+    rellenar_select(selecreg.rubro, "select-rubro")
+    $('#inp-modelo').val(selecreg.modelo)
+    $('#inp-num-serie').val(selecreg.num_serie)
+    $('#inp-fecha').val(selecreg.fecha)
+    $('#inp-estatus').val(selecreg.estado)
 
-    rellenar_select(selecreg.zona, "select-zona")
-    rellenar_select(selecreg.rubro, "slect-rubro")
+    switch (selecreg.estado) {
+        case "Pendiente":
+            $('#estatus-icon').css('color', '#ff7300')
+            break;
+        case "En proceso":
+            $('#estatus-icon').css('color', '#0385ffff')
+            break;
+        case "Realizado":
+            $('#estatus-icon').css('color', '#28a745')
+            break;
+        case "Vencido":
+            $('#estatus-icon').css('color', '#dc3545')
+            break;
+        default:
+            $('#estatus-icon').css('color', '')
+            break;
+    }
 
     $('#mdl-mant-info').modal("show")
 }
@@ -495,3 +525,110 @@ function rellenar_select(texto, select) {
 
     $select.trigger('change');
 }
+
+
+//todo Subida de reportes de mantenimiento
+FilePond.registerPlugin(FilePondPluginFileValidateType);
+
+
+let pond
+//* Variable utilizada para guardar temporalmente el archivo y asi poder ser eliminado desde otra función
+let fileItemCargado
+function abrir_subir_reporte(id) {
+    //*Escondiendo el visor de pdf
+    $('#ver-pdf-reporte').hide()
+
+    if (pond) {
+        pond.destroy();   //* <- Esto destruye la instancia anterior, lo cual es necesario
+    }
+
+    //* Al destruir la instancia es necesario colocarle de nuevo el name al input, sino, no aceptará el archivo el php
+    $('#subir-reporte').attr('name', 'reporte_mantenimiento');
+
+    let fileResguardo = document.getElementById('subir-reporte')
+
+    // Create a FilePond instance
+    pond = FilePond.create(fileResguardo, {
+        maxFiles: 1,
+        labelIdle: 'Arrastra y suelta tu archivo .pdf o <span class="filepond--label-action"> Examina </span>',
+        allowMultiple: false,
+        dropOnPage: true,
+        dropValidation: true,
+        instantUpload: false,
+        acceptedFileTypes: ['application/pdf'],
+        labelFileTypeNotAllowed: 'Archivo no válido solo .pdf',
+        server: {
+            process: {
+                url: "database/controller_mantenimientos/controller_mantenimientos.php",
+                method: 'POST',
+                name: 'reporte_mantenimiento',
+                withCredentials: false,
+                ondata: (formData) => {
+                    const trama = {
+                        accion: 1,
+                        id_equipo: id,
+                    };
+                    formData.append('trama', JSON.stringify(trama));
+                    return formData;
+                },
+                onload: (response) => {
+                    try {
+                        const data = JSON.parse(response); // <- convierte string en objeto
+                        if (data.resultado.error) {
+                            //console.error("Error del servidor:", data.resultado.error);
+                            mostrar_toast("error", "Error", data.resultado.error);
+                        } else {
+                            mostrar_toast("success", "Subido", data.resultado.mensaje)
+
+                            pond.removeFile();
+                        }
+
+                    } catch (e) {
+                        console.error("Error al parsear respuesta:", e);
+                    }
+                },
+                onerror: (error) => {
+                    console.error('Error al subir:', error);
+                    alert("Error al subir archivo.");
+                }
+            },
+        }
+
+
+    });
+
+
+    //* Mostrando pdf cuando se suba
+    let fileToOpen;
+
+    pond.on('addfile', (error, fileItem) => {
+        if (error) {
+            mostrar_toast('error', 'Error', 'Error al cargar PDF:' + error);
+            return;
+        }
+
+        fileItemCargado = fileItem; // <-- guardar archivo
+
+        // Generar URL temporal para el archivo PDF
+        fileToOpen = URL.createObjectURL(fileItem.file);
+
+        const viewer = document.getElementById('pdf-reporte-viewer');
+        viewer.src = fileToOpen;
+
+        $('#ver-pdf-reporte').show()
+
+    });
+}
+
+//*Funcion para remover el archivo del filepond cuando se cierre el control-sidebar
+function remover_archivo() {
+    if (pond && fileItemCargado) {
+        pond.removeFile(fileItemCargado);
+        fileItemCargado = null;
+    }
+}
+
+//* Escondiendo el boton de ver pdf cuando el archivo haya sido removido del filePond
+document.addEventListener('FilePond:removefile', (e) => {
+    $('#ver-pdf-reporte').hide()
+})

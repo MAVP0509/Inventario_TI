@@ -245,18 +245,27 @@ async function general_select2({ selectId, tabla, campo, data, placeholder, drop
 }
 
 //TODO animando iconos 
-$(".icon").on('mouseover', function () {
+/* $(".icon").on('mouseover', function () {
     $(this).find('i').addClass("fa-bounce");
 })
 $(".icon").on('mouseout', function (e) {
     $(this).find('i').removeClass("fa-bounce");
-})
+}) */
 
 $(document).on('mouseover', '.icon', function () {
     $(this).find('i').addClass('fa-bounce');
 }).on('mouseout', '.icon', function () {
     $(this).find('i').removeClass('fa-bounce');
 });
+
+//TODO Animando icono de enviar correo
+
+$(document).on('mouseover', '.envelope',function () {
+  $(this).find('i').removeClass('fa-solid fa-envelope').addClass('fa-solid fa-envelope-open');
+})
+$(document).on('mouseout','.envelope', function () {
+  $(this).find('i').removeClass('fa-solid fa-envelope-open ').addClass('fa-solid fa-envelope')
+})
 
 //todo Animando modals
 $(document).ready(function () {
