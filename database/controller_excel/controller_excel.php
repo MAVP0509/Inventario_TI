@@ -442,6 +442,7 @@ function fecha_programa($anio, $mes)
 function programa_mantenimiento($valores)
 {
     include('../conexion.php');
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
     $anio_actual = date("Y") + 1;
     // $mes = $mes_index + 1;
@@ -472,7 +473,17 @@ function programa_mantenimiento($valores)
 
         $sql_insert = "INSERT INTO mantenimiento(id_equipo, anio, fecha_programada, estado)
                         VALUES ('$id_equipo','$anio_actual', '$fecha_programada', '$estado')";
-        mysqli_query($con, $sql_insert);
+
+        try {
+            mysqli_query($con, $sql_insert);
+        } catch (mysqli_sql_exception $e) {
+            if ($e->getCode() == 1062) {
+                return array(
+                    'duplicado' => false
+                );
+            }
+        }
+        
     }
 
     unset($dispositivo); // Libera la variable de referencia
@@ -578,7 +589,8 @@ function programa_mantenimiento($valores)
     // Retorna un arreglo con el resultado y la URL para descargar el archivo
     return array(
         'result' => true,
-        'url' => $url_descarga
+        'url' => $url_descarga,
+        'duplicados' => $duplicados
     );
 }
 

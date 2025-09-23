@@ -375,17 +375,20 @@ async function programar_mantenimiento() {
         window.location = server.resultado.url;
         mostrar_toast('success', '¡Programa de mantenimiento exitosa!', 'Rellena los campos. Inténtelo nuevamente.');
         $('#mdl-prog-mant').modal("hide");
-    } else {
+    } else if (server.resultado.result === false) {
         mostrar_toast('error', 'Error', 'No se pudo realizar el programa de mantenimiento. Inténtalo nuevamente.');
+    } else if (server.resultado.duplicado === false) {
+        mostrar_toast('error', '¡Error!', 'Ya existe un programa de mantenimiento para el año');
     }
+
 }
 
-let selecreg 
+let selecreg
 async function mdl_mantenimiento_info(elemento_mnt) {
     // Busca en el arreglo 'datos' el registro con el mismo id_equipo
     for (let i = 0; i < datos.length; i++) {
         const element = datos[i];
-        if (element.id_equipo === elemento_mnt.id_equipo && element.anio === elemento_mnt.anio ) {
+        if (element.id_equipo === elemento_mnt.id_equipo && element.anio === elemento_mnt.anio) {
             // Guarda el registro completo en una variable global
             selecreg = element;
             // console.log(selecreg)
@@ -476,8 +479,7 @@ async function reporte_mantenimiento(elemento_mnt) {
         mostrar_toast('success', '¡Generación de reporte exitoso!', 'La generación de reporte de mantenimiento se ha realizado correctamente.');
     } else {
         mostrar_toast('error', '¡Error!', 'No se pudo generar el reporte de mantenimiento. Inténtelo nuevamente.');
-    }
-
+    } 
 }
 
 //? Inicializar popover
