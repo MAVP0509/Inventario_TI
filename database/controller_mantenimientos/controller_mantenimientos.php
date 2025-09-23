@@ -10,8 +10,10 @@ $respuesta_servidor = new stdClass();
 
 if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_datos($clientejson);
-}elseif ($clientejson->accion == 1){
+} elseif ($clientejson->accion == 1) {
     $respuesta_servidor->resultado = guardar_reportes($clientejson);
+} elseif ($clientejson->accion == 2) {
+    $respuesta_servidor->resultado = consultar_orden($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -32,6 +34,20 @@ function consultar_datos()
     }
 
     return $array;
+}
+
+function consultar_orden() {
+    include("../conexion.php");
+
+    $sql = "SELECT * FROM vorden_tipos ORDER BY FIELD(tipo_id, 40, 41, 58, 55, 22, 23, 25, 1, 2, 78, 79, 80, 81, 82, 73, 74, 75, 76, 46, 51)";
+    $query = mysqli_query($con, $sql);
+
+    $datos = array();
+    while ($fila = mysqli_fetch_object($query)) {
+        array_push($datos, $fila);
+    }
+
+    return $datos;
 }
 
 function guardar_reportes($valores)
@@ -79,4 +95,3 @@ function guardar_reportes($valores)
     }
     return $respuesta;
 }
-

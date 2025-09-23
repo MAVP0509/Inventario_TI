@@ -989,8 +989,9 @@ async function confirmar_eliminacion() {
 }
 
 async function mostrar_baja() {
+    // Busca todos los elementos del DOM que tengan el atributo name="lmp-baja".
     let input = $('[name="lmp-baja"]');
-    // Limpia el valor de todos los inpust
+    // Limpia el valor de todos los elementos
     input.each(function () { $(this).val(''); });
 
     // Filtra los datos globales para obtener los equipo seleccionados
@@ -1014,10 +1015,6 @@ async function mostrar_baja() {
             placeholder: 'Selecione un motivo',
             dropdownParent: '#step-1',
             tags: true,
-            // popoverTitle: 'Descripción',
-            // popoverContent: 'Causa por la cual no se encuentre en condiciones óptimas para su uso y/o aprovechamiento.',
-            // placement: "right",
-
         }),
 
         general_select2({
@@ -1101,14 +1098,13 @@ async function mostrar_baja() {
         })
     ])
     // console.timeEnd('selects');
-    // console.log(opcion)
+    
     // Deshabilita inputs específicos por defecto
     $('#inp-motivo, #inp-monto, #inp-quincena, #inp-reubicacion').prop('disabled', true);
     $('#cg-emisor, #cg-supervisor, #cg-vobo, #cg-autorizo').prop('disabled', true);
 
-    // $('#smartwizard').smartWizard("reset");
-    // Configura el asistente visual de pasos
-    $('#smartwizard').smartWizard({
+    // Configura el asistente visual de pasos (SmartWizard)
+    $('#smartwizard').smartWizard({ 
         selected: 0,
         theme: 'dots',
         justified: true,
@@ -1153,11 +1149,13 @@ async function mostrar_baja() {
                 return;
             }
         }
+        // Si todo está bien, llama la función para continuar la baja
         generar_baja();
     });
 
     // Evento para botón Cancelar
     $('#btn-cancelar').on('click', function () {
+        // Alerta de confirmación para cancelar el proceso
         mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false, function () {
             $("#mdl-baja").modal("hide")
         });
@@ -1199,7 +1197,7 @@ async function mostrar_baja() {
         $('#inp-monto, #inp-quincena').prop('disabled', motivo_seleccionado !== '3');
         $('#inp-reubicacion').prop('disabled', motivo_seleccionado !== '6');
 
-
+        // Si no hay motivo, limpia la tabla
         if (!motivo_seleccionado) {
             if (tbl_baja) tbl_baja.clearData();
             return;
@@ -1341,7 +1339,7 @@ $(document).ready(function () {
             .prop('readonly', false)
             .removeClass('text-muted');
     });
-    
+
 });
 
 $(document).ready(function () {
@@ -1479,11 +1477,11 @@ async function crear_resguardo() {
 
     if (server.resultado.error) {
         mostrar_toast('warning', 'Aviso', server.resultado.error)
-    } else if(server.resultado){
-        
+    } else if (server.resultado) {
+
         abrir_resguardo(server.resultado)
         consultar_informacion();
-    }else{
+    } else {
         mostrar_toast('error', 'Aviso', "Hubo un error")
     }
 

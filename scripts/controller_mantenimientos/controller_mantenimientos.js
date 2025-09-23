@@ -300,9 +300,25 @@ let tabla_tipos
 let tipos
 let orden_tipos = []
 
+async function consultar_orden_tipo() {
+
+    let server = await server_mantenimiento({ accion: 2 });
+
+    orden_tipos = server.resultado
+
+    tabla_tipos = new Tabulator('#tbl-tipos', {
+        movableRows: true,
+        data: orden_tipos,
+        columns: [
+            { title: "Tipos de activos", field: "tipo" },
+        ],
+    })
+
+}
+
 async function mdl_programar_mantenimiento() {
 
-    tipos = Array.from(
+    /* tipos = Array.from(
         new Map(
             datos_mantenimiento.map(item => [item.tipo_id, { tipo_id: item.tipo_id, tipo: item.tipo }])
         ).values()
@@ -317,12 +333,13 @@ async function mdl_programar_mantenimiento() {
         columns: [
             { title: "Tipos de activos", field: "tipo" },
         ],
-        rowMoved: function (row) {
+         rowMoved: function (row) {
             let orden = tabla_tipos.getData();
             orden_tipos = orden.map(r => r.tipo_id);
-        }
-    })
-    console.log(orden_tipos);
+        } 
+    }) */
+
+    await consultar_orden_tipo()
 
     await Promise.all([
         general_select2({
@@ -394,7 +411,7 @@ async function programar_mantenimiento() {
         cg_elaboro: $('#select-cg-elaboro').select2('data')[0].text,
         autorizo: $('#select-autorizo').select2('data')[0].text,
         cg_autorizo: $('#select-cg-autorizo').select2('data')[0].text,
-        tipo: orden_actual
+        // tipo: orden_actual
 
     }
 

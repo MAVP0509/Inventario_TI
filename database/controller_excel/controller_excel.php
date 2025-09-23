@@ -462,7 +462,7 @@ function programa_mantenimiento($valores)
         $datos[] = $fila; // Agrega cada fila al arreglo $datos
     }
 
-    // $sql_orden = "INSERT INTO ";
+    consultar_orden($tipos_ordenados);
 
     // Define las columnas de Excel correspondientes a los meses del año
     $meses_columnas = ['H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'];
