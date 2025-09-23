@@ -35,7 +35,7 @@ function server_excel(model) {
     })
 }
 
-let datos
+let datos_mantenimiento = []
 let elemento_mnt
 let table
 let gruposAbiertosKey = "grupos_abiertos_mantenimientos";
@@ -86,7 +86,7 @@ function restaurarEstadoDeGrupos() {
 async function consultar_informacion() {
 
     let server = await server_mantenimiento({ accion: 0 })
-    datos = server.resultado
+    datos_mantenimiento = server.resultado
     Tabulator.extendModule("localize", "langs", {
         "es": {
             "pagination": {
@@ -155,7 +155,7 @@ async function consultar_informacion() {
 
     table = new Tabulator('#tbl01', {
         locale: "es",
-        data: datos,
+        data: datos_mantenimiento,
         layout: "fitColumns",              //fit columns to width of table
         movableColumns: true,              //allow column order to be changed
         paginationButtonCount: 3,
@@ -291,11 +291,32 @@ async function consultar_informacion() {
 }
 
 let tabla_tipos
+let tipos
+let orden_tipos = []
+
 async function mdl_programar_mantenimiento() {
 
+    tipos = Array.from(
+        new Map(
+            datos_mantenimiento.map(item => [item.tipo_id, { tipo_id: item.tipo_id, tipo: item.tipo }])
+        ).values()
+    );
+
+    // orden_tipos = tipos.map(t => t.tipo_id)
+
+    // console.log(tipos)
     tabla_tipos = new Tabulator('#tbl-tipos', {
         movableRows: true,
+        data: tipos,
+        columns: [
+            { title: "Tipos de activos", field: "tipo" },
+        ],
+        rowMoved: function (row) {
+            let orden = tabla_tipos.getData();
+            orden_tipos = orden.map(r => r.tipo_id);
+        }
     })
+    console.log(orden_tipos);
 
     await Promise.all([
         general_select2({
@@ -359,12 +380,16 @@ async function programar_mantenimiento() {
         return;
     }
 
+    const orden_actual = tabla_tipos.getData().map(r => parseInt(r.tipo_id));
+
     let model = {
         accion: 3,
         elaboro: $('#select-elaboro').select2('data')[0].text,
         cg_elaboro: $('#select-cg-elaboro').select2('data')[0].text,
         autorizo: $('#select-autorizo').select2('data')[0].text,
         cg_autorizo: $('#select-cg-autorizo').select2('data')[0].text,
+        tipo: orden_actual
+
     }
 
     mostrar_toast_cargando()
@@ -479,7 +504,7 @@ async function reporte_mantenimiento(elemento_mnt) {
         mostrar_toast('success', '¡Generación de reporte exitoso!', 'La generación de reporte de mantenimiento se ha realizado correctamente.');
     } else {
         mostrar_toast('error', '¡Error!', 'No se pudo generar el reporte de mantenimiento. Inténtelo nuevamente.');
-    } 
+    }
 }
 
 //? Inicializar popover

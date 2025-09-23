@@ -445,16 +445,24 @@ function programa_mantenimiento($valores)
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
     $anio_actual = date("Y") + 1;
+    $orden = array_map('intval', $valores->tipo);
+    $tipos_ordenados = implode(',', $orden);
+
+    // var_dumkp($orden);
     // $mes = $mes_index + 1;
 
     // Consulta SQL que obtiene todos los registros de la vista, en un orden específico según ID
-    $sql_inv = "SELECT * FROM vprograma_mantenimiento ORDER BY FIELD(equipo,40,41,58,55,22,23,25,1,2,78,79,80,81,82,73,74,75,76,46,51)";
+    $sql_inv = "SELECT * FROM vprograma_mantenimiento ORDER BY FIELD(equipo,$tipos_ordenados)";
+    // var_dump($sql_inv);
     $query = mysqli_query($con, $sql_inv);
+    
 
     $datos = []; // Crea un arreglo vacío para almacenar los datos
     while ($fila =  mysqli_fetch_assoc($query)) { // Recorre los resultados fila por fila
         $datos[] = $fila; // Agrega cada fila al arreglo $datos
     }
+
+    // $sql_orden = "INSERT INTO ";
 
     // Define las columnas de Excel correspondientes a los meses del año
     $meses_columnas = ['H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'];
