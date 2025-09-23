@@ -137,7 +137,7 @@ async function consultar_informacion() {
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
-        return "<button type='button' class='btn btn-lock btn-outline-dark icon' onclick=''><i class='fa-solid fa-eye '></i></button>";
+        return "<button type='button' class='btn btn-lock btn-outline-dark icon' data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Ver pdf'><i class='fa-solid fa-eye '></i></button>";
     }
 
     let mailIcon = function (cell, formatterParams, onRendered) { //plain text value
@@ -263,7 +263,7 @@ async function consultar_informacion() {
                 formatter: eyeIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
                 cellClick: function (e, cell) {
                     elemento_mnt = cell.getRow().getData();
-                    //mdl_mantenimiento_info(elemento_mnt);
+                    ver_pdf_reporte(elemento_mnt.id,elemento_mnt.fecha)
                 }
             },
             {
@@ -534,7 +534,10 @@ FilePond.registerPlugin(FilePondPluginFileValidateType);
 let pond
 //* Variable utilizada para guardar temporalmente el archivo y asi poder ser eliminado desde otra función
 let fileItemCargado
-function abrir_subir_reporte(id) {
+async function abrir_subir_reporte(id) {
+    //*Escondiendo el alert
+    document.getElementById('alert-reporte').setAttribute('style', 'display: none !important;  background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;');
+
     //*Escondiendo el visor de pdf
     $('#ver-pdf-reporte').hide()
 
@@ -545,10 +548,10 @@ function abrir_subir_reporte(id) {
     //* Al destruir la instancia es necesario colocarle de nuevo el name al input, sino, no aceptará el archivo el php
     $('#subir-reporte').attr('name', 'reporte_mantenimiento');
 
-    let fileResguardo = document.getElementById('subir-reporte')
+    let fileReporte = document.getElementById('subir-reporte')
 
     // Create a FilePond instance
-    pond = FilePond.create(fileResguardo, {
+    pond = FilePond.create(fileReporte, {
         maxFiles: 1,
         labelIdle: 'Arrastra y suelta tu archivo .pdf o <span class="filepond--label-action"> Examina </span>',
         allowMultiple: false,
@@ -618,6 +621,12 @@ function abrir_subir_reporte(id) {
         $('#ver-pdf-reporte').show()
 
     });
+
+    let server = await server_mantenimiento({accion: 2, id_equipo : id})
+
+    if(server.resultado){
+        document.getElementById('alert-reporte').style.display = 'block'
+    }
 }
 
 //*Funcion para remover el archivo del filepond cuando se cierre el control-sidebar
@@ -631,4 +640,33 @@ function remover_archivo() {
 //* Escondiendo el boton de ver pdf cuando el archivo haya sido removido del filePond
 document.addEventListener('FilePond:removefile', (e) => {
     $('#ver-pdf-reporte').hide()
+    $('[data-widget="control-sidebar"]').ControlSidebar('toggle')
 })
+
+
+//*todo Vista del pdf del reporte en caso de existir
+async function ver_pdf_reporte(id,fecha){
+    dominio = window.location.hostname
+    puerto = location.port
+
+    let model = {
+        accion: 3,
+        id_equipo : id,
+        fecha_mnto : fecha
+    }
+
+    let server = await server_mantenimiento(model)
+
+    if (server.resultado.documento){
+        //archivoPdf = URL.createObjectURL(server.resultado.documento);
+        let ruta = dominio + ':' + puerto + server.resultado.documento
+        const viewer = document.getElementById('mdl-ver-pdf-reporte');
+        viewer.src = ruta;
+
+        $('#mdl-ver-pdf').show()
+    }else if (server.resultado.aviso){
+        mostrar_toast('warning','Aviso', server.resultado.aviso)
+    }else{
+        mostrar_toast('error','Error', "Hubo un error, consulte al equipo de TI")
+    }
+}
