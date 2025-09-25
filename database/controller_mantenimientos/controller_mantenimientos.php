@@ -13,7 +13,9 @@ if ($clientejson->accion == 0) {
 } elseif ($clientejson->accion == 1) {
     $respuesta_servidor->resultado = guardar_reportes($clientejson);
 } elseif ($clientejson->accion == 2) {
-    $respuesta_servidor->resultado = consultar_orden($clientejson);
+    $respuesta_servidor->resultado = validar_reporte_mismo_año($clientejson);
+} elseif ($clientejson->accion == 3) {
+    $respuesta_servidor->resultado = consultar_reporte($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -54,6 +56,13 @@ function guardar_reportes($valores)
 {
     $respuesta = new stdClass();
     //var_dump($_FILES['reporte_mantenimiento']);
+
+    $validacion = validar_reporte_mismo_año($valores);
+    if ($validacion && isset($validacion->resultado)) {
+        unlink($validacion->resultado);
+    }
+
+
     if (isset($_FILES['reporte_mantenimiento']) && $_FILES['reporte_mantenimiento']['error'] === UPLOAD_ERR_OK) {
         $nombreOriginal = $_FILES['reporte_mantenimiento']['name'];
         $tmpPath = $_FILES['reporte_mantenimiento']['tmp_name'];
@@ -93,5 +102,68 @@ function guardar_reportes($valores)
     } else {
         $respuesta->error = "No se recibió ningún archivo válido.";
     }
+    return $respuesta;
+}
+
+function validar_reporte_mismo_año($valores)
+{
+    $respuesta = new stdClass();
+
+    $añoActual = date('Y');
+    //*ruta física del servidor
+    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->id_equipo;
+
+    //* Verifica si existe la carpeta
+    if (is_dir($carpeta)) {
+
+        //* Escanea los archivos, los guarda en un array ignorando sus extensiones
+        $archivos = array_diff(scandir($carpeta), ['.', '..']);
+
+        //*Arma un array de enlaces para acceder al documento 
+        foreach ($archivos as $archivo) {
+            $partes = explode('_', $archivo);
+            $fechaArchivo = $partes[0];
+
+            $añoArchivo = substr($fechaArchivo, 0, 4);
+
+            if ($añoArchivo === $añoActual) {
+                $respuesta->resultado = $carpeta . '/' . $archivo;
+                return $respuesta;
+            }
+        }
+    }
+    return false;
+}
+
+function consultar_reporte($valores)
+{
+    $respuesta = new stdClass();
+    $año = explode('-',$valores->fecha_mnto);
+
+    $añoConsulta = $año[0];
+
+    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->id_equipo;
+
+    $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/' . $valores->id_equipo;
+
+    if (is_dir($carpeta)) {
+        $archivos = array_diff(scandir($carpeta), ['.', '..']);
+
+        foreach ($archivos as $archivo) {
+            $partes = explode('_', $archivo);
+            $fechaArchivo = $partes[0];
+
+            $añoArchivo = substr($fechaArchivo, 0, 4);
+
+            if ($añoArchivo === $añoConsulta) {
+                $respuesta->documento = $carpetaUrl. '/'. $archivo;
+                //var_dump($respuesta);
+                return $respuesta;
+            }
+        }
+    } else {
+        $respuesta->aviso = "El activo no tiene reporte subido";
+    }
+
     return $respuesta;
 }

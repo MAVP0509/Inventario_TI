@@ -32,6 +32,11 @@
     <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
     <link href="https://unpkg.com/filepond-plugin-pdf-preview/dist/filepond-plugin-pdf-preview.css" rel="stylesheet" />
 
+    <!-- Tippy.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/light.css" />
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/perspective-extreme.css" />
+
+
     <style>
         .fa-stack {
             font-size: 14px;
@@ -160,12 +165,21 @@
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col" id="col-subir-reporte">
-                                <input type="file" id="subir-reporte" name="reporte_mantenimiento">
-                                <div id="ver-pdf-reporte" >
+                                <div class="alert alert-danger position-relative d-flex align-items-start " role="alert"
+                                    style="display:none !important; background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;"
+                                    id="alert-reporte">
+                                    El activo ya tiene el reporte de este año, si sube uno, reemplazará el ya existente
+                                    y no será reversible
+                                </div>
+                                <div id="contenedor-filepond">
+                                    <input type="file" id="subir-reporte" name="reporte_mantenimiento">
+                                </div>
+
+                                <div id="ver-pdf-reporte">
                                     <embed id="pdf-reporte-viewer" src="libraries/web/viewer.html"
                                         style="width: 100%; height: 350px; border: none; margin-top: 20px;"
                                         loading="lazy" referrerpolicy="no-referrer"
-                                        sandbox="allow-scripts allow-same-origin allow-downloads" ></embed>
+                                        sandbox="allow-scripts allow-same-origin allow-downloads"></embed>
                                 </div>
 
                             </div>
@@ -339,8 +353,8 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-square-binary"></i></span>
                                     </div>
-                                    <input type="text" class=" form-control" id="inp-num-serie" name="mdl-mant-info-inputs"
-                                        disabled>
+                                    <input type="text" class=" form-control" id="inp-num-serie"
+                                        name="mdl-mant-info-inputs" disabled>
                                 </div>
 
                                 <h6>Ubicacion</h6>
@@ -362,7 +376,8 @@
                                 <h6>Estatus</h6>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span id="estatus-icon" class="input-group-text"><i class="fa-solid fa-circle"></i></span>
+                                        <span id="estatus-icon" class="input-group-text"><i
+                                                class="fa-solid fa-circle"></i></span>
                                     </div>
                                     <input type="input" class="form-control" id="inp-estatus"
                                         name="mdl-mant-info-inputs" disabled>
@@ -386,6 +401,37 @@
                             </div>
                             <select class="form-control select" id="select-cargo" name="mdl-mant-info-inputs"
                                 disabled></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
+                            class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal ver pdf-->
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-ver-pdf" role="dialog" data-backdrop="static"
+        data-keyboard="false">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fa-solid fa-file-signature"></i> Resguardo firmado</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col">
+                                <embed id="mdl-ver-pdf-reporte" src="libraries/web/viewer.html"
+                                    style="width: 100%; height: 700px; border: none; margin-top: 20px;" loading="lazy"
+                                    referrerpolicy="no-referrer"
+                                    sandbox="allow-scripts allow-same-origin allow-downloads"></embed>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -425,6 +471,11 @@
 
 <!--Admin LTE-->
 <script src="dist/js/adminlte.min.js" defer></script>
+
+<!-- Tippy.js -->
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6"></script>
+
 
 <!--Scripts-->
 <script src="scripts/controller_acceso/controller_acceso.js?v=1.0.1" defer></script>
