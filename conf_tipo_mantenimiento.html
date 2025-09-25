@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="images/x-icon" href="images/diavaz.jfif">
     <!-- Bootstrap  -->
-    <link rel="stylesheet" href="libraries/bootstrap-4.6.2-dist/css/bootstrap-grid.min.css">
+    <link rel="stylesheet" href="libraries/bootstrap-4.6.2-dist/css/bootstrap.min.css">
 
     <!--  AdminLTE -->
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
@@ -93,8 +93,11 @@
                                             onclick="mdl_nuevo_orden_tipo()"><i class="fa-solid fa-plus fa-lg"></i>
                                             Nuevo</button>
                                         <button type="button" class="btn btn-danger mr-3 icon"
-                                            onclick="mensaje_eliminar()"><i class="fa-solid fa-trash-can fa-lg"></i>
+                                            onclick="msj_eliminar_orden_tipo()"><i
+                                                class="fa-solid fa-trash-can fa-lg"></i>
                                             Eliminar</button>
+                                        <!-- <button type="button" class="btn btn-primary mr-3 icon"
+                                            onclick=" orden_tipos_mantenimiento()">Guardar orden</button> -->
                                     </div>
                                 </div><!-- /.card-header -->
 
@@ -117,7 +120,7 @@
     </div>
 
     <!--Modal tipo -->
-    <div class="modal fade" tabindex="-1" aria-hidden="true" id="mdl-tipo-mant">
+    <div class="modal fade" tabindex="-1" aria-hidden="true" id="mdl-tipo-mant" data-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -131,7 +134,7 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa-solid fa-desktop"></i></span>
                         </div>
-                        <select id="slc-orden-tp" class="form-control"></select>
+                        <select id="slc-orden-tp" class="form-control select2bs4" name="nv-tipo-mant" multiple></select>
                         <!-- <input type="text" class="form-control" id="tipo" autocomplete="off"> -->
                         <div class="invalid-feedback" id="tipo-feedback">Por favor, ingrese un tipo.</div>
                     </div>
@@ -145,8 +148,8 @@
                     </div> -->
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-orden">Cancelar <i
-                            class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-orden">Cancelar
+                        <i class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
                     <button type="button" class="btn btn-success icon" id="mdl-btn-orden-tp">Confirmar <i
                             class="fa-solid fa-circle-check fa-lg"></i></button>
                 </div>
@@ -184,6 +187,8 @@
 <!-- Scripts -->
 <script src="scripts/controller_acceso/controller_acceso.js?v=1.0.1" defer></script>
 <script src="scripts/controller_global/controller_global.js?v=1.0.2" defer></script>
+<script src="scripts/controller_mantenimientos/controller_mantenimientos.js" defer></script>
 <script src="scripts/controller_conf_tipo_mantenimiento/controller_conf_tipo_mantenimiento.js?v=1.0.0" defer></script>
+
 
 </html>

@@ -298,7 +298,7 @@ async function consultar_informacion() {
 
 }
 
-let tabla_tipos
+/* let tabla_tipos
 let tipos
 let orden_tipos = []
 
@@ -316,7 +316,7 @@ async function consultar_orden_tipo() {
         ],
     })
 
-}
+} */
 
 async function mdl_programar_mantenimiento() {
 
@@ -392,11 +392,12 @@ async function mdl_programar_mantenimiento() {
     rellenar_select("Alejandro Cancino Arguello", "select-elaboro")
 
     $('#select-cg-elaboro, #select-cg-autorizo').prop('disabled', true)
+    $("#mdl-btn-conf").off("click").on("click", function () { programar_mantenimiento() })
 
     $('#mdl-prog-mant').modal("show")
 }
 
-async function programar_mantenimiento() {
+async function programar_mantenimiento(orden_actual) {
 
     const validar = ['select-elaboro', 'select-autorizo']
 
@@ -405,6 +406,7 @@ async function programar_mantenimiento() {
         return;
     }
 
+    // console.log(orden_actual)
     // const orden_actual = tabla_tipos.getData().map(r => parseInt(r.tipo_id));
 
     let model = {
@@ -413,7 +415,7 @@ async function programar_mantenimiento() {
         cg_elaboro: $('#select-cg-elaboro').select2('data')[0].text,
         autorizo: $('#select-autorizo').select2('data')[0].text,
         cg_autorizo: $('#select-cg-autorizo').select2('data')[0].text,
-        // tipo: orden_actual
+        // orden: orden_actual,
     }
 
     mostrar_toast_cargando()
@@ -426,8 +428,10 @@ async function programar_mantenimiento() {
         $('#mdl-prog-mant').modal("hide");
     } else if (server.resultado.result === false) {
         mostrar_toast('error', 'Error', 'No se pudo realizar el programa de mantenimiento. Inténtalo nuevamente.');
+        $('#mdl-prog-mant').modal("hide");
     } else if (server.resultado.duplicado === false) {
         mostrar_toast('error', '¡Error!', 'Ya existe un programa de mantenimiento para el año');
+        $('#mdl-prog-mant').modal("hide");
     }
 
 }

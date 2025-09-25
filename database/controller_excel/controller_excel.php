@@ -439,20 +439,37 @@ function fecha_programa($anio, $mes)
     return $fecha->format('Y-m-d');
 }
 
+function ConsultarOrdenMTTO()
+{
+    include('../conexion.php');
+    $SQL = "SELECT * FROM vorden_mantenimiento";
+    $query = mysqli_query($con, $SQL);
+    $datos = array();
+    while ($filas = mysqli_fetch_object($query)) {
+        array_push($datos, $filas->tipo_id);
+    }
+    return $datos;
+}
+
 function programa_mantenimiento($valores)
 {
     include('../conexion.php');
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    $anio_actual = date("Y") + 1;
+    // $anio_actual = date("Y") + 1;
+    $anio_actual = date("Y");
     // $orden = array_map('intval', $valores->tipo);
-    // $tipos_ordenados = implode(',', $orden);
+    $orden = ConsultarOrdenMTTO();
+    // var_dump($orden);
+    $tipos_ordenados = implode(',', ConsultarOrdenMTTO());
+
+    $orden = "";
 
     // var_dumkp($orden);
     // $mes = $mes_index + 1;
 
     // Consulta SQL que obtiene todos los registros de la vista, en un orden específico según ID
-    $sql_inv = "SELECT * FROM vprograma_mantenimiento ORDER BY FIELD(equipo,40, 41, 58, 55, 22, 23, 25, 1, 2, 78, 79, 80, 81, 82, 73, 74, 75, 76, 46, 51)";
+    $sql_inv = "SELECT * FROM vprograma_mantenimiento ORDER BY FIELD(equipo, $tipos_ordenados)";
     // var_dump($sql_inv);
     $query = mysqli_query($con, $sql_inv);
 

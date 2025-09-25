@@ -143,7 +143,7 @@ function seleccionar_registro(id, lista) {
     // console.log(lista)
 }
 
-async function general_select2({ selectId, tabla, campo, data, placeholder, dropdownParent, tags, popoverTitle, popoverContent, placement, sincronizarCon, sincronizarCampo }) {
+async function general_select2({ selectId, tabla, campo, data, placeholder, dropdownParent, tags, popoverTitle, popoverContent, placement, sincronizarCon, sincronizarCampo, multiple = false }) {
     //try {
     let opciones = [];
 
@@ -170,6 +170,14 @@ async function general_select2({ selectId, tabla, campo, data, placeholder, drop
     }
 
     const $select = $('#' + selectId);
+
+    if(multiple){
+        $select.attr('multiple', 'multiple');
+    } else {
+        $select.removeAttr('multiple');
+    }
+
+    // $select.addClass('form-control select2bs4');
     $select.empty().append(new Option('', '', false, false));
 
     $select.select2({
@@ -181,7 +189,8 @@ async function general_select2({ selectId, tabla, campo, data, placeholder, drop
         data: opciones
     });
 
-    $select.val(null).trigger('change');
+    // Para múltiples valores, se asigna [] como valor inicaial
+    $select.val(multiple ? [] : null).trigger('change');
 
     //  Si se pasan datos de popover, aplicarlo
     if (popoverTitle && popoverContent) {
