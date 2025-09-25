@@ -697,12 +697,12 @@ document.addEventListener('FilePond:removefile', (e) => {
 })
 
 //todo Cerrando el control-sidebar con click fuera de éste
-$(".content-wrapper").click(function () {
+/* $(".content-wrapper").click(function () {
     if ($('body').hasClass('control-sidebar-slide-open')) {
         //console.log('cerrando sidebar');
         $('[data-widget="control-sidebar"]').ControlSidebar('toggle');
     }
-});
+}); */
 
 //*todo Vista del pdf del reporte en caso de existir
 async function ver_pdf_reporte(id, fecha) {
