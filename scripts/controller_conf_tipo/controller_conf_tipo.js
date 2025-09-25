@@ -22,7 +22,7 @@ function server_tipo(model) {
     });
 }
 
-let datos = []
+let datos_tipo = []
 let elemento
 let table
 let tipo_selecionado = []
@@ -30,7 +30,7 @@ let tipo_selecionado = []
 async function consultar_informacion(){
     let server = await server_tipo({accion : 2})
 
-    datos = JSON.parse(respuesta).resultado
+    datos_tipo = server.resultado
 
     //* Idioma Español
     Tabulator.extendModule("localize", "langs", {
@@ -67,7 +67,7 @@ async function consultar_informacion(){
     });
 
     // Inicializar cada fila con "seleccionado: false"
-    datos.forEach(d => d.seleccionado = false);
+    datos_tipo.forEach(d => d.seleccionado = false);
 
     // Formatter del ícono tipo checkbox
     let squareIcon = function (cell, formatterParams, onRendered) {
@@ -84,7 +84,7 @@ async function consultar_informacion(){
 
      table = new Tabulator('#tbl', {
          locale: "es",
-        data: datos,
+        data: datos_tipo,
         layout: "fitColumns",              //fit columns to width of table
         pagination: "local",               //paginate the data
         paginationSize: 10,                //allow 10 rows per page of data
@@ -137,8 +137,8 @@ async function consultar_informacion(){
 let datoSelected = ""
 selected = false
 function mdl_editar_tipo(params) {
-    for (let i = 0; i < datos.length; i++) {
-        let element = datos[i]
+    for (let i = 0; i < datos_tipos.length; i++) {
+        let element = datos_tipos[i]
 
         if (element.id === params.id) {
             datoSelected = element
@@ -274,7 +274,7 @@ async function eliminar_tipo() {
 
 function deseleccionar_todos() {
     //  Resetear propiedad "seleccionado"
-    datos.forEach(d => d.seleccionado = false);
+    datos_tipos.forEach(d => d.seleccionado = false);
 
     //  Limpiar el array de tipo_selecionado
     tipo_selecionado = [];

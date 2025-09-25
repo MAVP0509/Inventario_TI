@@ -445,24 +445,22 @@ function programa_mantenimiento($valores)
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
     $anio_actual = date("Y") + 1;
-    $orden = array_map('intval', $valores->tipo);
-    $tipos_ordenados = implode(',', $orden);
+    // $orden = array_map('intval', $valores->tipo);
+    // $tipos_ordenados = implode(',', $orden);
 
     // var_dumkp($orden);
     // $mes = $mes_index + 1;
 
     // Consulta SQL que obtiene todos los registros de la vista, en un orden específico según ID
-    $sql_inv = "SELECT * FROM vprograma_mantenimiento ORDER BY FIELD(equipo,$tipos_ordenados)";
+    $sql_inv = "SELECT * FROM vprograma_mantenimiento ORDER BY FIELD(equipo,40, 41, 58, 55, 22, 23, 25, 1, 2, 78, 79, 80, 81, 82, 73, 74, 75, 76, 46, 51)";
     // var_dump($sql_inv);
     $query = mysqli_query($con, $sql_inv);
-    
+
 
     $datos = []; // Crea un arreglo vacío para almacenar los datos
     while ($fila =  mysqli_fetch_assoc($query)) { // Recorre los resultados fila por fila
         $datos[] = $fila; // Agrega cada fila al arreglo $datos
     }
-
-    consultar_orden($tipos_ordenados);
 
     // Define las columnas de Excel correspondientes a los meses del año
     $meses_columnas = ['H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'];
@@ -491,7 +489,6 @@ function programa_mantenimiento($valores)
                 );
             }
         }
-        
     }
 
     unset($dispositivo); // Libera la variable de referencia
@@ -628,9 +625,9 @@ function reporte_mantenimiento($valores)
     $pageMargins->setLeft(0.5);
     $pageMargins->setRight(0.5);
 
-    $worksheet->setCellValue("G11", !empty($valores->usuario) ? $valores->usuario : 'NA');
-    $worksheet->setCellValue("G12", !empty($valores->cargo) ? $valores->cargo : 'NA');
-    $worksheet->setCellValue("G13", !empty($valores->region) ? $valores->region : 'NA');
+    $worksheet->setCellValue("G11", !empty($valores->elementos->usuario) ? $valores->elementos->usuario : 'NA');
+    $worksheet->setCellValue("G12", !empty($valores->elementos->cargo) ? $valores->elementos->cargo : 'NA');
+    $worksheet->setCellValue("G13", !empty($valores->elementos->region) ? $valores->elementos->region : 'NA');
     // $worksheet->setCellValue("G14", !empty($valores->id) ? $valores->id : 'NA');
 
     // Mapeo de tipo -> fila
@@ -658,9 +655,9 @@ function reporte_mantenimiento($valores)
     $fila = $mapa_filas[$tipo] ?? 26; // 26 = Otros
 
     // Rellenar datos
-    $marca = !empty($valores->marca) ? $valores->marca : 'NA';
-    $modelo = !empty($valores->modelo) ? $valores->modelo : 'NA';
-    $serie = !empty($valores->num_serie) ? $valores->num_serie : 'NA';
+    $marca = !empty($valores->elementos->marca) ? $valores->elementos->marca : 'NA';
+    $modelo = !empty($valores->elementos->modelo) ? $valores->elementos->modelo : 'NA';
+    $serie = !empty($valores->elementos->num_serie) ? $valores->elementos->num_serie : 'NA';
     // $observaciones = !empty($valores->ubicacion) ? $valores->ubicacion : 'NA';
     $observaciones = false;
     if ($marca !== 'NA' || $modelo !== 'NA' || $serie !== 'NA') {
@@ -678,8 +675,8 @@ function reporte_mantenimiento($valores)
     $worksheet->setCellValue("L{$fila}", $modelo);
     $worksheet->setCellValue("Q{$fila}", $serie);
 
-    $worksheet->setCellValue("U69", !empty($valores->usuario) ? $valores->usuario : '');
-    $worksheet->setCellValue("D69", !empty($valores->usuario) ? $valores->usuario : '');
+    $worksheet->setCellValue("D69", !empty($valores->encargado) ? $valores->encargado : '');
+    $worksheet->setCellValue("U69", !empty($valores->elementos->usuario) ? $valores->elementos->usuario : '');
 
     // $workskheet->setCellValue("W{$fila}", $observaciones);
 

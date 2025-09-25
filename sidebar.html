@@ -1,113 +1,132 @@
 <!-- sidebar.html -->
 <div class="sidebar">
-    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-      <div class="image">
-        <img src="images/user2.png" class="img-circle elevation-2" alt="User Image">
-      </div>
-      <div class="info">
-        <a href="#" class="d-block" id="user">Name user</a>
-      </div>
+  <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+    <div class="image">
+      <img src="images/user2.png" class="img-circle elevation-2" alt="User Image">
     </div>
-  
-    <nav class="mt-2">
-      <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent" data-widget="treeview" role="menu" data-accordion="false">
-  
-        <!-- Visible para todos los roles -->
-        <li class="nav-item" data-role="admin,user">
-          <a href="inventario.html" class="nav-link">
-            <i class="nav-icon fa-solid fa-cubes"></i>
-            <p>Inventario</p>
-          </a>
-        </li>
+    <div class="info">
+      <a href="#" class="d-block" id="user">Name user</a>
+    </div>
+  </div>
 
-        <!-- <li class="nav-item" data-role="admin,user">
+  <nav class="mt-2">
+    <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent" data-widget="treeview" role="menu"
+      data-accordion="false">
+
+      <!-- Visible para todos los roles -->
+      <li class="nav-item" data-role="admin,user">
+        <a href="inventario.html" class="nav-link">
+          <i class="nav-icon fa-solid fa-cubes"></i>
+          <p>Inventario</p>
+        </a>
+      </li>
+
+      <!-- <li class="nav-item" data-role="admin,user">
           <a href="mantenimientos_auditorias.html" class="nav-link">
             <i class="nav-icon fa-solid fa-file-contract"></i>
             <p>Mantenimientos y auditorias</p>
           </a>
         </li> -->
 
-        <li class="nav-item" data-role="admin,user">
-          <a href="mantenimientos.html" class="nav-link">
-            <i class="nav-icon fa-solid fa-screwdriver-wrench"></i>
-            <p>Mantenimientos</p>
-          </a>
-        </li>
-  
-        <!-- Solo visible para admin -->
+      <li class="nav-item" data-role="admin,user">
+        <a href="mantenimientos.html" class="nav-link">
+          <i class="nav-icon fa-solid fa-screwdriver-wrench"></i>
+          <p>Mantenimientos</p>
+        </a>
+      </li>
 
-        <li class="nav-item" data-role="admin">
-          <a href="historico.html" class="nav-link">
-            <i class="nav-icon fa-solid fa-clock-rotate-left"></i>
-            <p>Histórico</p>
-          </a>
-        </li>
-        <li class="nav-item" data-role="admin">
-          <a href="bajas.html" class="nav-link">
-            <i class=" fa-solid fa-desktop"></i><i class="fa-solid fa-arrow-turn-down"></i>
-            <p>Activos de baja</p>
-          </a>
-        </li>
+      <!-- Solo visible para admin -->
 
-        <li class="nav-item" data-role="admin">
+      <li class="nav-item" data-role="admin">
+        <a href="historico.html" class="nav-link">
+          <i class="nav-icon fa-solid fa-clock-rotate-left"></i>
+          <p>Histórico</p>
+        </a>
+      </li>
+      <li class="nav-item" data-role="admin">
+        <a href="bajas.html" class="nav-link">
+          <i class=" fa-solid fa-desktop"></i><i class="fa-solid fa-arrow-turn-down"></i>
+          <p>Activos de baja</p>
+        </a>
+      </li>
+
+      <li class="nav-item" data-role="admin">
+        <a href="#" class="nav-link">
+          <i class="nav-icon fa-solid fa-gear"></i>
+          <p>Configuración<i class="right fa-solid fa-angle-left"></i></p>
+        </a>
+        <ul class="nav nav-treeview nav-child-indent">
+
+          <li class="nav-item">
+            <a href="supervisores.html" class="nav-link">
+              <i class="fa-solid fa-users-rays nav-icon"></i>
+              <p>Supervisores</p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="usuario.html" class="nav-link">
+              <i class="fa-solid fa-users nav-icon"></i>
+              <p>Usuarios del sistema</p>
+            </a>
+          </li>
+          <!-- <li class="nav-item">
+            <a href="conf_tipo_mantenimiento.html" class="nav-link">
+              <i class="fa-solid fa-file-lines nav-icon"></i>
+              <p>Orden tipos</p>
+            </a>
+          </li> -->
+
+          <li class="nav-item" data-role="admin">
             <a href="#" class="nav-link">
-                <i class="nav-icon fa-solid fa-gear"></i>
-                <p>Configuración<i class="right fa-solid fa-angle-left"></i></p>
+              <i class="nav-icon fa-solid fa-warehouse"></i>
+              <p>Inventario<i class="right fa-solid fa-angle-left"></i></p>
             </a>
             <ul class="nav nav-treeview nav-child-indent">
-                <li class="nav-item">
-                    <a href="supervisores.html" class="nav-link">
-                      <i class="fa-solid fa-users-rays nav-icon"></i>
-                        <p>Supervisores</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="usuario.html" class="nav-link">
-                      <i class="fa-solid fa-users nav-icon"></i>
-                        <p>Usuarios del sistema</p>
-                    </a>
-                </li>
-                <!-- <li class="nav-item">
-                    <a href="conf_formatos.html" class="nav-link">
-                      <i class="fa-solid fa-file-lines nav-icon"></i>
-                        <p>Formatos</p>
-                    </a>
-                </li> -->
-                <li class="nav-item" data-role="admin">
-                  <a href="#" class="nav-link">
-                    <i class="nav-icon fa-solid fa-warehouse"></i>
-                    <p>Inventario<i class="right fa-solid fa-angle-left"></i></p>
-                  </a>
-                  <ul class="nav nav-treeview nav-child-indent">
-                    <li class="nav-item">
-                      <a href="conf_rubro.html" class="nav-link">
-                        <i class="nav-icon fa-solid fa-computer fa-lg"></i>
-                        <p>Rubro</p>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a href="conf_tipo.html" class="nav-link">
-                        <i class="nav-icon fa-solid fa-display"></i>
-                        <p>Tipos de dispositivos</p>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a href="conf_marca.html" class="nav-link">
-                        <i class="nav-icon fa-solid fa-registered"></i>
-                        <p>Marca</p>
-                      </a>
-                    </li>
-                    <li class="nav-item">
-                      <a href="conf_usuarios.html" class="nav-link">
-                        <i class="nav-icon fa-solid fa-users"></i>
-                        <p>Usuarios</p>
-                      </a>
-                    </li>
-                  </ul>
-                </li>
+              <li class="nav-item">
+                <a href="conf_rubro.html" class="nav-link">
+                  <i class="nav-icon fa-solid fa-computer fa-lg"></i>
+                  <p>Rubro</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="conf_tipo.html" class="nav-link">
+                  <i class="nav-icon fa-solid fa-display"></i>
+                  <p>Tipos de dispositivos</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="conf_marca.html" class="nav-link">
+                  <i class="nav-icon fa-solid fa-registered"></i>
+                  <p>Marca</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="conf_usuarios.html" class="nav-link">
+                  <i class="nav-icon fa-solid fa-users"></i>
+                  <p>Usuarios</p>
+                </a>
+              </li>
             </ul>
-        </li>
-  
-      </ul>
-    </nav>
-  </div>
+          </li>
+          <!-- Mantenimiento -->
+          <li class="nav-item" data-role="admin">
+            <a href="#" class="nav-link">
+              <i class="fa-solid fa-screwdriver"></i>
+              <p>Mantenimiento<i class="right fa-solid fa-angle-left"></i></p>
+            </a>
+            <ul class="nav nav-treeview nav-child-indent">
+              <li class="nav-item">
+                <a href="conf_tipo_mantenimiento.html" class="nav-link">
+                  <i class="fa-solid fa-computer"></i>
+                  <p>Tipos de dispositivos</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+
+    </ul>
+  </nav>
+</div>

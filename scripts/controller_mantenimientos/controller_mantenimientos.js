@@ -131,6 +131,7 @@ async function consultar_informacion() {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
         return "<button type='button' class='btn btn-success icon' data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Reporte de mantenimiento' onclick=''><i class='fa-solid fa-file-excel fa-lg'></i></button>";
+        
     }
 
     let eyeIcon = function (cell, formatterParams, onRendered) { //plain text value
@@ -248,7 +249,8 @@ async function consultar_informacion() {
                 formatter: fileIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
                 cellClick: function (e, cell) {
                     elemento_mnt = cell.getRow().getData();
-                    reporte_mantenimiento(elemento_mnt);
+                    mdl_reporte_mantenimiento(elemento_mnt);
+                    // reporte_mantenimiento(elemento_mnt);
                 }
             },
             {
@@ -339,7 +341,7 @@ async function mdl_programar_mantenimiento() {
         } 
     }) */
 
-    await consultar_orden_tipo()
+    // await consultar_orden_tipo()
 
     await Promise.all([
         general_select2({
@@ -403,7 +405,7 @@ async function programar_mantenimiento() {
         return;
     }
 
-    const orden_actual = tabla_tipos.getData().map(r => parseInt(r.tipo_id));
+    // const orden_actual = tabla_tipos.getData().map(r => parseInt(r.tipo_id));
 
     let model = {
         accion: 3,
@@ -412,7 +414,6 @@ async function programar_mantenimiento() {
         autorizo: $('#select-autorizo').select2('data')[0].text,
         cg_autorizo: $('#select-cg-autorizo').select2('data')[0].text,
         // tipo: orden_actual
-
     }
 
     mostrar_toast_cargando()
@@ -433,9 +434,9 @@ async function programar_mantenimiento() {
 
 let selecreg
 async function mdl_mantenimiento_info(elemento_mnt) {
-    // Busca en el arreglo 'datos' el registro con el mismo id_equipo
-    for (let i = 0; i < datos.length; i++) {
-        const element = datos[i];
+    // Busca en el arreglo 'datos_mantenimiento' el registro con el mismo id_equipo
+    for (let i = 0; i < datos_mantenimiento.length; i++) {
+        const element = datos_mantenimiento[i];
         if (element.id === elemento_mnt.id && element.anio === elemento_mnt.anio) {
             // Guarda el registro completo en una variable global
             selecreg = element;
@@ -540,14 +541,34 @@ async function mdl_mantenimiento_info(elemento_mnt) {
     $('#mdl-mant-info').modal("show")
 }
 
+async function mdl_reporte_mantenimiento(elemento_mnt) {
+
+    await general_select2({
+        selectId: 'slc-encargado',
+        tabla: 'cat_usuarios',
+        campo: 'nombre',
+        dropdownParent: '#mdl-reporte-mant',
+        placeholder: 'Seleccione un encargado'
+    })
+
+    rellenar_select("César Ignacio Torres Almeida", "slc-encargado");
+    $("#btn-reporte-mant").off('click').on('click', function () { reporte_mantenimiento(elemento_mnt) })
+    $("#mdl-reporte-mant").modal("show");
+}
+
 async function reporte_mantenimiento(elemento_mnt) {
     // console.log(elemento_mnt)
-    elemento_mnt.accion = 4;
+    let model = {
+        accion: 4,
+        elementos: elemento_mnt,
+        encargado: $("#slc-encargado").select2('data')[0].text
+    }
 
-    let server = await server_excel(elemento_mnt);
+    let server = await server_excel(model);
 
     if (server.resultado.result === true && server.resultado.url) {
         window.location = server.resultado.url;
+        $('#mdl-reporte-mant').modal("hide");
         mostrar_toast('success', '¡Generación de reporte exitoso!', 'La generación de reporte de mantenimiento se ha realizado correctamente.');
     } else {
         mostrar_toast('error', '¡Error!', 'No se pudo generar el reporte de mantenimiento. Inténtelo nuevamente.');

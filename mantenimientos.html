@@ -179,9 +179,6 @@
 
     </div>
 
-
-
-
     <!--Modal programar mantenimiento -->
     <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-prog-mant" role="dialog" data-backdrop="static"
         data-keyboard="false">
@@ -196,7 +193,7 @@
                 <div class="modal-body">
                     <div class="container-fluid">
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-12">
                                 <h6>Elaboró</h6>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
@@ -234,9 +231,9 @@
                                     <div class="invalid-feedback">Por favor, seleccione una persona.</div>
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <!-- <div class="col-6">
                                 <div id="tbl-tipos"></div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
@@ -247,6 +244,38 @@
                         onclick="programar_mantenimiento()">Confirmar <i
                             class="fa-solid fa-circle-check fa-lg"></i></button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de reporte de mantenimiento -->
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-reporte-mant" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reporte de mantenimiento</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <!-- Body -->
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <h6>Encargado de realizar el reporte</h6>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text"><i class="fa-solid fa-user"></i></div>
+                            </div>
+                            <select id="slc-encargado" class="form-control"></select>
+                            <div class="invalid-feedback">Por favor, selecione un encargado</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Footer -->
+                 <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cancelar</button>
+                    <button type="button" class="btn btn-success icon" id="btn-reporte-mant"><i class="fa-solid fa-file-arrow-down"></i> Generar</button>
+                 </div>
             </div>
         </div>
     </div>
