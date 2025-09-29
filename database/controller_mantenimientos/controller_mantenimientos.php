@@ -38,6 +38,20 @@ function consultar_datos()
     return $array;
 }
 
+function consultar_orden() {
+    include("../conexion.php");
+
+    $sql = "SELECT * FROM vorden_tipos ORDER BY FIELD(tipo_id, 40, 41, 58, 55, 22, 23, 25, 1, 2, 78, 79, 80, 81, 82, 73, 74, 75, 76, 46, 51)";
+    $query = mysqli_query($con, $sql);
+
+    $datos = array();
+    while ($fila = mysqli_fetch_object($query)) {
+        array_push($datos, $fila);
+    }
+
+    return $datos;
+}
+
 function guardar_reportes($valores)
 {
     include("../conexion.php");

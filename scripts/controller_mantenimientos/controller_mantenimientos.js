@@ -59,7 +59,7 @@ function server_correo(model) {
     })
 }
 
-let datos
+let datos_mantenimiento = []
 let elemento_mnt
 let table
 let gruposAbiertosKey = "grupos_abiertos_mantenimientos";
@@ -110,7 +110,7 @@ function restaurarEstadoDeGrupos() {
 async function consultar_informacion() {
 
     let server = await server_mantenimiento({ accion: 0 })
-    datos = server.resultado
+    datos_mantenimiento = server.resultado
     Tabulator.extendModule("localize", "langs", {
         "es": {
             "pagination": {
@@ -197,7 +197,7 @@ async function consultar_informacion() {
 
     table = new Tabulator('#tbl01', {
         locale: "es",
-        data: datos,
+        data: datos_mantenimiento,
         layout: "fitColumns",              //fit columns to width of table
         movableColumns: true,              //allow column order to be changed
         paginationButtonCount: 3,
@@ -343,12 +343,50 @@ async function consultar_informacion() {
 
 }
 
-let tabla_tipos
-async function mdl_programar_mantenimiento() {
+/* let tabla_tipos
+let tipos
+let orden_tipos = []
+
+async function consultar_orden_tipo() {
+
+    let server = await server_mantenimiento({ accion: 2 });
+
+    orden_tipos = server.resultado
 
     tabla_tipos = new Tabulator('#tbl-tipos', {
         movableRows: true,
+        data: orden_tipos,
+        columns: [
+            { title: "Tipos de activos", field: "tipo" },
+        ],
     })
+
+} */
+
+async function mdl_programar_mantenimiento() {
+
+    /* tipos = Array.from(
+        new Map(
+            datos_mantenimiento.map(item => [item.tipo_id, { tipo_id: item.tipo_id, tipo: item.tipo }])
+        ).values()
+    );
+
+    // orden_tipos = tipos.map(t => t.tipo_id)
+
+    // console.log(tipos)
+    tabla_tipos = new Tabulator('#tbl-tipos', {
+        movableRows: true,
+        data: tipos,
+        columns: [
+            { title: "Tipos de activos", field: "tipo" },
+        ],
+         rowMoved: function (row) {
+            let orden = tabla_tipos.getData();
+            orden_tipos = orden.map(r => r.tipo_id);
+        } 
+    }) */
+
+    // await consultar_orden_tipo()
 
     await Promise.all([
         general_select2({
@@ -399,11 +437,12 @@ async function mdl_programar_mantenimiento() {
     rellenar_select("Alejandro Cancino Arguello", "select-elaboro")
 
     $('#select-cg-elaboro, #select-cg-autorizo').prop('disabled', true)
+    $("#mdl-btn-conf").off("click").on("click", function () { programar_mantenimiento() })
 
     $('#mdl-prog-mant').modal("show")
 }
 
-async function programar_mantenimiento() {
+async function programar_mantenimiento(orden_actual) {
 
     const validar = ['select-elaboro', 'select-autorizo']
 
@@ -412,12 +451,16 @@ async function programar_mantenimiento() {
         return;
     }
 
+    // console.log(orden_actual)
+    // const orden_actual = tabla_tipos.getData().map(r => parseInt(r.tipo_id));
+
     let model = {
         accion: 3,
         elaboro: $('#select-elaboro').select2('data')[0].text,
         cg_elaboro: $('#select-cg-elaboro').select2('data')[0].text,
         autorizo: $('#select-autorizo').select2('data')[0].text,
         cg_autorizo: $('#select-cg-autorizo').select2('data')[0].text,
+        // orden: orden_actual,
     }
 
     mostrar_toast_cargando('Programando mantenimiento...')
@@ -428,16 +471,21 @@ async function programar_mantenimiento() {
         window.location = server.resultado.url;
         mostrar_toast('success', '¡Programa de mantenimiento exitosa!', 'Rellena los campos. Inténtelo nuevamente.');
         $('#mdl-prog-mant').modal("hide");
-    } else {
+    } else if (server.resultado.result === false) {
         mostrar_toast('error', 'Error', 'No se pudo realizar el programa de mantenimiento. Inténtalo nuevamente.');
+        $('#mdl-prog-mant').modal("hide");
+    } else if (server.resultado.duplicado === false) {
+        mostrar_toast('error', '¡Error!', 'Ya existe un programa de mantenimiento para el año');
+        $('#mdl-prog-mant').modal("hide");
     }
+
 }
 
 let selecreg
 async function mdl_mantenimiento_info(elemento_mnt) {
-    // Busca en el arreglo 'datos' el registro con el mismo id_equipo
-    for (let i = 0; i < datos.length; i++) {
-        const element = datos[i];
+    // Busca en el arreglo 'datos_mantenimiento' el registro con el mismo id_equipo
+    for (let i = 0; i < datos_mantenimiento.length; i++) {
+        const element = datos_mantenimiento[i];
         if (element.id === elemento_mnt.id && element.anio === elemento_mnt.anio) {
             // Guarda el registro completo en una variable global
             selecreg = element;
@@ -542,20 +590,38 @@ async function mdl_mantenimiento_info(elemento_mnt) {
     $('#mdl-mant-info').modal("show")
 }
 
+async function mdl_reporte_mantenimiento(elemento_mnt) {
+
+    await general_select2({
+        selectId: 'slc-encargado',
+        tabla: 'cat_usuarios',
+        campo: 'nombre',
+        dropdownParent: '#mdl-reporte-mant',
+        placeholder: 'Seleccione un encargado'
+    })
+
+    rellenar_select("César Ignacio Torres Almeida", "slc-encargado");
+    $("#btn-reporte-mant").off('click').on('click', function () { reporte_mantenimiento(elemento_mnt) })
+    $("#mdl-reporte-mant").modal("show");
+}
+
 async function reporte_mantenimiento(elemento_mnt) {
     // console.log(elemento_mnt)
-    elemento_mnt.accion = 4;
+    let model = {
+        accion: 4,
+        elementos: elemento_mnt,
+        encargado: $("#slc-encargado").select2('data')[0].text
+    }
 
-    let server = await server_excel(elemento_mnt);
+    let server = await server_excel(model);
 
     if (server.resultado.result === true && server.resultado.url) {
         window.location = server.resultado.url;
-        table.updateData([{ id: elemento_mnt.id, reporte_descargado: 1, estado: "En proceso" }])
+        $('#mdl-reporte-mant').modal("hide");
         mostrar_toast('success', '¡Generación de reporte exitoso!', 'La generación de reporte de mantenimiento se ha realizado correctamente.');
     } else {
         mostrar_toast('error', '¡Error!', 'No se pudo generar el reporte de mantenimiento. Inténtelo nuevamente.');
     }
-
 }
 
 //? Inicializar popover

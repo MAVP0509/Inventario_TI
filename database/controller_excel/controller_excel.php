@@ -439,16 +439,40 @@ function fecha_programa($anio, $mes)
     return $fecha->format('Y-m-d');
 }
 
+function ConsultarOrdenMTTO()
+{
+    include('../conexion.php');
+    $SQL = "SELECT * FROM vorden_mantenimiento ORDER BY orden";
+    $query = mysqli_query($con, $SQL);
+    $datos = array();
+    while ($filas = mysqli_fetch_object($query)) {
+        array_push($datos, $filas->tipo_id);
+    }
+    return $datos;
+}
+
 function programa_mantenimiento($valores)
 {
     include('../conexion.php');
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    $anio_actual = date("Y") + 1;
+    // $anio_actual = date("Y") + 1;
+    $anio_actual = date("Y");
+    // $orden = array_map('intval', $valores->tipo);
+    $orden = ConsultarOrdenMTTO();
+    // var_dump($orden);
+    $tipos_ordenados = implode(',', ConsultarOrdenMTTO());
+
+    // $orden = "";
+
+    // var_dumkp($orden);
     // $mes = $mes_index + 1;
 
     // Consulta SQL que obtiene todos los registros de la vista, en un orden específico según ID
-    $sql_inv = "SELECT * FROM vprograma_mantenimiento ORDER BY FIELD(equipo,40,41,58,55,22,23,25,1,2,78,79,80,81,82,73,74,75,76,46,51)";
+    $sql_inv = "SELECT * FROM vprograma_mantenimiento ORDER BY FIELD(equipo, $tipos_ordenados)";
+    // var_dump($sql_inv);
     $query = mysqli_query($con, $sql_inv);
+
 
     $datos = []; // Crea un arreglo vacío para almacenar los datos
     while ($fila =  mysqli_fetch_assoc($query)) { // Recorre los resultados fila por fila
@@ -470,9 +494,18 @@ function programa_mantenimiento($valores)
         $id_equipo = $dispositivo['id_equipo'];
         $estado = 'Pendiente';
 
-        $sql_insert = "INSERT INTO mantenimiento(id_equipo, anio, fecha_programada, estado, correo_enviado, reporte_descargado, reporte_subido)
-                        VALUES ('$id_equipo','$anio_actual', '$fecha_programada', '$estado', 0, 0, 0)";
-        mysqli_query($con, $sql_insert);
+        $sql_insert = "INSERT INTO mantenimiento(id_equipo, anio, fecha_programada, estado)
+                        VALUES ('$id_equipo','$anio_actual', '$fecha_programada', '$estado')";
+
+        try {
+            mysqli_query($con, $sql_insert);
+        } catch (mysqli_sql_exception $e) {
+            if ($e->getCode() == 1062) {
+                return array(
+                    'duplicado' => false
+                );
+            }
+        }
     }
 
     unset($dispositivo); // Libera la variable de referencia
@@ -568,7 +601,7 @@ function programa_mantenimiento($valores)
         // Define la ruta física donde se guardará el archivo, basada en la estructura del proyecto
         $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . 'documentos_descarga' . DIRECTORY_SEPARATOR . 'mantenimiento' . DIRECTORY_SEPARATOR . 'programa' . DIRECTORY_SEPARATOR . $nombre_doc;
         // Construye la URL de descarga del archivo generado
-        $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/matenimiento/programa/{$nombre_doc}";
+        $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/mantenimiento/programa/{$nombre_doc}";
     }
 
     // Crea y guarda el archivo Excel
@@ -578,7 +611,8 @@ function programa_mantenimiento($valores)
     // Retorna un arreglo con el resultado y la URL para descargar el archivo
     return array(
         'result' => true,
-        'url' => $url_descarga
+        'url' => $url_descarga,
+        // 'duplicados' => $duplicados
     );
 }
 
@@ -608,9 +642,9 @@ function reporte_mantenimiento($valores)
     $pageMargins->setLeft(0.5);
     $pageMargins->setRight(0.5);
 
-    $worksheet->setCellValue("G11", !empty($valores->usuario) ? $valores->usuario : 'NA');
-    $worksheet->setCellValue("G12", !empty($valores->cargo) ? $valores->cargo : 'NA');
-    $worksheet->setCellValue("G13", !empty($valores->region) ? $valores->region : 'NA');
+    $worksheet->setCellValue("G11", !empty($valores->elementos->usuario) ? $valores->elementos->usuario : 'NA');
+    $worksheet->setCellValue("G12", !empty($valores->elementos->cargo) ? $valores->elementos->cargo : 'NA');
+    $worksheet->setCellValue("G13", !empty($valores->elementos->region) ? $valores->elementos->region : 'NA');
     // $worksheet->setCellValue("G14", !empty($valores->id) ? $valores->id : 'NA');
 
     // Mapeo de tipo -> fila
@@ -638,9 +672,9 @@ function reporte_mantenimiento($valores)
     $fila = $mapa_filas[$tipo] ?? 26; // 26 = Otros
 
     // Rellenar datos
-    $marca = !empty($valores->marca) ? $valores->marca : 'NA';
-    $modelo = !empty($valores->modelo) ? $valores->modelo : 'NA';
-    $serie = !empty($valores->num_serie) ? $valores->num_serie : 'NA';
+    $marca = !empty($valores->elementos->marca) ? $valores->elementos->marca : 'NA';
+    $modelo = !empty($valores->elementos->modelo) ? $valores->elementos->modelo : 'NA';
+    $serie = !empty($valores->elementos->num_serie) ? $valores->elementos->num_serie : 'NA';
     // $observaciones = !empty($valores->ubicacion) ? $valores->ubicacion : 'NA';
     $observaciones = false;
     if ($marca !== 'NA' || $modelo !== 'NA' || $serie !== 'NA') {
@@ -658,8 +692,8 @@ function reporte_mantenimiento($valores)
     $worksheet->setCellValue("L{$fila}", $modelo);
     $worksheet->setCellValue("Q{$fila}", $serie);
 
-    $worksheet->setCellValue("U69", !empty($valores->usuario) ? $valores->usuario : '');
-    $worksheet->setCellValue("D69", !empty($valores->usuario) ? $valores->usuario : '');
+    $worksheet->setCellValue("D69", !empty($valores->encargado) ? $valores->encargado : '');
+    $worksheet->setCellValue("U69", !empty($valores->elementos->usuario) ? $valores->elementos->usuario : '');
 
     // $workskheet->setCellValue("W{$fila}", $observaciones);
 
