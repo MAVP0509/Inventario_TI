@@ -119,6 +119,7 @@ use PHPMailer\PHPMailer\PHPMailer;
                 return "Error al enviar el correo";
             } */
 <<<<<<< HEAD
+<<<<<<< HEAD
         return true;
     } catch (Exception $e) {
         return false;
@@ -236,6 +237,14 @@ function email_reporte_mantenimiento($valores)
         return false;
     }
 }
+=======
+            return true;
+
+            } catch (Exception $e) {
+            return false;
+        }
+    }
+>>>>>>> parent of f16b4a9 (Merge branch 'Miguel' into Janny)
 =======
             return true;
 
