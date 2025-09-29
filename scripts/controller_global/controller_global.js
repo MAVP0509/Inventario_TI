@@ -171,7 +171,7 @@ async function general_select2({ selectId, tabla, campo, data, placeholder, drop
 
     const $select = $('#' + selectId);
 
-    if(multiple){
+    if (multiple) {
         $select.attr('multiple', 'multiple');
     } else {
         $select.removeAttr('multiple');
@@ -346,3 +346,25 @@ function alert_cargando() {
 
     });
 }
+
+//todo comprobando los mantenimientos vencidos para notificarlos
+$(window).on('load',consultar_mantenimientos_vencidos)
+
+async function consultar_mantenimientos_vencidos() {
+    let server = await server_global({ accion: 1 })
+
+    if (server.resultado.total_vencidos  >= 1) {
+        $('#aviso-badge-pestaña-mantenimiento').text(server.resultado.total_vencidos)
+        $('[name=aviso-badge-campana').text(server.resultado.total_vencidos)
+        $('[name=header-campana-notificacion').text('Tienes '+server.resultado.total_vencidos + (server.resultado.total_vencidos == 1 ? ' notificación' : ' notificaciones'))
+        $('[name=header-divider-campana-notificacion').after(`
+                                                            <a href="mantenimientos.html" class="dropdown-item">
+                                                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                                                            <span class="float-right text-muted text-sm">${server.resultado.total_vencidos + (server.resultado.total_vencidos == 1 ? ' Mantenimiento vencido' : ' Mantenimientos vencidos')}</span>
+                                                            <div class="dropdown-divider"></div></a>`)
+
+    } else {
+        return
+    }
+}
+id = "aviso-badge-pestaña-mantenimiento"

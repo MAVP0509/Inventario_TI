@@ -51,6 +51,18 @@
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
+                <!--Notificaciones-->
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#" aria-expanded="false"><i
+                            class="fa-solid fa-bell"></i><span class="badge badge-danger navbar-badge"
+                            name="aviso-badge-campana" ></span></a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" name="aviso-campana-notificacion"
+                        style="left: inherit; right: 0px;">
+                        <span class="dropdown-item dropdown-header" name="header-campana-notificacion">Sin
+                            Notificaciones</span>
+                        <div class="dropdown-divider" name="header-divider-campana-notificacion"></div>
+                    </div>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#" role="button" onclick="cerrar_sesionmsg()" id="log-out"><i
                             class="fa-solid fa-door-closed fa-xl"></i></a>
@@ -270,8 +282,7 @@
                                         <h6>Modelo del dispositivo</h6>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text"><i
-                                                        class="fa-solid fa-pager"></i></span>
+                                                <span class="input-group-text"><i class="fa-solid fa-pager"></i></span>
                                             </div>
                                             <input type="text" class="form-control" id="inp-modelo" name="mdl-reg"
                                                 placeholder="Modelo del dispositivo" autocomplete="off"
@@ -328,7 +339,8 @@
                                         <h6>Activo Fijo</h6>
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text"><i class="fa-solid fa-a"></i><i class="fa-solid fa-f"></i></span>
+                                                <span class="input-group-text"><i class="fa-solid fa-a"></i><i
+                                                        class="fa-solid fa-f"></i></span>
                                             </div>
                                             <input type="text" class="form-control" id="inp-af" name="mdl-reg"
                                                 placeholder="AF" autocomplete="off" data-toggle="popover"
@@ -628,7 +640,8 @@
                                                         class="fa-solid fa-clipboard-question"></i></span>
                                             </div>
                                             <input type="text" class="form-control" id="inp-reubicacion" name="lmp-baja"
-                                                placeholder="Especifique la nueva ubicación del activo" autocomplete="off">
+                                                placeholder="Especifique la nueva ubicación del activo"
+                                                autocomplete="off">
                                             <div class="invalid-feedback">Por favor, especifique la ubicación</div>
                                         </div>
                                     </div>
@@ -655,7 +668,8 @@
                                                 </div>
                                                 <input type="text" class="form-control" id="inp-quincena"
                                                     name="lmp-baja"
-                                                    placeholder="Especifique el número de quincenas a descontar" autocomplete="off">
+                                                    placeholder="Especifique el número de quincenas a descontar"
+                                                    autocomplete="off">
                                                 <div class="invalid-feedback">Por favor, especifique el número de
                                                     quincenas</div>
                                             </div>

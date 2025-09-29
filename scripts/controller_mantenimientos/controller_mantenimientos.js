@@ -700,6 +700,7 @@ async function abrir_subir_reporte(id, fechaMnto) {
                         } else {
                             table.updateData([{ id: id, reporte_subido: 1, estado: "Realizado" }])
                             mostrar_toast("success", "Subido", data.resultado.mensaje)
+                            consultar_mantenimientos_vencidos()
 
 
                             pond.removeFile();

@@ -82,10 +82,14 @@
             <ul class="navbar-nav ml-auto">
                 <!--Notificaciones-->
                 <li class="nav-item dropdown">
-                    <a class="nav-link" data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa-solid fa-bell"></i><span class="badge badge-danger navbar-badge">1</span></a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="left: inherit; right: 0px;">
-                        <div class="dropdown-divider"></div>
-                        <a href="mantenimientos.html" class="dropdown-item"><i class="fa-solid fa-screwdriver-wrench"></i><span class="float-right text-muted text-sm">1 Mantenimientos vencidos</span></a>
+                    <a class="nav-link" data-toggle="dropdown" href="#" aria-expanded="false"><i
+                            class="fa-solid fa-bell"></i><span class="badge badge-danger navbar-badge"
+                            name="aviso-badge-campana"></span></a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" name="aviso-campana-notificacion"
+                        style="left: inherit; right: 0px;">
+                        <span class="dropdown-item dropdown-header" name="header-campana-notificacion">Sin
+                            Notificaciones</span>
+                        <div class="dropdown-divider" name="header-divider-campana-notificacion"></div>
                     </div>
                 </li>
                 <li class="nav-item">
@@ -270,7 +274,8 @@
     </div>
 
     <!-- Modal de reporte de mantenimiento -->
-    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-reporte-mant" role="dialog" data-backdrop="static" data-keyboard="false">
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-reporte-mant" role="dialog" data-backdrop="static"
+        data-keyboard="false">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -293,10 +298,12 @@
                     </div>
                 </div>
                 <!-- Footer -->
-                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger icon" data-dismiss="modal"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cancelar</button>
-                    <button type="button" class="btn btn-success icon" id="btn-reporte-mant"><i class="fa-solid fa-file-arrow-down"></i> Generar</button>
-                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal"><i
+                            class="fa-solid fa-arrow-right-from-bracket"></i> Cancelar</button>
+                    <button type="button" class="btn btn-success icon" id="btn-reporte-mant"><i
+                            class="fa-solid fa-file-arrow-down"></i> Generar</button>
+                </div>
             </div>
         </div>
     </div>
@@ -483,22 +490,23 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa-solid fa-at"></i></span>
                             </div>
-                            <input type="input" style="text-transform: lowercase;" class="form-control" id="inp-correo" name="mdl-mant-info-inputs" autocomplete="off">
+                            <input type="input" style="text-transform: lowercase;" class="form-control" id="inp-correo"
+                                name="mdl-mant-info-inputs" autocomplete="off">
                         </div>
                         <small class="form-text text-muted">Porfavor confirme el correo </small>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa-solid fa-at"></i></span>
                             </div>
-                            <input type="input" style="text-transform: lowercase;" class="form-control" id="inp-correo-validar" name="mdl-mant-info-inputs" autocomplete="off">
+                            <input type="input" style="text-transform: lowercase;" class="form-control"
+                                id="inp-correo-validar" name="mdl-mant-info-inputs" autocomplete="off">
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
                             class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
-                    <button type="button" class="btn btn-success envelope" id="btn-mdl-reporte"
-                        onclick="">Enviar <i
+                    <button type="button" class="btn btn-success envelope" id="btn-mdl-reporte" onclick="">Enviar <i
                             class="fa-solid fa-envelope"></i></button>
                 </div>
             </div>

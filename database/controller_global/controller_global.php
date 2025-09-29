@@ -9,6 +9,8 @@ $respuesta_servidor = new stdClass();
 
 if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_distintos($clientejson);
+}else if($clientejson-> accion == 1){
+    $respuesta_servidor->resultado = consultar_mantenimientos_vencidos($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -65,4 +67,16 @@ function consultar_distintos($valores)
     return $datos;
 }
 
+function consultar_mantenimientos_vencidos(){
+    include("../conexion.php");
+
+    $sql = "SELECT COUNT(*) AS total_vencidos FROM mantenimiento WHERE estado = 'Vencido'";
+    $query = mysqli_query($con,$sql);
+    if($query){
+        $result = mysqli_fetch_assoc($query);
+        return $result;
+    }else{
+        return false;
+    }
+}
 ?>
