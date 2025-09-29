@@ -202,9 +202,9 @@ function email_reporte_mantenimiento($valores)
                             </tr>
                         </table>
                     </div>
-                    <div style="text-align: center; margin-bottom: 20px;">
+                    <!--<div style="text-align: center; margin-bottom: 20px;">
                         <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmRyMTBmbGpxMmFzYmN5cDZ4aTgzamhpODloN21nenlhcWtzaGtubCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/5W0i0seIes4mDYtC0p/giphy.gif" alt="Animación mantenimiento" width="120" style="display: block; margin: 0 auto;" />
-                    </div>
+                    </div> -->
                     <div style="background-color: #f9fafc; color: #888; text-align: center; padding: 15px; font-size: 12px; border-top: 1px solid #e0e0e0;">
                         &copy; ' . $Year . ' Inventario TI.
                     </div>
@@ -222,12 +222,18 @@ function email_reporte_mantenimiento($valores)
             } */
 
         $sql = "UPDATE mantenimiento SET correo_enviado = 1 WHERE id_equipo = '$datos_equipo->id' AND  anio = '$datos_equipo->anio'";
-        if(mysqli_query($con,$sql)){
-            return true;
-        }else{
-            return false;
+        if(!mysqli_query($con,$sql)){
+            return "No se pudo actualizar la BD";
         }
-        //return true;
+
+        if($valores->datos->usuario !== 'NA'){
+            $sql_correo_usuario = "UPDATE cat_usuarios SET correo_usuario = '$valores->correo' WHERE nombre = '$valores->usuario'";
+            if(!mysqli_query($con,$sql_correo_usuario)){
+                return "No se pudo guardar el correo";
+            }
+        }
+        
+        return true;
     } catch (Exception $e) {
         return false;
     }
