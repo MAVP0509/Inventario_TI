@@ -377,11 +377,11 @@ async function consultar_mantenimientos_vencidos() {
                                                             <span class="float-right text-muted text-sm">${server.resultado.total_vencidos + (server.resultado.total_vencidos == 1 ? ' Mantenimiento vencido' : ' Mantenimientos vencidos')}</span>
                                                             <div class="dropdown-divider"></div></a>`)
 
-        if(alert){
+/*         if(alert){
             sessionStorage.removeItem('alert-mnto')
             mostrar_alert('warning',`Hay ${server.resultado.total_vencidos + (server.resultado.total_vencidos == 1 ? ' Mantenimiento vencido' : ' Mantenimientos vencidos')} `)
             
-        }
+        } */
         
     } else {
         return

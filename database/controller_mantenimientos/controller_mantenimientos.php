@@ -21,12 +21,12 @@ if ($clientejson->accion == 0) {
 print(json_encode($respuesta_servidor));
 
 
-function consultar_datos()
+function consultar_datos($valores)
 {
     include("../conexion.php");
 
 
-    $sql = "SELECT * FROM vmantenimiento ORDER BY fecha ASC";
+    $sql = "SELECT * FROM vmantenimiento WHERE anio = '$valores->anio' ORDER BY fecha ASC";
     $query = mysqli_query($con, $sql);
 
 

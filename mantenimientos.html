@@ -64,7 +64,7 @@
 
 </head>
 
-<body class="hold-transition sidebar-mini layout-fixed" onload="consultar_informacion()">
+<body class="hold-transition sidebar-mini layout-fixed" onload="load()">
 
     <div class="wrapper">
 
@@ -128,7 +128,7 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col">
-                            <div class="card card-outline card-lightblue">
+                            <div class="card card-outline card-lightblue" id="card-mantenimientos">
                                 <!--Card header-->
                                 <div class="card-header">
                                     <h1 class="card-title" style="font-size: 23px;">
@@ -150,7 +150,15 @@
                                     </div>
                                 </div>
                                 <!--Card Body-->
+
                                 <div class="card-body">
+                                    <label>Año de mantenimiento</label>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
+                                        </div>
+                                        <select class="form-control select" id="select-anio-mantenimiento" onchange="consultar_informacion(this)"></select>
+                                    </div>
                                     <div id="tbl01" style="overflow-x: auto; width: 100%;"></div>
                                 </div>
                             </div>
