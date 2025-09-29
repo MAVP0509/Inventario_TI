@@ -1,8 +1,31 @@
+mantenimiento_loading = false
 function server_mantenimiento(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
             url: "database/controller_mantenimientos/controller_mantenimientos.php",
+            data: {
+                trama: JSON.stringify(model)
+            },
+            success: function (respose) {
+                try {
+                    resolve(JSON.parse(respose))
+                    if (mantenimiento_loading) {
+                        Swal.close()
+                        mantenimiento_loading = !mantenimiento_loading
+                    }
+                } catch (error) {
+                    reject(error)
+                }
+            }
+        })
+    })
+}
+function server_excel(model) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: "POST",
+            url: "database/controller_excel/controller_excel.php",
             data: {
                 trama: JSON.stringify(model)
             },
@@ -16,11 +39,12 @@ function server_mantenimiento(model) {
         })
     })
 }
-function server_excel(model) {
+
+function server_correo(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "database/controller_excel/controller_excel.php",
+            url: "database/controller_email/controller_email.php",
             data: {
                 trama: JSON.stringify(model)
             },
@@ -123,29 +147,39 @@ async function consultar_informacion() {
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
-        return `<button type='button' class='btn btn-info icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' data-widget="control-sidebar" data-slide="true" ><i class='fa-solid fa-upload fa-lg'></i></button>`;
+        const data = cell.getRow().getData()
+        const disabled = data.reporte_descargado == 0 ? "disabled" : ""
+
+        return `<button type='button' class='btn btn-info icon' ${disabled} data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' data-widget="control-sidebar" data-slide="true" ><i class='fa-solid fa-upload fa-lg'></i></button>`;
     }
 
     let fileIcon = function (cell, formatterParams, onRendered) { //plain text value
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
-        return "<button type='button' class='btn btn-success icon' data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Reporte de mantenimiento' onclick=''><i class='fa-solid fa-file-excel fa-lg'></i></button>";
-        
+        const data = cell.getRow().getData()
+        const disabled = data.correo_enviado == 0 ? "disabled" : ""
+
+        return `<button type='button' class='btn btn-success icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Reporte de mantenimiento' onclick=''><i class='fa-solid fa-file-excel fa-lg'></i></button>`;
     }
 
     let eyeIcon = function (cell, formatterParams, onRendered) { //plain text value
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
-        return "<button type='button' class='btn btn-lock btn-outline-dark icon' data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Ver pdf'><i class='fa-solid fa-eye '></i></button>";
+        const data = cell.getRow().getData()
+        const disabled = data.reporte_subido == 0 ? "disabled" : ""
+
+        return `<button type='button' class='btn btn-lock btn-outline-dark icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Ver pdf'><i class='fa-solid fa-eye '></i></button>`;
     }
 
     let mailIcon = function (cell, formatterParams, onRendered) { //plain text value
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
-        return "<button type='button' class='btn btn-lock btn-danger envelope' data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Enviar correo'><i class='fa-solid fa-envelope '></i></button>";
+        /* const data = cell.getRow().getData()
+        const disabled = data.correo_enviado == 1 ? "disabled" : "" */
+        return `<button type='button' class='btn btn-lock btn-danger envelope'  data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Enviar correo'><i class='fa-solid fa-envelope '></i></button>`;
     }
 
     let menuEstatus = [
@@ -239,33 +273,44 @@ async function consultar_informacion() {
 
             },
             {
-                formatter: mailIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
+                formatter: mailIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "correo_enviado",
                 cellClick: function (e, cell) {
                     elemento_mnt = cell.getRow().getData();
-
+                    mdl_correo_reporte_mantenimiento(elemento_mnt)
                 },
             },
             {
-                formatter: fileIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
+                formatter: fileIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "correo_enviado",
                 cellClick: function (e, cell) {
-                    elemento_mnt = cell.getRow().getData();
-                    mdl_reporte_mantenimiento(elemento_mnt);
-                    // reporte_mantenimiento(elemento_mnt);
+                    const button = cell.getElement().querySelector('button');
+                    if (button && !button.disabled) {
+                        // Deshabilita el botón
+                        button.disabled = true;
+
+                        // Acción que quieres ejecutar al hacer clic
+                        const elemento_mnt = cell.getRow().getData();
+                        reporte_mantenimiento(elemento_mnt);
+
+                        // Rehabilita el botón después de 3 segundos
+                        setTimeout(() => {
+                            button.disabled = false;
+                        }, 3000);
+                    }
                 }
             },
             {
-                formatter: uploadIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
+                formatter: uploadIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_descargado",
                 cellClick: function (e, cell) {
                     elemento_mnt = cell.getRow().getData();
-                    abrir_subir_reporte(elemento_mnt.id)
+                    abrir_subir_reporte(elemento_mnt.id, elemento_mnt.fecha)
                 }
             },
 
             {
-                formatter: eyeIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
+                formatter: eyeIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_subido",
                 cellClick: function (e, cell) {
                     elemento_mnt = cell.getRow().getData();
-                    ver_pdf_reporte(elemento_mnt.id,elemento_mnt.fecha)
+                    ver_pdf_reporte(elemento_mnt.id, elemento_mnt.fecha)
                 }
             },
             {
@@ -418,7 +463,7 @@ async function programar_mantenimiento(orden_actual) {
         // orden: orden_actual,
     }
 
-    mostrar_toast_cargando()
+    mostrar_toast_cargando('Programando mantenimiento...')
 
     let server = await server_excel(model);
 
@@ -603,7 +648,7 @@ FilePond.registerPlugin(FilePondPluginFileValidateType);
 let pond
 //* Variable utilizada para guardar temporalmente el archivo y asi poder ser eliminado desde otra función
 let fileItemCargado
-async function abrir_subir_reporte(id) {
+async function abrir_subir_reporte(id, fechaMnto) {
     //*Escondiendo el alert
     document.getElementById('alert-reporte').setAttribute('style', 'display: none !important;  background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;');
 
@@ -618,6 +663,8 @@ async function abrir_subir_reporte(id) {
     $('#subir-reporte').attr('name', 'reporte_mantenimiento');
 
     let fileReporte = document.getElementById('subir-reporte')
+
+    //datos_documento = [id,fechaMnto]
 
     // Create a FilePond instance
     pond = FilePond.create(fileReporte, {
@@ -639,6 +686,7 @@ async function abrir_subir_reporte(id) {
                     const trama = {
                         accion: 1,
                         id_equipo: id,
+                        fecha_mnto: fechaMnto
                     };
                     formData.append('trama', JSON.stringify(trama));
                     return formData;
@@ -650,7 +698,9 @@ async function abrir_subir_reporte(id) {
                             //console.error("Error del servidor:", data.resultado.error);
                             mostrar_toast("error", "Error", data.resultado.error);
                         } else {
+                            table.updateData([{ id: id, reporte_subido: 1, estado: "Realizado" }])
                             mostrar_toast("success", "Subido", data.resultado.mensaje)
+
 
                             pond.removeFile();
                         }
@@ -691,9 +741,9 @@ async function abrir_subir_reporte(id) {
 
     });
 
-    let server = await server_mantenimiento({accion: 2, id_equipo : id})
+    let server = await server_mantenimiento({ accion: 2, id_equipo: id, fecha_mnto: fechaMnto })
 
-    if(server.resultado){
+    if (server.resultado) {
         document.getElementById('alert-reporte').style.display = 'block'
     }
 }
@@ -712,30 +762,139 @@ document.addEventListener('FilePond:removefile', (e) => {
     $('[data-widget="control-sidebar"]').ControlSidebar('toggle')
 })
 
+//todo Cerrando el control-sidebar con click fuera de éste
+/* $(".content-wrapper").click(function () {
+    if ($('body').hasClass('control-sidebar-slide-open')) {
+        //console.log('cerrando sidebar');
+        $('[data-widget="control-sidebar"]').ControlSidebar('toggle');
+    }
+}); */
 
 //*todo Vista del pdf del reporte en caso de existir
-async function ver_pdf_reporte(id,fecha){
+async function ver_pdf_reporte(id, fecha) {
     dominio = window.location.hostname
     puerto = location.port
 
     let model = {
         accion: 3,
-        id_equipo : id,
-        fecha_mnto : fecha
+        id_equipo: id,
+        fecha_mnto: fecha
     }
 
     let server = await server_mantenimiento(model)
 
-    if (server.resultado.documento){
-        //archivoPdf = URL.createObjectURL(server.resultado.documento);
-        let ruta = dominio + ':' + puerto + server.resultado.documento
+    if (server.resultado.documento) {
+
+        let ruta = `${location.origin}${server.resultado.documento}`;
+
+
         const viewer = document.getElementById('mdl-ver-pdf-reporte');
         viewer.src = ruta;
 
-        $('#mdl-ver-pdf').show()
-    }else if (server.resultado.aviso){
-        mostrar_toast('warning','Aviso', server.resultado.aviso)
-    }else{
-        mostrar_toast('error','Error', "Hubo un error, consulte al equipo de TI")
+        $('#mdl-ver-pdf').modal('show')
+    } else if (server.resultado.aviso) {
+        mostrar_toast('warning', 'Aviso', server.resultado.aviso)
+    } else {
+        mostrar_toast('error', 'Error', "Hubo un error, consulte al equipo de TI")
+    }
+}
+
+
+//todo Funciones para el envío de correo de reporte
+async function mdl_correo_reporte_mantenimiento(equipo) {
+
+    await Promise.all([
+        general_select2({
+            selectId: 'select-usuario-correo',
+            tabla: 'cat_usuarios',
+            campo: 'nombre',
+            placeholder: 'NA',
+            dropdownParent: '#mdl-mant-info',
+        }),
+
+        general_select2({
+            selectId: 'select-cargo-correo',
+            tabla: 'cat_usuarios',
+            campo: 'cargo',
+            placeholder: 'NA',
+            dropdownParent: '#mdl-mant-info',
+            sincronizarCampo: 'cargo',
+            sincronizarCon: 'select-usuario'
+        })
+    ])
+    rellenar_select(equipo.usuario, "select-usuario-correo");
+    rellenar_select(equipo.cargo, 'select-cargo-correo')
+    $('#inp-correo').val(equipo.correo_usuario)
+    $('#inp-correo-validar').val('')
+
+    $('#btn-mdl-reporte').off('click').on('click', () => { enviar_correo_reporte(equipo); })
+    $('#mdl-correo-reporte').modal('show')
+}
+
+async function enviar_correo_reporte(datos_equipo) {
+    const validar = ['inp-correo', 'inp-correo-validar']
+
+    if (!validar_campos(validar)) {
+        mostrar_toast('warning', 'Aviso', 'Rellena los campos. Inténtelo nuevamente.');
+        return;
+    }
+
+    if (!validar_correo($('#inp-correo').val().trim().toLowerCase()) || !validar_correo($('#inp-correo-validar').val().trim().toLowerCase())) {
+        mostrar_toast('warning', 'Aviso', 'Uno o ambos correos no tienen el formato correcto');
+        return;
+    }
+
+    if (!validar_dos_input_text($('#inp-correo').val().trim().toLowerCase(), $('#inp-correo-validar').val().trim().toLowerCase())) {
+        mostrar_toast('warning', 'Aviso', 'Los correos no coinciden');
+        return;
+    }
+
+    let model = {
+        accion: 1,
+        correo: $('#inp-correo').val().trim().toLowerCase(),
+        datos: datos_equipo,
+        dominio: window.location.hostname,
+        puerto: location.port
+    }
+    //*Variable global para saber si la página esta mostrarndo algun loader
+    mantenimiento_loading = true
+    mostrar_toast_cargando('Enviando correo...')
+    $('#mdl-correo-reporte').modal('hide')
+
+    let server = await server_correo(model)
+
+    if (server.resultado) {
+        //table.updateData([{ id: datos_equipo.id, correo_enviado: 1 }])
+
+        //consultar_informacion()
+        mostrar_toast('success', '¡Realizado!', "Correo enviado al usuario")
+        
+        //* Actualizando la fila sin dibujar de nuevo la tabla
+        const row = table.getRow(datos_equipo.id);
+        if (row) {
+            row.update({ correo_enviado: 1 }); //*Agregar await al principio si se requiere forzar renderizado de un boton de habilitado a deshabilitado
+            table.redraw(true); 
+        }
+
+        return
+    } else if (server.resultado == false) {
+        mostrar_toast('error', '¡Error!', "Hubo un problema con el servidor")
+        return
+    } else {
+        mostrar_toast('error', '¡Error!', 'Hubo un problema con el servidor')
+        return
+    }
+}
+
+function validar_correo(correo) {
+    const correo_valido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return correo_valido.test(correo)
+}
+
+function validar_dos_input_text(texto1, texto2) {
+    if (texto1 === texto2) {
+        return true
+    } else {
+        return false
     }
 }

@@ -542,7 +542,7 @@ function crear_word() {
 
 }
 
-function mostrar_toast_cargando() {
+/* function mostrar_toast_cargando(texto) {
     Swal.fire({
         toast: true,
         position: 'top-end',
@@ -561,4 +561,4 @@ function mostrar_toast_cargando() {
             //Swal.showLoading(); // Esto muestra el spinner
         }
     });
-}
+} */

@@ -80,6 +80,14 @@
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
+                <!--Notificaciones-->
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#" aria-expanded="false"><i class="fa-solid fa-bell"></i><span class="badge badge-danger navbar-badge">1</span></a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="left: inherit; right: 0px;">
+                        <div class="dropdown-divider"></div>
+                        <a href="mantenimientos.html" class="dropdown-item"><i class="fa-solid fa-screwdriver-wrench"></i><span class="float-right text-muted text-sm">1 Mantenimientos vencidos</span></a>
+                    </div>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#" role="button" onclick="cerrar_sesionmsg()" id="log-out"><i
                             class="fa-solid fa-door-closed fa-xl"></i></a>
@@ -418,7 +426,7 @@
         <div class="modal-dialog modal-dialog-scrollable modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="fa-solid fa-file-signature"></i> Resguardo firmado</h5>
+                    <h5 class="modal-title"><i class="fa-solid fa-file"></i> Reporte de mantenimiento</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -427,10 +435,9 @@
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col">
-                                <embed id="mdl-ver-pdf-reporte" src="libraries/web/viewer.html"
+                                <iframe id="mdl-ver-pdf-reporte" src="libraries/web/viewer.html"
                                     style="width: 100%; height: 700px; border: none; margin-top: 20px;" loading="lazy"
-                                    referrerpolicy="no-referrer"
-                                    sandbox="allow-scripts allow-same-origin allow-downloads"></embed>
+                                    allowfullscreen></iframe>
                             </div>
                         </div>
                     </div>
@@ -438,6 +445,61 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
                             class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal enviar correo reporte-->
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-correo-reporte" role="dialog"
+        data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fa-solid fa-envelope-open-text"></i> Correo de mantenimiento</h5>
+                    <!-- <i class="fa-brands fa-optin-monster"></i> -->
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <h6>Usuario asignado</h6>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                            </div>
+                            <select class="form-control select" id="select-usuario-correo" disabled></select>
+                        </div>
+                        <h6>Cargo del usuario</h6>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa-solid fa-briefcase"></i></span>
+                            </div>
+                            <select class="form-control select" id="select-cargo-correo" disabled></select>
+                        </div>
+                        <h6>Correo destinatario</h6>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa-solid fa-at"></i></span>
+                            </div>
+                            <input type="input" style="text-transform: lowercase;" class="form-control" id="inp-correo" name="mdl-mant-info-inputs" autocomplete="off">
+                        </div>
+                        <small class="form-text text-muted">Porfavor confirme el correo </small>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa-solid fa-at"></i></span>
+                            </div>
+                            <input type="input" style="text-transform: lowercase;" class="form-control" id="inp-correo-validar" name="mdl-mant-info-inputs" autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
+                            class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+                    <button type="button" class="btn btn-success envelope" id="btn-mdl-reporte"
+                        onclick="">Enviar <i
+                            class="fa-solid fa-envelope"></i></button>
                 </div>
             </div>
         </div>

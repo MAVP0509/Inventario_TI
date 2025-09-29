@@ -54,6 +54,8 @@ function consultar_orden() {
 
 function guardar_reportes($valores)
 {
+    include("../conexion.php");
+
     $respuesta = new stdClass();
     //var_dump($_FILES['reporte_mantenimiento']);
 
@@ -73,9 +75,12 @@ function guardar_reportes($valores)
             $respuesta->error = "Tipo de archivo no permitido. Solo .pdf";
             return $respuesta;
         }
-
+        $nombreOriginalArreglado = explode(' ', $nombreOriginal);
+        $nombreOriginalArreglado = join('_', $nombreOriginalArreglado);
         //* Generar nombre único para evitar colisiones
-        $nuevoNombre = date('Y-m-d') . '_' . $nombreOriginal;
+        $nuevoNombre = $valores->fecha_mnto . '_' . $nombreOriginalArreglado;
+
+        //var_dump($nuevoNombre);
 
 
         //* Ruta de la carpeta
@@ -94,8 +99,15 @@ function guardar_reportes($valores)
         }
 
         if (move_uploaded_file($tmpPath, $destino)) {
+            
+            $añoMantenimiento = explode('-', $valores->fecha_mnto);
+            $añoMantenimiento = $añoMantenimiento[0];
+            $sql = "UPDATE mantenimiento SET reporte_subido = 1, estado = 'Realizado' WHERE id_equipo = '$valores->id_equipo' AND anio = '$añoMantenimiento'";
+            if(!mysqli_query($con,$sql)){
+                return $respuesta->error = "No se pudo registrar en la base datos, favor de avisar a TI";
+            }
             $respuesta->mensaje = "Archivo guardado correctamente";
-            //$respuesta->ruta = 'C:\\xampp\\htdocs\\Inventario_TI\\database\\controller_inventario\\' . $nuevoNombre;
+            
         } else {
             $respuesta->error = "No se pudo mover el archivo.";
         }
@@ -108,8 +120,10 @@ function guardar_reportes($valores)
 function validar_reporte_mismo_año($valores)
 {
     $respuesta = new stdClass();
+    //var_dump($valores);
+    $añoActual = explode('-', $valores->fecha_mnto);
+    $añoActual = $añoActual[0];
 
-    $añoActual = date('Y');
     //*ruta física del servidor
     $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->id_equipo;
 
@@ -121,10 +135,9 @@ function validar_reporte_mismo_año($valores)
 
         //*Arma un array de enlaces para acceder al documento 
         foreach ($archivos as $archivo) {
-            $partes = explode('_', $archivo);
-            $fechaArchivo = $partes[0];
+            $partes = explode('-', $archivo);
 
-            $añoArchivo = substr($fechaArchivo, 0, 4);
+            $añoArchivo = $partes[0];
 
             if ($añoArchivo === $añoActual) {
                 $respuesta->resultado = $carpeta . '/' . $archivo;
@@ -138,7 +151,7 @@ function validar_reporte_mismo_año($valores)
 function consultar_reporte($valores)
 {
     $respuesta = new stdClass();
-    $año = explode('-',$valores->fecha_mnto);
+    $año = explode('-', $valores->fecha_mnto);
 
     $añoConsulta = $año[0];
 
@@ -156,8 +169,8 @@ function consultar_reporte($valores)
             $añoArchivo = substr($fechaArchivo, 0, 4);
 
             if ($añoArchivo === $añoConsulta) {
-                $respuesta->documento = $carpetaUrl. '/'. $archivo;
-                //var_dump($respuesta);
+                $respuesta->documento = $carpetaUrl . '/' . $archivo;
+                //var_dump($archivo);
                 return $respuesta;
             }
         }
