@@ -177,9 +177,9 @@ async function consultar_informacion() {
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
-        const data = cell.getRow().getData()
-        const disabled = data.correo_enviado == 1 ? "disabled" : ""
-        return `<button type='button' class='btn btn-lock btn-danger envelope' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Enviar correo'><i class='fa-solid fa-envelope '></i></button>`;
+        /* const data = cell.getRow().getData()
+        const disabled = data.correo_enviado == 1 ? "disabled" : "" */
+        return `<button type='button' class='btn btn-lock btn-danger envelope'  data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Enviar correo'><i class='fa-solid fa-envelope '></i></button>`;
     }
 
     let menuEstatus = [
@@ -803,11 +803,11 @@ async function enviar_correo_reporte(datos_equipo) {
         //consultar_informacion()
         mostrar_toast('success', '¡Realizado!', "Correo enviado al usuario")
         
-
+        //* Actualizando la fila sin dibujar de nuevo la tabla
         const row = table.getRow(datos_equipo.id);
         if (row) {
-            await row.update({ correo_enviado: 1 });
-            table.redraw(true); // Forzar redibujado completo de las celdas
+            row.update({ correo_enviado: 1 }); //*Agregar await al principio si se requiere forzar renderizado de un boton de habilitado a deshabilitado
+            table.redraw(true); 
         }
 
         return
