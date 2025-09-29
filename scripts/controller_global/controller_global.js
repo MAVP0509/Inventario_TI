@@ -354,11 +354,13 @@ async function consultar_mantenimientos_vencidos() {
     let server = await server_global({ accion: 1 })
 
     if (server.resultado.total_vencidos  >= 1) {
+        $('[name=notificacion-numero-mantenimientos]').remove()
+
         $('#aviso-badge-pestaña-mantenimiento').text(server.resultado.total_vencidos)
-        $('[name=aviso-badge-campana').text(server.resultado.total_vencidos)
-        $('[name=header-campana-notificacion').text('Tienes '+server.resultado.total_vencidos + (server.resultado.total_vencidos == 1 ? ' notificación' : ' notificaciones'))
-        $('[name=header-divider-campana-notificacion').after(`
-                                                            <a href="mantenimientos.html" class="dropdown-item">
+        $('[name="aviso-badge-campana"]').text(server.resultado.total_vencidos)
+        $('[name="header-campana-notificacion"]').text('Tienes '+server.resultado.total_vencidos + (server.resultado.total_vencidos == 1 ? ' notificación' : ' notificaciones'))
+        $('[name="header-divider-campana-notificacion"]').after(`
+                                                            <a href="mantenimientos.html" class="dropdown-item" name="notificacion-numero-mantenimientos">
                                                             <i class="fa-solid fa-screwdriver-wrench"></i>
                                                             <span class="float-right text-muted text-sm">${server.resultado.total_vencidos + (server.resultado.total_vencidos == 1 ? ' Mantenimiento vencido' : ' Mantenimientos vencidos')}</span>
                                                             <div class="dropdown-divider"></div></a>`)
@@ -367,4 +369,4 @@ async function consultar_mantenimientos_vencidos() {
         return
     }
 }
-id = "aviso-badge-pestaña-mantenimiento"
+

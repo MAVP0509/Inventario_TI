@@ -22,6 +22,8 @@ $respuesta_servidor = new stdClass();
 
 if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = verificar_email($clientejson);
+}else if ($clientejson->accion == 1) {
+    $respuesta_servidor->resultado = email_reporte_mantenimiento($clientejson);
 }
 print(json_encode($respuesta_servidor));
 
