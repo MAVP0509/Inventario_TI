@@ -512,6 +512,8 @@ async function editar_registro() {
         //posicion: $("#edi-posicion").select2('data')[0].text,
         fecha_entrega: $("#inp-fecha-entrega").val()
     }
+
+    $("#btn-mdl-inventario").prop("disabled", true);
     // Llama a la función asincrónica que envía los datos al servidor
     let server = await server_inventario(model);
 
@@ -1097,14 +1099,17 @@ async function mostrar_baja() {
             tags: true,
         })
     ])
+
+    rellenar_select("César Ignacio Torres Almeida", "slc-emisor")
+    rellenar_select("Alejandro Cancino Arguello", "slc-supervisor");
     // console.timeEnd('selects');
-    
+
     // Deshabilita inputs específicos por defecto
     $('#inp-motivo, #inp-monto, #inp-quincena, #inp-reubicacion').prop('disabled', true);
     $('#cg-emisor, #cg-supervisor, #cg-vobo, #cg-autorizo').prop('disabled', true);
 
     // Configura el asistente visual de pasos (SmartWizard)
-    $('#smartwizard').smartWizard({ 
+    $('#smartwizard').smartWizard({
         selected: 0,
         theme: 'dots',
         justified: true,
@@ -1133,7 +1138,7 @@ async function mostrar_baja() {
     // Resetea el paso actual del wizard
     $('#smartwizard').smartWizard("goToStep", 0);
 
-    // Asigna evento para botón confirmació
+    // Asigna evento para botón confirmación
     $('#btn-confirmar').on('click', function () {
         // Ejecuta validaciones de todos los pasos antes de confirmar
         const validaciones = {
@@ -1377,6 +1382,12 @@ async function resguardo(userSelect) {
         $('#fecha-resguardo').val(hoy);
     });
 
+    let region = [
+        { id: 1, text: 'Norte' },
+        { id: 2, text: 'Sur' },
+        { id: 3, text: 'Tampico' }
+    ]
+
     await general_select2({
         selectId: 'select-usu',
         tabla: 'cat_usuarios',
@@ -1388,8 +1399,7 @@ async function resguardo(userSelect) {
 
     await general_select2({
         selectId: 'select-region',
-        tabla: 'supervisor',
-        campo: 'region',
+        data: region,
         placeholder: 'Seleccione una región',
         dropdownParent: '#mdl-res',
         tags: false

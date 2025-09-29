@@ -391,7 +391,7 @@ async function mdl_programar_mantenimiento() {
         }),
     ])
 
-    rellenar_select("Alejandro Cancino Arguello", "select-elaboro")
+    rellenar_select("Alejandro Cancino Argüello", "select-elaboro");
 
     $('#select-cg-elaboro, #select-cg-autorizo').prop('disabled', true)
     $("#mdl-btn-conf").off("click").on("click", function () { programar_mantenimiento() })
@@ -408,9 +408,6 @@ async function programar_mantenimiento() {
         return;
     }
 
-    // console.log(orden_actual)
-    // const orden_actual = tabla_tipos.getData().map(r => parseInt(r.tipo_id));
-
     let model = {
         accion: 3,
         elaboro: $('#select-elaboro').select2('data')[0].text,
@@ -421,6 +418,7 @@ async function programar_mantenimiento() {
     }
 
     mostrar_toast_cargando('Programando mantenimiento...')
+    $('#mdl-btn-conf').prop('disabled', true);
 
     let server = await server_excel(model);
 
@@ -571,6 +569,7 @@ async function reporte_mantenimiento(elemento_mnt) {
     }
 
     mostrar_toast_cargando("Generando reporte de mantenimiento...")
+    $("#btn-reporte-mant").prop("disabled", true);
     let server = await server_excel(model);
 
     if (server.resultado.result === true && server.resultado.url) {
