@@ -351,6 +351,7 @@ function alert_cargando() {
 $(window).on('load',consultar_mantenimientos_vencidos)
 
 async function consultar_mantenimientos_vencidos() {
+    const alert = sessionStorage.getItem('alert-mnto')
     let server = await server_global({ accion: 1 })
 
     if (server.resultado.total_vencidos  >= 1) {
@@ -365,6 +366,12 @@ async function consultar_mantenimientos_vencidos() {
                                                             <span class="float-right text-muted text-sm">${server.resultado.total_vencidos + (server.resultado.total_vencidos == 1 ? ' Mantenimiento vencido' : ' Mantenimientos vencidos')}</span>
                                                             <div class="dropdown-divider"></div></a>`)
 
+        if(alert){
+            sessionStorage.removeItem('alert-mnto')
+            mostrar_alert('warning',`Hay ${server.resultado.total_vencidos + (server.resultado.total_vencidos == 1 ? ' Mantenimiento vencido' : ' Mantenimientos vencidos')} `)
+            
+        }
+        
     } else {
         return
     }

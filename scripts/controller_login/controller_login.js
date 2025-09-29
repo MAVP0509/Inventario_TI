@@ -303,6 +303,7 @@ async function validar_ingreso() {
             sessionStorage.setItem("log", 'true')
             sessionStorage.setItem("rol", resp.resultado[5])
             sessionStorage.setItem("bienvenido", "Bienvenido " + resp.resultado[0])
+            sessionStorage.setItem("alert-mnto", true)
             window.location.href = "inventario.html";
             let inputs = document.getElementsByName('inputInit')
             for (let i = 0; i < inputs.length; i++) {
