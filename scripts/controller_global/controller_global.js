@@ -65,7 +65,7 @@ function mostrar_toast_cargando(texto) {
         position: 'top-end',
         showConfirmButton: false,
         showCloseButton: false,
-        timer: undefined, // No cerrar automáticamente
+        timer: undefined, // No cerrar automáticamentekm
         allowOutsideClick: false,
         background: '#fff',
         html: `
