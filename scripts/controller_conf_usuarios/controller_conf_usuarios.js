@@ -131,6 +131,24 @@ async function consultar_informacion() {
                     }
             },
             {
+                title: "Región", field: "region", headerFilter: "input", headerSort: false, cellClick:
+                    function (e, cell) {
+                        let rowData = cell.getRow().getData()
+                        rowData.seleccionado = !rowData.seleccionado
+                        cell.getRow().reformat();
+                        seleccionar_registro(rowData.id, usuarios_seleccionados)
+                    }
+            },
+            {
+                title: "Correo", field: "correo_usuario", headerFilter: "input", headerSort: false, cellClick:
+                    function (e, cell) {
+                        let rowData = cell.getRow().getData()
+                        rowData.seleccionado = !rowData.seleccionado
+                        cell.getRow().reformat();
+                        seleccionar_registro(rowData.id, usuarios_seleccionados)
+                    }
+            },
+            {
                 formatter: editIcon, width: 60, hozAlign: "center",
                 cellClick: function (e, cell) {
                     elemento = cell.getRow().getData();
@@ -145,6 +163,11 @@ async function consultar_informacion() {
 let datoSelected = ""
 selected = false
 async function mdl_editar_usuarios(params) {
+
+    document.querySelectorAll('[name="conf-usuario"]').forEach(function (el) {
+        el.classList.remove('is-invalid', 'is-valid')
+    })
+
     for (let i = 0; i < datos.length; i++) {
         let element = datos[i]
 
@@ -153,13 +176,12 @@ async function mdl_editar_usuarios(params) {
             break;
         }
     }
-    const serie = document.getElementById('usu');
-    serie.classList.remove('is-invalid'); // Remover clase de error si existía
 
-    $('.select').each(function () {
-        $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
-        $(this).removeClass('is-invalid'); // Elimina la clase de validación
-    });
+    let region = [
+        { id: 1, text: 'Norte' },
+        { id: 2, text: 'Sur' },
+        { id: 3, text: 'Tampico' },
+    ]
 
     // Limpia y carga los select
     await general_select2({
@@ -168,17 +190,25 @@ async function mdl_editar_usuarios(params) {
         campo: 'cargo',
         placeholder: 'Seleccione un cargo',
         dropdownParent: '#mdl-usu',
-        tags:true,
+        tags: true,
     })
+
+    await general_select2({
+        selectId: 'select-region',
+        data: region,
+        placeholder: 'Seleccione una región',
+        dropdownParent: '#mdl-usu',
+    })
+
+    document.getElementById("usu").value = params.nombre;
+    rellenar_select(params.cargo, "select-cargo");
+    rellenar_select(params.region, "select-region");
+    document.getElementById("inp-correo").value = params.correo_usuario;
 
     document.getElementById('alert-edit-usu').style.display = 'block'
     document.getElementById('mdl-title').textContent = "Editar Usuario"
-    document.getElementById('usu').value = datoSelected.nombre
-    //document.getElementById('cargo').value = datoSelected.cargo
-    $('#select-cargo').val(datoSelected.cargo).trigger('change');
     document.getElementById('mdl-btn-conf').onclick = function () { editar_usuario() }
     document.getElementById('mdl-btn-conf').disabled = true
-
 
     $("#mdl-usu").modal('show');
 }
@@ -205,7 +235,9 @@ async function editar_usuario() {
         accion: 1,
         id: datoSelected.id,
         nombre: $('#usu').val().trim(),
-        cargo: $("#select-cargo").val().trim()
+        cargo: $("#select-cargo").select2('data')[0].text,
+        region: $('#select-region').select2('data')[0].text,
+        correo: $('#inp-correo').val().trim(),
     }
 
     let server = await server_usuarios(model)
@@ -217,7 +249,7 @@ async function editar_usuario() {
         return;
     }
     datoSelected = ""
-    table.updateData([{ id: elemento.id, nombre: model.nombre, cargo: model.cargo }]);
+    table.updateData([{ id: elemento.id, nombre: model.nombre, cargo: model.cargo, region: model.region, correo_usuario: model.correo }]);
     $("#mdl-usu").modal('hide')
 }
 //*Cada que se cierre el modal se reseteará el checkbox
@@ -229,10 +261,25 @@ $('#mdl-usu').on('hidden.bs.modal', function () {
 });
 
 async function mdl_nuevo_usuario() {
-    $('.select').each(function () {
-        $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
-        $(this).removeClass('is-invalid'); // Elimina la clase de validación
-    });
+    document.querySelectorAll('[name="conf-usuario"]').forEach(function (el) {
+        el.classList.remove('is-invalid', 'is-valid')
+        el.value = '';
+    })
+
+    let region = [
+        { id: 1, text: 'Norte' },
+        { id: 2, text: 'Sur' },
+        { id: 3, text: 'Tampico' },
+    ]
+
+    // Limpia y carga los select
+    await general_select2({
+        selectId: 'select-region',
+        data: region,
+        placeholder: 'Seleccione una región',
+        dropdownParent: '#mdl-usu',
+        // tags: true,
+    })
 
     // Limpia y carga los select
     await general_select2({
@@ -241,17 +288,10 @@ async function mdl_nuevo_usuario() {
         campo: 'cargo',
         placeholder: 'Seleccione un cargo',
         dropdownParent: '#mdl-usu',
-        tags:true,
+        tags: true,
     })
 
-    const serie = document.getElementById('usu');
-    serie.classList.remove('is-invalid'); // Remover clase de error si existía
-
     document.getElementById('mdl-title').textContent = "Nuevo Usuario"
-    document.getElementById('usu').value = ""
-    document.getElementById('usu').placeholder = "Nuevo usuario"
-    //document.getElementById('cargo').value = ""
-    //document.getElementById('cargo').placeholder = "Cargo"
     document.getElementById('mdl-btn-conf').onclick = function () { nuevo_usuario() }
     document.getElementById('mdl-btn-conf').disabled = false
     document.getElementById('alert-edit-usu').setAttribute('style', 'display: none !important;  background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;');
@@ -270,7 +310,9 @@ async function nuevo_usuario() {
     let model = {
         accion: 0,
         nombre: $('#usu').val().trim(),
-        cargo: $('#select-cargo').val().trim()
+        cargo: $('#select-cargo').select2('data')[0].text,
+        region: $('#select-region').select2('data')[0].text,
+        correo: $('#inp-correo').val().trim(),
     }
 
     let server = await server_usuarios(model)
@@ -313,41 +355,6 @@ async function eliminar_usuario() {
         mostrar_toast('error', 'Error', 'Fallo al conectar');
     }
     deseleccionar_todos()
-}
-
-
-async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags }) {
-    //try {
-    const response = await server_usuarios({
-        accion: 4,
-        tabla: tabla,
-        campo: campo
-    });
-
-    //console.log('Respuesta del servidor para select2:', response);
-
-    const opciones = response.resultado.map(item => ({
-        id: item[campo] || '',
-        text: item[campo] || ''
-    }));
-
-    const $select = $('#' + selectId);
-    $select.empty().append(new Option('', '', false, false));
-
-    $select.select2({
-        theme: 'bootstrap4',
-        allowClear: true,
-        placeholder: placeholder,
-        tags: tags,
-        dropdownParent: $(dropdownParent),
-        data: opciones
-    });
-
-    $select.val(null).trigger('change');
-
-    //} catch (error) {
-
-    //}
 }
 
 function deseleccionar_todos() {

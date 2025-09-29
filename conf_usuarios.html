@@ -136,19 +136,42 @@
           </button>
         </div>
         <div class="modal-body">
+          <!-- Nombre de usuario -->
+          <h6>Nonbre de usuario</h6>
           <div class="input-group mb-3">
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
             </div>
-            <input type="text" class="form-control" id="usu" autocomplete="off">
+            <input type="text" class="form-control" id="usu" autocomplete="off" name="conf-usuario" placeholder="Ingre un nombre">
             <div class="invalid-feedback" id="usu-feedback">Por favor, ingrese un usuario.</div>
           </div>
+          <!-- Cargo del usuario -->
+          <h6>Cargo del usuario</h6>
           <div class="input-group mb-3">
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="fa-solid fa-briefcase"></i></span>
             </div>
-            <select class="form-control select" id="select-cargo"></select>
+            <select class="form-control select" id="select-cargo" name="conf-usuario"></select>
             <div class="invalid-feedback" id="cargo-feedback">Por favor, seleccione un cargo.</div>
+          </div>
+          <!-- Región del usuario -->
+          <h6>Región del usuairo</h6>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa-solid fa-map-location-dot"></i></span>
+            </div>
+            <select name="conf-usuario" id="select-region" class="form-control"></select>
+            <div class="invalid-feedback" id="usu-feedback">Por favor, selecione una región.</div>
+          </div>
+          <!-- Correo -->
+          <h6>Correo del usuario</h6>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa-solid fa-at"></i></span>
+            </div>
+            <input type="text" name="conf-usuario" id="inp-correo" class="form-control" autocomplete="off"
+              placeholder="Ingrese un correo">
+            <div class="invalid-feedback" id="usu-feedback">Por favor, ingrese un correo.</div>
           </div>
           <div class="alert alert-danger position-relative d-flex align-items-start " role="alert"
             style="display:none !important; background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;"

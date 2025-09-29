@@ -338,35 +338,6 @@ function consultar_para_resguardo($valores)
     return json_decode($respuesta_raw);
 }
 
-function insertar_o_obtener_id($con, $tabla, $campo, $valor)
-{
-    if (ctype_digit($valor)) {
-        // Ya es un ID
-        return (int)$valor;
-    }
-
-    $valor_limpio = mysqli_real_escape_string($con, trim($valor));
-
-    // Verificar si ya existe el valor en la tabla
-    $sql_check = "SELECT id FROM $tabla WHERE $campo = '$valor_limpio' LIMIT 1;";
-    $result_check = mysqli_query($con, $sql_check);
-
-    if ($row = mysqli_fetch_assoc($result_check)) {
-        return (int)$row['id'];
-    }
-
-    // Insertar el nuevo valor
-    $sql_insert = "INSERT INTO $tabla($campo) VALUES ('$valor_limpio');";
-    mysqli_query($con, $sql_insert);
-
-    // Obtener el ID insertado
-    $sql_id = "SELECT id FROM $tabla WHERE $campo = '$valor_limpio' LIMIT 1;";
-    $result_id = mysqli_query($con, $sql_id);
-    $row_id = mysqli_fetch_assoc($result_id);
-
-    return (int)$row_id['id'];
-}
-
 function verificar_nuevos_id($valor)
 {
     if (ctype_digit($valor)) {

@@ -17,6 +17,17 @@ function server_global(model) {
     })
 }
 
+function rellenar_select(texto, select) {
+    let textoBuscado = texto;
+    let $select = $('#' + select);
+
+    $select.find('option').filter(function () {
+        return $(this).text().trim() === textoBuscado;
+    }).prop('selected', true);
+
+    $select.trigger('change');
+}
+
 //*Función para mostrar un alert
 function mostrar_alert(tipo, mensaje, skip, funcion, denyButton, denyButtonText, denyFuction) {
     Swal.fire({
