@@ -442,7 +442,7 @@ async function mdl_programar_mantenimiento() {
     $('#mdl-prog-mant').modal("show")
 }
 
-async function programar_mantenimiento(orden_actual) {
+async function programar_mantenimiento() {
 
     const validar = ['select-elaboro', 'select-autorizo']
 
@@ -460,7 +460,7 @@ async function programar_mantenimiento(orden_actual) {
         cg_elaboro: $('#select-cg-elaboro').select2('data')[0].text,
         autorizo: $('#select-autorizo').select2('data')[0].text,
         cg_autorizo: $('#select-cg-autorizo').select2('data')[0].text,
-        // orden: orden_actual,
+
     }
 
     mostrar_toast_cargando('Programando mantenimiento...')
@@ -606,13 +606,13 @@ async function mdl_reporte_mantenimiento(elemento_mnt) {
 }
 
 async function reporte_mantenimiento(elemento_mnt) {
-    // console.log(elemento_mnt)
     let model = {
         accion: 4,
         elementos: elemento_mnt,
         encargado: $("#slc-encargado").select2('data')[0].text
     }
 
+    mostrar_toast_cargando("Generando reporte de mantenimiento...")
     let server = await server_excel(model);
 
     if (server.resultado.result === true && server.resultado.url) {
