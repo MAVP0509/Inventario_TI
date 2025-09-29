@@ -456,17 +456,8 @@ function programa_mantenimiento($valores)
     include('../conexion.php');
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    // $anio_actual = date("Y") + 1;
-    $anio_actual = date("Y");
-    // $orden = array_map('intval', $valores->tipo);
-    $orden = ConsultarOrdenMTTO();
-    // var_dump($orden);
+    $anio_actual = date("Y") + 1;
     $tipos_ordenados = implode(',', ConsultarOrdenMTTO());
-
-    // $orden = "";
-
-    // var_dumkp($orden);
-    // $mes = $mes_index + 1;
 
     // Consulta SQL que obtiene todos los registros de la vista, en un orden específico según ID
     $sql_inv = "SELECT * FROM vprograma_mantenimiento ORDER BY FIELD(equipo, $tipos_ordenados)";

@@ -7,23 +7,23 @@
   <link rel="icon" type="images/x-icon" href="images/diavaz.jfif">
 
   <!--Bootstrap-->
-<link rel="stylesheet" href="libraries/bootstrap-4.6.2-dist/css/bootstrap-grid.min.css">
+  <link rel="stylesheet" href="libraries/bootstrap-4.6.2-dist/css/bootstrap-grid.min.css">
 
-<!--AdminLTE-->
-<link rel="stylesheet" href="dist/css/adminlte.min.css">
+  <!--AdminLTE-->
+  <link rel="stylesheet" href="dist/css/adminlte.min.css">
 
-<!--FontAwesome-->
-<link rel="stylesheet" href="libraries/fontawesome-free-6.7.2-web/css/all.min.css">
+  <!--FontAwesome-->
+  <link rel="stylesheet" href="libraries/fontawesome-free-6.7.2-web/css/all.min.css">
 
-<!--Tabulator-->
-<link rel="stylesheet" href="libraries/Tabulator/tabulator_bootstrap4.min.css">
+  <!--Tabulator-->
+  <link rel="stylesheet" href="libraries/Tabulator/tabulator_bootstrap4.min.css">
 
-<!--Select2-->
-<link rel="stylesheet" href="libraries/select2/css/select2.min.css">
-<link rel="stylesheet" href="libraries/select2/css/select2-bootstrap4.min.css">
+  <!--Select2-->
+  <link rel="stylesheet" href="libraries/select2/css/select2.min.css">
+  <link rel="stylesheet" href="libraries/select2/css/select2-bootstrap4.min.css">
 
-<!--Animate.css-->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <!--Animate.css-->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
 
   <title>Inventario TI</title>
@@ -126,19 +126,42 @@
           </button>
         </div>
         <div class="modal-body">
+          <!-- Nombre de usuario -->
+          <h6>Nonbre de usuario</h6>
           <div class="input-group mb-3">
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
             </div>
-            <input type="text" class="form-control" id="usu" autocomplete="off">
+            <input type="text" class="form-control" id="usu" autocomplete="off" name="conf-usuario" placeholder="Ingre un nombre">
             <div class="invalid-feedback" id="usu-feedback">Por favor, ingrese un usuario.</div>
           </div>
+          <!-- Cargo del usuario -->
+          <h6>Cargo del usuario</h6>
           <div class="input-group mb-3">
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="fa-solid fa-briefcase"></i></span>
             </div>
-            <select class="form-control select" id="select-cargo"></select>
+            <select class="form-control select" id="select-cargo" name="conf-usuario"></select>
             <div class="invalid-feedback" id="cargo-feedback">Por favor, seleccione un cargo.</div>
+          </div>
+          <!-- Región del usuario -->
+          <h6>Región del usuairo</h6>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa-solid fa-map-location-dot"></i></span>
+            </div>
+            <select name="conf-usuario" id="select-region" class="form-control"></select>
+            <div class="invalid-feedback" id="usu-feedback">Por favor, selecione una región.</div>
+          </div>
+          <!-- Correo -->
+          <h6>Correo del usuario</h6>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa-solid fa-at"></i></span>
+            </div>
+            <input type="text" name="conf-usuario" id="inp-correo" class="form-control" autocomplete="off"
+              placeholder="Ingrese un correo">
+            <div class="invalid-feedback" id="usu-feedback">Por favor, ingrese un correo.</div>
           </div>
           <div class="alert alert-danger position-relative d-flex align-items-start " role="alert"
             style="display:none !important; background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;"
@@ -167,11 +190,13 @@
 
 <!-- Popper.js -->
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
-  integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous" defer></script>
+  integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"
+  defer></script>
 
 <!-- Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"
-  integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous" defer></script>
+  integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"
+  defer></script>
 
 <!-- AdminLTE -->
 <script src="dist/js/adminlte.min.js" defer></script>

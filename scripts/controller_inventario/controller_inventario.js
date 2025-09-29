@@ -1279,17 +1279,6 @@ async function generar_baja() {
 
 //TODO Funciones de los Select2
 
-function rellenar_select(texto, select) {
-    let textoBuscado = texto;
-    let $select = $('#' + select);
-
-    $select.find('option').filter(function () {
-        return $(this).text().trim() === textoBuscado;
-    }).prop('selected', true);
-
-    $select.trigger('change');
-}
-
 //* Deshabilitando el input TAG del registro
 $(document).ready(function () {
     // Escucha cambios en el campo "inp-tipo"

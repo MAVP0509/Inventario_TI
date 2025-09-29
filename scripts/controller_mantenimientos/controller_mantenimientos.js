@@ -343,50 +343,7 @@ async function consultar_informacion() {
 
 }
 
-/* let tabla_tipos
-let tipos
-let orden_tipos = []
-
-async function consultar_orden_tipo() {
-
-    let server = await server_mantenimiento({ accion: 2 });
-
-    orden_tipos = server.resultado
-
-    tabla_tipos = new Tabulator('#tbl-tipos', {
-        movableRows: true,
-        data: orden_tipos,
-        columns: [
-            { title: "Tipos de activos", field: "tipo" },
-        ],
-    })
-
-} */
-
 async function mdl_programar_mantenimiento() {
-
-    /* tipos = Array.from(
-        new Map(
-            datos_mantenimiento.map(item => [item.tipo_id, { tipo_id: item.tipo_id, tipo: item.tipo }])
-        ).values()
-    );
-
-    // orden_tipos = tipos.map(t => t.tipo_id)
-
-    // console.log(tipos)
-    tabla_tipos = new Tabulator('#tbl-tipos', {
-        movableRows: true,
-        data: tipos,
-        columns: [
-            { title: "Tipos de activos", field: "tipo" },
-        ],
-         rowMoved: function (row) {
-            let orden = tabla_tipos.getData();
-            orden_tipos = orden.map(r => r.tipo_id);
-        } 
-    }) */
-
-    // await consultar_orden_tipo()
 
     await Promise.all([
         general_select2({

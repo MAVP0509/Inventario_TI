@@ -16,17 +16,24 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_usuarios($clientejson);
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = eliminar_usuarios($clientejson);
-} elseif($clientejson->accion==4){
-    $respuesta_servidor->resultado=consultar_distintos($clientejson->tabla, $clientejson->campo);
 }
 
 print(json_encode($respuesta_servidor)); //? envía la respuesta de la base de datos a javascript
 
 
 //* Creación de un nuevo usuario
-function insertar_usuarios($valores){
+function insertar_usuarios($valores)
+{
     include("../conexion.php");
-    $sql = "INSERT INTO cat_usuarios(nombre,cargo) VALUES ('$valores->nombre','$valores->cargo');";
+
+    $nombre = mysqli_real_escape_string($con, $valores->nombre ?? '');
+    $cargo = mysqli_real_escape_string($con, $valores->cargo ?? '');
+    $region = mysqli_real_escape_string($con, $valores->region ?? '');
+    $correo = mysqli_real_escape_string($con, isset($valores->correo) ? $valores->nombre : '@diavaz.com');
+
+    // $nv_cargo = insertar_o_obtener_id($con, 'cat_usuario', 'cargo');
+
+    $sql = "INSERT INTO cat_usuarios(nombre,cargo, region, correo_usuario, habilitado) VALUES ('$nombre','$cargo', '$region', '$correo', 1);";
 
     $sql_val_usuario = "SELECT * FROM cat_usuarios WHERE nombre = '$valores->nombre'";
     if (mysqli_query($con, $sql_val_usuario)->num_rows > 0) {
@@ -37,14 +44,21 @@ function insertar_usuarios($valores){
 }
 
 //* Edita un usuario 
-function editar_usuarios($valores){
+function editar_usuarios($valores)
+{
     include("../conexion.php");
-    $sql = "UPDATE cat_usuarios SET nombre = '$valores->nombre',cargo='$valores->cargo' WHERE id='$valores->id';";
+    $nombre = mysqli_real_escape_string($con, $valores->nombre ?? '');
+    $cargo = mysqli_real_escape_string($con, $valores->cargo ?? '');
+    $region = mysqli_real_escape_string($con, $valores->region ?? '');
+     $correo = mysqli_real_escape_string($con, $valores->correo ?? '');
+    
+    $sql = "UPDATE cat_usuarios SET nombre = '$nombre',cargo='$cargo', region = '$region', correo_usuario ='$correo' WHERE id='$valores->id';";
     return mysqli_query($con, $sql);
 }
 
 //* Consulta los usuarios  para mostrarlos en el programa
-function consultar_usuarios(){
+function consultar_usuarios()
+{
     include("../conexion.php");
     $sql = "SELECT * FROM  cat_usuarios WHERE nombre <> 'NA' AND habilitado = 1";
     $query = mysqli_query($con, $sql);
@@ -74,26 +88,4 @@ function eliminar_usuarios($valores)
     $ids = implode(",", array_map('intval', $valores->id)); //* Convierte el array de IDs en una lista separada por comas
     $sql = "UPDATE cat_usuarios SET habilitado = 0 WHERE id IN ($ids);"; //* Consulta sql usando IN para eliminar múltiples registros
     return mysqli_query($con, $sql);
-}
-
-//* Consulta utilizada para llenar selects2 en los formularios
-function consultar_distintos($tabla, $campo){
-    include("../conexion.php");
-    //Validación para evitar inyecciones
-    $tabla = mysqli_real_escape_string($con, $tabla);
-    $campo = mysqli_real_escape_string($con, $campo);
-
-    $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE  `$campo` <> 'NA'";
-    $query = mysqli_query($con, $sql);
-
-    $datos = [];
-    while ($fila = mysqli_fetch_assoc($query)) {
-        $valor = $fila[$campo];
-        $datos[] = [
-            'id' => $valor,
-            $campo => $valor
-        ];
-    }
-
-    return $datos;
 }
