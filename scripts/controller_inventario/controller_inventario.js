@@ -1525,6 +1525,8 @@ $(document).ready(function () {
     }, /* function (start, end) {
         $('#rango-fecha').val(start.format('YYYY/MM/DD') + ' - ' + end.format('YYYY/MM/DD'));
     } */);
+
+    //consultar_mantenimientos_vencidos()
 })//.val(start + " - " + end);
 
 function myCallback(start, end) {

@@ -704,7 +704,8 @@ function reporte_mantenimiento($valores)
     $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
     $writer->save($ruta_guardar);
 
-    $sql = "UPDATE mantenimiento SET reporte_descargado = 1, estado = 'En proceso' WHERE id_equipo = '$valores->id' AND  anio = '$valores->anio'";
+    $datos = $valores->elementos;
+    $sql = "UPDATE mantenimiento SET reporte_descargado = 1, estado = 'En proceso' WHERE id_equipo = '$datos->id' AND  anio = '$datos->anio'";
     
 
     if(!mysqli_query($con,$sql)){

@@ -289,7 +289,7 @@ async function consultar_informacion() {
 
                         // Acción que quieres ejecutar al hacer clic
                         const elemento_mnt = cell.getRow().getData();
-                        reporte_mantenimiento(elemento_mnt);
+                        mdl_reporte_mantenimiento(elemento_mnt);
 
                         // Rehabilita el botón después de 3 segundos
                         setTimeout(() => {
@@ -428,6 +428,7 @@ async function programar_mantenimiento() {
         window.location = server.resultado.url;
         mostrar_toast('success', '¡Programa de mantenimiento exitosa!', 'Rellena los campos. Inténtelo nuevamente.');
         $('#mdl-prog-mant').modal("hide");
+        
     } else if (server.resultado.result === false) {
         mostrar_toast('error', 'Error', 'No se pudo realizar el programa de mantenimiento. Inténtalo nuevamente.');
         $('#mdl-prog-mant').modal("hide");
@@ -575,6 +576,7 @@ async function reporte_mantenimiento(elemento_mnt) {
     if (server.resultado.result === true && server.resultado.url) {
         window.location = server.resultado.url;
         $('#mdl-reporte-mant').modal("hide");
+        table.updateData([{ id: elemento_mnt.id, reporte_descargado: 1, estado: "En proceso" }])
         mostrar_toast('success', '¡Generación de reporte exitoso!', 'La generación de reporte de mantenimiento se ha realizado correctamente.');
     } else {
         mostrar_toast('error', '¡Error!', 'No se pudo generar el reporte de mantenimiento. Inténtelo nuevamente.');
@@ -657,6 +659,8 @@ async function abrir_subir_reporte(id, fechaMnto) {
                         } else {
                             table.updateData([{ id: id, reporte_subido: 1, estado: "Realizado" }])
                             mostrar_toast("success", "Subido", data.resultado.mensaje)
+                            //window.location.reload()
+                            consultar_mantenimientos_vencidos()
 
 
                             pond.removeFile();
