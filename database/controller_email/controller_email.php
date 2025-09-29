@@ -124,3 +124,116 @@ function email_recuperacion($destino, $token)
         return false;
     }
 }
+
+function email_reporte_mantenimiento($valores)
+{
+    include("../email/Exception.php");
+    include("../email/PHPMailer.php");
+    include("../email/SMTP.php");
+    include("../conexion.php");
+
+    $mail = new PHPMailer();
+
+    $datos_equipo = $valores->datos;
+
+    try {
+        // Configuración del servidor SMTP
+        $mail->isSMTP(); // Usar el servidor SMTP
+        $mail->Host = 'smtp.gmail.com'; // Servidor SMTP de Gmail (ajustar según el servidor que uses)
+        $mail->SMTPSecure = "ssl";
+        $mail->SMTPAuth = true; // Habilitar la autenticación SMTP
+        $mail->Username = 'diavazdsp@diavaz.com'; // Dirección de correo electrónico
+        $mail->Password = 'nttbycbzoljyqitu'; // Contraseña de correo electrónico
+        $mail->Port = 465; // Puerto SMTP
+
+        $Year =  date("Y");
+        $Month = date("m");
+        $mail->CharSet = 'UTF-8';
+        // Configuración del remitente y destinatario
+        $mail->setFrom('diavazdsp@diavaz.com', 'Inventario TI');
+        $mail->addAddress($valores->correo, 'Destinatario');
+        //$IP = exec("curl https://checkip.amazonaws.com");
+        //$Puerto = $_SERVER['SERVER_PORT'];
+
+        //$reset_link = "http://$destino->dominio:$destino->puerto/Inventario_TI/recuperacion.html?ftygui=$token";
+        // $mail->addReplyTo('otra-direccion@dominio.com', 'Responder a'); // Opcional: dirección de respuesta
+
+        // Contenido del correo
+        $mail->isHTML(true); // Usar HTML en el correo
+        $mail->Subject = 'Mantenimiento de equipos';
+        $mail->Body =
+            '<html>
+                <body style="font-family: Arial, sans-serif; background-color: #f9fafc; color: #333; margin: 0; padding: 0;">
+                    <div style="max-width: 450px; margin: 40px auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; border: 1px solid #e0e0e0; text-align: center;">
+                    <div style="background-color: #007bff; color: #ffffff; padding: 20px; font-size: 20px; font-weight: bold;">
+                        Notificación de Inventario TI
+                    </div>
+                    <div style="padding: 20px; text-align: center;">
+                        <h2 style="color: #007bff; margin-bottom: 15px; font-size: 22px;">Mantenimiento de equipos</h2>
+                        <p style="font-size: 16px; line-height: 1.6; color: #555;">Le informamos que como parte de nuestro plan de mantenimiento preventivo, su equipo ' . $valores->datos->tipo . ' está 
+                        programado para mantenimiento durante el mes </p>
+                        <p style="font-size: 16px; line-height: 1.6; color: #555;">Información del mantenimiento:</p>
+                        <table style="width: 90%; margin: 0 auto 20px auto; border-collapse: collapse; font-size: 14px; color: #555;">
+                            <tr>
+                                <td style="padding: 8px; text-align: left; font-weight: bold;">Equipo</td>
+                                <td style="padding: 8px; text-align: left;">' . $valores->datos->tipo . '</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; text-align: left; font-weight: bold;">Marca</td>
+                                <td style="padding: 8px; text-align: left;">' . $valores->datos->marca . '</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; text-align: left; font-weight: bold;">Número de serie</td>
+                                <td style="padding: 8px; text-align: left;">' . $valores->datos->num_serie . '</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; text-align: left; font-weight: bold;">Modelo</td>
+                                <td style="padding: 8px; text-align: left;">' . $valores->datos->modelo . '</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; text-align: left; font-weight: bold;">Ubicación</td>
+                                <td style="padding: 8px; text-align: left;">' . $valores->datos->ubicacion . '</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px; text-align: left; font-weight: bold;">Usuario asignado</td>
+                                <td style="padding: 8px; text-align: left;">' . $valores->datos->usuario . '</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <!--<div style="text-align: center; margin-bottom: 20px;">
+                        <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmRyMTBmbGpxMmFzYmN5cDZ4aTgzamhpODloN21nenlhcWtzaGtubCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/5W0i0seIes4mDYtC0p/giphy.gif" alt="Animación mantenimiento" width="120" style="display: block; margin: 0 auto;" />
+                    </div> -->
+                    <div style="background-color: #f9fafc; color: #888; text-align: center; padding: 15px; font-size: 12px; border-top: 1px solid #e0e0e0;">
+                        &copy; ' . $Year . ' Inventario TI.
+                    </div>
+                    </div>
+                </body>
+            </html>';
+        $mail->AltBody = 'Mantenimiento de ecuipos';
+
+        // Enviar el correo
+        $mail->send();
+        /* if ($mail->send()) {
+                return "correo enviado correctamente.";
+            } else {
+                return "Error al enviar el correo";
+            } */
+
+        $sql = "UPDATE mantenimiento SET correo_enviado = 1 WHERE id_equipo = '$datos_equipo->id' AND  anio = '$datos_equipo->anio'";
+        if(!mysqli_query($con,$sql)){
+            return "No se pudo actualizar la BD";
+        }
+
+        if($valores->datos->usuario !== 'NA'){
+            $user = $valores->datos->usuario;
+            $sql_correo_usuario = "UPDATE cat_usuarios SET correo_usuario = '$valores->correo' WHERE nombre = '$user'";
+            if(!mysqli_query($con,$sql_correo_usuario)){
+                return "No se pudo guardar el correo";
+            }
+        }
+        
+        return true;
+    } catch (Exception $e) {
+        return false;
+    }
+}
