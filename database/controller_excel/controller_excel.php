@@ -494,8 +494,8 @@ function programa_mantenimiento($valores)
         $id_equipo = $dispositivo['id_equipo'];
         $estado = 'Pendiente';
 
-        $sql_insert = "INSERT INTO mantenimiento(id_equipo, anio, fecha_programada, estado)
-                        VALUES ('$id_equipo','$anio_actual', '$fecha_programada', '$estado')";
+        $sql_insert = "INSERT INTO mantenimiento(id_equipo, anio, fecha_programada, estado, correo_enviado, reporte_descargado,reporte_subido)
+                        VALUES ('$id_equipo','$anio_actual', '$fecha_programada', '$estado',0,0,0)";
 
         try {
             mysqli_query($con, $sql_insert);
