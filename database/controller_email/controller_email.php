@@ -227,7 +227,8 @@ function email_reporte_mantenimiento($valores)
         }
 
         if($valores->datos->usuario !== 'NA'){
-            $sql_correo_usuario = "UPDATE cat_usuarios SET correo_usuario = '$valores->correo' WHERE nombre = '$valores->usuario'";
+            $user = $valores->datos->usuario;
+            $sql_correo_usuario = "UPDATE cat_usuarios SET correo_usuario = '$valores->correo' WHERE nombre = '$user'";
             if(!mysqli_query($con,$sql_correo_usuario)){
                 return "No se pudo guardar el correo";
             }
