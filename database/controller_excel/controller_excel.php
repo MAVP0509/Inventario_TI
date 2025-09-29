@@ -442,7 +442,7 @@ function fecha_programa($anio, $mes)
 function ConsultarOrdenMTTO()
 {
     include('../conexion.php');
-    $SQL = "SELECT * FROM vorden_mantenimiento";
+    $SQL = "SELECT * FROM vorden_mantenimiento ORDER BY orden";
     $query = mysqli_query($con, $SQL);
     $datos = array();
     while ($filas = mysqli_fetch_object($query)) {
@@ -463,7 +463,7 @@ function programa_mantenimiento($valores)
     // var_dump($orden);
     $tipos_ordenados = implode(',', ConsultarOrdenMTTO());
 
-    $orden = "";
+    // $orden = "";
 
     // var_dumkp($orden);
     // $mes = $mes_index + 1;
@@ -601,7 +601,7 @@ function programa_mantenimiento($valores)
         // Define la ruta física donde se guardará el archivo, basada en la estructura del proyecto
         $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . 'documentos_descarga' . DIRECTORY_SEPARATOR . 'mantenimiento' . DIRECTORY_SEPARATOR . 'programa' . DIRECTORY_SEPARATOR . $nombre_doc;
         // Construye la URL de descarga del archivo generado
-        $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/matenimiento/programa/{$nombre_doc}";
+        $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/mantenimiento/programa/{$nombre_doc}";
     }
 
     // Crea y guarda el archivo Excel
@@ -612,7 +612,7 @@ function programa_mantenimiento($valores)
     return array(
         'result' => true,
         'url' => $url_descarga,
-        'duplicados' => $duplicados
+        // 'duplicados' => $duplicados
     );
 }
 
