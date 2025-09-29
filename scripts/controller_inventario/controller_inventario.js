@@ -1263,7 +1263,7 @@ async function generar_baja() {
 
     }
 
-    mostrar_toast_cargando('Generando documento...');
+    mostrar_toast_cargando();
     let server = await server_excel(model);
 
     if (server.resultado.result === true && server.resultado.url) {
@@ -1471,7 +1471,7 @@ async function crear_resguardo() {
         cel: celSelected ? 1 : 0
     }
     loading = true
-    mostrar_toast_cargando('Generando documento...')
+    mostrar_toast_cargando()
     $("#mdl-res").modal('hide')
     let server = await server_inventario(model)
 

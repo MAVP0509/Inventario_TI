@@ -59,7 +59,7 @@ function mostrar_toast(tipo, titulo, mensaje, tiempo) {
     });
 }
 
-function mostrar_toast_cargando(texto) {
+function mostrar_toast_cargando() {
     Swal.fire({
         toast: true,
         position: 'top-end',
@@ -71,8 +71,8 @@ function mostrar_toast_cargando(texto) {
         html: `
             <div style="display: flex; align-items: center;">
                 <!--<i class="fas fa-spinner fa-spin fa-lg" style="margin-right: 10px; color: #007bff;"></i>-->
-                <img src="images/circles.svg" alt="Icono" height="30" width="30">
-                <span style="font-weight: 500; margin-left: 8px;">${texto}</span>
+                <img src="images/gooey-balls-1.svg" alt="Icono" height="30" width="30">
+                <span style="font-weight: 500; margin-left: 8px;">Cargando...</span>
             </div>
         `,
         didOpen: () => {
@@ -269,11 +269,11 @@ $(document).on('mouseover', '.icon', function () {
 
 //TODO Animando icono de enviar correo
 
-$(document).on('mouseover', '.envelope', function () {
-    $(this).find('i').removeClass('fa-solid fa-envelope').addClass('fa-solid fa-envelope-open');
+$(document).on('mouseover', '.envelope',function () {
+  $(this).find('i').removeClass('fa-solid fa-envelope').addClass('fa-solid fa-envelope-open');
 })
-$(document).on('mouseout', '.envelope', function () {
-    $(this).find('i').removeClass('fa-solid fa-envelope-open ').addClass('fa-solid fa-envelope')
+$(document).on('mouseout','.envelope', function () {
+  $(this).find('i').removeClass('fa-solid fa-envelope-open ').addClass('fa-solid fa-envelope')
 })
 
 //todo Animando modals
@@ -324,25 +324,3 @@ $(document).ready(function () {
         $dialog.removeClass(`animate__animated ${salida}`);
     });
 });
-
-
-function alert_cargando() {
-    Swal.fire({
-        title: 'Cargando...',
-        text: 'Por favor espere un momento',
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        heightAuto: false,
-        color: "#716add",
-        backdrop: `
-        rgba(0,0,123,0.4)` ,
-        imageUrl: "images/diavaz.png",
-        imageWidth: 200,
-        imageHeight: 200,
-        imageAlt: "Custom image",
-        didOpen: () => {
-            Swal.showLoading();
-        }
-
-    });
-}

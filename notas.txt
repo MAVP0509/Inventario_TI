@@ -60,6 +60,4 @@ ver 1.2.3 : {
 ver 1.2.4:{
     0: Arreglo de autocompletados,
     1: Arreglo, en el modal de inventario, no se visualizaba en cargo del usuario cuando se editaba
-    2: Cambio a la función de toast cargando, pide texto a utilizar,
-    
 }
