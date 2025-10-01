@@ -576,3 +576,4 @@ Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_A
 >>>>>>> parent of f16b4a9 (Merge branch 'Miguel' into Janny)
 =======
 >>>>>>> parent of dfa935a (pruebas)
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Janny_Leticia_García_Mendoza.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Janny_Leticia_García_Mendoza.pdf using filter : calc_pdf_Export

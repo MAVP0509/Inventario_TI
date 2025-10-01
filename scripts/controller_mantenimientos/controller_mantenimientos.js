@@ -70,6 +70,10 @@ async function load() {
         // popoverTitle: "Descripción",
         // popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
     })
+
+    // const actual = new Date().getFullYear() + 1;
+
+    // rellenar_select( actual, "select-anio-mantenimiento")
 }
 
 let datos_mantenimiento = []
@@ -121,8 +125,26 @@ function restaurarEstadoDeGrupos() {
 }
 
 async function consultar_informacion(anio) {
+    
+    const fecha = anio.value
     //load()
-    let server = await server_mantenimiento({ accion: 0, anio : anio.value })
+    let server = await server_mantenimiento({ accion: 0, anio: fecha })
+
+    //* Mostrar mensaje
+    /* if (!fecha) {
+        table = new Tabulator('#tbl01', {
+            locale: "es",
+            layout: "fitColumns",
+            data: [{ mensaje: "Seleccione un año para ver la información de mantenimiento." }],
+            columns: [
+                { title: "Mensaje", field: "mensaje", hozAlign: "center" }
+            ]
+        });
+        return;
+    } */
+
+        if(!fecha) return;
+
     datos_mantenimiento = server.resultado
     Tabulator.extendModule("localize", "langs", {
         "es": {

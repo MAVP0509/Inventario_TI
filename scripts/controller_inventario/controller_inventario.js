@@ -18,8 +18,6 @@ function server_inventario(model) {
                         Swal.close()
                         loading = !loading
                     }
-
-                    //console.log(resolve(JSON.parse(response)))
                     respuesta = response
                 } catch (error) {
                     reject(error)
@@ -41,8 +39,6 @@ function server_excel(model) {
             success: function (response) {
                 try {
                     resolve(JSON.parse(response))
-
-                    //console.log(resolve(JSON.parse(response)))
                     respuesta = response
                 } catch (error) {
                     reject(error)
@@ -59,8 +55,6 @@ window.addEventListener('load', function () {
     if (mensajeRegistro) {
         // Si el mensaje existe, mostramos el toast
         mostrar_toast('success', 'Bienvenido', mensajeRegistro);
-        console.log('Mensaje encontrado:', mensajeRegistro);
-
         // Eliminamos el mensaje para evitar que aparezca nuevamente
         sessionStorage.removeItem('bienvenido');
     }
@@ -324,7 +318,6 @@ async function consultar_informacion() {
             ],
 
         });
-        // console.log(datos)
 
     } catch (error) {
         console.log(error)
@@ -361,7 +354,6 @@ async function mdl_editar(params) {
         if (element.id_equipo === params.id_equipo) {
             // Guarda el registro completo en una variable global
             selecreg = element;
-            // console.log(selecreg)
             break;
         }
     }
@@ -472,7 +464,6 @@ async function mdl_editar(params) {
     document.getElementById('btn-mdl-inventario').onclick = function () { editar_registro() }
     // Muestra el modal en pantalla
     $("#mdl-inventario").modal("show");
-    //console.log(selecreg)
 }
 // Función para guardar los cambios de un activo editado
 async function editar_registro() {
@@ -676,7 +667,6 @@ async function crear_registro() {
             validacion // No hace nada, mantiene validacion igual
             break;
     }
-    // console.log(validacion)
 
     // Validar los campos indicados; si falla, mostrar error y salir
     if (!validar_campos(validacion)) {
@@ -835,10 +825,11 @@ async function desactivar_registro() {
     };
 
     let response = await server_inventario(model);
-    // console.log(response)
+
     if (Array.isArray(response.resultado)) {
         await registrar_historico('Baja de activo', response.resultado);
         mostrar_toast('success', '¡Baja de activo exitosa!', 'La baja se ha realizado correctamente.');
+        equipo_seleccionado = []
         consultar_informacion();
     } else {
         mostrar_toast('error', 'Error', 'No se pudo realizar la baja del activo. Inténtalo nuevamente.');
@@ -972,7 +963,6 @@ async function confirmar_eliminacion() {
     }
     // Comprueba si alguno de los activos seleccionados está en estado "Asignafo"
     let estado = data.some(item => item.estatus === 'Asignado')
-    // console.log(estado)
     // Si alguno está asignado, muestra advertencia y no continúa
     if (estado) {
         mostrar_toast('warning', 'Alerta', 'Uno o más activos se encuentran asignados. Inténtalo nuevamente.');
@@ -994,7 +984,7 @@ async function mostrar_baja() {
     // Busca todos los elementos del DOM que tengan el atributo name="lmp-baja".
     let input = $('[name="lmp-baja"]');
     // Limpia el valor de todos los elementos
-    input.each(function () { $(this).val(''); });
+    input.each(function () { $(this).val(''); $(this).removeClass('is-invalid') });
 
     // Filtra los datos globales para obtener los equipo seleccionados
     let data = datos.filter(el => equipo_seleccionado.includes(el.id_equipo));
@@ -1139,7 +1129,7 @@ async function mostrar_baja() {
     $('#smartwizard').smartWizard("goToStep", 0);
 
     // Asigna evento para botón confirmación
-    $('#btn-confirmar').on('click', function () {
+    $('#btn-confirmar').off('click').on('click', function () {
         // Ejecuta validaciones de todos los pasos antes de confirmar
         const validaciones = {
             0: ['slc-motivo', 'inp-motivo', 'inp-monto', 'inp-quincena', 'inp-reubicacion'],
@@ -1426,8 +1416,6 @@ $(document).ready(function () {
     // Escucha cambios en el campo "inp-tipo"
     $('#check-resguardo-pemex').on('click', function () {
 
-        //console.log(selected)
-
         if (selected) {
             $('#inp-user-pemex').addClass('is-required');
             $('#inp-cargo-pemex').addClass('is-required');
@@ -1507,7 +1495,6 @@ function abrir_resguardo(datos) {
     ruta = ruta.replace(/\.xlsx$/i, '.pdf');
 
     ruta = ruta.replace("C:/xampp/htdocs", "http://" + dominio + ":" + puerto)
-    // console.log(ruta.resultado)
     window.open(ruta, '_blank');
 }
 
@@ -1545,7 +1532,7 @@ function myCallback(start, end) {
 }
 
 function button_checked(button) {
-    //console.log(button[0].id)
+
     if (button[0].id == "check-resguardo-pemex") {
         selected = !selected;
 
@@ -1582,15 +1569,12 @@ function button_checked(button) {
 //todo Cerrando el control-sidebar con click fuera de éste
 $(".content-wrapper").click(function () {
     if ($('body').hasClass('control-sidebar-slide-open')) {
-        //console.log('cerrando sidebar');
         $('[data-widget="control-sidebar"]').ControlSidebar('toggle');
     }
 });
 
 let dominio = window.location.hostname
 let puerto = location.port
-
-//console.log(window.FilePond);
 
 FilePond.registerPlugin(FilePondPluginFileValidateType);
 
@@ -1781,7 +1765,7 @@ $('#select-ver-usu-file').on('change', async function () {
     server = await server_inventario(model)
 
     if (server.resultado.documentos) {
-        //console.log(server.resultado.documentos)
+
         let rutas = server.resultado.documentos.reverse()
 
         let documentos = rutas.map(rutaCompleta => {
@@ -1842,7 +1826,6 @@ $('#select-ver-usu-file').on('change', async function () {
 
 
     } else if (server.resultado.mensaje) {
-        //console.log(server.resultado.mensaje)
         let mensaje = server.resultado.mensaje
 
         let contenedor = document.getElementById('lista-documentos');

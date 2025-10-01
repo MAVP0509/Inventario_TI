@@ -78,9 +78,10 @@ async function consultar_orden_tipo(params) {
         data: datos_orden,
         layout: "fitColumns",
         movableRows: true,
-        pagination: "local",
-        paginationSize: 15,
-        paginationSizeSelector: [5, 10, 15, 20, true],
+        height: "600px",
+        // pagination: "local",
+        // paginationSize: 15,
+        // paginationSizeSelector: [5, 10, 15, 20, true],
         paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
             const totalRows = table_orden.getDataCount(); // Asegúrate que 'table' esté accesible
             const end = Math.min(currentRowStart + pageSize - 1, totalRows);
@@ -120,8 +121,8 @@ async function consultar_orden_tipo(params) {
 
     })
 
-    table_orden.on("rowMoved", function(row) {
-        let orden = table_orden.getData().map( data => data.tipo_id)
+    table_orden.on("rowMoved", function (row) {
+        let orden = table_orden.getData().map(data => data.tipo_id)
         console.log(orden)
         orden_tipos_mantenimiento(orden);
     })
@@ -179,12 +180,12 @@ async function msj_eliminar_orden_tipo() {
 }
 
 async function eliminar_orden_tipo() {
-    
+
     let model = { accion: 3, activo: orden_seleccionado };
 
     let server = await server_tipo_mantenimiento(model);
 
-    if(server.resultado === true) {
+    if (server.resultado === true) {
         await consultar_orden_tipo();
         mostrar_toast('success', '¡Eliminación exitosa!', 'La eliminación se realizo correctamente.');
     } else {
@@ -201,7 +202,7 @@ async function orden_tipos_mantenimiento(orden_actual) {
 
     let server = await server_tipo_mantenimiento(model);
 
-    if(server.resultado.result === true) {
+    if (server.resultado.result === true) {
         await consultar_orden_tipo();
         // programar_mantenimiento(orden_actual);
         mostrar_toast('success', '¡Orden registrado!', 'Orden registrado exitosamente.');
