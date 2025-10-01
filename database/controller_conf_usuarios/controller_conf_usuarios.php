@@ -28,8 +28,8 @@ function insertar_usuarios($valores)
 
     $nombre = mysqli_real_escape_string($con, $valores->nombre ?? '');
     $cargo = mysqli_real_escape_string($con, $valores->cargo ?? '');
-    $region = mysqli_real_escape_string($con, $valores->region ?? '');
-    $correo = mysqli_real_escape_string($con, isset($valores->correo) ? $valores->nombre : '@diavaz.com');
+    $region = mysqli_real_escape_string($con, isset($valores->region) ? $valores->region : 'NA');
+    $correo = mysqli_real_escape_string($con, isset($valores->correo) ? $valores->correo : '@diavaz.com');
 
     // $nv_cargo = insertar_o_obtener_id($con, 'cat_usuario', 'cargo');
 
@@ -50,8 +50,8 @@ function editar_usuarios($valores)
     $nombre = mysqli_real_escape_string($con, $valores->nombre ?? '');
     $cargo = mysqli_real_escape_string($con, $valores->cargo ?? '');
     $region = mysqli_real_escape_string($con, $valores->region ?? '');
-     $correo = mysqli_real_escape_string($con, $valores->correo ?? '');
-    
+    $correo = mysqli_real_escape_string($con, $valores->correo ?? '');
+
     $sql = "UPDATE cat_usuarios SET nombre = '$nombre',cargo='$cargo', region = '$region', correo_usuario ='$correo' WHERE id='$valores->id';";
     return mysqli_query($con, $sql);
 }

@@ -730,6 +730,7 @@ async function traspasos() {
 
     let validacion = ['mdl-estado']
 
+    // Se obtiene el valor actual del campo (estado seleccionado por el usuario)
     const tipo_seleccionado = $('#mdl-estado').val();
 
     if (tipo_seleccionado === 'Asignado') {
@@ -1231,12 +1232,14 @@ async function mostrar_baja() {
     })
 }
 
+// Función de genración de documento de baja
 async function generar_baja() {
-
+    // Verifica si la tabla no ha sido inicializada.
     if (!tbl_baja) {
         mostrar_toast('error', 'Error', 'No hay datos en la tabla para generar la baja.');
         return;
     }
+    // Creación de objeto que agrupa toda la información necesaria para procesar la baja.
     let model = {
         accion: 2,
         motivo: $("#slc-motivo").val(),
@@ -1253,27 +1256,30 @@ async function generar_baja() {
         cg_vobo: $("#cg-vobo").select2('data')[0].text,
         autorizo: $("#slc-autorizo").select2('data')[0].text,
         cg_autorizo: $("#cg-autorizo").select2('data')[0].text,
-        tabla_baja: tbl_baja.getData().map((item, index) => ({
+        tabla_baja: tbl_baja.getData().map((item, index) => ({ //Extrae los datos de la tabla y los transforma para agregar campos adicionales por cada fila
             ...item,
             rownum: index + 1,
+            // Se crea una descripción compuesta para cada activo.
             descripcion: `${item.tipo || ''} Marca ${item.marca || ''} Serie ${item.num_serie || ''} Modelo ${item.modelo || ''}`
         })),
 
     }
 
+    // Muestra una notificación tipo "loading" inc
     mostrar_toast_cargando('Generando documento...');
     let server = await server_excel(model);
 
+    // Verifica la respuesta del servidor con dos resultados
+    // server.resultado.url : url para descargar el archivo de baja.
+    // server.resultado.result : es una respuesta booleana con solo dos resultado (true, false)
     if (server.resultado.result === true && server.resultado.url) {
-        // mostrar_toast('success', '¡Baja exitosa!', 'El activo se ha dado de baja correctamente.');
-        window.location = server.resultado.url;
-        desactivar_registro();
+        window.location = server.resultado.url; // Redirecciona el navegador a esa URL (descarga automática del archivo).
+        desactivar_registro(); //Llama a la función encargada de realizar la baja
         $('#mdl-baja').modal("hide");
-    } else {
+    } else { // Mensaje de error al recibir una respuesta del servidor "false"
         mostrar_toast('error', 'Error', 'No se pudo dar de baja el activo. Inténtalo nuevamente.')
     }
 }
-
 
 //TODO Funciones de los Select2
 
