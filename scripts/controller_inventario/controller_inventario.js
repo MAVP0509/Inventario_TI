@@ -878,6 +878,7 @@ async function mdl_imprimir() {
         check_columnas.dataset.listenerAttached = "true";
     }
 
+    $("#btn-imprimir").off('click').on('click', function () { imprimir_pdf()})
     $("#mdl-imprimir").modal("show");
 
 }
@@ -938,13 +939,15 @@ async function imprimir_pdf() {
         }
     };
 
-    pdfMake.createPdf(docDefinition).download("Inventario_TI.pdf");
+    const fecha = moment().format('YYYYMMDD_HHmmss');
+    pdfMake.createPdf(docDefinition).download(`Inventario_TI_${fecha}.pdf`);
 
     $('#mdl-imprimir').modal('hide'); // Cierra modal
 }
 
 function imprimir_excel() {
-    table.download("xlsx", "Inventario_TI.xlsx", {
+    const fecha = moment().format('YYYYMMDD_HHmmss');
+    table.download("xlsx", `Inventario_TI_${fecha}.xlsx`, {
         sheetName: "Inventario",
     })
 }
@@ -1466,7 +1469,8 @@ async function crear_resguardo() {
         mostrar_toast('warning', 'Aviso', server.resultado.error)
     } else if (server.resultado) {
 
-        abrir_resguardo(server.resultado)
+        abrir_resguardo(server.resultado.result)
+        await registrar_historico('Generación de resguardo',  server.resultado.resguardo);
         consultar_informacion();
     } else {
         mostrar_toast('error', 'Aviso', "Hubo un error")

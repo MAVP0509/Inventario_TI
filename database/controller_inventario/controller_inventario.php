@@ -286,6 +286,13 @@ function consultar_para_resguardo($valores)
     include("../conexion.php");
     $respuesta = new stdClass();
 
+    $sql_historico = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, modelo, tag, imei, linea, fecha_entrega FROM inventario_ti_sur WHERE fk_usuario = $valores->usuario;";
+    $query_historico = mysqli_query($con, $sql_historico);
+    $historico = array();
+    while ($fila = mysqli_fetch_object($query_historico)) {
+        array_push($historico, $fila);
+    }
+
     $sql = "call sp_info_resguardo('$valores->usuario');";
     $query = mysqli_query($con, $sql);
 
@@ -365,7 +372,12 @@ function consultar_para_resguardo($valores)
     curl_close($ch);
 
     // Retornar al frontend lo que devuelva el segundo PHP
-    return json_decode($respuesta_raw);
+    // return json_decode($respuesta_raw);
+
+    return array(
+        'result' => json_decode($respuesta_raw),
+        'resguardo' => $historico
+    );
 }
 
 function verificar_nuevos_id($valor)
