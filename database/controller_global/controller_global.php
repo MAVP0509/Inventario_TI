@@ -40,6 +40,7 @@ function consultar_distintos($valores)
             case "zona":
             case "ubicacion":
             case "evento":
+            case "anio":
                 // case "cargo":
                 $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE  `$campo` <> 'NA'";
                 break;

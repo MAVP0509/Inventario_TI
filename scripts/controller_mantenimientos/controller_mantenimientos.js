@@ -59,6 +59,19 @@ function server_correo(model) {
     })
 }
 
+async function load() {
+    await general_select2({
+        selectId: 'select-anio-mantenimiento',
+        tabla: 'mantenimiento',
+        campo: 'anio',
+        placeholder: 'Selecione un año',
+        dropdownParent: '#card-mantenimientos',
+        tags: false,
+        // popoverTitle: "Descripción",
+        // popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
+    })
+}
+
 let datos_mantenimiento = []
 let elemento_mnt
 let table
@@ -107,9 +120,9 @@ function restaurarEstadoDeGrupos() {
     }, 100);
 }
 
-async function consultar_informacion() {
-
-    let server = await server_mantenimiento({ accion: 0 })
+async function consultar_informacion(anio) {
+    //load()
+    let server = await server_mantenimiento({ accion: 0, anio : anio.value })
     datos_mantenimiento = server.resultado
     Tabulator.extendModule("localize", "langs", {
         "es": {
@@ -426,7 +439,7 @@ async function programar_mantenimiento() {
         window.location = server.resultado.url;
         mostrar_toast('success', '¡Programa de mantenimiento exitosa!', 'Rellena los campos. Inténtelo nuevamente.');
         $('#mdl-prog-mant').modal("hide");
-        
+
     } else if (server.resultado.result === false) {
         mostrar_toast('error', 'Error', 'No se pudo realizar el programa de mantenimiento. Inténtalo nuevamente.');
         $('#mdl-prog-mant').modal("hide");
@@ -576,6 +589,7 @@ async function reporte_mantenimiento(elemento_mnt) {
         window.location = server.resultado.url;
         $('#mdl-reporte-mant').modal("hide");
         table.updateData([{ id: elemento_mnt.id, reporte_descargado: 1, estado: "En proceso" }])
+        consultar_mantenimientos_vencidos()
         mostrar_toast('success', '¡Generación de reporte exitoso!', 'La generación de reporte de mantenimiento se ha realizado correctamente.');
     } else {
         mostrar_toast('error', '¡Error!', 'No se pudo generar el reporte de mantenimiento. Inténtelo nuevamente.');
@@ -659,7 +673,7 @@ async function abrir_subir_reporte(id, fechaMnto) {
                             table.updateData([{ id: id, reporte_subido: 1, estado: "Realizado" }])
                             mostrar_toast("success", "Subido", data.resultado.mensaje)
                             //window.location.reload()
-                            consultar_mantenimientos_vencidos()
+
 
 
                             pond.removeFile();
@@ -828,12 +842,12 @@ async function enviar_correo_reporte(datos_equipo) {
 
         //consultar_informacion()
         mostrar_toast('success', '¡Realizado!', "Correo enviado al usuario")
-        
+
         //* Actualizando la fila sin dibujar de nuevo la tabla
         const row = table.getRow(datos_equipo.id);
         if (row) {
             row.update({ correo_enviado: 1 }); //*Agregar await al principio si se requiere forzar renderizado de un boton de habilitado a deshabilitado
-            table.redraw(true); 
+            table.redraw(true);
         }
 
         return
