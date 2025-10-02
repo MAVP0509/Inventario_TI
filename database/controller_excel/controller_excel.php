@@ -405,8 +405,8 @@ function bajas($valores)
 
     if ($base !== false) {
         // DIRECTORY_SEPARATOR para compatibilidad entre SO
-        $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . $nombreArchivo;
-        $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/{$nombreArchivo}";
+        $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . 'documentos_descarga' . DIRECTORY_SEPARATOR . 'bajas' . DIRECTORY_SEPARATOR  . $nombreArchivo;
+        $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/bajas/{$nombreArchivo}";
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
         // $writer->save('php://output');
         $writer->save($ruta_guardar);
