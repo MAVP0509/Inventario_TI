@@ -82,7 +82,7 @@ let table
 let gruposAbiertosKey = "grupos_abiertos_mantenimientos";
 let gruposRestaurados = false;
 
-function guardarEstadoDeGrupos() {
+/* function guardarEstadoDeGrupos() {
     const abiertos = table.getGroups()
         .filter(group => group.isVisible())
         .map(group => group.getKey());
@@ -122,7 +122,7 @@ function restaurarEstadoDeGrupos() {
         }
 
     }, 100);
-}
+} */
 
 async function consultar_informacion(anio) {
     
@@ -461,6 +461,7 @@ async function programar_mantenimiento() {
         window.location = server.resultado.url;
         mostrar_toast('success', '¡Programa de mantenimiento exitosa!', 'Rellena los campos. Inténtelo nuevamente.');
         $('#mdl-prog-mant').modal("hide");
+        load()
 
     } else if (server.resultado.result === false) {
         mostrar_toast('error', 'Error', 'No se pudo realizar el programa de mantenimiento. Inténtalo nuevamente.');
@@ -592,6 +593,7 @@ async function mdl_reporte_mantenimiento(elemento_mnt) {
     })
 
     rellenar_select("César Ignacio Torres Almeida", "slc-encargado");
+    $("#btn-reporte-mant").prop("disabled", false);
     $("#btn-reporte-mant").off('click').on('click', function () { reporte_mantenimiento(elemento_mnt) })
     $("#mdl-reporte-mant").modal("show");
 }
