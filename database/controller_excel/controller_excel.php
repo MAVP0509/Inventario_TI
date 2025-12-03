@@ -1,6 +1,9 @@
 <?php
 //TODO PHP para generación de documentos en excel y PDF
 require __DIR__ . '/../../libraries/vendor/autoload.php';  //*Importamos el autoload del composer para acceder a la librería PHP SpreadSheet
+require_once('vendor/autoload.php');
+
+use Ilovepdf\Ilovepdf;
 
 //* Importación de utilidades de la librería
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -442,7 +445,11 @@ function fecha_programa($anio, $mes)
 function ConsultarOrdenMTTO()
 {
     include('../conexion.php');
-    $SQL = "SELECT * FROM vorden_mantenimiento ORDER BY orden";
+    $sql_dis = "SELECT tipo_id FROM vorden_mantenimiento";
+    $sql_orden = "SELECT orden FROM vorden_mantenimiento ORDER BY orden";
+
+    $SQL = "CALL pprograma_mantenimiento($sql_dis, $sql_orden)";
+    // $SQL = "SELECT * FROM vorden_mantenimiento ORDER BY orden";
     $query = mysqli_query($con, $SQL);
     $datos = array();
     while ($filas = mysqli_fetch_object($query)) {
@@ -457,11 +464,37 @@ function programa_mantenimiento($valores)
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
     $anio_actual = date("Y") + 1;
-    $tipos_ordenados = implode(',', ConsultarOrdenMTTO());
+    $sql_dev = "SELECT tipo_id FROM vorden_mantenimiento";
+    $query_dev = mysqli_query($con, $sql_dev);
+
+    $datos_dev = [];
+    while ($filas = mysqli_fetch_object($query_dev)) {
+         $datos_dev[] = "'".$filas->tipo_id."'";
+    }
+
+    /* $sql_orden = "SELECT orden FROM vorden_mantenimiento ORDER BY orden";
+    $query_orden = mysqli_query($con, $sql_orden);
+
+    $datos_orden = [];
+    while ($filas = mysqli_fetch_object($query_orden)) {
+        $datos_orden[] = "'".$filas->orden."'";
+    } */
+    // var_dump($datos_dev);
+    $dev = implode(',', $datos_dev);
+    // var_dump($dev);
+    // $orden = implode(',', $datos_orden);
+    // var_dump($tipos_ordenados);
+
+    if (empty($dev)) {
+        return [
+            'result' => false,
+            'error' => 'No hay un orden de mantenimiento de dispositivos. Específica un orden en configuración.'
+        ];
+    }
 
     // Consulta SQL que obtiene todos los registros de la vista, en un orden específico según ID
-    $sql_inv = "SELECT * FROM vprograma_mantenimiento ORDER BY FIELD(equipo, $tipos_ordenados)";
-    // var_dump($sql_inv);
+    $sql_inv = "CALL pprograma_mantenimiento(\"$dev\", \"$dev\")";
+    var_dump($sql_inv);
     $query = mysqli_query($con, $sql_inv);
 
 
@@ -493,7 +526,8 @@ function programa_mantenimiento($valores)
         } catch (mysqli_sql_exception $e) {
             if ($e->getCode() == 1062) {
                 return array(
-                    'duplicado' => false
+                    'result' => false,
+                    'error' => 'Ya existe un programa de mantenimiento para el año'
                 );
             }
         }
@@ -581,30 +615,34 @@ function programa_mantenimiento($valores)
     $worksheet->setCellValue("D$fechas", date('Y-m-d'));
     $worksheet->getStyle("C$fechas")->getAlignment()->setWrapText(true);
 
-    $fecha = date('Ymd_His'); // Genera una marca de tiempo para el nombre del archivo
-    $nombre_doc = "FO-DSP-TI-03_Programa de Mantenimiento Preventivo TI Región Sur_{$fecha}.xlsx"; // Nombre del archivo generado
-
     $base = realpath(__DIR__ . '/../../../');
-    $host = $_SERVER['HTTP_HOST'];
-    $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+
 
     if ($base !== false) {
+        $fecha = date('Ymd_His'); // Genera una marca de tiempo para el nombre del archivo
+        $nombre_doc = "FO-DSP-TI-03_Programa de Mantenimiento Preventivo TI Región Sur_{$fecha}.xlsx"; // Nombre del archivo generado
         // Define la ruta física donde se guardará el archivo, basada en la estructura del proyecto
         $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . 'documentos_descarga' . DIRECTORY_SEPARATOR . 'mantenimiento' . DIRECTORY_SEPARATOR . 'programa' . DIRECTORY_SEPARATOR . $nombre_doc;
+        $host = $_SERVER['HTTP_HOST'];
+        $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
         // Construye la URL de descarga del archivo generado
         $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/mantenimiento/programa/{$nombre_doc}";
+        // Crea y guarda el archivo Excel
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save($ruta_guardar); // Guarda el archivo en la ruta definida
+
+        // Retorna un arreglo con el resultado y la URL para descargar el archivo
+        return array(
+            'result' => true,
+            'url' => $url_descarga,
+            // 'duplicados' => $duplicados
+        );
+    } else {
+        return [
+            'result' => false,
+            'error' => 'No se pudo realizar el programa de mantenimiento. Inténtalo nuevamente.'
+        ];
     }
-
-    // Crea y guarda el archivo Excel
-    $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-    $writer->save($ruta_guardar); // Guarda el archivo en la ruta definida
-
-    // Retorna un arreglo con el resultado y la URL para descargar el archivo
-    return array(
-        'result' => true,
-        'url' => $url_descarga,
-        // 'duplicados' => $duplicados
-    );
 }
 
 
@@ -706,9 +744,9 @@ function reporte_mantenimiento($valores)
 
     $datos = $valores->elementos;
     $sql = "UPDATE mantenimiento SET reporte_descargado = 1, estado = 'En proceso' WHERE id_equipo = '$datos->id' AND  anio = '$datos->anio'";
-    
 
-    if(!mysqli_query($con,$sql)){
+
+    if (!mysqli_query($con, $sql)) {
         return false;
     }
 
