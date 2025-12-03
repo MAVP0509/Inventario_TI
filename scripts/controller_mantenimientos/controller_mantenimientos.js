@@ -463,13 +463,13 @@ async function programar_mantenimiento() {
         $('#mdl-prog-mant').modal("hide");
         load()
 
-    } else if (server.resultado.result === false) {
-        mostrar_toast('error', 'Error', 'No se pudo realizar el programa de mantenimiento. Inténtalo nuevamente.');
+    } else if(server.resultado.result === false) {
+        mostrar_toast('error', 'Error', server.resultado.error);
         $('#mdl-prog-mant').modal("hide");
-    } else if (server.resultado.duplicado === false) {
+    }/*  else if (server.resultado.duplicado === false) {
         mostrar_toast('error', '¡Error!', 'Ya existe un programa de mantenimiento para el año');
         $('#mdl-prog-mant').modal("hide");
-    }
+    } */
 
 }
 

@@ -211,7 +211,7 @@ function email_reporte_mantenimiento($valores)
                     </div>
                 </body>
             </html>';
-        $mail->AltBody = 'Mantenimiento de ecuipos';
+        $mail->AltBody = 'Mantenimiento de equipos';
 
         // Enviar el correo
         $mail->send();
