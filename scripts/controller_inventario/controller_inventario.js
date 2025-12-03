@@ -975,7 +975,7 @@ async function confirmar_eliminacion() {
     } else {
         // Si están en estado "Bodega", muestra una alerta con opciones:
         // Confirmar baja directa o genera formato excel antes de continuar
-        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activos(s)?`, false,
+        mostrar_alert('warning', `¿Está seguro de eliminar ${equipo_seleccionado.length} activo(s)?`, false,
             desactivar_registro,    // Función para baja directa
             true,   // Muestra dos botones
             'Generar formato <i class="fa-solid fa-file-excel"></i>',   // Segundo botón
