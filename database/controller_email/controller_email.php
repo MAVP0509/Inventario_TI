@@ -162,7 +162,7 @@ function email_reporte_mantenimiento($valores)
 
         // Contenido del correo
         $mail->isHTML(true); // Usar HTML en el correo
-        $mail->Subject = 'Mantenimiento de equipos';
+        $mail->Subject = 'Mantenimiento de equipo: '.$valores->datos->tipo. ' Folio '.$valores->datos->id;
         $mail->Body =
             '<html>
                 <body style="font-family: Arial, sans-serif; background-color: #f9fafc; color: #333; margin: 0; padding: 0;">
@@ -172,33 +172,33 @@ function email_reporte_mantenimiento($valores)
                     </div>
                     <div style="padding: 20px; text-align: center;">
                         <h2 style="color: #333333; margin-bottom: 15px; font-size: 22px;">Su equipo será revisado este mes</h2>
-                        <p style="font-size: 16px; line-height: 1.6; color: #555;">Le informamos que como parte de nuestro plan de mantenimiento preventivo, su equipo ' . $valores->datos->tipo . ' está 
+                        <p style="font-size: 16px; line-height: 1.6; color: #555; text-align: justify;">Le informamos que como parte de nuestro plan de mantenimiento preventivo, su equipo ' . $valores->datos->tipo . ' está 
                         programado para mantenimiento durante el mes </p>
                         <p style="font-size: 16px; line-height: 1.6; color: #555;">Información del mantenimiento:</p>
-                        <table style="width: 90%; margin: 0 auto 20px auto; border-collapse: collapse; font-size: 14px; color: #555;">
-                            <tr>
-                                <td style="padding: 8px; text-align: left; font-weight: bold;">Equipo</td>
-                                <td style="padding: 8px; text-align: left;">' . $valores->datos->tipo . '</td>
+                        <table style="width: 100%; margin-top: 15px; border-collapse: separate; border-spacing: 0 5px;font-size: 14px; color: #333;">
+                            <tr style="background-color: #eef2f7; border-radius: 5px;">
+                                <td style="padding: 10px; text-align: left; font-weight: bold; width: 40%; border-radius: 5px 0 0 5px;">Equipo</td>
+                                <td style="padding: 10px; text-align: left; border-radius: 0 5px 5px 0;">' . $valores->datos->tipo . '</td>
                             </tr>
-                            <tr>
-                                <td style="padding: 8px; text-align: left; font-weight: bold;">Marca</td>
-                                <td style="padding: 8px; text-align: left;">' . $valores->datos->marca . '</td>
+                            <tr style=" border-radius: 5px;">
+                                <td style="padding: 10px; text-align: left; font-weight: bold; width: 40%; border-radius: 5px 0 0 5px;">Marca</td>
+                                <td style="padding: 10px; text-align: left; border-radius: 0 5px 5px 0;">' . $valores->datos->marca . '</td>
                             </tr>
-                            <tr>
-                                <td style="padding: 8px; text-align: left; font-weight: bold;">Número de serie</td>
-                                <td style="padding: 8px; text-align: left;">' . $valores->datos->num_serie . '</td>
+                            <tr style="background-color: #eef2f7; border-radius: 5px;">
+                                <td style="padding: 10px; text-align: left; font-weight: bold; width: 40%; border-radius: 5px 0 0 5px;">Número de serie</td>
+                                <td style="padding: 10px; text-align: left; border-radius: 0 5px 5px 0;">' . $valores->datos->num_serie . '</td>
                             </tr>
-                            <tr>
-                                <td style="padding: 8px; text-align: left; font-weight: bold;">Modelo</td>
-                                <td style="padding: 8px; text-align: left;">' . $valores->datos->modelo . '</td>
+                            <tr style=" border-radius: 5px;">
+                                <td style="padding: 10px; text-align: left; font-weight: bold; width: 40%; border-radius: 5px 0 0 5px;">Modelo</td>
+                                <td style="padding: 10px; text-align: left; border-radius: 0 5px 5px 0;">' . $valores->datos->modelo . '</td>
                             </tr>
-                            <tr>
-                                <td style="padding: 8px; text-align: left; font-weight: bold;">Ubicación</td>
-                                <td style="padding: 8px; text-align: left;">' . $valores->datos->ubicacion . '</td>
+                            <tr style="background-color: #eef2f7; border-radius: 5px;">
+                                <td style="padding: 10px; text-align: left; font-weight: bold; width: 40%; border-radius: 5px 0 0 5px;">Ubicación</td>
+                                <td style="padding: 10px; text-align: left; border-radius: 0 5px 5px 0;">' . $valores->datos->ubicacion . '</td>
                             </tr>
-                            <tr>
-                                <td style="padding: 8px; text-align: left; font-weight: bold;">Usuario asignado</td>
-                                <td style="padding: 8px; text-align: left;">' . $valores->datos->usuario . '</td>
+                            <tr style=" border-radius: 5px;">
+                                <td style="padding: 10px; text-align: left; font-weight: bold; width: 40%; border-radius: 5px 0 0 5px;">Usuario asignado</td>
+                                <td style="padding: 10px; text-align: left;border-radius: 0 5px 5px 0;">' . $valores->datos->usuario . '</td>
                             </tr>
                         </table>
                     </div>
