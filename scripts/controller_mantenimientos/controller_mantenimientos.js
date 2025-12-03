@@ -242,7 +242,12 @@ async function consultar_informacion(anio) {
             // Creamos una fecha con día explícito
             const fecha = new Date(`${año}-${mes}-01T00:00:00`);
             const opciones = { year: 'numeric', month: 'long' };
-            return fecha.toLocaleDateString('es-ES', opciones);
+
+            let excluir = ['Realizado']
+            const datos = data.filter(d=> d.estado && !excluir.includes(d.estado)).length
+
+
+            return `${fecha.toLocaleDateString('es-ES', opciones)} (${datos} mantenimientos pendientes)`
         },
         groupStartOpen: false,
         groupToggleElement: "header", //* Permite que dando click en cualquier parte del header group, éste se despliegue

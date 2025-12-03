@@ -157,7 +157,8 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
                                         </div>
-                                        <select class="form-control select" id="select-anio-mantenimiento" onchange="consultar_informacion(this)"></select>
+                                        <select class="form-control select" id="select-anio-mantenimiento"
+                                            onchange="consultar_informacion(this)"></select>
                                     </div>
                                     <div id="tbl01" style="overflow-x: auto; width: 100%;"></div>
                                 </div>
@@ -188,11 +189,16 @@
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col" id="col-subir-reporte">
-                                <div class="alert alert-danger position-relative d-flex align-items-start " role="alert"
-                                    style="display:none !important; background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;"
+                                <div class="alert alert-danger d-flex align-items-center " role="alert"
+                                    style="display:none !important;  background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;"
                                     id="alert-reporte">
-                                    El activo ya tiene el reporte de este año, si sube uno, reemplazará el ya existente
-                                    y no será reversible
+                                    <div style="margin-right: 15px; display: flex; align-items: center; flex-shrink: 0;">
+                                        <i class="fa-solid fa-triangle-exclamation fa-2xl"></i>
+                                    </div>
+                                    <span style="line-height: 1.4;">El activo ya tiene el reporte de este año, si sube uno, reemplazará el ya
+                                        existente
+                                        y no será reversible</span>
+
                                 </div>
                                 <div id="contenedor-filepond">
                                     <input type="file" id="subir-reporte" name="reporte_mantenimiento">
@@ -501,16 +507,16 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa-solid fa-at"></i></span>
                             </div>
-                            <input type="input"  class="form-control" id="inp-correo"
-                                name="mdl-mant-info-inputs" autocomplete="off">
+                            <input type="input" class="form-control" id="inp-correo" name="mdl-mant-info-inputs"
+                                autocomplete="off">
                         </div>
                         <!--<small class="form-text text-muted">Porfavor confirme el correo </small>-->
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa-solid fa-at"></i></span>
                             </div>
-                            <input type="input"  class="form-control"
-                                id="inp-correo-validar" name="mdl-mant-info-inputs" autocomplete="off" placeholder="Confirmar correo">
+                            <input type="input" class="form-control" id="inp-correo-validar" name="mdl-mant-info-inputs"
+                                autocomplete="off" placeholder="Confirmar correo">
                         </div>
                     </div>
                 </div>
