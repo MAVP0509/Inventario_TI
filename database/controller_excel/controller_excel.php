@@ -700,7 +700,10 @@ function reporte_mantenimiento($valores)
     }
 
     // Determinar fila a llenar según tipo
-    $tipo = !empty($valores->tipo) ? $valores->tipo : 'Otros';
+    $tipo = !empty($valores->elementos->tipo) ? $valores->elementos->tipo : 'Otros';
+    // var_dump($tipo);
+    // $tipo = preg_replace('/\s+/', ' ', $tipo);
+    // $tipo = ucfirst(strtolower($tipo));
     $fila = $mapa_filas[$tipo] ?? 26; // 26 = Otros
 
     // Rellenar datos
