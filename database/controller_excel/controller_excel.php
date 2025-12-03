@@ -1,9 +1,6 @@
 <?php
 //TODO PHP para generación de documentos en excel y PDF
 require __DIR__ . '/../../libraries/vendor/autoload.php';  //*Importamos el autoload del composer para acceder a la librería PHP SpreadSheet
-require_once('vendor/autoload.php');
-
-use Ilovepdf\Ilovepdf;
 
 //* Importación de utilidades de la librería
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -469,7 +466,7 @@ function programa_mantenimiento($valores)
 
     $datos_dev = [];
     while ($filas = mysqli_fetch_object($query_dev)) {
-         $datos_dev[] = "'".$filas->tipo_id."'";
+        $datos_dev[] = $filas->tipo_id;
     }
 
     /* $sql_orden = "SELECT orden FROM vorden_mantenimiento ORDER BY orden";
@@ -493,14 +490,20 @@ function programa_mantenimiento($valores)
     }
 
     // Consulta SQL que obtiene todos los registros de la vista, en un orden específico según ID
-    $sql_inv = "CALL pprograma_mantenimiento(\"$dev\", \"$dev\")";
-    var_dump($sql_inv);
+    $sql_inv = "CALL pprograma_mantenimiento('$dev', '$dev')";
+    // var_dump($sql_inv);
     $query = mysqli_query($con, $sql_inv);
 
-
     $datos = []; // Crea un arreglo vacío para almacenar los datos
-    while ($fila =  mysqli_fetch_assoc($query)) { // Recorre los resultados fila por fila
-        $datos[] = $fila; // Agrega cada fila al arreglo $datos
+
+    if ($query) {
+        while ($fila =  mysqli_fetch_assoc($query)) { // Recorre los resultados fila por fila
+            $datos[] = $fila; // Agrega cada fila al arreglo $datos
+        }
+
+        while (mysqli_next_result($con)) {
+            mysqli_use_result($con);
+        }
     }
 
     // Define las columnas de Excel correspondientes a los meses del año
