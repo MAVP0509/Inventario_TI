@@ -60,6 +60,324 @@
             z-index: 1040;
             /* Asegura que esté por encima del contenido */
         }
+
+        /* .meses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .mes-card {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            border: 2px solid transparent;
+            transition: 0.2s ease-in-out;
+            font-weight: 500;
+        }
+
+        .mes-card.disponible {
+            background: #007bff;
+            color: white;
+        }
+
+        .mes-card.disponible:hover {
+            background: #0056b3;
+            transform: scale(1.03);
+        }
+
+        .mes-card.no-disponible {
+            background: #e9ecef;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        .mes-card.no-disponible:hover {
+            transform: none;
+        } */
+        /* -------------------------------------------------------- */
+        /* .meses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 18px;
+            padding: 10px;
+        }
+
+        .mes-card {
+            padding: 18px;
+            border-radius: 12px;
+            background: white;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            border: 1px solid #e1e5eb;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
+            transition: all 0.25s ease;
+        }
+
+        .mes-card .mes-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+            transition: 0.2s ease;
+        }
+
+        .mes-card .mes-nombre {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .mes-card .mes-status {
+            margin-top: 5px;
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .mes-card.disponible {
+            border-color: #007bff;
+        }
+
+        .mes-card.disponible .mes-status {
+            background: #007bff;
+            color: white;
+        }
+
+        .mes-card.disponible:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+        }
+
+        .mes-card.disponible:hover .mes-icon {
+            color: #0056b3;
+            transform: scale(1.1);
+        }
+
+        .mes-card.no-disponible {
+            cursor: not-allowed;
+            opacity: 0.55;
+        }
+
+        .mes-card.no-disponible .mes-status {
+            background: #adb5bd;
+            color: white;
+        } */
+        /* --------------------------------------------- */
+
+        /* .meses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 18px;
+            padding: 10px;
+        }
+
+        .mes-card {
+            position: relative;
+            padding: 20px;
+            border-radius: 12px;
+            background: white;
+            border: 1px solid #dfe4ea;
+            text-align: center;
+            cursor: pointer;
+            overflow: hidden;
+            user-select: none;
+            transition: all 0.25s ease;
+        }
+
+
+        .mes-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, #007bff 0%, #0056b3 100%);
+            z-index: 0;
+            transform: translateY(100%);
+
+            transition: transform 0.4s ease;
+        }
+
+
+        .mes-card:hover::before {
+            transform: translateY(0);
+
+        }
+
+        .mes-nombre,
+        .mes-status {
+            position: relative;
+            z-index: 1;
+
+            transition: color 0.3s ease;
+        }
+
+        .mes-nombre {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .mes-status {
+            margin-top: 6px;
+            font-size: 13px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            color: #555;
+            background: #f1f2f6;
+        }
+
+
+        .mes-card.disponible:hover .mes-nombre,
+        .mes-card.disponible:hover .mes-status {
+            color: white;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+
+        .mes-card.no-disponible {
+            cursor: not-allowed;
+            opacity: 0.45;
+        }
+
+        .mes-card.no-disponible:hover::before {
+            transform: translateY(100%);
+
+        }
+
+        .mes-card.no-disponible:hover .mes-nombre,
+        .mes-card.no-disponible:hover .mes-status {
+            color: #444;
+        } */
+        /* ------------------------------------------- */
+
+        .meses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px;
+            padding: 10px;
+        }
+
+        /* ---- CARD BASE (GLASSMORPHISM) ---- */
+        .mes-card {
+            position: relative;
+            padding: 20px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            text-align: center;
+            cursor: pointer;
+            overflow: hidden;
+            user-select: none;
+            transition: all 0.4s ease;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+
+            z-index: 1;
+        }
+
+        /* ---- DEGRADADO QUE SE RELLENA ---- */
+        .mes-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            z-index: 0;
+            opacity: 0;
+            transform: scale(1.2);
+            transition: opacity 0.45s ease, transform 0.45s ease;
+        }
+
+        /* Hover: el degradado aparece y se acerca */
+        .mes-card.disponible:hover::before {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* ---- BORDE ANIMADO (Glow Border) ---- */
+        .mes-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            padding: 2px;
+            background: linear-gradient(120deg,
+                    #4facfe,
+                    #00f2fe,
+                    #4facfe);
+            background-size: 300% 300%;
+            animation: bordeGlow 5s ease infinite;
+            -webkit-mask:
+                linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        @keyframes bordeGlow {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* ---- TEXTO ---- */
+        .mes-nombre,
+        .mes-status {
+            position: relative;
+            z-index: 3;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .mes-nombre {
+            font-size: 17px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .mes-status {
+            margin-top: 8px;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.20);
+            color: white;
+        }
+
+        /* ---- Hover: aumenta ligera escala ---- */
+        .mes-card.disponible:hover .mes-nombre,
+        .mes-card.disponible:hover .mes-status {
+            transform: translateY(-3px);
+        }
+
+        /* ---- NO DISPONIBLE ---- */
+        .mes-card.no-disponible {
+            cursor: not-allowed;
+            opacity: 0.45;
+            filter: grayscale(40%);
+        }
+
+        .mes-card.no-disponible:hover::before {
+            opacity: 0;
+            /* sin efecto */
+        }
+
+        .mes-card.no-disponible:hover .mes-nombre,
+        .mes-card.no-disponible:hover .mes-status {
+            transform: none;
+        }
     </style>
 
 </head>
@@ -143,7 +461,8 @@
 
                                         <button type="button" style="text-align: center" data-toggle="popover"
                                             data-trigger="hover" data-html="true" data-placement="bottom"
-                                            data-content="Baja de activo" class="btn bg-gray-dark rounded icon mr-3"
+                                            data-content="Programar mantenimiento"
+                                            class="btn bg-gray-dark rounded icon mr-3"
                                             onclick="mdl_programar_mantenimiento()"><i
                                                 class="fa-solid fa-file-invoice"></i> Programar Mantenimiento
                                         </button>
@@ -152,6 +471,13 @@
                                             data-placement="bottom" data-content="Programas firmados"
                                             data-widget="control-sidebar" data-slide="true" onclick="">
                                             <i class="fa-solid fa-file-signature"></i>
+
+                                        <button type="button" style="text-align: center" data-toggle="popover"
+                                            data-trigger="hover" data-html="true" data-placement="bottom"
+                                            data-content="Descargar reportes mensuales"
+                                            class="btn btn-outline-danger rounded icon mr-3"
+                                            onclick="mdl_descargar_reportes_mensuales()"><i
+                                                class="fa-solid fa-file-pdf fa-lg"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -166,7 +492,7 @@
                                         <select class="form-control select" id="select-anio-mantenimiento"
                                             onchange="consultar_informacion(this)"></select>
                                     </div>
-                                    <div id="tbl01" style="overflow-x: auto; width: 100%;"></div>
+                                    <div id="tbl01"></div>
                                 </div>
                             </div>
                         </div>
@@ -542,7 +868,7 @@
 
     <!--Modal enviar correo reporte-->
     <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-correo-reporte" role="dialog"
-        data-backdrop="static" data-keyboard="false">
+        data-backdrop="static" data-keyboard="false" data-focus="false">
         <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -591,6 +917,56 @@
                             class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
                     <button type="button" class="btn btn-success envelope" id="btn-mdl-reporte" onclick="">Enviar <i
                             class="fa-solid fa-envelope"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal enviar correo reporte-->
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-descargar-reportes-mes" role="dialog"
+        data-backdrop="static" data-keyboard="false" data-focus="false">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fa-solid fa-download"></i>
+                        Descargar reportes mensuales
+                    </h5>
+                    <!-- <i class="fa-brands fa-optin-monster"></i> -->
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col">
+                                <h6>Año</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
+                                    </div>
+                                    <select class="form-control select" id="select-anio-reporte"></select>
+
+                                </div>
+                                <div id="mesesContainer" class="meses-grid">
+
+                                </div>
+                            </div>
+                            <!-- <div class="col">
+                                <label>Meses disponibles</label>
+                                <div id="listaMeses" class="meses-grid">
+
+                                </div>
+                            </div> -->
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
+                            class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+                    <!--                     <button type="button" class="btn btn-success envelope" id="btn-mdl-reporte" onclick="">Enviar <i
+                            class="fa-solid fa-envelope"></i></button> -->
                 </div>
             </div>
         </div>
