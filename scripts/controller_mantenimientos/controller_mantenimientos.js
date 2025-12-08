@@ -435,6 +435,7 @@ async function mdl_programar_mantenimiento() {
     rellenar_select("César Ignacio Torres Almeida", "select-elaboro");
 
     $('#select-cg-elaboro, #select-cg-autorizo').prop('disabled', true)
+    $('#mdl-btn-conf').prop('disabled', false);
     $("#mdl-btn-conf").off("click").on("click", function () { programar_mantenimiento() })
 
     $('#mdl-prog-mant').modal("show")

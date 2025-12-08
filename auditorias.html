@@ -133,19 +133,31 @@
                                 <div class="card-header">
                                     <h1 class="card-title" style="font-size: 23px;">
                                         <span class="fa-stack fa-2x">
-                                            <i class="fa-regular fa-file fa-stack-2x"></i> <!-- fondo, tamaño doble -->
-                                            <i class="fa-solid fa-screwdriver-wrench fa-stack-1x"></i>
+                                            <!-- <i class="fa-regular fa-file fa-stack-2x"></i> fondo, tamaño doble -->
+                                            <i class="fa-regular fa-clipboard fa-stack-2x"></i>
+                                            <i class="fa-solid fa-pen-clip fa-stack-1x"></i>
                                             <!-- ícono arriba, tamaño normal -->
                                         </span>
-                                        Mantenimientos
+                                        Auditorias
                                     </h1>
                                     <div class="d-flex justify-content-end">
 
                                         <button type="button" style="text-align: center" data-toggle="popover"
                                             data-trigger="hover" data-html="true" data-placement="bottom"
                                             data-content="Baja de activo" class="btn bg-gray-dark rounded icon mr-3"
-                                            onclick="mdl_programar_mantenimiento()"><i
-                                                class="fa-solid fa-file-invoice"></i> Programar Mantenimiento
+                                            onclick=""><i class="fa-solid fa-file-invoice"></i> Programar auditoria
+                                        </button>
+                                        <button type="button" class="btn btn-lg btn-outline-success mr-3 icon"
+                                            data-toggle="popover" data-trigger="hover" data-html="true"
+                                            data-placement="bottom" data-content="Exportación a Excel" id="btn-excel"
+                                            onclick="imprimir_excel()"><i class="fa-solid fa-file-excel"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-lg  btn-outline-info mr-3 icon"
+                                            data-toggle="popover" data-trigger="hover" data-html="true"
+                                            data-placement="bottom" data-content="Resguardos firmados"
+                                            data-widget="control-sidebar" data-slide="true"
+                                            onclick="abrir_control_sidebar()">
+                                            <i class="fa-solid fa-file-signature"></i>
                                         </button>
                                     </div>
                                 </div>
