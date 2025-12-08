@@ -79,6 +79,7 @@ async function load() {
 let datos_mantenimiento = []
 let elemento_mnt
 let table
+let mantenimientosPendientes
 /* let gruposAbiertosKey = "grupos_abiertos_mantenimientos";
 let gruposRestaurados = false; */
 
@@ -243,21 +244,44 @@ async function consultar_informacion(anio) {
             const fecha = new Date(`${año}-${mes}-01T00:00:00`);
             const opciones = { year: 'numeric', month: 'long' };
 
-            let excluir = ['Realizado']
-            const datos = data.filter(d=> d.estado && !excluir.includes(d.estado)).length
+            //let excluir = ['Realizado']
+            //const datos = table.getData().filter(d=> d.estado && !excluir.includes(d.estado)).length
 
 
-            return `${fecha.toLocaleDateString('es-ES', opciones)} (${datos} mantenimientos pendientes)`
+            return `${fecha.toLocaleDateString('es-ES', opciones)}`
+        },
+        groupHeader: function (value, count, data) {
+            const fila = data[0];  // Primera fila del grupo
+
+            const [año, mes] = fila.fecha.split("-");
+            const fecha = new Date(`${año}-${mes}-01T00:00:00`);
+            const opciones = { year: 'numeric', month: 'long' };
+
+            // Excluir estatus
+            const excluir = ['Realizado'];
+
+            // Contar pendiente SOLO dentro del grupo actual
+            const pendientes = data.filter(d =>
+                d.estado &&
+                !excluir.includes(d.estado)
+            ).length;
+
+
+
+
+            return `${fecha.toLocaleDateString('es-ES', opciones)} (${pendientes} mantenimientos pendientes)`;
+
+
         },
         groupStartOpen: false,
         groupToggleElement: "header", //* Permite que dando click en cualquier parte del header group, éste se despliegue
         //headerVisible: false,
-/*         dataGrouped: function (groups) {
-            restaurarEstadoDeGrupos();
-        },
-        renderComplete: function () {
-            restaurarEstadoDeGrupos()
-        }, */
+        /*         dataGrouped: function (groups) {
+                    restaurarEstadoDeGrupos();
+                },
+                renderComplete: function () {
+                    restaurarEstadoDeGrupos()
+                }, */
         columns: [
             {
                 title: "Fecha", field: "fecha", width: 115, headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input", sorter: "date",
@@ -361,10 +385,19 @@ async function consultar_informacion(anio) {
                 }
             },
         ],
-
-
-
     })
+    mantenimientosPendientes = datos_mantenimiento.reduce((objeto, item) => {
+
+        if(item.estado == "Realizado") return objeto
+
+        let fecha = item.fecha.split('-')
+        let mes = fecha[1]
+
+        //si ya existe este mes, incrementa su valor, sino lo inicia en 0 y suma 1
+        objeto[mes] = (objeto[mes] || 0) + 1
+
+        return objeto
+    }, {})
     // Guarda cuando se expande o colapsa un grupo
     /* table.on("groupVisibilityChanged", guardarEstadoDeGrupos);
 
@@ -481,6 +514,7 @@ async function programar_mantenimiento() {
 let selecreg
 async function mdl_mantenimiento_info(elemento_mnt) {
     // Busca en el arreglo 'datos_mantenimiento' el registro con el mismo id_equipo
+    console.log(mantenimientosPendientes)
     for (let i = 0; i < datos_mantenimiento.length; i++) {
         const element = datos_mantenimiento[i];
         if (element.id === elemento_mnt.id && element.anio === elemento_mnt.anio) {
@@ -666,7 +700,9 @@ async function abrir_subir_reporte(id, fechaMnto) {
     let fileReporte = document.getElementById('subir-reporte')
 
     //datos_documento = [id,fechaMnto]
-
+    let fecha = fechaMnto.split('-')
+    let anio = {}
+    anio.value = fecha[0]
     // Create a FilePond instance
     pond = FilePond.create(fileReporte, {
         maxFiles: 1,
@@ -701,6 +737,9 @@ async function abrir_subir_reporte(id, fechaMnto) {
                         } else {
                             table.updateData([{ id: id, reporte_subido: 1, estado: "Realizado" }])
                             mostrar_toast("success", "Subido", data.resultado.mensaje)
+                            consultar_informacion(anio)
+                            /* table.replaceData(table.getData())
+                            table.redraw(true) */
                             //window.location.reload()
 
 
@@ -805,6 +844,7 @@ async function ver_pdf_reporte(id, fecha) {
 
 //todo Funciones para el envío de correo de reporte
 async function mdl_correo_reporte_mantenimiento(equipo) {
+    let fecha = equipo.fecha.split('-')
 
     await Promise.all([
         general_select2({
