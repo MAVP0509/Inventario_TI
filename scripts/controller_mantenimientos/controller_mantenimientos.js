@@ -421,7 +421,7 @@ async function mdl_programar_mantenimiento() {
     await Promise.all([
         general_select2({
             selectId: 'select-elaboro',
-            tabla: 'supervisor',
+            tabla: 'cat_usuarios',
             campo: 'nombre',
             placeholder: 'Selecione un usuario',
             dropdownParent: '#mdl-prog-mant',
@@ -432,7 +432,7 @@ async function mdl_programar_mantenimiento() {
 
         general_select2({
             selectId: 'select-cg-elaboro',
-            tabla: 'supervisor',
+            tabla: 'cat_usuarios',
             campo: 'cargo',
             placeholder: 'Seleccione un cargo',
             dropdownParent: '#mdl-prog-mant',
@@ -443,7 +443,7 @@ async function mdl_programar_mantenimiento() {
 
         general_select2({
             selectId: 'select-autorizo',
-            tabla: 'cat_usuarios',
+            tabla: 'supervisor',
             campo: 'nombre',
             placeholder: 'Selecione un usuario',
             dropdownParent: '#mdl-prog-mant',
@@ -454,7 +454,7 @@ async function mdl_programar_mantenimiento() {
 
         general_select2({
             selectId: 'select-cg-autorizo',
-            tabla: 'cat_usuarios',
+            tabla: 'supervisor',
             campo: 'cargo',
             placeholder: 'Seleccione un cargo',
             dropdownParent: '#mdl-prog-mant',
@@ -464,7 +464,8 @@ async function mdl_programar_mantenimiento() {
         }),
     ])
 
-    rellenar_select("Alejandro Cancino Argüello", "select-elaboro");
+    rellenar_select("Alejandro Cancino Argüello", "select-autorizo");
+    rellenar_select("César Ignacio Torres Almeida", "select-elaboro");
 
     $('#select-cg-elaboro, #select-cg-autorizo').prop('disabled', true)
     $("#mdl-btn-conf").off("click").on("click", function () { programar_mantenimiento() })
