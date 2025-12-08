@@ -38,7 +38,8 @@ function consultar_datos($valores)
     return $array;
 }
 
-function consultar_orden() {
+function consultar_orden()
+{
     include("../conexion.php");
 
     $sql = "SELECT * FROM vorden_tipos ORDER BY FIELD(tipo_id, 40, 41, 58, 55, 22, 23, 25, 1, 2, 78, 79, 80, 81, 82, 73, 74, 75, 76, 46, 51)";
@@ -78,36 +79,46 @@ function guardar_reportes($valores)
         $nombreOriginalArreglado = explode(' ', $nombreOriginal);
         $nombreOriginalArreglado = join('_', $nombreOriginalArreglado);
         //* Generar nombre único para evitar colisiones
-        $nuevoNombre = $valores->fecha_mnto . '_' . $nombreOriginalArreglado;
+        $nuevoNombre = $valores->id_equipo . '-' . $nombreOriginalArreglado;
 
+        $fechaMantenimiento = explode('-', $valores->fecha_mnto);
         //var_dump($nuevoNombre);
 
 
         //* Ruta de la carpeta
-        $ruta = __DIR__ . '/../../Documentos/mantenimiento/reporte/' . $valores->id_equipo;
+        $rutaAnio =  __DIR__ . '/../../Documentos/mantenimiento/reporte/' . $fechaMantenimiento[0];
+        $rutaMes =  __DIR__ . '/../../Documentos/mantenimiento/reporte/' . $fechaMantenimiento[0] . '/' . $fechaMantenimiento[1];
+        //$ruta = __DIR__ . '/../../Documentos/mantenimiento/reporte/'. $fechaMantenimiento[0].'/'. $fechaMantenimiento[1].'/'. $valores->id_equipo;
 
-        //* Validando si el usuario ya tiene su carpeta o no
-        if (is_dir($ruta)) {
-            //* Ruta destino, __DIR__ es carpeta donde está este script PHP
-            $destino = $ruta . '/' . $nuevoNombre;
+        //* Validando si el año de mantenimiento ya tiene su carpeta o no
+        if (is_dir($rutaAnio)) {
+            //* Validando si el mes ya tiene su carpeta
+            if (is_dir($rutaMes)) {
+                $destino = $rutaMes . '/' . $nuevoNombre;
+            } else {
+                //*Se crea la carpeta del mes
+                mkdir($rutaMes, 0777, true);
+                $destino = $rutaMes . '/' . $nuevoNombre;
+            }
         } else {
-            //* Creación de la carpeta
-            mkdir($ruta, 0777, true);
+            //* Creación de la carpeta del año
+            mkdir($rutaAnio, 0777, true);
+            //*Se crea la carpeta del mes
+            mkdir($rutaMes, 0777, true);
 
             //* Ruta destino
-            $destino = $ruta . '/' . $nuevoNombre;
+            $destino = $rutaMes . '/' . $nuevoNombre;
         }
 
         if (move_uploaded_file($tmpPath, $destino)) {
-            
-            $añoMantenimiento = explode('-', $valores->fecha_mnto);
-            $añoMantenimiento = $añoMantenimiento[0];
+
+
+            $añoMantenimiento = $fechaMantenimiento[0];
             $sql = "UPDATE mantenimiento SET reporte_subido = 1, estado = 'Realizado' WHERE id_equipo = '$valores->id_equipo' AND anio = '$añoMantenimiento'";
-            if(!mysqli_query($con,$sql)){
+            if (!mysqli_query($con, $sql)) {
                 return $respuesta->error = "No se pudo registrar en la base datos, favor de avisar a TI";
             }
             $respuesta->mensaje = "Archivo guardado correctamente";
-            
         } else {
             $respuesta->error = "No se pudo mover el archivo.";
         }
@@ -121,11 +132,12 @@ function validar_reporte_mismo_año($valores)
 {
     $respuesta = new stdClass();
     //var_dump($valores);
-    $añoActual = explode('-', $valores->fecha_mnto);
-    $añoActual = $añoActual[0];
+    $fecha = explode('-', $valores->fecha_mnto);
+    $año = $fecha[0];
+    $mes = $fecha[1];
 
     //*ruta física del servidor
-    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->id_equipo;
+    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/'.$año.'/'.$mes;
 
     //* Verifica si existe la carpeta
     if (is_dir($carpeta)) {
@@ -137,9 +149,9 @@ function validar_reporte_mismo_año($valores)
         foreach ($archivos as $archivo) {
             $partes = explode('-', $archivo);
 
-            $añoArchivo = $partes[0];
+            $idEquipo = $partes[0];
 
-            if ($añoArchivo === $añoActual) {
+            if ($idEquipo === $valores->id_equipo) {
                 $respuesta->resultado = $carpeta . '/' . $archivo;
                 return $respuesta;
             }
@@ -151,24 +163,23 @@ function validar_reporte_mismo_año($valores)
 function consultar_reporte($valores)
 {
     $respuesta = new stdClass();
-    $año = explode('-', $valores->fecha_mnto);
+    $fecha = explode('-', $valores->fecha_mnto);
 
-    $añoConsulta = $año[0];
+    $año = $fecha[0];
+    $mes = $fecha[1];
 
-    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->id_equipo;
+    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $año.'/'.$mes;
 
-    $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/' . $valores->id_equipo;
+    $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/' . $año . '/' . $mes;
 
     if (is_dir($carpeta)) {
         $archivos = array_diff(scandir($carpeta), ['.', '..']);
 
         foreach ($archivos as $archivo) {
-            $partes = explode('_', $archivo);
-            $fechaArchivo = $partes[0];
+            $partes = explode('-', $archivo);
+            $idEquipo = $partes[0];
 
-            $añoArchivo = substr($fechaArchivo, 0, 4);
-
-            if ($añoArchivo === $añoConsulta) {
+            if ($idEquipo === $valores->id_equipo) {
                 $respuesta->documento = $carpetaUrl . '/' . $archivo;
                 //var_dump($archivo);
                 return $respuesta;

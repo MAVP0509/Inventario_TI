@@ -189,16 +189,11 @@
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col" id="col-subir-reporte">
-                                <div class="alert alert-danger d-flex align-items-center " role="alert"
-                                    style="display:none !important;  background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;"
+                                <div class="alert alert-danger position-relative d-flex align-items-start " role="alert"
+                                    style="display:none !important; background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;"
                                     id="alert-reporte">
-                                    <div style="margin-right: 15px; display: flex; align-items: center; flex-shrink: 0;">
-                                        <i class="fa-solid fa-triangle-exclamation fa-2xl"></i>
-                                    </div>
-                                    <span style="line-height: 1.4;">El activo ya tiene el reporte de este año, si sube uno, reemplazará el ya
-                                        existente
-                                        y no será reversible</span>
-
+                                    El activo ya tiene el reporte de este año, si sube uno, reemplazará el ya existente
+                                    y no será reversible
                                 </div>
                                 <div id="contenedor-filepond">
                                     <input type="file" id="subir-reporte" name="reporte_mantenimiento">
@@ -328,7 +323,7 @@
     <!--Modal info mantenimiento -->
     <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-mant-info" role="dialog" data-backdrop="static"
         data-keyboard="false">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Información</h5>
@@ -477,7 +472,7 @@
     <!--Modal enviar correo reporte-->
     <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-correo-reporte" role="dialog"
         data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title"><i class="fa-solid fa-envelope-open-text"></i> Correo de mantenimiento</h5>

@@ -79,8 +79,8 @@ async function load() {
 let datos_mantenimiento = []
 let elemento_mnt
 let table
-let gruposAbiertosKey = "grupos_abiertos_mantenimientos";
-let gruposRestaurados = false;
+/* let gruposAbiertosKey = "grupos_abiertos_mantenimientos";
+let gruposRestaurados = false; */
 
 /* function guardarEstadoDeGrupos() {
     const abiertos = table.getGroups()
@@ -125,7 +125,7 @@ function restaurarEstadoDeGrupos() {
 } */
 
 async function consultar_informacion(anio) {
-    
+
     const fecha = anio.value
     //load()
     let server = await server_mantenimiento({ accion: 0, anio: fecha })
@@ -143,7 +143,7 @@ async function consultar_informacion(anio) {
         return;
     } */
 
-        if(!fecha) return;
+    if (!fecha) return;
 
     datos_mantenimiento = server.resultado
     Tabulator.extendModule("localize", "langs", {
@@ -242,17 +242,22 @@ async function consultar_informacion(anio) {
             // Creamos una fecha con día explícito
             const fecha = new Date(`${año}-${mes}-01T00:00:00`);
             const opciones = { year: 'numeric', month: 'long' };
-            return fecha.toLocaleDateString('es-ES', opciones);
+
+            let excluir = ['Realizado']
+            const datos = data.filter(d=> d.estado && !excluir.includes(d.estado)).length
+
+
+            return `${fecha.toLocaleDateString('es-ES', opciones)} (${datos} mantenimientos pendientes)`
         },
         groupStartOpen: false,
         groupToggleElement: "header", //* Permite que dando click en cualquier parte del header group, éste se despliegue
         //headerVisible: false,
-        dataGrouped: function (groups) {
+/*         dataGrouped: function (groups) {
             restaurarEstadoDeGrupos();
         },
         renderComplete: function () {
             restaurarEstadoDeGrupos()
-        },
+        }, */
         columns: [
             {
                 title: "Fecha", field: "fecha", width: 115, headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input", sorter: "date",
@@ -361,7 +366,7 @@ async function consultar_informacion(anio) {
 
     })
     // Guarda cuando se expande o colapsa un grupo
-    table.on("groupVisibilityChanged", guardarEstadoDeGrupos);
+    /* table.on("groupVisibilityChanged", guardarEstadoDeGrupos);
 
     // Verificar cada 100ms hasta que los grupos existan, máximo por 3 segundos
     const intentoMax = 30;
@@ -374,7 +379,7 @@ async function consultar_informacion(anio) {
         if (gruposRestaurados || intento >= intentoMax) {
             clearInterval(timer);
         }
-    }, 100);
+    }, 100); */
 
 }
 
@@ -464,7 +469,7 @@ async function programar_mantenimiento() {
         $('#mdl-prog-mant').modal("hide");
         load()
 
-    } else if(server.resultado.result === false) {
+    } else if (server.resultado.result === false) {
         mostrar_toast('error', 'Error', server.resultado.error);
         $('#mdl-prog-mant').modal("hide");
     }/*  else if (server.resultado.duplicado === false) {
