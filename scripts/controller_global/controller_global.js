@@ -281,10 +281,10 @@ $(document).on('mouseover', '.icon', function () {
 //TODO Animando icono de enviar correo
 
 $(document).on('mouseover', '.envelope', function () {
-    $(this).find('i').removeClass('fa-solid fa-envelope').addClass('fa-solid fa-envelope-open');
+    $(this).find('i').removeClass('fa-solid fa-envelope').addClass('fa-solid fa-envelope-open-text');
 })
 $(document).on('mouseout', '.envelope', function () {
-    $(this).find('i').removeClass('fa-solid fa-envelope-open ').addClass('fa-solid fa-envelope')
+    $(this).find('i').removeClass('fa-solid fa-envelope-open-text ').addClass('fa-solid fa-envelope')
 })
 
 //todo Animando modals

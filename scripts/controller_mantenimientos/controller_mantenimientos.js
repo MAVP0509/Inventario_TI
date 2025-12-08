@@ -64,14 +64,14 @@ async function load() {
         selectId: 'select-anio-mantenimiento',
         tabla: 'mantenimiento',
         campo: 'anio',
-        placeholder: 'Selecione un año',
+        placeholder: 'Seleccione un año',
         dropdownParent: '#card-mantenimientos',
         tags: false,
         // popoverTitle: "Descripción",
         // popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
     })
 
-    // const actual = new Date().getFullYear() + 1;
+    //const actual = new Date().getFullYear() + 1;
 
     // rellenar_select( actual, "select-anio-mantenimiento")
 }
@@ -80,50 +80,6 @@ let datos_mantenimiento = []
 let elemento_mnt
 let table
 let mantenimientosPendientes
-/* let gruposAbiertosKey = "grupos_abiertos_mantenimientos";
-let gruposRestaurados = false; */
-
-/* function guardarEstadoDeGrupos() {
-    const abiertos = table.getGroups()
-        .filter(group => group.isVisible())
-        .map(group => group.getKey());
-    localStorage.setItem(gruposAbiertosKey, JSON.stringify(abiertos));
-}
-
-function restaurarEstadoDeGrupos() {
-    if (gruposRestaurados) return;
-
-    const abiertos = JSON.parse(localStorage.getItem(gruposAbiertosKey) || "[]");
-    let intentos = 0;
-    const maxIntentos = 30;
-
-    const intervalo = setInterval(() => {
-        intentos++;
-        const grupos = table.getGroups();
-
-        if (grupos.length === 0) return; // no hay grupos todavía
-
-        // Intentar abrir todos los grupos que están en 'abiertos'
-        abiertos.forEach(key => {
-            const grupo = grupos.find(g => g.getKey() === key);
-            if (grupo) {
-                grupo.show();
-            }
-        });
-
-        // Verificar si todos los grupos ya están abiertos
-        const todosAbiertos = abiertos.every(key => {
-            const grupo = grupos.find(g => g.getKey() === key);
-            return grupo && grupo.isVisible();
-        });
-
-        if (todosAbiertos || intentos >= maxIntentos) {
-            gruposRestaurados = true;
-            clearInterval(intervalo);
-        }
-
-    }, 100);
-} */
 
 async function consultar_informacion(anio) {
 
@@ -235,8 +191,18 @@ async function consultar_informacion(anio) {
         locale: "es",
         data: datos_mantenimiento,
         layout: "fitColumns",              //fit columns to width of table
+        //height: window.innerHeight ,
+        maxHeight: window.innerHeight,
         movableColumns: true,              //allow column order to be changed
-        paginationButtonCount: 3,
+        pagination: true,
+        paginationSize: 15,
+        paginationSizeSelector: [15, 25, 35, true],
+        paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
+            const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
+            const end = Math.min(currentRowStart + pageSize - 1, totalRows);
+            return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
+        },
+        //paginationButtonCount: 3,
         groupBy: function (data) {
             // Asegura que tenga formato YYYY-MM
             const [año, mes] = data.fecha.split("-");
@@ -388,7 +354,7 @@ async function consultar_informacion(anio) {
     })
     mantenimientosPendientes = datos_mantenimiento.reduce((objeto, item) => {
 
-        if(item.estado == "Realizado") return objeto
+        if (item.estado == "Realizado") return objeto
 
         let fecha = item.fecha.split('-')
         let mes = fecha[1]
@@ -846,6 +812,18 @@ async function ver_pdf_reporte(id, fecha) {
 //todo Funciones para el envío de correo de reporte
 async function mdl_correo_reporte_mantenimiento(equipo) {
     let fecha = equipo.fecha.split('-')
+    let mes = fecha[1]
+
+    let mesesPendientes = Object.entries(mantenimientosPendientes).filter(([clave, valor]) => clave < mes)
+
+    if (mesesPendientes.length !== 0) {
+        mostrar_toast('warning', 'Aviso', `Tiene mantenimientos pendientes de ${mesesPendientes.length} ${mesesPendientes.length == 1 ? `mes` : `meses`}`)
+        return
+    }
+    //let valido = mesesPendientes.find
+    //console.log(mesesPendientes)
+
+
 
     await Promise.all([
         general_select2({
@@ -872,7 +850,16 @@ async function mdl_correo_reporte_mantenimiento(equipo) {
     $('#inp-correo-validar').val('')
 
     $('#btn-mdl-reporte').off('click').on('click', () => { enviar_correo_reporte(equipo); })
+
+    let scrollAnterior = window.scrollY; // guarda scroll actual
+
+    /* $('#mdl-correo-reporte').off('shown.bs.modal').on('shown.bs.modal', function () {
+        window.scrollTo(0, scrollAnterior); // restaura scroll al terminar de abrir
+    }); */
+
     $('#mdl-correo-reporte').modal('show')
+
+
 }
 
 async function enviar_correo_reporte(datos_equipo) {
@@ -941,4 +928,91 @@ function validar_dos_input_text(texto1, texto2) {
     } else {
         return false
     }
+}
+
+async function mdl_descargar_reportes_mensuales() {
+    /* const meses = [
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+
+    function cargarMeses(mesesConDatos) {
+        const contenedor = document.getElementById("listaMeses");
+        contenedor.innerHTML = "";
+
+        meses.forEach((mes, index) => {
+            const btn = document.createElement("div");
+            btn.className = "btn-mes " + (mesesConDatos.includes(index + 1) ? "activo" : "");
+
+            btn.textContent = mes;
+            btn.onclick = () => {
+                if (mesesConDatos.includes(index + 1)) {
+                    descargarMes(index + 1);
+                }
+            };
+
+            contenedor.appendChild(btn);
+        });
+    }
+
+    // Ejemplo
+    cargarMeses([1, 2, 4, 7]); */
+
+    await general_select2({
+        selectId: 'select-anio-reporte',
+        tabla: 'mantenimiento',
+        campo: 'anio',
+        placeholder: 'Seleccione un año',
+        dropdownParent: '#mdl-descargar-reportes-mes',
+        tags: false,
+        // popoverTitle: "Descripción",
+        // popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
+    })
+    $('#mdl-descargar-reportes-mes').modal('show')
+}
+
+
+
+$(document).ready(function () {
+    $('[data-toggle="popover"]').popover();
+})
+
+
+
+const mesesNombres = [
+    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+];
+
+
+
+function cargarMeses(mesesDisponibles = []) {
+    const cont = document.getElementById("mesesContainer");
+    cont.innerHTML = "";
+
+    mesesNombres.forEach((mes, i) => {
+        const numMes = i + 1;
+        let disponible = mesesDisponibles.includes(numMes);
+
+        const card = document.createElement("div");
+        card.className = "mes-card " + (disponible ? "disponible" : "no-disponible");
+
+        card.innerHTML = `
+            <div class="mes-nombre">${mes}</div>
+            <div class="mes-status">${disponible ? "Disponible" : "No disponible"}</div>
+        `;
+
+        if (disponible) {
+            card.onclick = () => descargarMes(numMes);
+        }
+
+        cont.appendChild(card);
+    });
+}
+
+// ejemplos
+cargarMeses([1, 3, 6, 11]);
+
+function descargarMes(m) {
+    console.log("Descargando mes:", m);
 }
