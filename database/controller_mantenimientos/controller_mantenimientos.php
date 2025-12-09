@@ -4,6 +4,11 @@
 header('Content-Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
 
+//require_once('vendor/autoload.php');
+require __DIR__ . '/../../libraries/vendor/autoload.php';
+
+use Ilovepdf\Ilovepdf;
+
 $clientejson = json_decode($_POST['trama']);
 
 $respuesta_servidor = new stdClass();
@@ -16,6 +21,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = validar_reporte_mismo_año($clientejson);
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = consultar_reporte($clientejson);
+} elseif ($clientejson->accion == 4) {
+    $respuesta_servidor->resultado = consultar_anio_mantenimiento($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -34,8 +41,11 @@ function consultar_datos($valores)
     while ($fila = mysqli_fetch_object($query)) {
         array_push($array, $fila);  //* Se guardan los registros en un array
     }
-
-    return $array;
+    if ($query) {
+        return $array;
+    } else {
+        return false;
+    }
 }
 
 function consultar_orden()
@@ -137,7 +147,7 @@ function validar_reporte_mismo_año($valores)
     $mes = $fecha[1];
 
     //*ruta física del servidor
-    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/'.$año.'/'.$mes;
+    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $año . '/' . $mes;
 
     //* Verifica si existe la carpeta
     if (is_dir($carpeta)) {
@@ -168,7 +178,7 @@ function consultar_reporte($valores)
     $año = $fecha[0];
     $mes = $fecha[1];
 
-    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $año.'/'.$mes;
+    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $año . '/' . $mes;
 
     $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/' . $año . '/' . $mes;
 
@@ -187,6 +197,106 @@ function consultar_reporte($valores)
         }
     } else {
         $respuesta->aviso = "El activo no tiene reporte subido";
+    }
+
+    return $respuesta;
+}
+
+
+function consultar_anio_mantenimiento()
+{
+    include("../conexion.php");
+
+    $sql = "SELECT MAX(anio) AS anio FROM mantenimiento";
+    //$sql = "SELECT * FROM mantenimiento";
+    $query = mysqli_query($con, $sql);
+
+    $fila = mysqli_fetch_object($query);
+
+
+    return $fila;
+}
+
+
+function unir_reportes_mantenimiento($valores)
+{
+    $respuesta = new stdClass();
+
+    $carpeta_reporte =  __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->anio . '/reportes_unidos';
+    $archivoFinal = $carpeta_reporte . '/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
+    $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/' . $valores->anio . '/reportes_unidos/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
+
+    //$carpetaArchivoUnido = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->anio . '/reportes_unidos/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
+
+    if (file_exists($archivoFinal)) {
+        $respuesta->mensaje = "Archivos unidos correctamente";
+        $respuesta->ruta = $carpetaUrl;
+
+        return $respuesta;
+    }
+
+    try {
+        $ilovepdf = new Ilovepdf('project_public_id', 'project_secret_key');
+
+        // Create a new task
+        $myTaskMerge = $ilovepdf->newTask('merge');
+        // Add files to task for upload
+
+
+
+        $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->anio . '/' . $valores->mes;
+
+        if (!is_dir($carpeta)) {
+            $respuesta->error = "No se pudo encontrar los archivos";
+            return $respuesta;
+        }
+
+
+
+        $archivos = array_diff(scandir($carpeta), ['.', '..']);
+
+        $ruta = [];
+
+        foreach ($archivos as $archivo) {
+
+            $rutaCompleta = $carpeta . '/' . $archivo;
+
+            if (is_file($rutaCompleta) && strtolower(pathinfo($archivo, PATHINFO_EXTENSION)) === 'pdf') {  //  ignora carpetas
+                $ruta[] = $rutaCompleta;
+            }
+        }
+
+        if (empty($ruta)) {
+            $respuesta->error = "No se pudo encontrar los archivos";
+            return $respuesta;
+        }
+
+
+        foreach ($ruta as $archivo) {
+            $myTaskMerge->addFile($archivo);
+        }
+
+        // Crear carpeta antes de descargar
+        if (!is_dir($carpeta_reporte)) {
+            mkdir($carpeta_reporte, 0777, true);
+        }
+
+        // Execute the task
+        $myTaskMerge->execute();
+
+        // Download the package files
+        $myTaskMerge->download($archivoFinal);
+
+        $respuesta->mensaje = "Archivos unidos correctamente";
+
+        $respuesta->ruta = $carpetaUrl;
+        
+    } catch (\Ilovepdf\Exceptions\AuthException $e) {
+        $respuesta->error = "Error de autenticación Ilovepdf: " . $e->getMessage();
+    } catch (\Ilovepdf\Exceptions\TaskException $e) {
+        $respuesta->error = "Error en la tarea Ilovepdf: " . $e->getMessage();
+    }  catch (\Exception $e) {
+        $respuesta->error = "Error general: " . $e->getMessage();
     }
 
     return $respuesta;

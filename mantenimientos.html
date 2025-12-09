@@ -271,7 +271,7 @@
             backdrop-filter: blur(12px) saturate(160%);
             background: rgba(255, 255, 255, 0.10);
 
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             box-shadow:
                 0 4px 15px rgba(0, 0, 0, 0.1),
                 inset 0 0 20px rgba(255, 255, 255, 0.05);
@@ -288,7 +288,7 @@
             content: "";
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            background: linear-gradient(135deg, #1666C5, #0D3D7D);
             opacity: 0;
             transform: scale(1.2);
             transition: opacity 0.45s ease, transform 0.45s ease;
@@ -297,7 +297,7 @@
 
         /* Hover: relleno degradado */
         .mes-card.disponible:hover::before {
-            opacity: 0.9;
+            opacity: 1;
             transform: scale(1);
         }
 
@@ -308,7 +308,7 @@
             inset: 0;
             border-radius: inherit;
             padding: 2px;
-            background: linear-gradient(120deg, #4facfe, #00f2fe, #4facfe);
+            background: linear-gradient(120deg, #0D3D7D, #0A2A52, #0D3D7D);
             background-size: 300% 300%;
             animation: bordeGlow 6s ease infinite;
 
@@ -365,7 +365,7 @@
         /* Hover: efecto de elevación del texto */
         .mes-card.disponible:hover .mes-nombre,
         .mes-card.disponible:hover .mes-status {
-             color: white;
+            color: white;
         }
 
         /* ---- NO DISPONIBLE ---- */
@@ -866,7 +866,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title"><i class="fa-solid fa-download"></i>
-                        Descargar reportes mensuales
+                        <span id="mdl-descargar-text">Descargar reportes mensuales</span>
                     </h5>
                     <!-- <i class="fa-brands fa-optin-monster"></i> -->
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -877,14 +877,6 @@
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col">
-                                <h6>Año</h6>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
-                                    </div>
-                                    <select class="form-control select" id="select-anio-reporte"></select>
-
-                                </div>
                                 <div id="mesesContainer" class="meses-grid">
 
                                 </div>
