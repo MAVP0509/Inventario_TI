@@ -16,6 +16,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = validar_reporte_mismo_año($clientejson);
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = consultar_reporte($clientejson);
+} elseif ($clientejson->accion == 4) {
+    $respuesta_servidor->resultado = guardar_programa($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -137,7 +139,7 @@ function validar_reporte_mismo_año($valores)
     $mes = $fecha[1];
 
     //*ruta física del servidor
-    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/'.$año.'/'.$mes;
+    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $año . '/' . $mes;
 
     //* Verifica si existe la carpeta
     if (is_dir($carpeta)) {
@@ -168,7 +170,7 @@ function consultar_reporte($valores)
     $año = $fecha[0];
     $mes = $fecha[1];
 
-    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $año.'/'.$mes;
+    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $año . '/' . $mes;
 
     $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/' . $año . '/' . $mes;
 
@@ -191,3 +193,128 @@ function consultar_reporte($valores)
 
     return $respuesta;
 }
+
+function guardar_programa($valores)
+{
+
+    $respuesta = new stdClass();
+
+    if (isset($_FILES['reporte_programa']) && $_FILES['reporte_programa']['error'] === UPLOAD_ERR_OK) {
+        $nombreOriginal = $_FILES['reporte_programa']['name'];
+        $tmpPath = $_FILES['reporte_programa']['tmp_name'];
+
+        // Validar extensión .xlsx
+        $ext = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));
+        if ($ext !== 'pdf') {
+            $respuesta->error = "Tipo de archivo no permitido. Solo .pdf";
+            return $respuesta;
+        }
+
+        $base = realpath(__DIR__ . '/../../../documentos/mantenimiento/programa');
+
+        if ($base == false) {
+            return [
+                'result' => false,
+                'error' => 'No se encontro la ruta. Intentálo nuevamente.'
+            ];
+        }
+
+        $carpeta_anual = $base . DIRECTORY_SEPARATOR . $valores->anio;
+
+        if (!is_dir($carpeta_anual)) {
+            mkdir($carpeta_anual, 0777, true);
+        }
+
+        $i = 1;
+        do {
+            $nombre_final = $carpeta_anual . DIRECTORY_SEPARATOR . "{$i}.pdf";
+            $i++;
+        } while (file_exists($nombre_final));
+
+        //* Generar nombre único para evitar colisiones
+        // $nuevoNombre = date('Ymd_His') . '_' . $nombreOriginal;
+
+        //* Ruta de la carpeta
+        // $ruta = __DIR__ . '/../../documentos/mantenimiento/' . $valores->usuario;
+
+        //* Validando si el usuario ya tiene su carpeta o no
+        // if (is_dir($ruta)) {
+        //     //* Ruta destino, __DIR__ es carpeta donde está este script PHP
+        //     $destino = $ruta . '/' . $nuevoNombre;
+        // } else {
+        //     //* Creación de la carpeta
+        //     mkdir($ruta, 0777, true);
+
+        //     //* Ruta destino
+        //     $destino = $ruta . '/' . $nuevoNombre;
+        // }
+
+        if (move_uploaded_file($tmpPath, $nombre_final)) {
+            $respuesta->mensaje = "Archivo guardado correctamente";
+            //$respuesta->ruta = 'C:\\xampp\\htdocs\\Inventario_TI\\database\\controller_inventario\\' . $nuevoNombre;
+        } else {
+            $respuesta->error = "No se pudo mover el archivo.";
+        }
+    } else {
+        $respuesta->error = "No se recibió ningún archivo válido.";
+    }
+    return $respuesta;
+}
+
+/* function guardar_programa($valores)
+{
+    $respuesta = new stdClass();
+
+    // Validar existencia del archivo
+    if (!isset($_FILES['reporte_programa']) || $_FILES['reporte_programa']['error'] !== UPLOAD_ERR_OK) {
+        $respuesta->error = "No se recibió ningún archivo válido.";
+        return $respuesta;
+    }
+
+    $archivo = $_FILES['reporte_programa'];
+    $nombreOriginal = $archivo['name'];
+    $tmpPath = $archivo['tmp_name'];
+
+    // Validar extensión PDF
+    $ext = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));
+    if ($ext !== 'pdf') {
+        $respuesta->error = "Tipo de archivo no permitido. Solo .pdf.";
+        return $respuesta;
+    }
+
+    // Ruta base donde se guardan los programas
+    $base = realpath(__DIR__ . '/../../../documentos/mantenimiento/programa');
+    if ($base === false) {
+        $respuesta->error = "No se encontró la ruta base.";
+        return $respuesta;
+    }
+
+    // Carpeta por año
+    $carpeta_anual = $base . DIRECTORY_SEPARATOR . $valores->anio;
+
+    // Crear carpeta si no existe
+    if (!is_dir($carpeta_anual)) {
+        if (!mkdir($carpeta_anual, 0777, true)) {
+            $respuesta->error = "No se pudo crear la carpeta del año.";
+            return $respuesta;
+        }
+    }
+
+    // Buscar nombre disponible (1.pdf, 2.pdf, 3.pdf...)
+    $i = 1;
+    do {
+        $nombre_final = $carpeta_anual . DIRECTORY_SEPARATOR . "{$i}.pdf";
+        $i++;
+    } while (file_exists($nombre_final));
+
+    // Guardar archivo
+    if (move_uploaded_file($tmpPath, $nombre_final)) {
+        $respuesta->mensaje = "Archivo guardado correctamente";
+        $respuesta->ruta_guardada = $nombre_final;
+    } else {
+        $respuesta->error = "No se pudo mover el archivo al destino.";
+    }
+
+    return $respuesta;
+}
+ */

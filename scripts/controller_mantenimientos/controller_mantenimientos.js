@@ -142,7 +142,7 @@ async function consultar_informacion(anio) {
         const data = cell.getRow().getData()
         const disabled = data.reporte_descargado == 0 ? "disabled" : ""
 
-        return `<button type='button' class='btn btn-info icon' ${disabled} data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' data-widget="control-sidebar" data-slide="true" ><i class='fa-solid fa-upload fa-lg'></i></button>`;
+        return `<button type='button' class='btn btn-info icon' ${disabled} data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true'><i class='fa-solid fa-upload fa-lg'></i></button>`;
     }
 
     let fileIcon = function (cell, formatterParams, onRendered) { //plain text value
@@ -632,23 +632,11 @@ $(function () {
     $('[data-toggle="popover"]').tooltip()
 })
 
-function rellenar_select(texto, select) {
-    let textoBuscado = texto;
-    let $select = $('#' + select);
-
-    $select.find('option').filter(function () {
-        return $(this).text().trim() === textoBuscado;
-    }).prop('selected', true);
-
-    $select.trigger('change');
-}
-
-
 //todo Subida de reportes de mantenimiento
 FilePond.registerPlugin(FilePondPluginFileValidateType);
 
 
-let pond
+let estanque2
 //* Variable utilizada para guardar temporalmente el archivo y asi poder ser eliminado desde otra función
 let fileItemCargado
 async function abrir_subir_reporte(id, fechaMnto) {
@@ -658,8 +646,8 @@ async function abrir_subir_reporte(id, fechaMnto) {
     //*Escondiendo el visor de pdf
     $('#ver-pdf-reporte').hide()
 
-    if (pond) {
-        pond.destroy();   //* <- Esto destruye la instancia anterior, lo cual es necesario
+    if (estanque2) {
+        estanque2.destroy();   //* <- Esto destruye la instancia anterior, lo cual es necesario
     }
 
     //* Al destruir la instancia es necesario colocarle de nuevo el name al input, sino, no aceptará el archivo el php
@@ -672,7 +660,7 @@ async function abrir_subir_reporte(id, fechaMnto) {
     let anio = {}
     anio.value = fecha[0]
     // Create a FilePond instance
-    pond = FilePond.create(fileReporte, {
+    estanque2 = FilePond.create(fileReporte, {
         maxFiles: 1,
         labelIdle: 'Arrastra y suelta tu archivo .pdf o <span class="filepond--label-action"> Examina </span>',
         allowMultiple: false,
@@ -712,7 +700,7 @@ async function abrir_subir_reporte(id, fechaMnto) {
 
 
 
-                            pond.removeFile();
+                            estanque2.removeFile();
                         }
 
                     } catch (e) {
@@ -733,7 +721,7 @@ async function abrir_subir_reporte(id, fechaMnto) {
     //* Mostrando pdf cuando se suba
     let fileToOpen;
 
-    pond.on('addfile', (error, fileItem) => {
+    estanque2.on('addfile', (error, fileItem) => {
         if (error) {
             mostrar_toast('error', 'Error', 'Error al cargar PDF:' + error);
             return;
@@ -756,12 +744,15 @@ async function abrir_subir_reporte(id, fechaMnto) {
     if (server.resultado) {
         document.getElementById('alert-reporte').style.display = 'block'
     }
+    $("#reporte-mantenimiento").show();
+    $("#programa-mantenimiento").hide();
+    $("#control-sidebar").ControlSidebar('toggle');
 }
 
 //*Funcion para remover el archivo del filepond cuando se cierre el control-sidebar
 function remover_archivo() {
-    if (pond && fileItemCargado) {
-        pond.removeFile(fileItemCargado);
+    if (estanque2 && fileItemCargado) {
+        estanque2.removeFile(fileItemCargado);
         fileItemCargado = null;
     }
 }
@@ -808,7 +799,6 @@ async function ver_pdf_reporte(id, fecha) {
         mostrar_toast('error', 'Error', "Hubo un error, consulte al equipo de TI")
     }
 }
-
 
 //todo Funciones para el envío de correo de reporte
 async function mdl_correo_reporte_mantenimiento(equipo) {
@@ -972,20 +962,14 @@ async function mdl_descargar_reportes_mensuales() {
     $('#mdl-descargar-reportes-mes').modal('show')
 }
 
-
-
 $(document).ready(function () {
     $('[data-toggle="popover"]').popover();
 })
-
-
 
 const mesesNombres = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
-
-
 
 function cargarMeses(mesesDisponibles = []) {
     const cont = document.getElementById("mesesContainer");
@@ -1010,10 +994,131 @@ function cargarMeses(mesesDisponibles = []) {
         cont.appendChild(card);
     });
 }
-
 // ejemplos
 cargarMeses([1, 3, 6, 11]);
 
 function descargarMes(m) {
     console.log("Descargando mes:", m);
+}
+
+let estanque
+
+async function sidebar_programa_mantenimiento() {
+
+    $('#visualizar-programa').hide()
+    let id_filepond = document.getElementById('up-programa-file');
+    if (!id_filepond) {
+        console.error("El input #up-programa-file no existe.");
+        return;
+    }
+
+    if (estanque) {
+        estanque.destroy();
+        estanque = null;
+    }
+
+    //* Al destruir la instancia es necesario colocarle de nuevo el name al input, sino, no aceptará el archivo el php
+    $('#up-programa-file').attr('name', 'reporte_programa');
+
+    await general_select2({
+        selectId: 'sb-programa',
+        tabla: 'mantenimiento',
+        campo: 'anio',
+        placeholder: 'Seleccione un año',
+        dropdownParent: '#control-sidebar',
+        tags: false,
+
+    });
+
+    estanque = FilePond.create(id_filepond, {
+        maxFiles: 1,
+        labelIdle: 'Arrastra y suelta tu archivo .pdf o <span class="filepond--label-action"> Examina </span>',
+        allowMultiple: false,
+        dropOnPage: true,
+        dropValidation: true,
+        instantUpload: false,
+        acceptedFileTypes: ['application/pdf'],
+        labelFileTypeNotAllowed: 'Archivo no válido. Solo se permiten archivos .pdf',
+        disabled: true,
+        server: {
+            process: {
+                url: "database/controller_mantenimientos/controller_mantenimientos.php",
+                method: 'POST',
+                name: 'reporte_programa',
+                withCredentials: false,
+                ondata: (formData) => {
+                    const trama = {
+                        accion: 4,
+                        anio: $('#sb-programa').val()
+                    };
+                    formData.append('trama', JSON.stringify(trama));
+                    return formData;
+                },
+                onload: (response) => {
+                    try {
+                        const data = JSON.parse(response); // <- convierte string en objeto
+                        if (data.resultado.error) {
+                            //console.error("Error del servidor:", data.resultado.error);
+                            alert("Error: " + data.resultado.error);
+                        } else {
+                            mostrar_toast("success", "Subido", data.resultado.mensaje)
+
+                            pond.removeFile();
+                        }
+
+                    } catch (e) {
+                        console.error("Error al parsear respuesta:", e);
+                    }
+                },
+                onerror: (error) => {
+                    console.error('Error al subir:', error);
+                    alert("Error al subir archivo.");
+                }
+            },
+        }
+    });
+
+    //*Habilitando el input para subir archivos
+    $('#sb-programa').on('change', function () {
+        const seleccionado = $(this).val();
+
+        if (seleccionado !== '') {
+            estanque.setOptions({ disabled: false })
+        } else {
+            estanque.setOptions({ disabled: true })
+            $('#btn-ver-pdm').prop('disabled', true)
+        }
+    })
+
+    //*Habilitando el boton de ver pdf cuando haya un archivo en el filePond
+    /* document.addEventListener('FilePond:addfile', (e) => {
+        $('#btn-ver-pgm').prop('disabled', false)
+    }) */
+
+    //* Deshabilitando el boton de ver pdf cuando el archivo haya sido removido del filePond
+    document.addEventListener('FilePond:removefile', (e) => {
+        // $('#btn-ver-pgm').prop('disabled', true)
+        $('#sb-programa').val(null).trigger('change');
+    })
+
+    //* Mostrando pdf cuando se suba
+    estanque.on('addfile', (error, fileItem) => {
+        if (error) {
+            mostrar_toast('error', 'Error', 'Error al cargar PDF:' + error);
+            return;
+        }
+
+        let visualizar =URL.createObjectURL(fileItem.file);
+
+        // Generar URL temporal para el archivo PDF
+        document.getElementById('visualizar-pdf-pgm').src = visualizar;
+
+        $('#visualizar-programa').show();
+
+    });
+
+    $("#programa-mantenimiento").show();
+    $("#reporte-mantenimiento").hide();
+    $("#control-sidebar").ControlSidebar('toggle');
+
 }

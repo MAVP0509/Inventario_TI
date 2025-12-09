@@ -954,8 +954,6 @@ function imprimir_excel() {
 }
 
 //TODO: Validación de funciones
-
-
 let tbl_baja = null;
 async function confirmar_eliminacion() {
     // Filtra los activos cuyos IDs están en equipo_seleccionado
