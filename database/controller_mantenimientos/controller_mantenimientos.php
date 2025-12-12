@@ -5,9 +5,10 @@ header('Content-Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
 
 //require_once('vendor/autoload.php');
-require __DIR__ . '/../../libraries/vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
 use Ilovepdf\Ilovepdf;
+
 
 $clientejson = json_decode($_POST['trama']);
 
@@ -23,6 +24,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_reporte($clientejson);
 } elseif ($clientejson->accion == 4) {
     $respuesta_servidor->resultado = consultar_anio_mantenimiento($clientejson);
+} elseif ($clientejson->accion == 5) {
+    $respuesta_servidor->resultado = unir_reportes_mantenimiento($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -220,6 +223,9 @@ function consultar_anio_mantenimiento()
 
 function unir_reportes_mantenimiento($valores)
 {
+
+
+
     $respuesta = new stdClass();
 
     $carpeta_reporte =  __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->anio . '/reportes_unidos';
@@ -234,10 +240,10 @@ function unir_reportes_mantenimiento($valores)
 
         return $respuesta;
     }
+    //var_dump("hola");
 
     try {
-        $ilovepdf = new Ilovepdf('project_public_id', 'project_secret_key');
-
+        $ilovepdf = new Ilovepdf('project_public_ecd8df30001f3773a605a14a2c0416c9_I--AV17bdca45d44f5b70e44a9960a810a1ab', 'secret_key_181ece80f4c57be30267facf2f3890af_TcklQ6a753e75d95f5b32aef79aac42c0d33c');
         // Create a new task
         $myTaskMerge = $ilovepdf->newTask('merge');
         // Add files to task for upload
@@ -246,8 +252,9 @@ function unir_reportes_mantenimiento($valores)
 
         $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->anio . '/' . $valores->mes;
 
+        //var_dump($carpeta);
         if (!is_dir($carpeta)) {
-            $respuesta->error = "No se pudo encontrar los archivos";
+            $respuesta->error = "No se pudo encontrar la ruta";
             return $respuesta;
         }
 
@@ -265,6 +272,7 @@ function unir_reportes_mantenimiento($valores)
                 $ruta[] = $rutaCompleta;
             }
         }
+        //var_dump($ruta);
 
         if (empty($ruta)) {
             $respuesta->error = "No se pudo encontrar los archivos";
@@ -276,6 +284,7 @@ function unir_reportes_mantenimiento($valores)
             $myTaskMerge->addFile($archivo);
         }
 
+
         // Crear carpeta antes de descargar
         if (!is_dir($carpeta_reporte)) {
             mkdir($carpeta_reporte, 0777, true);
@@ -284,18 +293,39 @@ function unir_reportes_mantenimiento($valores)
         // Execute the task
         $myTaskMerge->execute();
 
-        // Download the package files
-        $myTaskMerge->download($archivoFinal);
+        //$myTaskMerge->setOutputFileName('Reporte_' . $valores->anio . '_' . $valores->mes);
 
-        $respuesta->mensaje = "Archivos unidos correctamente";
+        // Download the package files
+        $myTaskMerge->download($carpeta_reporte);
+
+        //*Renombrando el pdf generado
+        $archivoDescargado = $carpeta_reporte . '/merged.pdf';
+
+        $nuevoNombre = $archivoFinal;
+
+        if (file_exists($archivoDescargado)) {
+            if (rename($archivoDescargado, $nuevoNombre)) {
+                $respuesta->mensaje = "Archivos unidos correctamente";
+                //$respuesta->error = "Archivo renombrado correctamente a $nuevoNombre";
+            } else {
+                $respuesta->error =  "Error al renombrar el archivo";
+                return $respuesta;
+            }
+        } else {
+            $respuesta->error =  "El archivo original no existe";
+            return $respuesta;
+        }
+
+        //$respuesta->mensaje = "Archivos unidos correctamente";
+
+
 
         $respuesta->ruta = $carpetaUrl;
-        
     } catch (\Ilovepdf\Exceptions\AuthException $e) {
         $respuesta->error = "Error de autenticación Ilovepdf: " . $e->getMessage();
     } catch (\Ilovepdf\Exceptions\TaskException $e) {
         $respuesta->error = "Error en la tarea Ilovepdf: " . $e->getMessage();
-    }  catch (\Exception $e) {
+    } catch (\Exception $e) {
         $respuesta->error = "Error general: " . $e->getMessage();
     }
 

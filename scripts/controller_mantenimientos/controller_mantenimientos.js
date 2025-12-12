@@ -999,9 +999,10 @@ function cargarMeses(mesesDisponibles = []) {
             <div class="mes-nombre">${mes}</div>
             <div class="mes-status">${disponible ? "Disponible" : "No disponible"}</div>
         `;
-
+       
         if (disponible) {
-            card.onclick = () => descargarMes(numMes);
+            let numeroMes = numMes.toString().padStart(2,'0') //Si es un digito, se añade un cero a la izquierda
+            card.onclick = () => descargarMes(numeroMes);
         }
 
         cont.appendChild(card);
@@ -1013,7 +1014,8 @@ async function descargarMes(mes) {
     dominio = window.location.hostname
     puerto = location.port
     console.log("Descargando mes:", mes);
-
+    mantenimiento_loading = true
+    alert_cargando('Uniendo los reportes, por favor espere...')
     let server = await server_mantenimiento({ accion: 5, anio: mantenimientosPendientes[0].anio, mes: mes })
 
     if (server.resultado.mensaje) {
