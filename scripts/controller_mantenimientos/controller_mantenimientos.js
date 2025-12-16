@@ -1078,7 +1078,7 @@ async function sidebar_programa_mantenimiento() {
     });
 
     //*Habilitando el input para subir archivos
-    $('#sb-programa').on('change', function () {
+    $('#sb-programa').off('change').on('change', function () {
         const seleccionado = $(this).val();
 
         if (seleccionado !== '') {
