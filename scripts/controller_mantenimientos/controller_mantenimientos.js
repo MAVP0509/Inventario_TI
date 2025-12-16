@@ -998,11 +998,10 @@ function cargarMeses(mesesDisponibles = []) {
 cargarMeses([1, 3, 6, 11]);
 
 function descargarMes(m) {
-    console.log("Descargando mes:", m);
+    // console.log("Descargando mes:", m);
 }
 
 let estanque
-
 async function sidebar_programa_mantenimiento() {
 
     $('#visualizar-programa').hide()
@@ -1029,7 +1028,7 @@ async function sidebar_programa_mantenimiento() {
         tags: false,
 
     });
-
+    console.log($("#sb-programa").select2('data')[0]);
     estanque = FilePond.create(id_filepond, {
         maxFiles: 1,
         labelIdle: 'Arrastra y suelta tu archivo .pdf o <span class="filepond--label-action"> Examina </span>',
@@ -1063,7 +1062,7 @@ async function sidebar_programa_mantenimiento() {
                         } else {
                             mostrar_toast("success", "Subido", data.resultado.mensaje)
 
-                            pond.removeFile();
+                            estanque.removeFile();
                         }
 
                     } catch (e) {
@@ -1072,7 +1071,7 @@ async function sidebar_programa_mantenimiento() {
                 },
                 onerror: (error) => {
                     console.error('Error al subir:', error);
-                    alert("Error al subir archivo.");
+                    // alert("Error al subir archivo.");
                 }
             },
         }
@@ -1108,7 +1107,7 @@ async function sidebar_programa_mantenimiento() {
             return;
         }
 
-        let visualizar =URL.createObjectURL(fileItem.file);
+        let visualizar = URL.createObjectURL(fileItem.file);
 
         // Generar URL temporal para el archivo PDF
         document.getElementById('visualizar-pdf-pgm').src = visualizar;

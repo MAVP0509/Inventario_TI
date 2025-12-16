@@ -194,7 +194,7 @@ function consultar_reporte($valores)
     return $respuesta;
 }
 
-function guardar_programa($valores)
+/* function guardar_programa($valores)
 {
 
     $respuesta = new stdClass();
@@ -259,9 +259,9 @@ function guardar_programa($valores)
         $respuesta->error = "No se recibió ningún archivo válido.";
     }
     return $respuesta;
-}
+} */
 
-/* function guardar_programa($valores)
+function guardar_programa($valores)
 {
     $respuesta = new stdClass();
 
@@ -275,6 +275,12 @@ function guardar_programa($valores)
     $nombreOriginal = $archivo['name'];
     $tmpPath = $archivo['tmp_name'];
 
+    $nombreSinExtension = pathinfo($nombreOriginal, PATHINFO_FILENAME);
+    $extension = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));
+
+    $nombreLimpio = preg_replace('/[^A-Za-z0-9_-]/', '_', $nombreSinExtension);
+
+
     // Validar extensión PDF
     $ext = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));
     if ($ext !== 'pdf') {
@@ -283,7 +289,7 @@ function guardar_programa($valores)
     }
 
     // Ruta base donde se guardan los programas
-    $base = realpath(__DIR__ . '/../../../documentos/mantenimiento/programa');
+    $base = realpath(__DIR__ . '/../../documentos/mantenimiento/programa');
     if ($base === false) {
         $respuesta->error = "No se encontró la ruta base.";
         return $respuesta;
@@ -294,7 +300,7 @@ function guardar_programa($valores)
 
     // Crear carpeta si no existe
     if (!is_dir($carpeta_anual)) {
-        if (!mkdir($carpeta_anual, 0777, true)) {
+        if (!mkdir($carpeta_anual, 0755, true)) {
             $respuesta->error = "No se pudo crear la carpeta del año.";
             return $respuesta;
         }
@@ -303,7 +309,7 @@ function guardar_programa($valores)
     // Buscar nombre disponible (1.pdf, 2.pdf, 3.pdf...)
     $i = 1;
     do {
-        $nombre_final = $carpeta_anual . DIRECTORY_SEPARATOR . "{$i}.pdf";
+         $nombre_final = $carpeta_anual . DIRECTORY_SEPARATOR . $i . '-' . $nombreLimpio . '.' . $extension;
         $i++;
     } while (file_exists($nombre_final));
 
@@ -317,4 +323,3 @@ function guardar_programa($valores)
 
     return $respuesta;
 }
- */

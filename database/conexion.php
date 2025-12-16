@@ -1,11 +1,11 @@
 <?php 
     //*Archivo de conección a la base de datos
-    $user="janny";
-    // $user="root";
-    $pass="janny789";
-    //$pass = "root";
-    $server="10.11.139.61";
-    //$server="localhost";
+    // $user="janny";
+    $user="root";
+    // $pass="janny789";
+    $pass = "root";
+    // $server="10.11.139.254";
+    $server="localhost";
     $db="inventario_ti";
     $con= mysqli_connect($server,$user,$pass) or die("Error al conectar");
     mysqli_select_db($con,$db);
