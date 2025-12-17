@@ -939,11 +939,7 @@ const mesesNombres = [
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
 
-
-
 function cargarMeses(mesesDisponibles = []) {
-
-
     const cont = document.getElementById("mesesContainer");
     cont.innerHTML = "";
 
