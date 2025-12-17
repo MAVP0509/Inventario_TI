@@ -4,6 +4,11 @@
 header('Content-Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
 
+//require_once('vendor/autoload.php');
+require __DIR__ . '/../../vendor/autoload.php';
+
+use Ilovepdf\Ilovepdf;
+
 $clientejson = json_decode($_POST['trama']);
 
 $respuesta_servidor = new stdClass();
