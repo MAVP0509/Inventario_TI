@@ -834,8 +834,6 @@ async function mdl_correo_reporte_mantenimiento(equipo) {
     //let valido = mesesPendientes.find
     //console.log(mesesPendientes)
 
-
-
     await Promise.all([
         general_select2({
             selectId: 'select-usuario-correo',
