@@ -305,8 +305,7 @@ function guardar_programa($valores)
             return $respuesta;
         }
     }
-
-    // Buscar nombre disponible (1.pdf, 2.pdf, 3.pdf...)
+    
     $i = 1;
     do {
          $nombre_final = $carpeta_anual . DIRECTORY_SEPARATOR . $i . '-' . $nombreLimpio . '.' . $extension;
