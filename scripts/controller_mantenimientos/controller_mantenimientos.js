@@ -148,7 +148,7 @@ async function consultar_informacion(anio) {
         const data = cell.getRow().getData()
         const disabled = data.reporte_descargado == 0 ? "disabled" : ""
 
-        return `<button type='button' class='btn btn-info icon' ${disabled} data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' data-widget="control-sidebar" data-slide="true" ><i class='fa-solid fa-upload fa-lg'></i></button>`;
+        return `<button type='button' class='btn btn-info icon' ${disabled} data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' data-widget="control-sidebar" data-slide="true" data-target="#control-sidebar"><i class='fa-solid fa-upload fa-lg'></i></button>`;
     }
 
     let fileIcon = function (cell, formatterParams, onRendered) { //plain text value
@@ -393,6 +393,9 @@ async function consultar_informacion(anio) {
 
 }
 
+console.log(mantenimientosPendientes);
+
+
 async function mdl_programar_mantenimiento() {
 
     await Promise.all([
@@ -486,8 +489,13 @@ async function programar_mantenimiento() {
         mostrar_toast('error', '¡Error!', 'Ya existe un programa de mantenimiento para el año');
         $('#mdl-prog-mant').modal("hide");
     } */
+console.log(mantenimientosPendientes);
+
 
 }
+
+console.log(mantenimientosPendientes);
+
 
 let selecreg
 async function mdl_mantenimiento_info(elemento_mnt) {
@@ -1003,7 +1011,6 @@ function cargarMeses(mesesDisponibles = []) {
     });
 }
 
-
 async function descargarMes(mes) {
     dominio = window.location.hostname
     puerto = location.port
@@ -1024,4 +1031,42 @@ async function descargarMes(mes) {
     } else {
         mostrar_toast('error', '¡Error!', 'Hubo un problema')
     }
+}
+
+let estanque = null;
+let archivo;
+
+async function programa_firmado() {
+
+    // Si ya existía una instancia, la destruimos antes de crear una nueva
+    if (estanque) {
+        estanque.destroy();
+        estanque = null;
+    }
+    // Input donde creamos la instancia de Filepond
+    const input = document.getElementById("subir-programa");
+
+    estanque = FilePond.create(input, {
+        maxFiles: 1,
+        acceptedFileTypes: ['application/pdf'],
+        labelIdle: 'Arrastre y suelta un archivo .pdf o <span class="filepond--label-action"> Examina </span>',
+        allowMultiple: false,
+        dropOnPage: false,
+        instantUpload: false,
+        labelFileTypeNotAllowed: 'Archivo no válido solo .pdf',
+        server: {
+            process: {
+                url: "database/controller_mantenimientos/controller_mantenimientos.php",
+                method: "POST",
+                name: 'reporte_programa',
+                withCredentials: false,
+                ondata: (formData) => {
+                    const trama = {
+                        accion: 6,
+                        anio: k
+                    }
+                }
+            }
+        }
+    })
 }
