@@ -393,7 +393,7 @@ async function consultar_informacion(anio) {
 
 }
 
-console.log(mantenimientosPendientes);
+// console.log(mantenimientosPendientes);
 
 
 async function mdl_programar_mantenimiento() {
@@ -489,12 +489,12 @@ async function programar_mantenimiento() {
         mostrar_toast('error', '¡Error!', 'Ya existe un programa de mantenimiento para el año');
         $('#mdl-prog-mant').modal("hide");
     } */
-console.log(mantenimientosPendientes);
+    // console.log(mantenimientosPendientes);
 
 
 }
 
-console.log(mantenimientosPendientes);
+// console.log(mantenimientosPendientes);
 
 
 let selecreg
@@ -605,6 +605,8 @@ async function mdl_mantenimiento_info(elemento_mnt) {
     }
 
     $('#mdl-mant-info').modal("show")
+    console.log(mantenimientosPendientes);
+
 }
 
 async function mdl_reporte_mantenimiento(elemento_mnt) {
@@ -1033,40 +1035,110 @@ async function descargarMes(mes) {
     }
 }
 
-let estanque = null;
-let archivo;
+async function verificar_programa(anio_programa) {
+    const model = {
+        accion: 8,
+        anio: anio_programa
+    };
 
-async function programa_firmado() {
-
-    // Si ya existía una instancia, la destruimos antes de crear una nueva
-    if (estanque) {
-        estanque.destroy();
-        estanque = null;
+    try {
+        const resultado = await server_mantenimiento(model);
+        return resultado.resultado; // <- ojo, el JSON que devuelve tu PHP tiene 'resultado'
+    } catch (error) {
+        console.error("Error al consultar el programa:", error);
+        return { existe: false };
     }
-    // Input donde creamos la instancia de Filepond
-    const input = document.getElementById("subir-programa");
+}
 
-    estanque = FilePond.create(input, {
-        maxFiles: 1,
-        acceptedFileTypes: ['application/pdf'],
-        labelIdle: 'Arrastre y suelta un archivo .pdf o <span class="filepond--label-action"> Examina </span>',
-        allowMultiple: false,
-        dropOnPage: false,
-        instantUpload: false,
-        labelFileTypeNotAllowed: 'Archivo no válido solo .pdf',
-        server: {
-            process: {
-                url: "database/controller_mantenimientos/controller_mantenimientos.php",
-                method: "POST",
-                name: 'reporte_programa',
-                withCredentials: false,
-                ondata: (formData) => {
-                    const trama = {
-                        accion: 6,
-                        anio: k
+// let archivo;
+async function alert_programa(anio_programa) {
+    const archivo = await verificar_programa(anio_programa);
+
+    const alertDiv = document.getElementById("alert-reporte");
+    const archivoDiv = document.getElementById("archivo-reporte"); // contenedor donde pondremos el link
+
+    if (archivo.existe) {
+        alertDiv.style.display = "flex"; // mostramos el alert
+
+        // Creamos el link al archivo
+        const rutaArchivo = `documentos/mantenimiento/programa/${anio_programa}/${archivo.archivo}`;
+        const ListElement = `
+            <li class="list-group-item p-2">
+                <div class="row">
+                    <div class="col-sm">
+                        <a href="${rutaArchivo}" target="_blank" class="text-decoration-none">
+                            ${archivo.archivo}
+                        </a>
+                        <br>
+                        <span style="font-size: 13px; color: #555;">
+                            Fecha de carga: ${archivo.fecha_subida || '-'}
+                        </span>
+                    </div>
+                </div>
+            </li>
+        `;
+        archivoDiv.innerHTML = ListElement;
+
+    } else {
+        alertDiv.style.display = "none"; // ocultamos el alert
+        archivoDiv.innerHTML = ''; // limpiamos si no hay archivo
+    }
+}
+
+$('#control-sidebar-programa').on('control-sidebar-slide', function () {
+    const año_programa = mantenimientosPendientes[0].anio;
+    programa_firmado(año_programa);
+});
+
+let estanque = null;
+let estanqueInicializado = false;
+async function programa_firmado(año_programa) {
+    // Mostrar alert si ya existe archivo
+    await alert_programa(año_programa);
+
+    // Inicializar FilePond si no se ha inicializado
+    if (!estanqueInicializado) {
+        const input = document.getElementById("subir-programa");
+
+        estanque = FilePond.create(input, {
+            maxFiles: 1,
+            acceptedFileTypes: ['application/pdf'],
+            labelIdle: 'Arrastre y suelta un archivo .pdf o <span class="filepond--label-action"> Examina </span>',
+            allowMultiple: false,
+            dropOnPage: false,
+            instantUpload: false,
+            labelFileTypeNotAllowed: 'Archivo no válido solo .pdf',
+            server: {
+                process: {
+                    url: "database/controller_mantenimientos/controller_mantenimientos.php",
+                    method: "POST",
+                    name: 'reporte_programa',
+                    withCredentials: false,
+                    ondata: (formData) => {
+                        formData.append('trama', JSON.stringify({ accion: 6, anio: año_programa }));
+                        return formData;
+                    },
+                    onload: (response) => {
+                        let data = JSON.parse(response);
+                        if (data.resultado.error) {
+                            mostrar_toast('error', '¡Error!', data.resultado.error);
+                        } else {
+                            mostrar_toast('success', '¡Carga exitosa!', data.resultado.mensaje);
+                            estanque.removeFiles();
+                            // Reconsultamos si existe archivo para mostrar alert actualizado
+                            alert_programa(año_programa);
+                        }
+                    },
+                    onerror: (err) => {
+                        console.error('Error al subir: ', err);
                     }
                 }
             }
-        }
-    })
+        });
+
+        estanqueInicializado = true;
+    } else {
+        estanque.removeFiles();
+    }
 }
+

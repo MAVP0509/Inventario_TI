@@ -27,6 +27,10 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = unir_reportes_mantenimiento($clientejson);
 } elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = guardar_programa($clientejson);
+} elseif ($clientejson->accion == 7) {
+    $respuesta_servidor->resultado = existe_programa($clientejson);
+} elseif ($clientejson->accion == 8) {
+    $respuesta_servidor->resultado = consultar_programa($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -207,30 +211,30 @@ function guardar_programa($valores)
 {
     $respuesta = new stdClass();
 
-    // Validar existencia del archivo
-    if (!isset($_FILES['reporte_programa']) || $_FILES['reporte_programa']['error'] !== UPLOAD_ERR_OK) {
+    // Validar archivo
+    if (
+        !isset($_FILES['reporte_programa']) ||
+        $_FILES['reporte_programa']['error'] !== UPLOAD_ERR_OK
+    ) {
         $respuesta->error = "No se recibió ningún archivo válido.";
         return $respuesta;
     }
 
     $archivo = $_FILES['reporte_programa'];
-    $nombreOriginal = $archivo['name'];
+
+    $nombreOriginal = pathinfo($archivo['name'], PATHINFO_FILENAME);
+    $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
     $tmpPath = $archivo['tmp_name'];
 
-    $nombreSinExtension = pathinfo($nombreOriginal, PATHINFO_FILENAME);
-    $extension = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));
-
-    $nombreLimpio = preg_replace('/[^A-Za-z0-9_-]/', '_', $nombreSinExtension);
-
-
-    // Validar extensión PDF
-    $ext = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));
-    if ($ext !== 'pdf') {
-        $respuesta->error = "Tipo de archivo no permitido. Solo .pdf.";
+    if ($extension !== 'pdf') {
+        $respuesta->error = "Tipo de archivo no permitido. Solo PDF.";
         return $respuesta;
     }
 
-    // Ruta base donde se guardan los programas
+    // Limpiar nombre (mantiene el nombre original)
+    $nombreLimpio = preg_replace('/[^A-Za-z0-9._-]/', '_', $nombreOriginal);
+
+    // Ruta base
     $base = realpath(__DIR__ . '/../../documentos/mantenimiento/programa');
     if ($base === false) {
         $respuesta->error = "No se encontró la ruta base.";
@@ -240,7 +244,6 @@ function guardar_programa($valores)
     // Carpeta por año
     $carpeta_anual = $base . DIRECTORY_SEPARATOR . $valores->anio;
 
-    // Crear carpeta si no existe
     if (!is_dir($carpeta_anual)) {
         if (!mkdir($carpeta_anual, 0755, true)) {
             $respuesta->error = "No se pudo crear la carpeta del año.";
@@ -248,19 +251,72 @@ function guardar_programa($valores)
         }
     }
 
-    // Buscar nombre disponible (1.pdf, 2.pdf, 3.pdf...)
-    $i = 1;
-    do {
-        $nombre_final = $carpeta_anual . DIRECTORY_SEPARATOR . $i . '-' . $nombreLimpio . '.' . $extension;
-        $i++;
-    } while (file_exists($nombre_final));
+    // Eliminar PDF existente
+    foreach (glob($carpeta_anual . DIRECTORY_SEPARATOR . '*.pdf') as $pdfExistente) {
+        unlink($pdfExistente);
+    }
+
+    // Nombre siempre con fecha actual
+    $fecha = date('Ymd');
+    $archivo_final = $carpeta_anual
+        . DIRECTORY_SEPARATOR
+        . $nombreLimpio . '_' . $fecha . '.pdf';
 
     // Guardar archivo
-    if (move_uploaded_file($tmpPath, $nombre_final)) {
-        $respuesta->mensaje = "Archivo guardado correctamente";
-        $respuesta->ruta_guardada = $nombre_final;
+    if (move_uploaded_file($tmpPath, $archivo_final)) {
+        $respuesta->mensaje = "Archivo guardado correctamente.";
+        $respuesta->ruta_guardada = basename($archivo_final);
+        $respuesta->fecha_subida = $fecha;
     } else {
-        $respuesta->error = "No se pudo mover el archivo al destino.";
+        $respuesta->error = "No se pudo guardar el archivo.";
+    }
+
+    return $respuesta;
+}
+
+function existe_programa($valores)
+{
+    $respuesta = new stdClass();
+
+    $base = realpath(__DIR__ . '/../../documentos/mantenimiento/programa');
+    $carpeta = $base . DIRECTORY_SEPARATOR . $valores->anio;
+
+    $respuesta->existe = false;
+    $respuesta->archivo = null;
+
+    if (is_dir($carpeta)) {
+        $archivos = glob($carpeta . DIRECTORY_SEPARATOR . '*.pdf');
+        if (!empty($archivos)) {
+            $respuesta->existe = true;
+            $respuesta->archivo = basename($archivos[0]);
+        }
+    }
+
+    return $respuesta;
+}
+
+function consultar_programa($valores)
+{
+    $respuesta = new stdClass();
+
+    // Ruta base
+    $base = realpath(__DIR__ . '/../../documentos/mantenimiento/programa');
+    $carpeta = $base . DIRECTORY_SEPARATOR . $valores->anio;
+
+    $respuesta->existe = false;
+    $respuesta->archivo = null;
+    $respuesta->ruta = null;
+
+    if (is_dir($carpeta)) {
+        $archivos = glob($carpeta . DIRECTORY_SEPARATOR . '*.pdf');
+        if (!empty($archivos)) {
+            $archivo = basename($archivos[0]);
+            $ruta_relativa = "documentos/mantenimiento/programa/{$valores->anio}/{$archivo}";
+
+            $respuesta->existe = true;
+            $respuesta->archivo = $archivo;
+            $respuesta->ruta = $ruta_relativa;
+        }
     }
 
     return $respuesta;
