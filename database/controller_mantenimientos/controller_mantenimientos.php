@@ -16,7 +16,11 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = validar_reporte_mismo_año($clientejson);
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = consultar_reporte($clientejson);
+<<<<<<< HEAD
 } elseif ($clientejson->accion == 6) {
+=======
+} elseif ($clientejson->accion == 4) {
+>>>>>>> parent of 399bd86 (Merge branch 'Miguel' into Janny)
     $respuesta_servidor->resultado = guardar_programa($clientejson);
 }
 
