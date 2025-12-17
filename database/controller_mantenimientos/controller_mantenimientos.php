@@ -16,7 +16,7 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = validar_reporte_mismo_año($clientejson);
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = consultar_reporte($clientejson);
-} elseif ($clientejson->accion == 4) {
+} elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = guardar_programa($clientejson);
 }
 

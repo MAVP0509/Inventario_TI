@@ -1001,11 +1001,11 @@ function descargarMes(m) {
     // console.log("Descargando mes:", m);
 }
 
-let estanque
+let estanque = null
 async function sidebar_programa_mantenimiento() {
 
     $('#visualizar-programa').hide()
-    let id_filepond = document.getElementById('up-programa-file');
+    const id_filepond = document.getElementById('up-programa-file');
     if (!id_filepond) {
         console.error("El input #up-programa-file no existe.");
         return;
@@ -1047,7 +1047,7 @@ async function sidebar_programa_mantenimiento() {
                 withCredentials: false,
                 ondata: (formData) => {
                     const trama = {
-                        accion: 4,
+                        accion: 6,
                         anio: $('#sb-programa').val()
                     };
                     formData.append('trama', JSON.stringify(trama));
