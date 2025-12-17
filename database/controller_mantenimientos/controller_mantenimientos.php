@@ -17,7 +17,11 @@ if ($clientejson->accion == 0) {
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = consultar_reporte($clientejson);
 <<<<<<< HEAD
+<<<<<<< HEAD
 } elseif ($clientejson->accion == 6) {
+=======
+} elseif ($clientejson->accion == 4) {
+>>>>>>> parent of 399bd86 (Merge branch 'Miguel' into Janny)
 =======
 } elseif ($clientejson->accion == 4) {
 >>>>>>> parent of 399bd86 (Merge branch 'Miguel' into Janny)
