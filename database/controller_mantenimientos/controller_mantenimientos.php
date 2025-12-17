@@ -265,3 +265,118 @@ function guardar_programa($valores)
 
     return $respuesta;
 }
+
+function consultar_anio_mantenimiento()
+{
+    include("../conexion.php");
+
+    $sql = "SELECT MAX(anio) AS anio FROM mantenimiento";
+    //$sql = "SELECT * FROM mantenimiento";
+    $query = mysqli_query($con, $sql);
+
+    $fila = mysqli_fetch_object($query);
+
+    return $fila;
+}
+
+function unir_reportes_mantenimiento($valores)
+{
+    $respuesta = new stdClass();
+
+    $carpeta_reporte =  __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->anio . '/reportes_unidos';
+    $archivoFinal = $carpeta_reporte . '/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
+    $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/' . $valores->anio . '/reportes_unidos/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
+
+    //$carpetaArchivoUnido = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->anio . '/reportes_unidos/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
+
+    if (file_exists($archivoFinal)) {
+        $respuesta->mensaje = "Archivos unidos correctamente";
+        $respuesta->ruta = $carpetaUrl;
+
+        return $respuesta;
+    }
+    //var_dump("hola");
+
+    try {
+        $ilovepdf = new Ilovepdf('project_public_ecd8df30001f3773a605a14a2c0416c9_I--AV17bdca45d44f5b70e44a9960a810a1ab', 'secret_key_181ece80f4c57be30267facf2f3890af_TcklQ6a753e75d95f5b32aef79aac42c0d33c');
+        // Create a new task
+        $myTaskMerge = $ilovepdf->newTask('merge');
+        // Add files to task for upload
+
+        $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->anio . '/' . $valores->mes;
+
+        //var_dump($carpeta);
+        if (!is_dir($carpeta)) {
+            $respuesta->error = "No se pudo encontrar la ruta";
+            return $respuesta;
+        }
+
+        $archivos = array_diff(scandir($carpeta), ['.', '..']);
+
+        $ruta = [];
+
+        foreach ($archivos as $archivo) {
+
+            $rutaCompleta = $carpeta . '/' . $archivo;
+
+            if (is_file($rutaCompleta) && strtolower(pathinfo($archivo, PATHINFO_EXTENSION)) === 'pdf') {  //  ignora carpetas
+                $ruta[] = $rutaCompleta;
+            }
+        }
+        //var_dump($ruta);
+
+        if (empty($ruta)) {
+            $respuesta->error = "No se pudo encontrar los archivos";
+            return $respuesta;
+        }
+
+
+        foreach ($ruta as $archivo) {
+            $myTaskMerge->addFile($archivo);
+        }
+
+
+        // Crear carpeta antes de descargar
+        if (!is_dir($carpeta_reporte)) {
+            mkdir($carpeta_reporte, 0777, true);
+        }
+
+        // Execute the task
+        $myTaskMerge->execute();
+
+        //$myTaskMerge->setOutputFileName('Reporte_' . $valores->anio . '_' . $valores->mes);
+
+        // Download the package files
+        $myTaskMerge->download($carpeta_reporte);
+
+        //*Renombrando el pdf generado
+        $archivoDescargado = $carpeta_reporte . '/merged.pdf';
+
+        $nuevoNombre = $archivoFinal;
+
+        if (file_exists($archivoDescargado)) {
+            if (rename($archivoDescargado, $nuevoNombre)) {
+                $respuesta->mensaje = "Archivos unidos correctamente";
+                //$respuesta->error = "Archivo renombrado correctamente a $nuevoNombre";
+            } else {
+                $respuesta->error =  "Error al renombrar el archivo";
+                return $respuesta;
+            }
+        } else {
+            $respuesta->error =  "El archivo original no existe";
+            return $respuesta;
+        }
+
+        //$respuesta->mensaje = "Archivos unidos correctamente";
+
+        $respuesta->ruta = $carpetaUrl;
+    } catch (\Ilovepdf\Exceptions\AuthException $e) {
+        $respuesta->error = "Error de autenticación Ilovepdf: " . $e->getMessage();
+    } catch (\Ilovepdf\Exceptions\TaskException $e) {
+        $respuesta->error = "Error en la tarea Ilovepdf: " . $e->getMessage();
+    } catch (\Exception $e) {
+        $respuesta->error = "Error general: " . $e->getMessage();
+    }
+
+    return $respuesta;
+}
