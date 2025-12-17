@@ -27,7 +27,7 @@ let elemento
 let table
 let supervisor_seleccionado = []
 
-async function consultar_informacion() {
+async function consultar_informacion(params) {
     let model = {
         accion: 2
     };
@@ -177,7 +177,7 @@ async function consultar_informacion() {
                                     if (otherRow) {
                                         otherRow.update({ habilitado: "0" });
 
-                                        
+                                        // Habilitar botón editar
                                         const otherRowEl = otherRow.getElement();
                                         const otherBtn = otherRowEl.querySelector("button.btn-warning");
                                         if (otherBtn) {
@@ -211,7 +211,15 @@ async function consultar_informacion() {
                         });
 
                         const editBtn = cell.getRow().getElement().querySelector("button.btn-warning");
-                        
+                        /* if (editBtn) {
+                            editBtn.disabled = true;
+                            editBtn.setAttribute("data-toggle", "popover");
+                            editBtn.setAttribute("data-trigger", "hover");
+                            editBtn.setAttribute("data-html", "true");
+                            editBtn.setAttribute("data-placement", "top");
+                            editBtn.setAttribute("data-content", '<div class="bg-warning text-dark p-1 rounded">Deshabilite para editar</div>');
+                            $(editBtn).popover();
+                        } */
 
                     } else {
                         // Intentamos desactivar

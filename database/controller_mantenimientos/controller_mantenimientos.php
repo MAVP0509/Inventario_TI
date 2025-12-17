@@ -4,12 +4,6 @@
 header('Content-Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
 
-//require_once('vendor/autoload.php');
-require __DIR__ . '/../../vendor/autoload.php';
-
-use Ilovepdf\Ilovepdf;
-
-
 $clientejson = json_decode($_POST['trama']);
 
 $respuesta_servidor = new stdClass();
@@ -23,10 +17,6 @@ if ($clientejson->accion == 0) {
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = consultar_reporte($clientejson);
 } elseif ($clientejson->accion == 4) {
-    $respuesta_servidor->resultado = consultar_anio_mantenimiento($clientejson);
-} elseif ($clientejson->accion == 5) {
-    $respuesta_servidor->resultado = unir_reportes_mantenimiento($clientejson);
-} elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = guardar_programa($clientejson);
 }
 
@@ -46,11 +36,8 @@ function consultar_datos($valores)
     while ($fila = mysqli_fetch_object($query)) {
         array_push($array, $fila);  //* Se guardan los registros en un array
     }
-    if ($query) {
-        return $array;
-    } else {
-        return false;
-    }
+
+    return $array;
 }
 
 function consultar_orden()
@@ -207,6 +194,73 @@ function consultar_reporte($valores)
     return $respuesta;
 }
 
+/* function guardar_programa($valores)
+{
+
+    $respuesta = new stdClass();
+
+    if (isset($_FILES['reporte_programa']) && $_FILES['reporte_programa']['error'] === UPLOAD_ERR_OK) {
+        $nombreOriginal = $_FILES['reporte_programa']['name'];
+        $tmpPath = $_FILES['reporte_programa']['tmp_name'];
+
+        // Validar extensión .xlsx
+        $ext = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));
+        if ($ext !== 'pdf') {
+            $respuesta->error = "Tipo de archivo no permitido. Solo .pdf";
+            return $respuesta;
+        }
+
+        $base = realpath(__DIR__ . '/../../../documentos/mantenimiento/programa');
+
+        if ($base == false) {
+            return [
+                'result' => false,
+                'error' => 'No se encontro la ruta. Intentálo nuevamente.'
+            ];
+        }
+
+        $carpeta_anual = $base . DIRECTORY_SEPARATOR . $valores->anio;
+
+        if (!is_dir($carpeta_anual)) {
+            mkdir($carpeta_anual, 0777, true);
+        }
+
+        $i = 1;
+        do {
+            $nombre_final = $carpeta_anual . DIRECTORY_SEPARATOR . "{$i}.pdf";
+            $i++;
+        } while (file_exists($nombre_final));
+
+        //* Generar nombre único para evitar colisiones
+        // $nuevoNombre = date('Ymd_His') . '_' . $nombreOriginal;
+
+        //* Ruta de la carpeta
+        // $ruta = __DIR__ . '/../../documentos/mantenimiento/' . $valores->usuario;
+
+        //* Validando si el usuario ya tiene su carpeta o no
+        // if (is_dir($ruta)) {
+        //     //* Ruta destino, __DIR__ es carpeta donde está este script PHP
+        //     $destino = $ruta . '/' . $nuevoNombre;
+        // } else {
+        //     //* Creación de la carpeta
+        //     mkdir($ruta, 0777, true);
+
+        //     //* Ruta destino
+        //     $destino = $ruta . '/' . $nuevoNombre;
+        // }
+
+        if (move_uploaded_file($tmpPath, $nombre_final)) {
+            $respuesta->mensaje = "Archivo guardado correctamente";
+            //$respuesta->ruta = 'C:\\xampp\\htdocs\\Inventario_TI\\database\\controller_inventario\\' . $nuevoNombre;
+        } else {
+            $respuesta->error = "No se pudo mover el archivo.";
+        }
+    } else {
+        $respuesta->error = "No se recibió ningún archivo válido.";
+    }
+    return $respuesta;
+} */
+
 function guardar_programa($valores)
 {
     $respuesta = new stdClass();
@@ -251,10 +305,10 @@ function guardar_programa($valores)
             return $respuesta;
         }
     }
-
+    
     $i = 1;
     do {
-        $nombre_final = $carpeta_anual . DIRECTORY_SEPARATOR . $i . '-' . $nombreLimpio . '.' . $extension;
+         $nombre_final = $carpeta_anual . DIRECTORY_SEPARATOR . $i . '-' . $nombreLimpio . '.' . $extension;
         $i++;
     } while (file_exists($nombre_final));
 
@@ -264,130 +318,6 @@ function guardar_programa($valores)
         $respuesta->ruta_guardada = $nombre_final;
     } else {
         $respuesta->error = "No se pudo mover el archivo al destino.";
-    }
-}
-
-function consultar_anio_mantenimiento()
-{
-    include("../conexion.php");
-
-    $sql = "SELECT MAX(anio) AS anio FROM mantenimiento";
-    //$sql = "SELECT * FROM mantenimiento";
-    $query = mysqli_query($con, $sql);
-
-    $fila = mysqli_fetch_object($query);
-
-
-    return $fila;
-}
-
-
-function unir_reportes_mantenimiento($valores)
-{
-
-
-
-    $respuesta = new stdClass();
-
-    $carpeta_reporte =  __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->anio . '/reportes_unidos';
-    $archivoFinal = $carpeta_reporte . '/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
-    $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/' . $valores->anio . '/reportes_unidos/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
-
-    //$carpetaArchivoUnido = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->anio . '/reportes_unidos/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
-
-    if (file_exists($archivoFinal)) {
-        $respuesta->mensaje = "Archivos unidos correctamente";
-        $respuesta->ruta = $carpetaUrl;
-
-        return $respuesta;
-    }
-    //var_dump("hola");
-
-    try {
-        $ilovepdf = new Ilovepdf('project_public_ecd8df30001f3773a605a14a2c0416c9_I--AV17bdca45d44f5b70e44a9960a810a1ab', 'secret_key_181ece80f4c57be30267facf2f3890af_TcklQ6a753e75d95f5b32aef79aac42c0d33c');
-        // Create a new task
-        $myTaskMerge = $ilovepdf->newTask('merge');
-        // Add files to task for upload
-
-
-
-        $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->anio . '/' . $valores->mes;
-
-        //var_dump($carpeta);
-        if (!is_dir($carpeta)) {
-            $respuesta->error = "No se pudo encontrar la ruta";
-            return $respuesta;
-        }
-
-
-
-        $archivos = array_diff(scandir($carpeta), ['.', '..']);
-
-        $ruta = [];
-
-        foreach ($archivos as $archivo) {
-
-            $rutaCompleta = $carpeta . '/' . $archivo;
-
-            if (is_file($rutaCompleta) && strtolower(pathinfo($archivo, PATHINFO_EXTENSION)) === 'pdf') {  //  ignora carpetas
-                $ruta[] = $rutaCompleta;
-            }
-        }
-        //var_dump($ruta);
-
-        if (empty($ruta)) {
-            $respuesta->error = "No se pudo encontrar los archivos";
-            return $respuesta;
-        }
-
-
-        foreach ($ruta as $archivo) {
-            $myTaskMerge->addFile($archivo);
-        }
-
-
-        // Crear carpeta antes de descargar
-        if (!is_dir($carpeta_reporte)) {
-            mkdir($carpeta_reporte, 0777, true);
-        }
-
-        // Execute the task
-        $myTaskMerge->execute();
-
-        //$myTaskMerge->setOutputFileName('Reporte_' . $valores->anio . '_' . $valores->mes);
-
-        // Download the package files
-        $myTaskMerge->download($carpeta_reporte);
-
-        //*Renombrando el pdf generado
-        $archivoDescargado = $carpeta_reporte . '/merged.pdf';
-
-        $nuevoNombre = $archivoFinal;
-
-        if (file_exists($archivoDescargado)) {
-            if (rename($archivoDescargado, $nuevoNombre)) {
-                $respuesta->mensaje = "Archivos unidos correctamente";
-                //$respuesta->error = "Archivo renombrado correctamente a $nuevoNombre";
-            } else {
-                $respuesta->error =  "Error al renombrar el archivo";
-                return $respuesta;
-            }
-        } else {
-            $respuesta->error =  "El archivo original no existe";
-            return $respuesta;
-        }
-
-        //$respuesta->mensaje = "Archivos unidos correctamente";
-
-
-
-        $respuesta->ruta = $carpetaUrl;
-    } catch (\Ilovepdf\Exceptions\AuthException $e) {
-        $respuesta->error = "Error de autenticación Ilovepdf: " . $e->getMessage();
-    } catch (\Ilovepdf\Exceptions\TaskException $e) {
-        $respuesta->error = "Error en la tarea Ilovepdf: " . $e->getMessage();
-    } catch (\Exception $e) {
-        $respuesta->error = "Error general: " . $e->getMessage();
     }
 
     return $respuesta;

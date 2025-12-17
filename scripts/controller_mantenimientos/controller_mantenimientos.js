@@ -71,15 +71,9 @@ async function load() {
         // popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
     })
 
-    let server = await server_mantenimiento({ accion: 4 })
-    if (!server.resultado) {
-        return
-    } else {
-        let fecha = {}
-        fecha.value = server.resultado.anio
-        $('#select-anio-mantenimiento').val(fecha.value).trigger('change')
+    //const actual = new Date().getFullYear() + 1;
 
-    }
+    // rellenar_select( actual, "select-anio-mantenimiento")
 }
 
 let datos_mantenimiento = []
@@ -358,23 +352,18 @@ async function consultar_informacion(anio) {
             },
         ],
     })
-    mantenimientosPendientes = Object.values(datos_mantenimiento.reduce((objeto, item) => {
+    mantenimientosPendientes = datos_mantenimiento.reduce((objeto, item) => {
 
         if (item.estado == "Realizado") return objeto
 
-        let anio = item.anio
-        let mes = item.fecha.split('-')[1]
-
-        // Si aún no existe el año, inicializamos su propiedad meses
-        if (!objeto[anio]) {
-            objeto[anio] = { anio: anio, meses: {} };
-        }
+        let fecha = item.fecha.split('-')
+        let mes = fecha[1]
 
         //si ya existe este mes, incrementa su valor, sino lo inicia en 0 y suma 1
-        objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
+        objeto[mes] = (objeto[mes] || 0) + 1
 
         return objeto
-    }, {}))
+    }, {})
     // Guarda cuando se expande o colapsa un grupo
     /* table.on("groupVisibilityChanged", guardarEstadoDeGrupos);
 
@@ -493,7 +482,7 @@ async function programar_mantenimiento() {
 let selecreg
 async function mdl_mantenimiento_info(elemento_mnt) {
     // Busca en el arreglo 'datos_mantenimiento' el registro con el mismo id_equipo
-
+    console.log(mantenimientosPendientes)
     for (let i = 0; i < datos_mantenimiento.length; i++) {
         const element = datos_mantenimiento[i];
         if (element.id === elemento_mnt.id && element.anio === elemento_mnt.anio) {
@@ -933,14 +922,43 @@ function validar_dos_input_text(texto1, texto2) {
 }
 
 async function mdl_descargar_reportes_mensuales() {
-    const cont = document.getElementById("mesesContainer");
-    cont.innerHTML = "";
+    /* const meses = [
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
 
-    let año = mantenimientosPendientes[0].anio
-    $('#mdl-descargar-text').text(`Descargar reportes mensuales del año ${año}`)
+    function cargarMeses(mesesConDatos) {
+        const contenedor = document.getElementById("listaMeses");
+        contenedor.innerHTML = "";
 
+        meses.forEach((mes, index) => {
+            const btn = document.createElement("div");
+            btn.className = "btn-mes " + (mesesConDatos.includes(index + 1) ? "activo" : "");
 
-    consultar_reportes_mensuales()
+            btn.textContent = mes;
+            btn.onclick = () => {
+                if (mesesConDatos.includes(index + 1)) {
+                    descargarMes(index + 1);
+                }
+            };
+
+            contenedor.appendChild(btn);
+        });
+    }
+
+    // Ejemplo
+    cargarMeses([1, 2, 4, 7]); */
+
+    await general_select2({
+        selectId: 'select-anio-reporte',
+        tabla: 'mantenimiento',
+        campo: 'anio',
+        placeholder: 'Seleccione un año',
+        dropdownParent: '#mdl-descargar-reportes-mes',
+        tags: false,
+        // popoverTitle: "Descripción",
+        // popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
+    })
     $('#mdl-descargar-reportes-mes').modal('show')
 }
 
@@ -948,30 +966,12 @@ $(document).ready(function () {
     $('[data-toggle="popover"]').popover();
 })
 
-
-function consultar_reportes_mensuales() {
-    //console.log(mantenimientosPendientes[0])
-
-    let meses = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
-    let mesesConMantenimientos = Object.keys(mantenimientosPendientes[0].meses)
-    //console.log(meses)
-    //console.log(mesesConMantenimientos)
-
-    let mesesCompletados = meses.filter(elemento => !mesesConMantenimientos.includes(elemento)).map(Number)
-    //console.log(mesesCompletados)
-
-    cargarMeses(mesesCompletados)
-}
-
-
 const mesesNombres = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
 
 function cargarMeses(mesesDisponibles = []) {
-
-
     const cont = document.getElementById("mesesContainer");
     cont.innerHTML = "";
 
@@ -986,10 +986,9 @@ function cargarMeses(mesesDisponibles = []) {
             <div class="mes-nombre">${mes}</div>
             <div class="mes-status">${disponible ? "Disponible" : "No disponible"}</div>
         `;
-       
+
         if (disponible) {
-            let numeroMes = numMes.toString().padStart(2,'0') //Si es un digito, se añade un cero a la izquierda
-            card.onclick = () => descargarMes(numeroMes);
+            card.onclick = () => descargarMes(numMes);
         }
 
         cont.appendChild(card);
@@ -1122,27 +1121,3 @@ async function sidebar_programa_mantenimiento() {
     $("#control-sidebar").ControlSidebar('toggle');
 
 }
-
-
-async function descargarMes(mes) {
-    dominio = window.location.hostname
-    puerto = location.port
-    console.log("Descargando mes:", mes);
-    mantenimiento_loading = true
-    alert_cargando('Uniendo los reportes, por favor espere...')
-    let server = await server_mantenimiento({ accion: 5, anio: mantenimientosPendientes[0].anio, mes: mes })
-
-    if (server.resultado.mensaje) {
-        mostrar_toast('success', '¡Éxito!', server.resultado.mensaje)
-
-        let ruta = `${location.origin}${server.resultado.ruta}`;
-
-        window.open(ruta, '_blank');
-
-    } else if(server.resultado.error){
-        mostrar_toast('error', '¡Error!', server.resultado.mensaje)
-    }else{
-        mostrar_toast('error', '¡Error!', 'Hubo un problema')
-    }
-}
-

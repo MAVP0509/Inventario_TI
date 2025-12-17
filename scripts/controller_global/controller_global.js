@@ -337,10 +337,10 @@ $(document).ready(function () {
 });
 
 
-function alert_cargando(texto) {
+function alert_cargando() {
     Swal.fire({
         title: 'Cargando...',
-        text: texto ? texto : 'Por favor espere un momento',
+        text: 'Por favor espere un momento',
         allowOutsideClick: false,
         allowEscapeKey: false,
         heightAuto: false,
