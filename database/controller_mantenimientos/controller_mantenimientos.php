@@ -16,15 +16,7 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = validar_reporte_mismo_año($clientejson);
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = consultar_reporte($clientejson);
-<<<<<<< HEAD
-<<<<<<< HEAD
 } elseif ($clientejson->accion == 6) {
-=======
-} elseif ($clientejson->accion == 4) {
->>>>>>> parent of 399bd86 (Merge branch 'Miguel' into Janny)
-=======
-} elseif ($clientejson->accion == 4) {
->>>>>>> parent of 399bd86 (Merge branch 'Miguel' into Janny)
     $respuesta_servidor->resultado = guardar_programa($clientejson);
 }
 
@@ -201,73 +193,6 @@ function consultar_reporte($valores)
 
     return $respuesta;
 }
-
-/* function guardar_programa($valores)
-{
-
-    $respuesta = new stdClass();
-
-    if (isset($_FILES['reporte_programa']) && $_FILES['reporte_programa']['error'] === UPLOAD_ERR_OK) {
-        $nombreOriginal = $_FILES['reporte_programa']['name'];
-        $tmpPath = $_FILES['reporte_programa']['tmp_name'];
-
-        // Validar extensión .xlsx
-        $ext = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));
-        if ($ext !== 'pdf') {
-            $respuesta->error = "Tipo de archivo no permitido. Solo .pdf";
-            return $respuesta;
-        }
-
-        $base = realpath(__DIR__ . '/../../../documentos/mantenimiento/programa');
-
-        if ($base == false) {
-            return [
-                'result' => false,
-                'error' => 'No se encontro la ruta. Intentálo nuevamente.'
-            ];
-        }
-
-        $carpeta_anual = $base . DIRECTORY_SEPARATOR . $valores->anio;
-
-        if (!is_dir($carpeta_anual)) {
-            mkdir($carpeta_anual, 0777, true);
-        }
-
-        $i = 1;
-        do {
-            $nombre_final = $carpeta_anual . DIRECTORY_SEPARATOR . "{$i}.pdf";
-            $i++;
-        } while (file_exists($nombre_final));
-
-        //* Generar nombre único para evitar colisiones
-        // $nuevoNombre = date('Ymd_His') . '_' . $nombreOriginal;
-
-        //* Ruta de la carpeta
-        // $ruta = __DIR__ . '/../../documentos/mantenimiento/' . $valores->usuario;
-
-        //* Validando si el usuario ya tiene su carpeta o no
-        // if (is_dir($ruta)) {
-        //     //* Ruta destino, __DIR__ es carpeta donde está este script PHP
-        //     $destino = $ruta . '/' . $nuevoNombre;
-        // } else {
-        //     //* Creación de la carpeta
-        //     mkdir($ruta, 0777, true);
-
-        //     //* Ruta destino
-        //     $destino = $ruta . '/' . $nuevoNombre;
-        // }
-
-        if (move_uploaded_file($tmpPath, $nombre_final)) {
-            $respuesta->mensaje = "Archivo guardado correctamente";
-            //$respuesta->ruta = 'C:\\xampp\\htdocs\\Inventario_TI\\database\\controller_inventario\\' . $nuevoNombre;
-        } else {
-            $respuesta->error = "No se pudo mover el archivo.";
-        }
-    } else {
-        $respuesta->error = "No se recibió ningún archivo válido.";
-    }
-    return $respuesta;
-} */
 
 function guardar_programa($valores)
 {
