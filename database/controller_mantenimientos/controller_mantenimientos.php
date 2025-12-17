@@ -318,8 +318,6 @@ function unir_reportes_mantenimiento($valores)
 
         //$respuesta->mensaje = "Archivos unidos correctamente";
 
-
-
         $respuesta->ruta = $carpetaUrl;
     } catch (\Ilovepdf\Exceptions\AuthException $e) {
         $respuesta->error = "Error de autenticación Ilovepdf: " . $e->getMessage();
