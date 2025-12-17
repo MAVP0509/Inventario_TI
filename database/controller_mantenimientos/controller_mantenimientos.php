@@ -16,6 +16,10 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = validar_reporte_mismo_año($clientejson);
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = consultar_reporte($clientejson);
+} elseif ($clientejson->accion == 4) {
+    $respuesta_servidor->resultado = consultar_anio_mantenimiento($clientejson);
+} elseif ($clientejson->accion == 5) {
+    $respuesta_servidor->resultado = unir_reportes_mantenimiento($clientejson);
 } elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = guardar_programa($clientejson);
 }
@@ -242,7 +246,7 @@ function guardar_programa($valores)
     // Buscar nombre disponible (1.pdf, 2.pdf, 3.pdf...)
     $i = 1;
     do {
-         $nombre_final = $carpeta_anual . DIRECTORY_SEPARATOR . $i . '-' . $nombreLimpio . '.' . $extension;
+        $nombre_final = $carpeta_anual . DIRECTORY_SEPARATOR . $i . '-' . $nombreLimpio . '.' . $extension;
         $i++;
     } while (file_exists($nombre_final));
 
