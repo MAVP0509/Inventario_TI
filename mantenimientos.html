@@ -262,61 +262,64 @@
             padding: 10px;
         }
 
-        /* ---- CARD BASE (GLASSMORPHISM) ---- */
+        /* ---- CARD BASE (GLASSMORPHISM REAL) ---- */
         .mes-card {
             position: relative;
             padding: 20px;
-            border-radius: 16px;
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 20px;
+
+            backdrop-filter: blur(12px) saturate(160%);
+            background: rgba(255, 255, 255, 0.10);
+
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow:
+                0 4px 15px rgba(0, 0, 0, 0.1),
+                inset 0 0 20px rgba(255, 255, 255, 0.05);
+
             text-align: center;
             cursor: pointer;
             overflow: hidden;
             user-select: none;
             transition: all 0.4s ease;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-
-            z-index: 1;
         }
 
-        /* ---- DEGRADADO QUE SE RELLENA ---- */
+        /* ---- DEGRADADO FLUIDO (Hover Fill) ---- */
         .mes-card::before {
             content: "";
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, #4facfe, #00f2fe);
-            z-index: 0;
+            background: linear-gradient(135deg, #1666C5, #0D3D7D);
             opacity: 0;
             transform: scale(1.2);
             transition: opacity 0.45s ease, transform 0.45s ease;
+            z-index: 0;
         }
 
-        /* Hover: el degradado aparece y se acerca */
+        /* Hover: relleno degradado */
         .mes-card.disponible:hover::before {
             opacity: 1;
             transform: scale(1);
         }
 
-        /* ---- BORDE ANIMADO (Glow Border) ---- */
+        /* ---- BORDE ANIMADO PREMIUM ---- */
         .mes-card::after {
             content: "";
             position: absolute;
             inset: 0;
-            border-radius: 16px;
+            border-radius: inherit;
             padding: 2px;
-            background: linear-gradient(120deg,
-                    #4facfe,
-                    #00f2fe,
-                    #4facfe);
+            background: linear-gradient(120deg, #0D3D7D, #0A2A52, #0D3D7D);
             background-size: 300% 300%;
-            animation: bordeGlow 5s ease infinite;
+            animation: bordeGlow 6s ease infinite;
+
+            /* máscara para dejar el borde hueco */
             -webkit-mask:
                 linear-gradient(#fff 0 0) content-box,
                 linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             pointer-events: none;
+            z-index: 2;
         }
 
         @keyframes bordeGlow {
@@ -343,40 +346,37 @@
 
         .mes-nombre {
             font-size: 17px;
-            font-weight: 600;
-            color: white;
+            font-weight: 700;
+            color: #1a1a1a;
+            /* oscuro para que se vea siempre */
+            /* text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); */
         }
 
         .mes-status {
             margin-top: 8px;
-            font-size: 12px;
-            padding: 4px 10px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.20);
-            color: white;
+            font-size: 13px;
+            padding: 4px 12px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.10);
+            color: #1a1a1a;
+            font-weight: 500;
         }
 
-        /* ---- Hover: aumenta ligera escala ---- */
+        /* Hover: efecto de elevación del texto */
         .mes-card.disponible:hover .mes-nombre,
         .mes-card.disponible:hover .mes-status {
-            transform: translateY(-3px);
+            color: white;
         }
 
         /* ---- NO DISPONIBLE ---- */
         .mes-card.no-disponible {
             cursor: not-allowed;
-            opacity: 0.45;
-            filter: grayscale(40%);
+            opacity: 0.35;
+            filter: grayscale(60%);
         }
 
         .mes-card.no-disponible:hover::before {
             opacity: 0;
-            /* sin efecto */
-        }
-
-        .mes-card.no-disponible:hover .mes-nombre,
-        .mes-card.no-disponible:hover .mes-status {
-            transform: none;
         }
     </style>
 
@@ -922,7 +922,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title"><i class="fa-solid fa-download"></i>
-                        Descargar reportes mensuales
+                        <span id="mdl-descargar-text">Descargar reportes mensuales</span>
                     </h5>
                     <!-- <i class="fa-brands fa-optin-monster"></i> -->
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -933,14 +933,6 @@
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col">
-                                <h6>Año</h6>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
-                                    </div>
-                                    <select class="form-control select" id="select-anio-reporte"></select>
-
-                                </div>
                                 <div id="mesesContainer" class="meses-grid">
 
                                 </div>
