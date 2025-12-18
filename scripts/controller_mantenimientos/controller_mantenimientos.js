@@ -1085,19 +1085,14 @@ async function alert_programa(anio_programa) {
     }
 }
 
-$('#control-sidebar-programa').on('control-sidebar-slide', function () {
-    const año_programa = mantenimientosPendientes[0].anio;
-    programa_firmado(año_programa);
-});
-
 let estanque = null;
 let estanqueInicializado = false;
-async function programa_firmado(año_programa) {
-    // Mostrar alert si ya existe archivo
-    await alert_programa(año_programa);
+async function programa_firmado() {
 
-    // Inicializar FilePond si no se ha inicializado
     if (!estanqueInicializado) {
+
+        let año_programa = mantenimientosPendientes[0].anio;
+
         const input = document.getElementById("subir-programa");
 
         estanque = FilePond.create(input, {
@@ -1125,8 +1120,6 @@ async function programa_firmado(año_programa) {
                         } else {
                             mostrar_toast('success', '¡Carga exitosa!', data.resultado.mensaje);
                             estanque.removeFiles();
-                            // Reconsultamos si existe archivo para mostrar alert actualizado
-                            alert_programa(año_programa);
                         }
                     },
                     onerror: (err) => {
@@ -1141,4 +1134,3 @@ async function programa_firmado(año_programa) {
         estanque.removeFiles();
     }
 }
-
