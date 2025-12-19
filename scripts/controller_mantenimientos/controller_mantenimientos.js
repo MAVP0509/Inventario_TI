@@ -1037,17 +1037,16 @@ async function descargarMes(mes) {
 
 async function consultar_programa_firmado() {
 
-    // document.getElementById('alert-programa').style.display = 'none';
+    let año_programa = mantenimientosPendientes[0].anio;
 
     let model = {
         accion: 7,
-        anio: mantenimientosPendientes[0].anio
+        anio: año_programa
     }
 
     let server = await server_mantenimiento(model);
-    console.log(server);
+
     const PDF = document.getElementById('lista-pdfs');
-    // PDF.innerHTML = item;
 
     if (server.resultado.existe === true) {
         document.getElementById('alert-programa').style.display = 'block';
@@ -1078,8 +1077,7 @@ async function consultar_programa_firmado() {
     }
 
     document.getElementById('btn-open-programa').click();
-    // $('#control-sidebar-programa').controlSidebar('show');
-
+    
     programa_firmado();
 }
 
@@ -1088,8 +1086,6 @@ let estanqueInicializado = false;
 async function programa_firmado() {
 
     if (!estanqueInicializado) {
-
-        let año_programa = mantenimientosPendientes[0].anio;
 
         const input = document.getElementById("subir-programa");
 
@@ -1108,7 +1104,7 @@ async function programa_firmado() {
                     name: 'reporte_programa',
                     withCredentials: false,
                     ondata: (formData) => {
-                        formData.append('trama', JSON.stringify({ accion: 6, anio: año_programa }));
+                        formData.append('trama', JSON.stringify({ accion: 6, anio: mantenimientosPendientes[0].anio }));
                         return formData;
                     },
                     onload: (response) => {
