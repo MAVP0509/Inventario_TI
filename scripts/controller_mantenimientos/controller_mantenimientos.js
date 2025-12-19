@@ -1035,54 +1035,50 @@ async function descargarMes(mes) {
     }
 }
 
-async function verificar_programa(anio_programa) {
-    const model = {
-        accion: 8,
-        anio: anio_programa
-    };
+async function consultar_programa_firmado() {
 
-    try {
-        const resultado = await server_mantenimiento(model);
-        return resultado.resultado; // <- ojo, el JSON que devuelve tu PHP tiene 'resultado'
-    } catch (error) {
-        console.error("Error al consultar el programa:", error);
-        return { existe: false };
+    let model = {
+        accion: 7,
+        anio: mantenimientosPendientes[0].anio
     }
-}
 
-// let archivo;
-async function alert_programa(anio_programa) {
-    const archivo = await verificar_programa(anio_programa);
+    let server = await server_mantenimiento(model);
+    console.log(server);
+    const PDF = document.getElementById('lista-pdfs');
+    // PDF.innerHTML = item;
 
-    const alertDiv = document.getElementById("alert-reporte");
-    const archivoDiv = document.getElementById("archivo-reporte"); // contenedor donde pondremos el link
+    if (server.resultado.existe === true) {
+        document.getElementById('alert-programa').style.display = 'block';
 
-    if (archivo.existe) {
-        alertDiv.style.display = "flex"; // mostramos el alert
-
-        // Creamos el link al archivo
-        const rutaArchivo = `documentos/mantenimiento/programa/${anio_programa}/${archivo.archivo}`;
-        const ListElement = `
-            <li class="list-group-item p-2">
-                <div class="row">
-                    <div class="col-sm">
-                        <a href="${rutaArchivo}" target="_blank" class="text-decoration-none">
-                            ${archivo.archivo}
-                        </a>
-                        <br>
-                        <span style="font-size: 13px; color: #555;">
-                            Fecha de carga: ${archivo.fecha_subida || '-'}
-                        </span>
+        const ruta = server.resultado.url;
+        const nombreArchivo = server.resultado.archivo;
+        const item = `
+            <div class="card mb-2 shadow-sm" style="width: 100%;">
+                <div class="card-body d-flex align-items-center p-2">
+                    <div class="text-danger mr-3" style="font-size: 2rem;">
+                        <i class="fa-solid fa-file-pdf"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <strong>${nombreArchivo}</strong><br>
+                        
+                        <button type="button" class="btn btn-outline-dark btn-sm mt-1" onclick="window.open('${ruta}', '_blank')">
+                            <i class="fa-solid fa-eye"></i> Ver
+                        </button>
                     </div>
                 </div>
-            </li>
+            </div>
         `;
-        archivoDiv.innerHTML = ListElement;
 
+        PDF.innerHTML = item;
     } else {
-        alertDiv.style.display = "none"; // ocultamos el alert
-        archivoDiv.innerHTML = ''; // limpiamos si no hay archivo
+        document.getElementById('alert-programa').style.display = 'none';
+        PDF.innerHTML = '';
     }
+
+    document.getElementById('btn-open-programa').click();
+    // $('#control-sidebar-programa').controlSidebar('show');
+
+    programa_firmado();
 }
 
 let estanque = null;

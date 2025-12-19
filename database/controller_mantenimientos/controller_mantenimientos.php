@@ -28,9 +28,7 @@ if ($clientejson->accion == 0) {
 } elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = guardar_programa($clientejson);
 } elseif ($clientejson->accion == 7) {
-    $respuesta_servidor->resultado = existe_programa($clientejson);
-} elseif ($clientejson->accion == 8) {
-    $respuesta_servidor->resultado = consultar_programa($clientejson);
+    $respuesta_servidor->resultado = consultar_programa_firmado($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -274,52 +272,45 @@ function guardar_programa($valores)
     return $respuesta;
 }
 
-function existe_programa($valores)
+function consultar_programa_firmado($valores)
 {
-    $respuesta = new stdClass();
+    $base = realpath(__DIR__ . '/../../Documentos/mantenimiento/programa');
 
-    $base = realpath(__DIR__ . '/../../documentos/mantenimiento/programa');
-    $carpeta = $base . DIRECTORY_SEPARATOR . $valores->anio;
-
-    $respuesta->existe = false;
-    $respuesta->archivo = null;
-
-    if (is_dir($carpeta)) {
-        $archivos = glob($carpeta . DIRECTORY_SEPARATOR . '*.pdf');
-        if (!empty($archivos)) {
-            $respuesta->existe = true;
-            $respuesta->archivo = basename($archivos[0]);
-        }
+    if ($base === false) {
+        return [
+            "existe" => false
+        ];
     }
 
-    return $respuesta;
-}
-
-function consultar_programa($valores)
-{
-    $respuesta = new stdClass();
-
-    // Ruta base
-    $base = realpath(__DIR__ . '/../../documentos/mantenimiento/programa');
     $carpeta = $base . DIRECTORY_SEPARATOR . $valores->anio;
 
-    $respuesta->existe = false;
-    $respuesta->archivo = null;
-    $respuesta->ruta = null;
-
-    if (is_dir($carpeta)) {
-        $archivos = glob($carpeta . DIRECTORY_SEPARATOR . '*.pdf');
-        if (!empty($archivos)) {
-            $archivo = basename($archivos[0]);
-            $ruta_relativa = "documentos/mantenimiento/programa/{$valores->anio}/{$archivo}";
-
-            $respuesta->existe = true;
-            $respuesta->archivo = $archivo;
-            $respuesta->ruta = $ruta_relativa;
-        }
+    if (!is_dir($carpeta)) {
+        return [
+            "existe" => false
+        ];
     }
 
-    return $respuesta;
+    $archivos = glob($carpeta . DIRECTORY_SEPARATOR . '*.pdf');
+
+    if (!empty($archivos)) {
+
+        $archivo = basename($archivos[0]);
+
+        $host = $_SERVER['HTTP_HOST'];
+        $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+
+        $url = "{$protocolo}://{$host}/Inventario_TI/Documentos/mantenimiento/programa/{$valores->anio}/{$archivo}";
+
+        return [
+            "existe" => true,
+            "archivo" => $archivo,
+            "url" => $url
+        ];
+    }
+
+    return [
+        "existe" => false
+    ];
 }
 
 function consultar_anio_mantenimiento()
