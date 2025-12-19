@@ -1037,6 +1037,8 @@ async function descargarMes(mes) {
 
 async function consultar_programa_firmado() {
 
+    // document.getElementById('alert-programa').style.display = 'none';
+
     let model = {
         accion: 7,
         anio: mantenimientosPendientes[0].anio

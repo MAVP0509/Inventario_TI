@@ -572,16 +572,41 @@
                     <!-- Contenedor para subir archivos -->
                     <div class="mb-3">
                         <label for="subir-pdf">Subir PDF</label>
-                        <div class="alert alert-danger d-flex align-items-center" role="alert"
-                            style="display:none; background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;"
-                            id="alert-programa">
-                            <div style="margin-right: 15px; display: flex; align-items: center; flex-shrink: 0;">
-                                <i class="fa-solid fa-triangle-exclamation fa-2xl"></i>
+
+                        <div class="alert alert-info" role="alert"
+                            style="color:#0c5460; background-color:#d1ecf1; border-color:#bee5eb;">
+
+                            <div style="display:flex; align-items:center; gap:15px; padding-right:3rem;">
+                                <i class="fa-solid fa-circle-info fa-2xl flex-shrink-0"></i>
+
+                                <div style="line-height:1.4;">
+                                    El documento se subirá al año seleccionado actualmente. Para registrarlo en un año
+                                    diferente, cierre este panel y cambie el filtro de año.
+                                </div>
                             </div>
-                            <span style="line-height: 1.4;">El activo ya tiene el reporte de este año, si sube
-                                uno, reemplazará el ya existente y no será reversible
-                            </span>
+
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"
+                                style="position:absolute; top:20%; right:1rem; transform:translateY(-50%);">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                         </div>
+
+
+                        <div class="alert alert-warning align-items-center" role="alert" id="alert-programa"
+                            style="color: #856404; background-color: #fff3cd; border-color: #ffeeba; padding-right: 4rem;">
+
+                            <div style="display:flex; align-items:center;">
+                                <div style="margin-right:15px; flex-shrink:0;">
+                                    <i class="fa-solid fa-triangle-exclamation fa-2xl"></i>
+                                </div>
+
+                                <div style="line-height:1.4;">
+                                    <strong>Atención:</strong> Ya existe un reporte de este año.
+                                    Al subir uno nuevo, se reemplazará de forma permanente.
+                                </div>
+                            </div>
+                        </div>
+
                         <div id="contenedor-filepond-programa">
                             <input type="file" id="subir-programa" name="reporte_programa" accept="application/pdf">
                         </div>
