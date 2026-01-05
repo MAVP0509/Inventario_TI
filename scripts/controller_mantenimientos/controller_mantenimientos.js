@@ -238,11 +238,7 @@ async function consultar_informacion(anio) {
                 !excluir.includes(d.estado)
             ).length;
 
-
-
-
             return `${fecha.toLocaleDateString('es-ES', opciones)} (${pendientes} mantenimientos pendientes)`;
-
 
         },
         groupStartOpen: false,

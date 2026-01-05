@@ -8,7 +8,7 @@ $clientejson = json_decode($_POST['trama']);
 $respuesta_servidor = new stdClass();
 
 if ($clientejson->accion == 0) {
-    $respuesta_servidor->resultado = consultar_datos($clientejson);
+    $respuesta_servidor->resultado = consultar_auditoria($clientejson);
 } elseif ($clientejson->accion == 1) {
     $respuesta_servidor->resultado = guardar_reportes($clientejson);
 } elseif ($clientejson->accion == 2) {
@@ -26,3 +26,31 @@ if ($clientejson->accion == 0) {
 }
 
 print(json_encode($respuesta_servidor));
+
+function consultar_auditoria($valores)
+{
+    include("../conexion.php");
+
+    $sql = "SELECT * FROM vauditoria WHERE anio = '$valores->anio' ORDER BY fecha ASC";
+    $query = mysqli_query($con, $sql);
+
+    $datos = [];
+    while ($fila = mysqli_fetch_object($query)) {
+        $datos[] = $fila;
+    }
+
+    return $datos;
+}
+
+function consultar_anio_auditoria()
+{
+    include("../conexion.php");
+
+    $sql = "SELECT MAX(anio) AS anio FROM auditoria";
+    //$sql = "SELECT * FROM auditoria";
+    $query = mysqli_query($con, $sql);
+
+    $fila = mysqli_fetch_object($query);
+
+    return $fila;
+}
