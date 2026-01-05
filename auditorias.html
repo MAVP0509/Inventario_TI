@@ -64,7 +64,7 @@
 
 </head>
 
-<body class="hold-transition sidebar-mini layout-fixed" onload="load()">
+<body class="hold-transition sidebar-mini layout-fixed">
 
     <div class="wrapper">
 
@@ -145,7 +145,7 @@
                                         <button type="button" style="text-align: center" data-toggle="popover"
                                             data-trigger="hover" data-html="true" data-placement="bottom"
                                             data-content="Baja de activo" class="btn bg-gray-dark rounded icon mr-3"
-                                            onclick=""><i class="fa-solid fa-file-invoice"></i> Programar auditoria
+                                            onclick="mdl_programar_auditoria()"><i class="fa-solid fa-file-invoice"></i> Programar auditoria
                                         </button>
                                         <button type="button" class="btn btn-lg btn-outline-success mr-3 icon"
                                             data-toggle="popover" data-trigger="hover" data-html="true"
@@ -190,7 +190,7 @@
                 <button type="button" class="btn btn-outline-danger icon"><i class="fa-solid fa-xmark"></i></button> -->
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h4 class="mb-0">
-                            <i class="fa-solid fa-file-arrow-up"></i> Subir reporte de mantenimiento
+                            <i class="fa-solid fa-file-arrow-up"></i> Subir reporte de auditoria
                         </h4>
                         <button type="button" class="btn btn-danger icon" data-widget="control-sidebar"
                             data-slide="true" onclick="remover_archivo()">
@@ -222,20 +222,83 @@
                         </div>
                     </div>
                 </div>
-
-
             </aside>
+
+            <!-- Control sidebar programa auditoria -->
+            <aside class="control-sidebar control-sidebar-light" id="control-sidebar-pauditoria"
+                style="width: 450px !important;">
+                <div class="p-3 control-sidebar-content d-flex flex-column h-100 overflow-hidden">
+
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="mb-0">
+                            <i class="fa-solid fa-file-signature"></i> Programa de auditotia firmado
+                        </h4>
+                        <button type="button" class="btn btn-danger icon" data-widget="control-sidebar"
+                            data-slide="true">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                    <hr class="mb-3">
+
+                    <!-- Contenedor para subir archivos -->
+                    <div class="mb-3">
+                        <label for="subir-pdf">Subir PDF</label>
+
+                        <div class="alert alert-info" role="alert"
+                            style="color:#0c5460; background-color:#d1ecf1; border-color:#bee5eb;">
+
+                            <div style="display:flex; align-items:center; gap:15px; padding-right:3rem;">
+                                <i class="fa-solid fa-circle-info fa-2xl flex-shrink-0"></i>
+
+                                <div style="line-height:1.4;">
+                                    El documento se subirá al año seleccionado actualmente. Para registrarlo en un año
+                                    diferente, cierre este panel y cambie el filtro de año.
+                                </div>
+                            </div>
+
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"
+                                style="position:absolute; top:20%; right:1rem; transform:translateY(-50%);">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+
+                        <div class="alert alert-warning align-items-center" role="alert" id="alert-pauditoria"
+                            style="color: #856404; background-color: #fff3cd; border-color: #ffeeba; padding-right: 4rem;">
+
+                            <div style="display:flex; align-items:center;">
+                                <div style="margin-right:15px; flex-shrink:0;">
+                                    <i class="fa-solid fa-triangle-exclamation fa-2xl"></i>
+                                </div>
+
+                                <div style="line-height:1.4;">
+                                    <strong>Atención:</strong> Ya existe un programa de este año.
+                                    Al subir uno nuevo, se reemplazará de forma permanente.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="contenedor-filepond-pauditoria">
+                            <input type="file" id="subir-pauditoria" name="reporte_pauditoria" accept="application/pdf">
+                        </div>
+                        <div id="lista-pdfs-pauditoria" class="overflow-auto"
+                            style="flex:1; border-top:1px solid #ccc; padding-top:10px;">
+                        </div>
+                    </div>
+                </div>
+            </aside> <!-- sidebar programa auditoria -->
         </div>
 
     </div>
 
-    <!--Modal programar mantenimiento -->
-    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-prog-mant" role="dialog" data-backdrop="static"
+    <!--Modal programar auditoria -->
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-prog-aud" role="dialog" data-backdrop="static"
         data-keyboard="false">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Programar mantenimiento</h5>
+                    <h5 class="modal-title">Programar auditoria</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -249,7 +312,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                                     </div>
-                                    <select class="form-control select" id="select-elaboro"
+                                    <select class="form-control select" id="elaboro-aud"
                                         name="inp-prog-mant"></select>
                                     <div class="invalid-feedback">Por favor, seleccione una persona.</div>
                                 </div>
@@ -258,7 +321,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                                     </div>
-                                    <select class="form-control select" id="select-cg-elaboro"
+                                    <select class="form-control select" id="cg-elaboro-aud"
                                         name="inp-prog-mant"></select>
                                     <div class="invalid-feedback">Por favor, seleccione una persona.</div>
                                 </div>
@@ -267,7 +330,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                                     </div>
-                                    <select class="form-control select" id="select-autorizo"
+                                    <select class="form-control select" id="autorizo-aud"
                                         name="inp-prog-mant"></select>
                                     <div class="invalid-feedback">Por favor, seleccione una persona.</div>
                                 </div>
@@ -276,7 +339,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                                     </div>
-                                    <select class="form-control select" id="select-cg-autorizo"
+                                    <select class="form-control select" id="cg-autorizo-aud"
                                         name="inp-prog-mant"></select>
                                     <div class="invalid-feedback">Por favor, seleccione una persona.</div>
                                 </div>
@@ -288,9 +351,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cancelar <i
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="btn-can-aud">Cancelar <i
                             class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
-                    <button type="button" class="btn btn-success icon" id="mdl-btn-conf">Confirmar <i
+                    <button type="button" class="btn btn-success icon" id="btn-conf-aud">Confirmar <i
                             class="fa-solid fa-circle-check fa-lg"></i></button>
                 </div>
             </div>
@@ -573,9 +636,9 @@
 
 <!--Scripts-->
 <script src="scripts/controller_acceso/controller_acceso.js?v=1.0.1" defer></script>
-<script src="scripts/controller_global/controller_global.js?v=1.0.2" defer></script>
-<script src="scripts/controller_conf_tipo_mantenimiento/controller_conf_tipo_mantenimiento.js" defer></script>
-<script src="scripts/controller_mantenimientos/controller_mantenimientos.js?v=1.0.0" defer></script>
+<script src="scripts/controller_global/controller_global.js" defer></script>
+<script src="scripts/controller_conf_tipo_auditoria/controller_conf_tipo_auditoria.js" defer></script>
+<script src="scripts/controller_auditoria/controller_auditoria.js?v=1.0.0" defer></script>
 
 
 </html>

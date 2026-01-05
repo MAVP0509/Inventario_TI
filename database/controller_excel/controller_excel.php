@@ -30,6 +30,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = programa_mantenimiento($clientejson);
 } elseif ($clientejson->accion == 4) {
     $respuesta_servidor->resultado = reporte_mantenimiento($clientejson);
+} elseif ($clientejson->accion == 5) {
+    $respuesta_servidor->resultado = programa_auditoria($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -439,7 +441,7 @@ function fecha_programa($anio, $mes)
     return $fecha->format('Y-m-d');
 }
 
-function ConsultarOrdenMTTO()
+/* function ConsultarOrdenMTTO()
 {
     include('../conexion.php');
     $sql_dis = "SELECT tipo_id FROM vorden_mantenimiento";
@@ -453,7 +455,7 @@ function ConsultarOrdenMTTO()
         array_push($datos, $filas->tipo_id);
     }
     return $datos;
-}
+} */
 
 function programa_mantenimiento($valores)
 {
@@ -763,7 +765,7 @@ function programa_auditoria($valores)
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
     $anio_actual = date("Y") + 1;
-    $sql_dev = "SELECT tipo_id FROM vorden_mantenimiento";
+    $sql_dev = "SELECT tipo_id FROM vorden_auditoria";
     $query_dev = mysqli_query($con, $sql_dev);
 
     $datos_dev = [];
@@ -776,12 +778,12 @@ function programa_auditoria($valores)
     if (empty($dev)) {
         return [
             'result' => false,
-            'error' => 'No hay un orden de mantenimiento de dispositivos. Específica un orden en la configuración.'
+            'error' => 'No hay un orden de auditoria de dispositivos. Específica un orden en la configuración.'
         ];
     }
 
     // Consulta SQL que obtiene todos los registros de la vista, en un orden específico según ID
-    $sql_inv = "CALL pprograma_mantenimiento('$dev', '$dev')";
+    $sql_inv = "CALL pprogramar_auditoria('$dev', '$dev')";
     // var_dump($sql_inv);
     $query = mysqli_query($con, $sql_inv);
 
@@ -807,12 +809,12 @@ function programa_auditoria($valores)
         $fecha_programada = fecha_programa($anio_actual, $mes);
         //  Se saca el residuo al dividir $i entre 12, 
         //  a su vez añadiendo un nuevo campo al $dispositivo llamado mes_index,
-        //  indicando en qué mes le tocará mantenimiento.
+        //  indicando en qué mes le tocará auditoria.
         $dispositivo['mes_index'] = $i % 12;
         $id_equipo = $dispositivo['id_equipo'];
         $estado = 'Pendiente';
 
-        $sql_insert = "INSERT INTO mantenimiento(id_equipo, anio, fecha_programada, estado, correo_enviado, reporte_descargado,reporte_subido)
+        $sql_insert = "INSERT INTO auditoria(id_equipo, anio, fecha_programada, estado, correo_enviado, reporte_descargado,reporte_subido)
                         VALUES ('$id_equipo','$anio_actual', '$fecha_programada', '$estado',0,0,0)";
 
         try {
@@ -821,7 +823,7 @@ function programa_auditoria($valores)
             if ($e->getCode() == 1062) {
                 return array(
                     'result' => false,
-                    'error' => 'Ya existe un programa de mantenimiento para el año'
+                    'error' => 'Ya existe un programa de auditoria para el año'
                 );
             }
         }
@@ -836,7 +838,7 @@ function programa_auditoria($valores)
     });
 
     // Carga la plantilla Excel base del programa de mantenimiento
-    $spreadsheet = IOFactory::load('FO-DSP-TI-03 Programa de Mantenimiento Preventivo Infraestructura TI Región XX Rev.00.xlsx');
+    $spreadsheet = IOFactory::load('FO-DSP-TI-04 Programa de Auditoria de Herramientas de Trabajo Región XX Rev.00.xlsx');
     $worksheet = $spreadsheet->getActiveSheet(); // Obtiene la hoja activa
 
     $pageSetup = $worksheet->getPageSetup();
@@ -883,7 +885,9 @@ function programa_auditoria($valores)
         // Marca con una 'x' el mes correspondiente al mantenimiento
         $mes_index = $item['mes_index'];
         $columna_mes = $meses_columnas[$mes_index];
-        $worksheet->setCellValue("{$columna_mes}{$fila_inicio}", 'x');
+        $celda = "{$columna_mes}{$fila_inicio}";
+        $worksheet->setCellValue($celda, 'x');
+        $worksheet->getStyle($celda)->getFont()->setBold(true);
 
         $fila_inicio++; // Pasa a la siguiente fila
     }
@@ -893,7 +897,7 @@ function programa_auditoria($valores)
 
     // Escribe los nombres de quien elaboró y autorizó
     $worksheet->setCellValue("C$nombres", $valores->elaboro);
-    $worksheet->setCellValue("G$nombres", $valores->autorizo);
+    $worksheet->setCellValue("I$nombres", $valores->autorizo);
     $worksheet->getStyle("C$nombres")->getAlignment()->setWrapText(true); // Ajuste de texto
 
     // Calcula la fila donde van los cargos
@@ -901,11 +905,11 @@ function programa_auditoria($valores)
 
     // Escribe los cargos correspondientes
     $worksheet->setCellValue("C$cargos", $valores->cg_elaboro);
-    $worksheet->setCellValue("G$cargos", $valores->cg_autorizo);
+    $worksheet->setCellValue("I$cargos", $valores->cg_autorizo);
     $worksheet->getStyle("C$cargos")->getAlignment()->setWrapText(true);
 
     // Calcula la fila de la fecha
-    $fechas = $fila_fecha + ($filas - 3);
+    $fechas = $fila_fecha + ($filas - 2);
     $worksheet->setCellValue("D$fechas", date('Y-m-d'));
     $worksheet->getStyle("C$fechas")->getAlignment()->setWrapText(true);
 
@@ -914,13 +918,13 @@ function programa_auditoria($valores)
 
     if ($base !== false) {
         $fecha = date('Ymd_His'); // Genera una marca de tiempo para el nombre del archivo
-        $nombre_doc = "FO-DSP-TI-03_Programa de Mantenimiento Preventivo TI Región Sur_{$fecha}.xlsx"; // Nombre del archivo generado
+        $nombre_doc = "FO-DSP-TI-04_Programa de Auditoria de Herramientas de Trabajo Región Sur_{$fecha}.xlsx"; // Nombre del archivo generado
         // Define la ruta física donde se guardará el archivo, basada en la estructura del proyecto
-        $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . 'documentos_descarga' . DIRECTORY_SEPARATOR . 'mantenimiento' . DIRECTORY_SEPARATOR . 'programa' . DIRECTORY_SEPARATOR . $nombre_doc;
+        $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . 'documentos_descarga' . DIRECTORY_SEPARATOR . 'auditoria' . DIRECTORY_SEPARATOR . 'programa' . DIRECTORY_SEPARATOR . $nombre_doc;
         $host = $_SERVER['HTTP_HOST'];
         $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
         // Construye la URL de descarga del archivo generado
-        $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/mantenimiento/programa/{$nombre_doc}";
+        $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/auditoria/programa/{$nombre_doc}";
         // Crea y guarda el archivo Excel
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->save($ruta_guardar); // Guarda el archivo en la ruta definida
@@ -934,7 +938,7 @@ function programa_auditoria($valores)
     } else {
         return [
             'result' => false,
-            'error' => 'No se pudo realizar el programa de mantenimiento. Inténtalo nuevamente.'
+            'error' => 'No se pudo realizar el programa de auditoria. Inténtalo nuevamente.'
         ];
     }
 }
