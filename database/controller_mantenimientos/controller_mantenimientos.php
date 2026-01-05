@@ -9,6 +9,13 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 use Ilovepdf\Ilovepdf;
 
+//*La funcion de unir pdfs puede tardar mas de dos minutos, es necesario aumentar ese tiempo
+set_time_limit(300);
+ini_set('max_execution_time', 300);
+
+
+
+
 $clientejson = json_decode($_POST['trama']);
 
 $respuesta_servidor = new stdClass();
@@ -345,7 +352,14 @@ function unir_reportes_mantenimiento($valores)
     //var_dump("hola");
 
     try {
-        $ilovepdf = new Ilovepdf('project_public_ecd8df30001f3773a605a14a2c0416c9_I--AV17bdca45d44f5b70e44a9960a810a1ab', 'secret_key_181ece80f4c57be30267facf2f3890af_TcklQ6a753e75d95f5b32aef79aac42c0d33c');
+        $ilovepdf = new Ilovepdf(
+            'project_public_ecd8df30001f3773a605a14a2c0416c9_I--AV17bdca45d44f5b70e44a9960a810a1ab',
+            'secret_key_181ece80f4c57be30267facf2f3890af_TcklQ6a753e75d95f5b32aef79aac42c0d33c',
+            [
+                'timeout' => 300,
+                'connect_timeout' => 60
+            ]
+        );
         // Create a new task
         $myTaskMerge = $ilovepdf->newTask('merge');
         // Add files to task for upload
