@@ -9,7 +9,6 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 use Ilovepdf\Ilovepdf;
 
-
 $clientejson = json_decode($_POST['trama']);
 
 $respuesta_servidor = new stdClass();
@@ -26,6 +25,10 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_anio_mantenimiento($clientejson);
 } elseif ($clientejson->accion == 5) {
     $respuesta_servidor->resultado = unir_reportes_mantenimiento($clientejson);
+} elseif ($clientejson->accion == 6) {
+    $respuesta_servidor->resultado = guardar_programa($clientejson);
+} elseif ($clientejson->accion == 7) {
+    $respuesta_servidor->resultado = consultar_programa_firmado($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -44,11 +47,8 @@ function consultar_datos($valores)
     while ($fila = mysqli_fetch_object($query)) {
         array_push($array, $fila);  //* Se guardan los registros en un array
     }
-    if ($query) {
-        return $array;
-    } else {
-        return false;
-    }
+
+    return $array;
 }
 
 function consultar_orden()
@@ -205,6 +205,113 @@ function consultar_reporte($valores)
     return $respuesta;
 }
 
+function guardar_programa($valores)
+{
+    $respuesta = new stdClass();
+
+    // Validar archivo
+    if (
+        !isset($_FILES['reporte_programa']) ||
+        $_FILES['reporte_programa']['error'] !== UPLOAD_ERR_OK
+    ) {
+        $respuesta->error = "No se recibió ningún archivo válido.";
+        return $respuesta;
+    }
+
+    $archivo = $_FILES['reporte_programa'];
+
+    $nombreOriginal = pathinfo($archivo['name'], PATHINFO_FILENAME);
+    $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
+    $tmpPath = $archivo['tmp_name'];
+
+    if ($extension !== 'pdf') {
+        $respuesta->error = "Tipo de archivo no permitido. Solo PDF.";
+        return $respuesta;
+    }
+
+    // Limpiar nombre (mantiene el nombre original)
+    $nombreLimpio = preg_replace('/[^A-Za-z0-9._-]/', '_', $nombreOriginal);
+
+    // Ruta base
+    $base = realpath(__DIR__ . '/../../documentos/mantenimiento/programa');
+    if ($base === false) {
+        $respuesta->error = "No se encontró la ruta base.";
+        return $respuesta;
+    }
+
+    // Carpeta por año
+    $carpeta_anual = $base . DIRECTORY_SEPARATOR . $valores->anio;
+
+    if (!is_dir($carpeta_anual)) {
+        if (!mkdir($carpeta_anual, 0755, true)) {
+            $respuesta->error = "No se pudo crear la carpeta del año.";
+            return $respuesta;
+        }
+    }
+
+    // Eliminar PDF existente
+    foreach (glob($carpeta_anual . DIRECTORY_SEPARATOR . '*.pdf') as $pdfExistente) {
+        unlink($pdfExistente);
+    }
+
+    // Nombre siempre con fecha actual
+    $fecha = date('Ymd');
+    $archivo_final = $carpeta_anual
+        . DIRECTORY_SEPARATOR
+        . $nombreLimpio . '_' . $fecha . '.pdf';
+
+    // Guardar archivo
+    if (move_uploaded_file($tmpPath, $archivo_final)) {
+        $respuesta->mensaje = "Archivo guardado correctamente.";
+        $respuesta->ruta_guardada = basename($archivo_final);
+        $respuesta->fecha_subida = $fecha;
+    } else {
+        $respuesta->error = "No se pudo guardar el archivo.";
+    }
+
+    return $respuesta;
+}
+
+function consultar_programa_firmado($valores)
+{
+    $base = realpath(__DIR__ . '/../../Documentos/mantenimiento/programa');
+
+    if ($base === false) {
+        return [
+            "existe" => false
+        ];
+    }
+
+    $carpeta = $base . DIRECTORY_SEPARATOR . $valores->anio;
+
+    if (!is_dir($carpeta)) {
+        return [
+            "existe" => false
+        ];
+    }
+
+    $archivos = glob($carpeta . DIRECTORY_SEPARATOR . '*.pdf');
+
+    if (!empty($archivos)) {
+
+        $archivo = basename($archivos[0]);
+
+        $host = $_SERVER['HTTP_HOST'];
+        $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+
+        $url = "{$protocolo}://{$host}/Inventario_TI/Documentos/mantenimiento/programa/{$valores->anio}/{$archivo}";
+
+        return [
+            "existe" => true,
+            "archivo" => $archivo,
+            "url" => $url
+        ];
+    }
+
+    return [
+        "existe" => false
+    ];
+}
 
 function consultar_anio_mantenimiento()
 {
@@ -216,16 +323,11 @@ function consultar_anio_mantenimiento()
 
     $fila = mysqli_fetch_object($query);
 
-
     return $fila;
 }
 
-
 function unir_reportes_mantenimiento($valores)
 {
-
-
-
     $respuesta = new stdClass();
 
     $carpeta_reporte =  __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->anio . '/reportes_unidos';
@@ -248,8 +350,6 @@ function unir_reportes_mantenimiento($valores)
         $myTaskMerge = $ilovepdf->newTask('merge');
         // Add files to task for upload
 
-
-
         $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->anio . '/' . $valores->mes;
 
         //var_dump($carpeta);
@@ -257,8 +357,6 @@ function unir_reportes_mantenimiento($valores)
             $respuesta->error = "No se pudo encontrar la ruta";
             return $respuesta;
         }
-
-
 
         $archivos = array_diff(scandir($carpeta), ['.', '..']);
 

@@ -148,7 +148,7 @@ async function consultar_informacion(anio) {
         const data = cell.getRow().getData()
         const disabled = data.reporte_descargado == 0 ? "disabled" : ""
 
-        return `<button type='button' class='btn btn-info icon' ${disabled} data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' data-widget="control-sidebar" data-slide="true" ><i class='fa-solid fa-upload fa-lg'></i></button>`;
+        return `<button type='button' class='btn btn-info icon' ${disabled} data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' data-widget="control-sidebar" data-slide="true" data-target="#control-sidebar"><i class='fa-solid fa-upload fa-lg'></i></button>`;
     }
 
     let fileIcon = function (cell, formatterParams, onRendered) { //plain text value
@@ -393,6 +393,9 @@ async function consultar_informacion(anio) {
 
 }
 
+// console.log(mantenimientosPendientes);
+
+
 async function mdl_programar_mantenimiento() {
 
     await Promise.all([
@@ -486,8 +489,13 @@ async function programar_mantenimiento() {
         mostrar_toast('error', '¡Error!', 'Ya existe un programa de mantenimiento para el año');
         $('#mdl-prog-mant').modal("hide");
     } */
+    // console.log(mantenimientosPendientes);
+
 
 }
+
+// console.log(mantenimientosPendientes);
+
 
 let selecreg
 async function mdl_mantenimiento_info(elemento_mnt) {
@@ -597,6 +605,8 @@ async function mdl_mantenimiento_info(elemento_mnt) {
     }
 
     $('#mdl-mant-info').modal("show")
+    console.log(mantenimientosPendientes);
+
 }
 
 async function mdl_reporte_mantenimiento(elemento_mnt) {
@@ -993,16 +1003,15 @@ function cargarMeses(mesesDisponibles = []) {
             <div class="mes-nombre">${mes}</div>
             <div class="mes-status">${disponible ? "Disponible" : "No disponible"}</div>
         `;
-       
+
         if (disponible) {
-            let numeroMes = numMes.toString().padStart(2,'0') //Si es un digito, se añade un cero a la izquierda
+            let numeroMes = numMes.toString().padStart(2, '0') //Si es un digito, se añade un cero a la izquierda
             card.onclick = () => descargarMes(numeroMes);
         }
 
         cont.appendChild(card);
     });
 }
-
 
 async function descargarMes(mes) {
     dominio = window.location.hostname
@@ -1019,10 +1028,103 @@ async function descargarMes(mes) {
 
         window.open(ruta, '_blank');
 
-    } else if(server.resultado.error){
+    } else if (server.resultado.error) {
         mostrar_toast('error', '¡Error!', server.resultado.mensaje)
-    }else{
+    } else {
         mostrar_toast('error', '¡Error!', 'Hubo un problema')
     }
 }
 
+async function consultar_programa_firmado() {
+
+    let año_programa = mantenimientosPendientes[0].anio;
+
+    let model = {
+        accion: 7,
+        anio: año_programa
+    }
+
+    let server = await server_mantenimiento(model);
+
+    const PDF = document.getElementById('lista-pdfs');
+
+    if (server.resultado.existe === true) {
+        document.getElementById('alert-programa').style.display = 'block';
+
+        const ruta = server.resultado.url;
+        const nombreArchivo = server.resultado.archivo;
+        const item = `
+            <div class="card mb-2 shadow-sm" style="width: 100%;">
+                <div class="card-body d-flex align-items-center p-2">
+                    <div class="text-danger mr-3" style="font-size: 2rem;">
+                        <i class="fa-solid fa-file-pdf"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <strong>${nombreArchivo}</strong><br>
+                        
+                        <button type="button" class="btn btn-outline-dark btn-sm mt-1" onclick="window.open('${ruta}', '_blank')">
+                            <i class="fa-solid fa-eye"></i> Ver
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        PDF.innerHTML = item;
+    } else {
+        document.getElementById('alert-programa').style.display = 'none';
+        PDF.innerHTML = '';
+    }
+
+    document.getElementById('btn-open-programa').click();
+    
+    programa_firmado();
+}
+
+let estanque = null;
+let estanqueInicializado = false;
+async function programa_firmado() {
+
+    if (!estanqueInicializado) {
+
+        const input = document.getElementById("subir-programa");
+
+        estanque = FilePond.create(input, {
+            maxFiles: 1,
+            acceptedFileTypes: ['application/pdf'],
+            labelIdle: 'Arrastre y suelta un archivo .pdf o <span class="filepond--label-action"> Examina </span>',
+            allowMultiple: false,
+            dropOnPage: false,
+            instantUpload: false,
+            labelFileTypeNotAllowed: 'Archivo no válido solo .pdf',
+            server: {
+                process: {
+                    url: "database/controller_mantenimientos/controller_mantenimientos.php",
+                    method: "POST",
+                    name: 'reporte_programa',
+                    withCredentials: false,
+                    ondata: (formData) => {
+                        formData.append('trama', JSON.stringify({ accion: 6, anio: mantenimientosPendientes[0].anio }));
+                        return formData;
+                    },
+                    onload: (response) => {
+                        let data = JSON.parse(response);
+                        if (data.resultado.error) {
+                            mostrar_toast('error', '¡Error!', data.resultado.error);
+                        } else {
+                            mostrar_toast('success', '¡Carga exitosa!', data.resultado.mensaje);
+                            estanque.removeFiles();
+                        }
+                    },
+                    onerror: (err) => {
+                        console.error('Error al subir: ', err);
+                    }
+                }
+            }
+        });
+
+        estanqueInicializado = true;
+    } else {
+        estanque.removeFiles();
+    }
+}

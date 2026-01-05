@@ -468,24 +468,315 @@ function programa_mantenimiento($valores)
     while ($filas = mysqli_fetch_object($query_dev)) {
         $datos_dev[] = $filas->tipo_id;
     }
-
-    /* $sql_orden = "SELECT orden FROM vorden_mantenimiento ORDER BY orden";
-    $query_orden = mysqli_query($con, $sql_orden);
-
-    $datos_orden = [];
-    while ($filas = mysqli_fetch_object($query_orden)) {
-        $datos_orden[] = "'".$filas->orden."'";
-    } */
     // var_dump($datos_dev);
     $dev = implode(',', $datos_dev);
-    // var_dump($dev);
-    // $orden = implode(',', $datos_orden);
-    // var_dump($tipos_ordenados);
 
     if (empty($dev)) {
         return [
             'result' => false,
-            'error' => 'No hay un orden de mantenimiento de dispositivos. Específica un orden en configuración.'
+            'error' => 'No hay un orden de mantenimiento de dispositivos. Específica un orden en la configuración.'
+        ];
+    }
+
+    // Consulta SQL que obtiene todos los registros de la vista, en un orden específico según ID
+    $sql_inv = "CALL pprograma_mantenimiento('$dev', '$dev')";
+    // var_dump($sql_inv);
+    $query = mysqli_query($con, $sql_inv);
+
+    $datos = []; // Crea un arreglo vacío para almacenar los datos
+
+    if ($query) {
+        while ($fila =  mysqli_fetch_assoc($query)) { // Recorre los resultados fila por fila
+            $datos[] = $fila; // Agrega cada fila al arreglo $datos
+        }
+
+        while (mysqli_next_result($con)) {
+            mysqli_use_result($con);
+        }
+    }
+
+    // Define las columnas de Excel correspondientes a los meses del año
+    $meses_columnas = ['H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'];
+
+    // Recorre cada dispositivo y le asigna un índice de mes basado en su posición
+    foreach ($datos as $i => &$dispositivo) {
+        $mes_index = $i % 12;
+        $mes = $mes_index + 1;
+        $fecha_programada = fecha_programa($anio_actual, $mes);
+        //  Se saca el residuo al dividir $i entre 12, 
+        //  a su vez añadiendo un nuevo campo al $dispositivo llamado mes_index,
+        //  indicando en qué mes le tocará mantenimiento.
+        $dispositivo['mes_index'] = $i % 12;
+        $id_equipo = $dispositivo['id_equipo'];
+        $estado = 'Pendiente';
+
+        $sql_insert = "INSERT INTO mantenimiento(id_equipo, anio, fecha_programada, estado, correo_enviado, reporte_descargado,reporte_subido)
+                        VALUES ('$id_equipo','$anio_actual', '$fecha_programada', '$estado',0,0,0)";
+
+        try {
+            mysqli_query($con, $sql_insert);
+        } catch (mysqli_sql_exception $e) {
+            if ($e->getCode() == 1062) {
+                return array(
+                    'result' => false,
+                    'error' => 'Ya existe un programa de mantenimiento para el año'
+                );
+            }
+        }
+    }
+
+    unset($dispositivo); // Libera la variable de referencia
+
+    // usort() ordena un arreglo en base a una función de comparación definida
+    // fuction($a, $b) es la función a usar que recibe dos parámetros; son dos elementos del arreglo $datos a comparar entre sí.
+    usort($datos, function ($a, $b) {
+        return $a['mes_index'] <=> $b['mes_index'];
+    });
+
+    // Carga la plantilla Excel base del programa de mantenimiento
+    $spreadsheet = IOFactory::load('FO-DSP-TI-03 Programa de Mantenimiento Preventivo Infraestructura TI Región XX Rev.00.xlsx');
+    $worksheet = $spreadsheet->getActiveSheet(); // Obtiene la hoja activa
+
+    $pageSetup = $worksheet->getPageSetup();
+    $pageSetup->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);   //  Orientación horizontal
+    $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LETTER);  //  Establece el tamaño del papel
+    $pageSetup->setFitToPage(true); //  Ajusta el contenido a una sola página
+    $pageSetup->setFitToWidth(1);   //  Ajusta el contenido al ancho de una página.
+    $pageSetup->setFitToHeight(0);  //  Permite que la altura no esté limitada (varias páginas verticales)
+
+    $pageMargins = $worksheet->getPageMargins();
+    $pageMargins->setTop(0.3);
+    $pageMargins->setBottom(0.3);
+    $pageMargins->setLeft(0.2);
+    $pageMargins->setRight(0.2);
+
+    // Define las filas base donde se empezará a escribir la tabla
+    $fila_inicio = 13;
+    $fila_nombre = 21;
+    $fila_cargo = 22;
+    $fila_fecha = 24;
+    $filas = count($datos); // Cuenta cuántos dispositivos hay
+
+    foreach ($datos as $index => $item) { // Recorre cada dispositivo
+        // var_dump($item);
+        // $fila_actual = $fila_inicio + $index;
+        if ($index >= 3) { // A partir del cuarto dispositivo, inserta una nueva fila
+            $worksheet->insertNewRowBefore($fila_inicio, 1); // Inserta nueva fila antes de la actual
+
+            $worksheet->duplicateStyle($worksheet->getStyle("B14:S14"), "B{$fila_inicio}:S{$fila_inicio}");
+        }
+
+        // Configura el estilo de texto para que se ajuste automáticamente
+        $worksheet->getStyle("B{$fila_inicio}:S{$fila_inicio}")->getAlignment()->setWrapText(true);
+        $worksheet->getRowDimension($fila_inicio)->setRowHeight(-1);
+
+        // Escribe los valores de cada campo en las tablas correspondientes
+        $worksheet->setCellValue("B{$fila_inicio}", $index + 1);
+        $worksheet->setCellValue("C{$fila_inicio}", $item['tipo']);
+        $worksheet->setCellValue("D{$fila_inicio}", $item['nombre']);
+        $worksheet->setCellValue("E{$fila_inicio}", $item['ubicacion']);
+        $worksheet->setCellValue("F{$fila_inicio}", $item['modelo']);
+        $worksheet->setCellValue("G{$fila_inicio}", $item['num_serie']);
+
+        // Marca con una 'x' el mes correspondiente al mantenimiento
+        $mes_index = $item['mes_index'];
+        $columna_mes = $meses_columnas[$mes_index];
+        $worksheet->setCellValue("{$columna_mes}{$fila_inicio}", 'x');
+
+        $fila_inicio++; // Pasa a la siguiente fila
+    }
+
+    // Calcula la fila donde se pondrán los nombres (según cuántos registros hay)
+    $nombres = $fila_nombre + ($filas - 3);
+
+    // Escribe los nombres de quien elaboró y autorizó
+    $worksheet->setCellValue("C$nombres", $valores->elaboro);
+    $worksheet->setCellValue("G$nombres", $valores->autorizo);
+    $worksheet->getStyle("C$nombres")->getAlignment()->setWrapText(true); // Ajuste de texto
+
+    // Calcula la fila donde van los cargos
+    $cargos = $fila_cargo + ($filas - 3);
+
+    // Escribe los cargos correspondientes
+    $worksheet->setCellValue("C$cargos", $valores->cg_elaboro);
+    $worksheet->setCellValue("G$cargos", $valores->cg_autorizo);
+    $worksheet->getStyle("C$cargos")->getAlignment()->setWrapText(true);
+
+    // Calcula la fila de la fecha
+    $fechas = $fila_fecha + ($filas - 3);
+    $worksheet->setCellValue("D$fechas", date('Y-m-d'));
+    $worksheet->getStyle("C$fechas")->getAlignment()->setWrapText(true);
+
+    $base = realpath(__DIR__ . '/../../../Inventario_TI/database/controller_excel/documentos_descarga/mantenimiento/programa/');
+
+
+    if ($base !== false) {
+
+        // Carpeta por año del programa
+        $carpeta_anual = $base . DIRECTORY_SEPARATOR . $anio_actual;
+        if (!is_dir($carpeta_anual)) {
+            mkdir($carpeta_anual, 0777, true);
+        }
+
+        $fecha = date('Ymd_His'); // Genera una marca de tiempo para el nombre del archivo
+        $nombre_doc = "FO-DSP-TI-03_Programa de Mantenimiento Preventivo TI Región Sur_{$anio_actual}_{$fecha}.xlsx"; // Nombre del archivo generado
+        // Define la ruta física donde se guardará el archivo, basada en la estructura del proyecto
+        $ruta_guardar = $carpeta_anual . DIRECTORY_SEPARATOR . $nombre_doc;
+        // Guardar Excel
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save($ruta_guardar); // Guarda el archivo en la ruta definida
+
+        $host = $_SERVER['HTTP_HOST'];
+        $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        // Construye la URL de descarga del archivo generado
+        $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/mantenimiento/programa/{$anio_actual}/{$nombre_doc}";
+        // Retorna un arreglo con el resultado y la URL para descargar el archivo
+        return [
+            'result' => true,
+            'url' => $url_descarga,
+            // 'duplicados' => $duplicados
+        ];
+    } else {
+        return [
+            'result' => false,
+            'error' => 'No se pudo realizar el programa de mantenimiento. Inténtalo nuevamente.'
+        ];
+    }
+}
+
+function reporte_mantenimiento($valores)
+{
+    include('../conexion.php');
+
+    $spreadsheet = IOFactory::load('FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.01.xlsx'); //*Cargando la plantilla del Excel
+    $worksheet = $spreadsheet->getActiveSheet();
+
+    /* 
+    TODO Configuración de impresión
+    * Es necesario para dar un formato, delimitar márgenes para cuando se exporte a pdf, el pdf no este descuadrado
+    */
+    $pageSetup = $worksheet->getPageSetup();
+    $pageSetup->setOrientation(PageSetup::ORIENTATION_PORTRAIT);
+    $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LETTER);
+    $pageSetup->setFitToPage(true);
+    $pageSetup->setFitToWidth(1);
+    $pageSetup->setFitToHeight(0);
+
+    //* ajustando márgenes
+    $pageMargins = $worksheet->getPageMargins();
+    $pageMargins->setTop(0.5);
+    $pageMargins->setBottom(0.5);
+    $pageMargins->setLeft(0.5);
+    $pageMargins->setRight(0.5);
+
+    $worksheet->setCellValue("G11", !empty($valores->elementos->usuario) ? $valores->elementos->usuario : 'NA');
+    $worksheet->setCellValue("G12", !empty($valores->elementos->cargo) ? $valores->elementos->cargo : 'NA');
+    $worksheet->setCellValue("G13", !empty($valores->elementos->region) ? $valores->elementos->region : 'NA');
+    // $worksheet->setCellValue("G14", !empty($valores->id) ? $valores->id : 'NA');
+
+    // Mapeo de tipo -> fila
+    $mapa_filas = [
+        'Laptop' => 20,
+        'Desktop' => 20,
+        'Monitor' => 21,
+        'Teclado' => 22,
+        'Mouse' => 23,
+        'Impresora' => 24,
+        'Docking' => 25,
+        'Docking Station' => 25,
+    ];
+
+    // Inicializar filas con 'NA'
+    for ($fila = 20; $fila <= 27; $fila++) {
+        $worksheet->setCellValue("G{$fila}", 'NA'); // Marca
+        $worksheet->setCellValue("L{$fila}", 'NA'); // Modelo
+        $worksheet->setCellValue("Q{$fila}", 'NA'); // Serie
+        $worksheet->setCellValue("W{$fila}", 'NA'); // Observaciones
+    }
+
+    // Determinar fila a llenar según tipo
+    $tipo = !empty($valores->elementos->tipo) ? $valores->elementos->tipo : 'Otros';
+    // var_dump($tipo);
+    // $tipo = preg_replace('/\s+/', ' ', $tipo);
+    // $tipo = ucfirst(strtolower($tipo));
+    $fila = $mapa_filas[$tipo] ?? 26; // 26 = Otros
+
+    // Rellenar datos
+    $marca = !empty($valores->elementos->marca) ? $valores->elementos->marca : 'NA';
+    $modelo = !empty($valores->elementos->modelo) ? $valores->elementos->modelo : 'NA';
+    $serie = !empty($valores->elementos->num_serie) ? $valores->elementos->num_serie : 'NA';
+    // $observaciones = !empty($valores->ubicacion) ? $valores->ubicacion : 'NA';
+    $observaciones = false;
+    if ($marca !== 'NA' || $modelo !== 'NA' || $serie !== 'NA') {
+        $worksheet->setCellValue("W{$fila}", '');
+        $observaciones = true;
+    }
+
+    if ($observaciones) {
+        for ($f = 20; $f <= 27; $f++); {
+            $worksheet->setCellValue("W{$f}", '');
+        }
+    }
+
+    $worksheet->setCellValue("G{$fila}", $marca);
+    $worksheet->setCellValue("L{$fila}", $modelo);
+    $worksheet->setCellValue("Q{$fila}", $serie);
+
+    $worksheet->setCellValue("D69", !empty($valores->encargado) ? $valores->encargado : '');
+    $worksheet->setCellValue("U69", !empty($valores->elementos->usuario) ? $valores->elementos->usuario : '');
+
+    // $workskheet->setCellValue("W{$fila}", $observaciones);
+
+
+    $fecha_doc = date('Ymd_His');
+    $nombre_doc = "FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.{$fecha_doc}.xlsx";
+
+    $base = realpath(__DIR__ . '/../../../');
+    $host = $_SERVER['HTTP_HOST'];
+    $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+
+    if ($base !== false) {
+        $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . 'documentos_descarga' . DIRECTORY_SEPARATOR . 'mantenimiento' . DIRECTORY_SEPARATOR . 'reporte' . DIRECTORY_SEPARATOR . $nombre_doc;
+        $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/mantenimiento/reporte/{$nombre_doc}";
+    }
+
+    $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+    $writer->save($ruta_guardar);
+
+    $datos = $valores->elementos;
+    $sql = "UPDATE mantenimiento SET reporte_descargado = 1, estado = 'En proceso' WHERE id_equipo = '$datos->id' AND  anio = '$datos->anio'";
+
+
+    if (!mysqli_query($con, $sql)) {
+        return false;
+    }
+
+    return array(
+        'result' => true,
+        'url' => $url_descarga
+    );
+}
+
+function programa_auditoria($valores)
+{
+    include('../conexion.php');
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+    $anio_actual = date("Y") + 1;
+    $sql_dev = "SELECT tipo_id FROM vorden_mantenimiento";
+    $query_dev = mysqli_query($con, $sql_dev);
+
+    $datos_dev = [];
+    while ($filas = mysqli_fetch_object($query_dev)) {
+        $datos_dev[] = $filas->tipo_id;
+    }
+    // var_dump($datos_dev);
+    $dev = implode(',', $datos_dev);
+
+    if (empty($dev)) {
+        return [
+            'result' => false,
+            'error' => 'No hay un orden de mantenimiento de dispositivos. Específica un orden en la configuración.'
         ];
     }
 
@@ -646,118 +937,4 @@ function programa_mantenimiento($valores)
             'error' => 'No se pudo realizar el programa de mantenimiento. Inténtalo nuevamente.'
         ];
     }
-}
-
-
-function reporte_mantenimiento($valores)
-{
-    include('../conexion.php');
-
-    $spreadsheet = IOFactory::load('FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.01.xlsx'); //*Cargando la plantilla del Excel
-    $worksheet = $spreadsheet->getActiveSheet();
-
-    /* 
-    TODO Configuración de impresión
-    * Es necesario para dar un formato, delimitar márgenes para cuando se exporte a pdf, el pdf no este descuadrado
-    */
-    $pageSetup = $worksheet->getPageSetup();
-    $pageSetup->setOrientation(PageSetup::ORIENTATION_PORTRAIT);
-    $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LETTER);
-    $pageSetup->setFitToPage(true);
-    $pageSetup->setFitToWidth(1);
-    $pageSetup->setFitToHeight(0);
-
-    //* ajustando márgenes
-    $pageMargins = $worksheet->getPageMargins();
-    $pageMargins->setTop(0.5);
-    $pageMargins->setBottom(0.5);
-    $pageMargins->setLeft(0.5);
-    $pageMargins->setRight(0.5);
-
-    $worksheet->setCellValue("G11", !empty($valores->elementos->usuario) ? $valores->elementos->usuario : 'NA');
-    $worksheet->setCellValue("G12", !empty($valores->elementos->cargo) ? $valores->elementos->cargo : 'NA');
-    $worksheet->setCellValue("G13", !empty($valores->elementos->region) ? $valores->elementos->region : 'NA');
-    // $worksheet->setCellValue("G14", !empty($valores->id) ? $valores->id : 'NA');
-
-    // Mapeo de tipo -> fila
-    $mapa_filas = [
-        'Laptop' => 20,
-        'Desktop' => 20,
-        'Monitor' => 21,
-        'Teclado' => 22,
-        'Mouse' => 23,
-        'Impresora' => 24,
-        'Docking' => 25,
-        'Docking Station' => 25,
-    ];
-
-    // Inicializar filas con 'NA'
-    for ($fila = 20; $fila <= 27; $fila++) {
-        $worksheet->setCellValue("G{$fila}", 'NA'); // Marca
-        $worksheet->setCellValue("L{$fila}", 'NA'); // Modelo
-        $worksheet->setCellValue("Q{$fila}", 'NA'); // Serie
-        $worksheet->setCellValue("W{$fila}", 'NA'); // Observaciones
-    }
-
-    // Determinar fila a llenar según tipo
-    $tipo = !empty($valores->elementos->tipo) ? $valores->elementos->tipo : 'Otros';
-    // var_dump($tipo);
-    // $tipo = preg_replace('/\s+/', ' ', $tipo);
-    // $tipo = ucfirst(strtolower($tipo));
-    $fila = $mapa_filas[$tipo] ?? 26; // 26 = Otros
-
-    // Rellenar datos
-    $marca = !empty($valores->elementos->marca) ? $valores->elementos->marca : 'NA';
-    $modelo = !empty($valores->elementos->modelo) ? $valores->elementos->modelo : 'NA';
-    $serie = !empty($valores->elementos->num_serie) ? $valores->elementos->num_serie : 'NA';
-    // $observaciones = !empty($valores->ubicacion) ? $valores->ubicacion : 'NA';
-    $observaciones = false;
-    if ($marca !== 'NA' || $modelo !== 'NA' || $serie !== 'NA') {
-        $worksheet->setCellValue("W{$fila}", '');
-        $observaciones = true;
-    }
-
-    if ($observaciones) {
-        for ($f = 20; $f <= 27; $f++); {
-            $worksheet->setCellValue("W{$f}", '');
-        }
-    }
-
-    $worksheet->setCellValue("G{$fila}", $marca);
-    $worksheet->setCellValue("L{$fila}", $modelo);
-    $worksheet->setCellValue("Q{$fila}", $serie);
-
-    $worksheet->setCellValue("D69", !empty($valores->encargado) ? $valores->encargado : '');
-    $worksheet->setCellValue("U69", !empty($valores->elementos->usuario) ? $valores->elementos->usuario : '');
-
-    // $workskheet->setCellValue("W{$fila}", $observaciones);
-
-
-    $fecha_doc = date('Ymd_His');
-    $nombre_doc = "FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.{$fecha_doc}.xlsx";
-
-    $base = realpath(__DIR__ . '/../../../');
-    $host = $_SERVER['HTTP_HOST'];
-    $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-
-    if ($base !== false) {
-        $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . 'documentos_descarga' . DIRECTORY_SEPARATOR . 'mantenimiento' . DIRECTORY_SEPARATOR . 'reporte' . DIRECTORY_SEPARATOR . $nombre_doc;
-        $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/mantenimiento/reporte/{$nombre_doc}";
-    }
-
-    $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-    $writer->save($ruta_guardar);
-
-    $datos = $valores->elementos;
-    $sql = "UPDATE mantenimiento SET reporte_descargado = 1, estado = 'En proceso' WHERE id_equipo = '$datos->id' AND  anio = '$datos->anio'";
-
-
-    if (!mysqli_query($con, $sql)) {
-        return false;
-    }
-
-    return array(
-        'result' => true,
-        'url' => $url_descarga
-    );
 }

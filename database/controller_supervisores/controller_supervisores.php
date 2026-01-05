@@ -13,8 +13,7 @@ if ($clientejson->accion == 0) {
 } elseif ($clientejson->accion == 1) {
     $respuesta_servidor->resultado = editar_supervisor($clientejson);
 } elseif ($clientejson->accion == 2) {
-    $respuesta_servidor->resultado = 
-    ($clientejson);
+    $respuesta_servidor->resultado = consultar_supervisor($clientejson);
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = desactivar_supervisor($clientejson);
 } elseif ($clientejson->accion == 4) {
