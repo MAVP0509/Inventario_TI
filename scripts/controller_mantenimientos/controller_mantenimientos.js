@@ -375,26 +375,7 @@ async function consultar_informacion(anio) {
 
         return objeto
     }, {}))
-    // Guarda cuando se expande o colapsa un grupo
-    /* table.on("groupVisibilityChanged", guardarEstadoDeGrupos);
-
-    // Verificar cada 100ms hasta que los grupos existan, máximo por 3 segundos
-    const intentoMax = 30;
-    let intento = 0;
-    const timer = setInterval(() => {
-        intento++;
-        if (!gruposRestaurados) {
-            restaurarEstadoDeGrupos();
-        }
-        if (gruposRestaurados || intento >= intentoMax) {
-            clearInterval(timer);
-        }
-    }, 100); */
-
 }
-
-// console.log(mantenimientosPendientes);
-
 
 async function mdl_programar_mantenimiento() {
 
@@ -489,12 +470,7 @@ async function programar_mantenimiento() {
         mostrar_toast('error', '¡Error!', 'Ya existe un programa de mantenimiento para el año');
         $('#mdl-prog-mant').modal("hide");
     } */
-    // console.log(mantenimientosPendientes);
-
-
 }
-
-// console.log(mantenimientosPendientes);
 
 
 let selecreg
@@ -506,7 +482,6 @@ async function mdl_mantenimiento_info(elemento_mnt) {
         if (element.id === elemento_mnt.id && element.anio === elemento_mnt.anio) {
             // Guarda el registro completo en una variable global
             selecreg = element;
-            // console.log(selecreg)
             break;
         }
     }
@@ -605,7 +580,6 @@ async function mdl_mantenimiento_info(elemento_mnt) {
     }
 
     $('#mdl-mant-info').modal("show")
-    console.log(mantenimientosPendientes);
 
 }
 
@@ -834,13 +808,7 @@ async function ver_pdf_reporte(id, fecha) {
 async function mdl_correo_reporte_mantenimiento(equipo) {
     let fecha = equipo.fecha.split('-')
     let mes = fecha[1]
-
-    let mesesPendientes = Object.entries(mantenimientosPendientes).filter(([clave, valor]) => clave < mes)
-
-    if (mesesPendientes.length !== 0) {
-        mostrar_toast('warning', 'Aviso', `Tiene mantenimientos pendientes de ${mesesPendientes.length} ${mesesPendientes.length == 1 ? `mes` : `meses`}`)
-        return
-    }
+    
     //let valido = mesesPendientes.find
     //console.log(mesesPendientes)
 
