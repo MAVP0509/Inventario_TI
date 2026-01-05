@@ -336,12 +336,12 @@ function unir_reportes_mantenimiento($valores)
 
     //$carpetaArchivoUnido = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->anio . '/reportes_unidos/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
 
-    if (file_exists($archivoFinal)) {
+    /* if (file_exists($archivoFinal)) {
         $respuesta->mensaje = "Archivos unidos correctamente";
         $respuesta->ruta = $carpetaUrl;
 
         return $respuesta;
-    }
+    } */
     //var_dump("hola");
 
     try {

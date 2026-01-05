@@ -986,7 +986,7 @@ async function descargarMes(mes) {
     puerto = location.port
     console.log("Descargando mes:", mes);
     mantenimiento_loading = true
-    alert_cargando('Uniendo los reportes, por favor espere...')
+    alert_cargando('Uniendo los reportes, esto tardará, por favor espere...')
     let server = await server_mantenimiento({ accion: 5, anio: mantenimientosPendientes[0].anio, mes: mes })
 
     if (server.resultado.mensaje) {
