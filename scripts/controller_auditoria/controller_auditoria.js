@@ -423,6 +423,52 @@ async function programar_auditoria() {
     }
 }
 
+async function consultar_programa_firmado() {
+
+    let año_programa = mantenimientosPendientes[0].anio;
+
+    let model = {
+        accion: 7,
+        anio: año_programa
+    }
+
+    let server = await server_mantenimiento(model);
+
+    const PDF = document.getElementById('lista-pdfs');
+
+    if (server.resultado.existe === true) {
+        document.getElementById('alert-programa').style.display = 'block';
+
+        const ruta = server.resultado.url;
+        const nombreArchivo = server.resultado.archivo;
+        const item = `
+            <div class="card mb-2 shadow-sm" style="width: 100%;">
+                <div class="card-body d-flex align-items-center p-2">
+                    <div class="text-danger mr-3" style="font-size: 2rem;">
+                        <i class="fa-solid fa-file-pdf"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <strong>${nombreArchivo}</strong><br>
+                        
+                        <button type="button" class="btn btn-outline-dark btn-sm mt-1" onclick="window.open('${ruta}', '_blank')">
+                            <i class="fa-solid fa-eye"></i> Ver
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        PDF.innerHTML = item;
+    } else {
+        document.getElementById('alert-programa').style.display = 'none';
+        PDF.innerHTML = '';
+    }
+
+    document.getElementById('btn-open-programa').click();
+    
+    programa_firmado();
+}
+
 let charco = null;
 let charcoInicializado = false;
 

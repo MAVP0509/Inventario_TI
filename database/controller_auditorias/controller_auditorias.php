@@ -22,7 +22,7 @@ if ($clientejson->accion == 0) {
 } elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = guardar_programa_auditoria($clientejson);
 } elseif ($clientejson->accion == 7) {
-    $respuesta_servidor->resultado = consultar_programa_firmado($clientejson);
+    $respuesta_servidor->resultado = consultar_auditoria_firmada($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -55,7 +55,7 @@ function consultar_anio_auditoria()
     return $fila;
 }
 
-function guardar_programa($valores)
+function guardar_programa_auditoria($valores)
 {
     $respuesta = new stdClass();
 
@@ -121,3 +121,46 @@ function guardar_programa($valores)
 
     return $respuesta;
 }
+
+function consultar_auditoria_firmada($valores)
+{
+    $base = realpath(__DIR__ . '/../../Documentos/mantenimiento/programa');
+
+    if ($base === false) {
+        return [
+            "existe" => false
+        ];
+    }
+
+    $carpeta = $base . DIRECTORY_SEPARATOR . $valores->anio;
+
+    if (!is_dir($carpeta)) {
+        return [
+            "existe" => false
+        ];
+    }
+
+    $archivos = glob($carpeta . DIRECTORY_SEPARATOR . '*.pdf');
+
+    if (!empty($archivos)) {
+
+        $archivo = basename($archivos[0]);
+
+        $host = $_SERVER['HTTP_HOST'];
+        $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+
+        $url = "{$protocolo}://{$host}/Inventario_TI/Documentos/mantenimiento/programa/{$valores->anio}/{$archivo}";
+
+        return [
+            "existe" => true,
+            "archivo" => $archivo,
+            "url" => $url
+        ];
+    }
+
+    return [
+        "existe" => false
+    ];
+}
+
+function unir_reportes_auditoria($valores) {}
