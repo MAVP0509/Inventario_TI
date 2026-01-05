@@ -20,7 +20,7 @@ if ($clientejson->accion == 0) {
 } elseif ($clientejson->accion == 5) {
     $respuesta_servidor->resultado = unir_reportes_auditoria($clientejson);
 } elseif ($clientejson->accion == 6) {
-    $respuesta_servidor->resultado = guardar_programa($clientejson);
+    $respuesta_servidor->resultado = guardar_programa_auditoria($clientejson);
 } elseif ($clientejson->accion == 7) {
     $respuesta_servidor->resultado = consultar_programa_firmado($clientejson);
 }
@@ -53,4 +53,71 @@ function consultar_anio_auditoria()
     $fila = mysqli_fetch_object($query);
 
     return $fila;
+}
+
+function guardar_programa($valores)
+{
+    $respuesta = new stdClass();
+
+    // Validar archivo
+    if (
+        !isset($_FILES['reporte_programa']) ||
+        $_FILES['reporte_programa']['error'] !== UPLOAD_ERR_OK
+    ) {
+        $respuesta->error = "No se recibió ningún archivo válido.";
+        return $respuesta;
+    }
+
+    $archivo = $_FILES['reporte_programa'];
+
+    $nombreOriginal = pathinfo($archivo['name'], PATHINFO_FILENAME);
+    $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
+    $tmpPath = $archivo['tmp_name'];
+
+    if ($extension !== 'pdf') {
+        $respuesta->error = "Tipo de archivo no permitido. Solo PDF.";
+        return $respuesta;
+    }
+
+    // Limpiar nombre (mantiene el nombre original)
+    $nombreLimpio = preg_replace('/[^A-Za-z0-9._-]/', '_', $nombreOriginal);
+
+    // Ruta base
+    $base = realpath(__DIR__ . '/../../documentos/mantenimiento/programa');
+    if ($base === false) {
+        $respuesta->error = "No se encontró la ruta base.";
+        return $respuesta;
+    }
+
+    // Carpeta por año
+    $carpeta_anual = $base . DIRECTORY_SEPARATOR . $valores->anio;
+
+    if (!is_dir($carpeta_anual)) {
+        if (!mkdir($carpeta_anual, 0755, true)) {
+            $respuesta->error = "No se pudo crear la carpeta del año.";
+            return $respuesta;
+        }
+    }
+
+    // Eliminar PDF existente
+    foreach (glob($carpeta_anual . DIRECTORY_SEPARATOR . '*.pdf') as $pdfExistente) {
+        unlink($pdfExistente);
+    }
+
+    // Nombre siempre con fecha actual
+    $fecha = date('Ymd');
+    $archivo_final = $carpeta_anual
+        . DIRECTORY_SEPARATOR
+        . $nombreLimpio . '_' . $fecha . '.pdf';
+
+    // Guardar archivo
+    if (move_uploaded_file($tmpPath, $archivo_final)) {
+        $respuesta->mensaje = "Archivo guardado correctamente.";
+        $respuesta->ruta_guardada = basename($archivo_final);
+        $respuesta->fecha_subida = $fecha;
+    } else {
+        $respuesta->error = "No se pudo guardar el archivo.";
+    }
+
+    return $respuesta;
 }

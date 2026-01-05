@@ -67,6 +67,7 @@ async function load_auditoria() {
 let datos_auditoria = [];
 let tabla_aud;
 let elemento_aud;
+let auditorias_pendientes
 
 async function consultar_auditoria(anio) {
     const fecha = anio.value;
@@ -160,7 +161,7 @@ async function consultar_auditoria(anio) {
     ]
 
     tabla_aud = new Tabulator("#tbl-aud", {
-        local: "es",
+        locale: "es",
         data: datos_auditoria,
         layout: "fitColumns",
         maxHeight: window.innerHeight,
@@ -311,6 +312,23 @@ async function consultar_auditoria(anio) {
             },
         ],
     });
+
+    auditorias_pendientes = Object.values(datos_auditoria.reduce((objeto, item) => {
+        if (item.estado == "Realizado") return objeto
+
+        let anio = item.anio
+        let mes = item.fecha.split('-')[1]
+
+        // Si aún no existe el año, inicializamos su propiedad meses
+        if (!objeto[anio]) {
+            objeto[anio] = { anio: anio, meses: {} };
+        }
+
+        //si ya existe este mes, incrementa su valor, sino lo inicia en 0 y suma 1
+        objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
+
+        return objeto
+    }, {}))
 }
 
 async function mdl_programar_auditoria() {
@@ -402,11 +420,53 @@ async function programar_auditoria() {
     } else {
         mostrar_toast('error', 'Error', server.resultado.error);
         $('#mdl-prog-aud').modal("hide");
-    }/*  else if (server.resultado.duplicado === false) {
-        mostrar_toast('error', '¡Error!', 'Ya existe un programa de auditoria para el año');
-        $('#mdl-prog-mant').modal("hide");
-    } */
-    // console.log(auditoriasPendientes);
+    }
+}
 
+let charco = null;
+let charcoInicializado = false;
 
+async function auditoria_firmado() {
+    if (!charcoInicializado) {
+
+        const input = document.getElementById("subir-programa");
+
+        charco = FilePond.create(input, {
+            maxFiles: 1,
+            acceptedFileTypes: ['application/pdf'],
+            labelIdle: 'Arrastre y suelta un archivo .pdf o <span class="filepond--label-action"> Examina </span>',
+            allowMultiple: false,
+            dropOnPage: false,
+            instantUpload: false,
+            labelFileTypeNotAllowed: 'Archivo no válido solo .pdf',
+            server: {
+                process: {
+                    url: "database/controller_mantenimientos/controller_mantenimientos.php",
+                    method: "POST",
+                    name: 'reporte_programa',
+                    withCredentials: false,
+                    ondata: (formData) => {
+                        formData.append('trama', JSON.stringify({ accion: 6, anio: mantenimientosPendientes[0].anio }));
+                        return formData;
+                    },
+                    onload: (response) => {
+                        let data = JSON.parse(response);
+                        if (data.resultado.error) {
+                            mostrar_toast('error', '¡Error!', data.resultado.error);
+                        } else {
+                            mostrar_toast('success', '¡Carga exitosa!', data.resultado.mensaje);
+                            charco.removeFiles();
+                        }
+                    },
+                    onerror: (err) => {
+                        console.error('Error al subir: ', err);
+                    }
+                }
+            }
+        });
+
+        charcoInicializado = true;
+    } else {
+        charco.removeFiles();
+    }
 }

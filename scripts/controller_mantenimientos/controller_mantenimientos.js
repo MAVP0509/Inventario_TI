@@ -491,8 +491,6 @@ async function programar_mantenimiento() {
 }
 
 // console.log(mantenimientosPendientes);
-
-
 let selecreg
 async function mdl_mantenimiento_info(elemento_mnt) {
     // Busca en el arreglo 'datos_mantenimiento' el registro con el mismo id_equipo
@@ -1100,7 +1098,7 @@ async function programa_firmado() {
                     name: 'reporte_programa',
                     withCredentials: false,
                     ondata: (formData) => {
-                        formData.append('trama', JSON.stringify({ accion: 6, anio: mantenimientosPendientes[0].anio }));
+                        formData.append('trama', JSON.stringify({ accion: 6, anio: auditorias_pendientes[0].anio }));
                         return formData;
                     },
                     onload: (response) => {
