@@ -41,18 +41,42 @@ function server_excel(model) {
     })
 }
 
+async function load_auditoria() {
+    await general_select2({
+        selectId: 'select-anio-auditoria',
+        tabla: 'auditoria',
+        campo: 'anio',
+        placeholder: 'Seleccione un año',
+        dropdownParent: '#card-auditoria',
+        tags: false,
+        // popoverTitle: "Descripción",
+        // popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
+    })
+
+    let server = await server_auditoria({ accion: 4 })
+    if (!server.resultado) {
+        return
+    } else {
+        let fecha = {}
+        fecha.value = server.resultado.anio
+        $('#select-anio-auditoria').val(fecha.value).trigger('change')
+
+    }
+}
+
 let datos_auditoria = [];
 let tabla_aud;
+let elemento_aud;
 
 async function consultar_auditoria(anio) {
     const fecha = anio.value;
 
-    let server = await server_mantenimiento({ accion: 0, anio: fecha });
+    let server = await server_auditoria({ accion: 0, anio: fecha });
 
     if (!fecha) return;
 
     datos_auditoria = server.resultado
-    Tabulator.extenModule("localize", "langs", {
+    Tabulator.extendModule("localize", "langs", {
         "es": {
             "pagination": {
                 "first": '<i class="fa-solid fa-angles-right fa-flip-horizontal"></i>',
@@ -135,7 +159,7 @@ async function consultar_auditoria(anio) {
         },
     ]
 
-    tabla_aud = new Tabulator("#tbl-aud"), {
+    tabla_aud = new Tabulator("#tbl-aud", {
         local: "es",
         data: datos_auditoria,
         layout: "fitColumns",
@@ -149,7 +173,144 @@ async function consultar_auditoria(anio) {
             const end = Math.min(currentRowStart + pageSize - 1, totalRows);
             return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
         },
-    }
+        groupBy: function (data) {
+            // Asegura que tenga formato YYYY-MM
+            const [año, mes] = data.fecha.split("-");
+            // Creamos una fecha con día explícito
+            const fecha = new Date(`${año}-${mes}-01T00:00:00`);
+            const opciones = { year: 'numeric', month: 'long' };
+
+            //let excluir = ['Realizado']
+            //const datos = table.getData().filter(d=> d.estado && !excluir.includes(d.estado)).length
+
+
+            return `${fecha.toLocaleDateString('es-ES', opciones)}`
+        },
+        groupHeader: function (value, count, data) {
+            const fila = data[0];  // Primera fila del grupo
+
+            const [año, mes] = fila.fecha.split("-");
+            const fecha = new Date(`${año}-${mes}-01T00:00:00`);
+            const opciones = { year: 'numeric', month: 'long' };
+
+            // Excluir estatus
+            const excluir = ['Realizado'];
+
+            // Contar pendiente SOLO dentro del grupo actual
+            const pendientes = data.filter(d =>
+                d.estado &&
+                !excluir.includes(d.estado)
+            ).length;
+
+            return `${fecha.toLocaleDateString('es-ES', opciones)} (${pendientes} mantenimientos pendientes)`;
+
+        },
+        groupStartOpen: false,
+        groupToggleElement: "header",
+        columns: [
+            {
+                title: "Fecha", field: "fecha", width: 115, headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input", sorter: "date",
+            },
+            {
+                title: "Tipo",
+                field: "tipo", width: 130, headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input",
+                formatter: function (cell, formatterParams, onRendered) {
+                    let data = cell.getData();
+                    return `${data.tipo}<br><small>${data.marca}<br><small>${data.modelo}`;
+                }
+            },
+            {
+                title: "Número de serie",
+                field: "num_serie", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input"
+
+            },
+            {
+                title: "Usuario",
+                field: "usuario", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input",
+                formatter: function (cell, formatterParams, onRendered) {
+                    let data = cell.getData(); // Obtiene toda la fila
+                    return `${data.usuario}<br><small>${data.cargo}</small>`;
+                }
+
+            },
+            {
+                title: "Ubicación",
+                field: "ubicacion", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "list",
+                headerFilterParams: {
+                    valuesLookup: true, clearable: true,
+                }
+
+            },
+            {
+                title: "Estatus",
+                field: "estado", hozAlign: "center", formatter: "lookup", headerHozAlign: "center", formatter: "lookup", width: 150,
+                headerFilterParams: {
+                    valuesLookup: true, clearable: true,
+                },
+                headerMenu: menuEstatus,
+                headerMenuIcon: '<i class="fa-solid fa-circle-question"></i>',
+                formatterParams: {
+                    "Pendiente": `<i class="fa-solid fa-circle" style="color: #ff7300;"></i> Pendiente`,
+                    "En proceso": `<i class="fa-solid fa-circle" style="color: #0385ffff;"></i> En proceso`,
+                    "Realizado": `<i class="fa-solid fa-circle" style="color: #28a745;"></i> Realizado`,
+                    "Vencido": `<i class="fa-solid fa-circle fa-beat-fade" style="color: #dc3545;"></i> Vencido`,
+                },
+                headerFilter: "list",
+                headerFilterParams: {
+                    valuesLookup: true, clearable: true,
+                }, headerSort: false,
+
+            },
+            {
+                formatter: correoIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "correo_enviado",
+                cellClick: function (e, cell) {
+                    elemento_aud = cell.getRow().getData();
+                    mdl_correo_reporte_mantenimiento(elemento_aud)
+                },
+            },
+            {
+                formatter: archivoIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "correo_enviado",
+                cellClick: function (e, cell) {
+                    const button = cell.getElement().querySelector('button');
+                    if (button && !button.disabled) {
+                        // Deshabilita el botón
+                        button.disabled = true;
+
+                        // Acción que quieres ejecutar al hacer clic
+                        const elemento_aud = cell.getRow().getData();
+                        mdl_reporte_mantenimiento(elemento_aud);
+
+                        // Rehabilita el botón después de 3 segundos
+                        setTimeout(() => {
+                            button.disabled = false;
+                        }, 3000);
+                    }
+                }
+            },
+            {
+                formatter: subirIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_descargado",
+                cellClick: function (e, cell) {
+                    elemento_aud = cell.getRow().getData();
+                    abrir_subir_reporte(elemento_aud.id, elemento_aud.fecha)
+                }
+            },
+
+            {
+                formatter: verIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_subido",
+                cellClick: function (e, cell) {
+                    elemento_aud = cell.getRow().getData();
+                    ver_pdf_reporte(elemento_aud.id, elemento_aud.fecha)
+                }
+            },
+            {
+                formatter: editarIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
+                cellClick: function (e, cell) {
+                    elemento_aud = cell.getRow().getData();
+                    mdl_mantenimiento_info(elemento_aud);
+                }
+            },
+        ],
+    });
 }
 
 async function mdl_programar_auditoria() {

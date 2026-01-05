@@ -64,7 +64,7 @@
 
 </head>
 
-<body class="hold-transition sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-mini layout-fixed" onload="load_auditoria()">
 
     <div class="wrapper">
 
@@ -128,7 +128,7 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col">
-                            <div class="card card-outline card-lightblue" id="card-mantenimientos">
+                            <div class="card card-outline card-lightblue" id="card-auditoria">
                                 <!--Card header-->
                                 <div class="card-header">
                                     <h1 class="card-title" style="font-size: 23px;">
@@ -164,13 +164,13 @@
                                 <!--Card Body-->
 
                                 <div class="card-body">
-                                    <label>Año de mantenimiento</label>
+                                    <label>Año de auditoria</label>
                                     <div class="input-group mb-3">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
                                         </div>
-                                        <select class="form-control select" id="select-anio-mantenimiento"
-                                            onchange="consultar_informacion(this)"></select>
+                                        <select class="form-control select" id="select-anio-auditoria"
+                                            onchange="consultar_auditoria(this)"></select>
                                     </div>
                                     <div id="tbl-aud" style="overflow-x: auto; width: 100%;"></div>
                                 </div>
