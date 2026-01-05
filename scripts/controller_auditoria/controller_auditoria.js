@@ -160,7 +160,7 @@ async function consultar_auditoria(anio) {
     ]
 
     tabla_aud = new Tabulator("#tbl-aud", {
-        local: "es",
+        locale: "es",
         data: datos_auditoria,
         layout: "fitColumns",
         maxHeight: window.innerHeight,
