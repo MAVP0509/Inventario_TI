@@ -398,7 +398,7 @@ function traspaso($valores)
     include("../conexion.php");
     $fecha = date('Y-m-d');
     $zona = "Región Sur";
-    $ubicacion = "NA";
+    $ubicacion = "Bodega";
     $usuario = '5';
     $datos = [];
     $nuevo = [];

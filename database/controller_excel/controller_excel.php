@@ -462,7 +462,7 @@ function programa_mantenimiento($valores)
     include('../conexion.php');
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    $anio_actual = date("Y") + 1;
+    $anio_actual = date("Y") -5;
     $sql_dev = "SELECT tipo_id FROM vorden_mantenimiento";
     $query_dev = mysqli_query($con, $sql_dev);
 
@@ -583,7 +583,9 @@ function programa_mantenimiento($valores)
         // Marca con una 'x' el mes correspondiente al mantenimiento
         $mes_index = $item['mes_index'];
         $columna_mes = $meses_columnas[$mes_index];
-        $worksheet->setCellValue("{$columna_mes}{$fila_inicio}", 'x');
+        $celda = "{$columna_mes}{$fila_inicio}";
+        $worksheet->setCellValue($celda, 'x');
+        $worksheet->getStyle($celda)->getFont()->setBold(true);
 
         $fila_inicio++; // Pasa a la siguiente fila
     }

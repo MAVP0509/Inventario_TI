@@ -580,6 +580,8 @@ async function mdl_mantenimiento_info(elemento_mnt) {
 
 async function mdl_reporte_mantenimiento(elemento_mnt) {
 
+    $("#btn-reporte-mant").prop("disabled", false);
+
     await general_select2({
         selectId: 'slc-encargado',
         tabla: 'cat_usuarios',
@@ -589,12 +591,12 @@ async function mdl_reporte_mantenimiento(elemento_mnt) {
     })
 
     rellenar_select("César Ignacio Torres Almeida", "slc-encargado");
-    $("#btn-reporte-mant").prop("disabled", false);
     $("#btn-reporte-mant").off('click').on('click', function () { reporte_mantenimiento(elemento_mnt) })
     $("#mdl-reporte-mant").modal("show");
 }
 
 async function reporte_mantenimiento(elemento_mnt) {
+
     let model = {
         accion: 4,
         elementos: elemento_mnt,
@@ -603,6 +605,7 @@ async function reporte_mantenimiento(elemento_mnt) {
 
     mostrar_toast_cargando("Generando reporte de mantenimiento...")
     $("#btn-reporte-mant").prop("disabled", true);
+
     let server = await server_excel(model);
 
     if (server.resultado.result === true && server.resultado.url) {
@@ -803,7 +806,7 @@ async function ver_pdf_reporte(id, fecha) {
 async function mdl_correo_reporte_mantenimiento(equipo) {
     let fecha = equipo.fecha.split('-')
     let mes = fecha[1]
-    
+
     //let valido = mesesPendientes.find
     //console.log(mesesPendientes)
 
@@ -1040,7 +1043,7 @@ async function consultar_programa_firmado() {
     }
 
     document.getElementById('btn-open-programa').click();
-    
+
     programa_firmado();
 }
 
