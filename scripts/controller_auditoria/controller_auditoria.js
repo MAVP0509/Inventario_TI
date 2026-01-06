@@ -41,6 +41,25 @@ function server_excel(model) {
     })
 }
 
+function server_correo(model) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: "POST",
+            url: "database/controller_email/controller_email.php",
+            data: {
+                trama: JSON.stringify(model)
+            },
+            success: function (respose) {
+                try {
+                    resolve(JSON.parse(respose))
+                } catch (error) {
+                    reject(error)
+                }
+            }
+        })
+    })
+}
+
 async function load_auditoria() {
     await general_select2({
         selectId: 'select-anio-auditoria',
@@ -267,7 +286,7 @@ async function consultar_auditoria(anio) {
                 formatter: correoIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "correo_enviado",
                 cellClick: function (e, cell) {
                     elemento_aud = cell.getRow().getData();
-                    mdl_correo_reporte_mantenimiento(elemento_aud)
+                    mdl_correo_reporte_auditoria(elemento_aud)
                 },
             },
             {
@@ -521,5 +540,102 @@ async function auditoria_firmado() {
         charcoInicializado = true;
     } else {
         charco.removeFiles();
+    }
+}
+
+//TODO: Funciones para el proceso de auditoria (notificación, descarga de reporte, carga de reporte, vista de reporte, información del activo)
+async function mdl_correo_reporte_auditoria(equipo) {
+
+    await Promise.all([
+        general_select2({
+            selectId: 'sa-usuario-correo',
+            tabla: 'cat_usuarios',
+            campo: 'nombre',
+            placeholder: 'NA',
+            dropdownParent: '#mdl-correo-rauditoria',
+        }),
+
+        general_select2({
+            selectId: 'sa-cargo-correo',
+            tabla: 'cat_usuarios',
+            campo: 'cargo',
+            placeholder: 'NA',
+            dropdownParent: '#mdl-correo-rauditoria',
+            sincronizarCampo: 'cargo',
+            sincronizarCon: 'sa-usuario-correo'
+        })
+    ])
+    rellenar_select(equipo.usuario, "sa-usuario-correo");
+    rellenar_select(equipo.cargo, 'sa-cargo-correo')
+    $('#inp-aud-correo').val(equipo.correo_usuario)
+    $('#inp-aud-correo-validar').val('')
+
+    $('#btn-mdl-rauditoria').off('click').on('click', () => { correo_reporte_auditoria(equipo); });
+
+    $('#mdl-correo-rauditoria').modal('show');
+}
+
+async function correo_reporte_auditoria(datos_equipo) {
+    const validar = ['inp-aud-correo', 'inp-aud-correo-validar'];
+
+    if (!validar_campos(validar)) {
+        mostrar_toast('warning', 'Aviso', 'Rellena los campos. Inténtelo nuevamente.');
+        return;
+    }
+
+    if (!validar_correo_auditoria($('#inp-aud-correo').val().trim().toLowerCase()) || !validar_correo_auditoria($('#inp-aud-correo-validar').val().trim().toLowerCase())) {
+        mostrar_toast('warning', 'Aviso', 'Uno o ambos correos no tienen el formato correcto');
+        return;
+    }
+
+    if (!validar_dos_input($('#inp-aud-correo').val().trim().toLowerCase(), $('#inp-aud-correo-validar').val().trim().toLowerCase())) {
+        mostrar_toast('warning', 'Aviso', 'Los correos no coinciden');
+        return;
+    }
+
+    let model = {
+        accion: 2,
+        correo: $('#inp-aud-correo').val().trim().toLowerCase(),
+        datos: datos_equipo,
+        /* dominio: window.location.hostname,
+        puerto: location.port */
+    }
+    //*Variable global para saber si la página esta mostrarndo algun loader
+    mantenimiento_loading = true
+    mostrar_toast_cargando('Enviando correo...')
+    $('#mdl-correo-rauditoria').modal('hide')
+
+    let server = await server_correo(model)
+
+    if (server.resultado) {
+        mostrar_toast('success', '¡Realizado!', "Correo enviado al usuario")
+
+        //* Actualizando la fila sin dibujar de nuevo la tabla
+        /* const row = table.getRow(datos_equipo.id);
+        if (row) {
+            row.update({ correo_enviado: 1 }); //*Agregar await al principio si se requiere forzar renderizado de un boton de habilitado a deshabilitado
+            table.redraw(true);
+        } */
+
+        return
+    } else if (server.resultado == false) {
+        mostrar_toast('error', '¡Error!', "Hubo un problema con el servidor")
+        return
+    } else {
+        mostrar_toast('error', '¡Error!', 'Hubo un problema con el servidor')
+        return
+    }
+}
+
+function validar_correo_auditoria(correo) {
+    const correo_valido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return correo_valido.test(correo)
+}
+
+function validar_dos_input(texto1, texto2) {
+    if (texto1 === texto2) {
+        return true
+    } else {
+        return false
     }
 }

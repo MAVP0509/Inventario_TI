@@ -24,6 +24,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = verificar_email($clientejson);
 }else if ($clientejson->accion == 1) {
     $respuesta_servidor->resultado = email_reporte_mantenimiento($clientejson);
+} else if ($clientejson->accion == 2) {
+    $respuesta_servidor->resultado = correo_reporte_auditoria($clientejson);
 }
 print(json_encode($respuesta_servidor));
 
@@ -175,6 +177,119 @@ function email_reporte_mantenimiento($valores)
                         <p style="font-size: 16px; line-height: 1.6; color: #555; text-align: justify;">Le informamos que como parte de nuestro plan de mantenimiento preventivo, su equipo ' . $valores->datos->tipo . ' está 
                         programado para mantenimiento durante el mes </p>
                         <p style="font-size: 16px; line-height: 1.6; color: #555;">Información del mantenimiento:</p>
+                        <table style="width: 100%; margin-top: 15px; border-collapse: separate; border-spacing: 0 5px;font-size: 14px; color: #333;">
+                            <tr style="background-color: #eef2f7; border-radius: 5px;">
+                                <td style="padding: 10px; text-align: left; font-weight: bold; width: 40%; border-radius: 5px 0 0 5px;">Equipo</td>
+                                <td style="padding: 10px; text-align: left; border-radius: 0 5px 5px 0;">' . $valores->datos->tipo . '</td>
+                            </tr>
+                            <tr style=" border-radius: 5px;">
+                                <td style="padding: 10px; text-align: left; font-weight: bold; width: 40%; border-radius: 5px 0 0 5px;">Marca</td>
+                                <td style="padding: 10px; text-align: left; border-radius: 0 5px 5px 0;">' . $valores->datos->marca . '</td>
+                            </tr>
+                            <tr style="background-color: #eef2f7; border-radius: 5px;">
+                                <td style="padding: 10px; text-align: left; font-weight: bold; width: 40%; border-radius: 5px 0 0 5px;">Número de serie</td>
+                                <td style="padding: 10px; text-align: left; border-radius: 0 5px 5px 0;">' . $valores->datos->num_serie . '</td>
+                            </tr>
+                            <tr style=" border-radius: 5px;">
+                                <td style="padding: 10px; text-align: left; font-weight: bold; width: 40%; border-radius: 5px 0 0 5px;">Modelo</td>
+                                <td style="padding: 10px; text-align: left; border-radius: 0 5px 5px 0;">' . $valores->datos->modelo . '</td>
+                            </tr>
+                            <tr style="background-color: #eef2f7; border-radius: 5px;">
+                                <td style="padding: 10px; text-align: left; font-weight: bold; width: 40%; border-radius: 5px 0 0 5px;">Ubicación</td>
+                                <td style="padding: 10px; text-align: left; border-radius: 0 5px 5px 0;">' . $valores->datos->ubicacion . '</td>
+                            </tr>
+                            <tr style=" border-radius: 5px;">
+                                <td style="padding: 10px; text-align: left; font-weight: bold; width: 40%; border-radius: 5px 0 0 5px;">Usuario asignado</td>
+                                <td style="padding: 10px; text-align: left;border-radius: 0 5px 5px 0;">' . $valores->datos->usuario . '</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbmRyMTBmbGpxMmFzYmN5cDZ4aTgzamhpODloN21nenlhcWtzaGtubCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/5W0i0seIes4mDYtC0p/giphy.gif" alt="Animación mantenimiento" width="120" style="display: block; margin: 0 auto;" />
+                    </div>
+                    <div style="background-color: #f9fafc; color: #888; text-align: center; padding: 15px; font-size: 12px; border-top: 1px solid #e0e0e0;">
+                        &copy; ' . $Year . ' Inventario TI.
+                    </div>
+                    </div>
+                </body>
+            </html>';
+        $mail->AltBody = 'Mantenimiento de equipos';
+
+        // Enviar el correo
+        $mail->send();
+        /* if ($mail->send()) {
+                return "correo enviado correctamente.";
+            } else {
+                return "Error al enviar el correo";
+            } */
+
+        $sql = "UPDATE mantenimiento SET correo_enviado = 1 WHERE id_equipo = '$datos_equipo->id' AND  anio = '$datos_equipo->anio'";
+        if(!mysqli_query($con,$sql)){
+            return "No se pudo actualizar la BD";
+        }
+
+        if($valores->datos->usuario !== 'NA'){
+            $user = $valores->datos->usuario;
+            $sql_correo_usuario = "UPDATE cat_usuarios SET correo_usuario = '$valores->correo' WHERE nombre = '$user'";
+            if(!mysqli_query($con,$sql_correo_usuario)){
+                return "No se pudo guardar el correo";
+            }
+        }
+        
+        return true;
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+function correo_reporte_auditoria($valores)
+{
+    include("../email/Exception.php");
+    include("../email/PHPMailer.php");
+    include("../email/SMTP.php");
+    include("../conexion.php");
+
+    $mail = new PHPMailer();
+
+    $datos_equipo = $valores->datos;
+
+    try {
+        // Configuración del servidor SMTP
+        $mail->isSMTP(); // Usar el servidor SMTP
+        $mail->Host = 'smtp.gmail.com'; // Servidor SMTP de Gmail (ajustar según el servidor que uses)
+        $mail->SMTPSecure = "ssl";
+        $mail->SMTPAuth = true; // Habilitar la autenticación SMTP
+        $mail->Username = 'diavazdsp@diavaz.com'; // Dirección de correo electrónico
+        $mail->Password = 'nttbycbzoljyqitu'; // Contraseña de correo electrónico
+        $mail->Port = 465; // Puerto SMTP
+
+        $Year =  date("Y");
+        $Month = date("m");
+        $mail->CharSet = 'UTF-8';
+        // Configuración del remitente y destinatario
+        $mail->setFrom('diavazdsp@diavaz.com', 'Inventario TI');
+        $mail->addAddress($valores->correo, 'Destinatario');
+        //$IP = exec("curl https://checkip.amazonaws.com");
+        //$Puerto = $_SERVER['SERVER_PORT'];
+
+        //$reset_link = "http://$destino->dominio:$destino->puerto/Inventario_TI/recuperacion.html?ftygui=$token";
+        // $mail->addReplyTo('otra-direccion@dominio.com', 'Responder a'); // Opcional: dirección de respuesta
+
+        // Contenido del correo
+        $mail->isHTML(true); // Usar HTML en el correo
+        $mail->Subject = 'Notificación de Auditoría TI: '.$valores->datos->tipo. ' Folio '.$valores->datos->id;
+        $mail->Body =
+            '<html>
+                <body style="font-family: Arial, sans-serif; background-color: #f9fafc; color: #333; margin: 0; padding: 0;">
+                    <div style="max-width: 500px; margin: 40px auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; border: 1px solid #dcdcdc; text-align: center;">
+                    <div style="background-color: #0D3D7D; color: #ffffff; padding: 20px; font-size: 20px; font-weight: bold;">
+                        Auditoria de activos – Inventario TI
+                    </div>
+                    <div style="padding: 20px; text-align: center;">
+                        <h2 style="color: #333333; margin-bottom: 15px; font-size: 22px;">Su equipo entrará en proceso de auditoría este mes</h2>
+                        <p style="font-size: 16px; line-height: 1.6; color: #555; text-align: justify;">Le informamos que como parte de nuestro protocolo de control de activos y cumplimiento normativo, su equipo ' . $valores->datos->tipo . ' ha sido seleccionado 
+                        para una auditoría programada para este mes. </p>
+                        <p style="font-size: 16px; line-height: 1.6; color: #555;">Información del equipo:</p>
                         <table style="width: 100%; margin-top: 15px; border-collapse: separate; border-spacing: 0 5px;font-size: 14px; color: #333;">
                             <tr style="background-color: #eef2f7; border-radius: 5px;">
                                 <td style="padding: 10px; text-align: left; font-weight: bold; width: 40%; border-radius: 5px 0 0 5px;">Equipo</td>
