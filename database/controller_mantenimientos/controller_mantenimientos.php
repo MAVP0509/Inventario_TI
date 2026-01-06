@@ -281,7 +281,7 @@ function guardar_programa($valores)
 
 function consultar_programa_firmado($valores)
 {
-    $base = realpath(__DIR__ . '/../../Documentos/mantenimiento/programa');
+    $base = realpath(__DIR__ . '/../../documentos/mantenimiento/programa');
 
     if ($base === false) {
         return [

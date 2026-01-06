@@ -3,14 +3,14 @@ function server_auditoria(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "database/controller_mantenimientos/controller_mantenimientos.php",
+            url: "database/controller_auditorias/controller_auditorias.php",
             data: {
                 trama: JSON.stringify(model)
             },
             success: function (respose) {
                 try {
                     resolve(JSON.parse(respose))
-                    if (mantenimiento_loading) {
+                    if (auditoria_loading) {
                         Swal.close()
                         auditoria_loading = !auditoria_loading
                     }
@@ -71,6 +71,7 @@ let auditorias_pendientes
 
 async function consultar_auditoria(anio) {
     const fecha = anio.value;
+    console.log(fecha);
 
     let server = await server_auditoria({ accion: 0, anio: fecha });
 
@@ -329,6 +330,7 @@ async function consultar_auditoria(anio) {
 
         return objeto
     }, {}))
+    console.log(auditorias_pendientes);
 }
 
 async function mdl_programar_auditoria() {
@@ -381,6 +383,7 @@ async function mdl_programar_auditoria() {
 
     rellenar_select("Alejandro Cancino Argüello", "autorizo-aud");
     rellenar_select("César Ignacio Torres Almeida", "elaboro-aud");
+    $('#btn-conf-aud').prop('disabled', false);
 
     $('#cg-elaboro-aud, #cg-autorizo-aud').prop('disabled', true)
     $("#btn-conf-aud").off("click").on("click", function () { programar_auditoria() })
@@ -407,7 +410,7 @@ async function programar_auditoria() {
     }
 
     mostrar_toast_cargando('Programando auditoria...')
-    $('#mdl-btn-conf').prop('disabled', true);
+    $('#btn-conf-aud').prop('disabled', true);
 
     let server = await server_excel(model);
 
@@ -415,7 +418,7 @@ async function programar_auditoria() {
         window.location = server.resultado.url;
         mostrar_toast('success', '¡Programa de auditoria exitosa!', 'El programa de auditoria se generó correctamente.');
         $('#mdl-prog-aud').modal("hide");
-        load()
+        load_auditoria()
 
     } else {
         mostrar_toast('error', 'Error', server.resultado.error);
@@ -423,21 +426,21 @@ async function programar_auditoria() {
     }
 }
 
-async function consultar_programa_firmado() {
+async function consultar_pauditoria_firmado() {
 
-    let año_programa = mantenimientosPendientes[0].anio;
+    let año_pauditoria = auditorias_pendientes[0].anio;
 
     let model = {
         accion: 7,
-        anio: año_programa
+        anio: año_pauditoria
     }
 
-    let server = await server_mantenimiento(model);
+    let server = await server_auditoria(model);
 
-    const PDF = document.getElementById('lista-pdfs');
+    const PDF = document.getElementById('lista-pdfs-pauditoria');
 
     if (server.resultado.existe === true) {
-        document.getElementById('alert-programa').style.display = 'block';
+        document.getElementById('alert-pauditoria').style.display = 'block';
 
         const ruta = server.resultado.url;
         const nombreArchivo = server.resultado.archivo;
@@ -460,22 +463,25 @@ async function consultar_programa_firmado() {
 
         PDF.innerHTML = item;
     } else {
-        document.getElementById('alert-programa').style.display = 'none';
+        document.getElementById('alert-pauditoria').style.display = 'none';
         PDF.innerHTML = '';
     }
 
-    document.getElementById('btn-open-programa').click();
-    
-    programa_firmado();
+    document.getElementById('btn-open-pauditoria').click();
+
+    auditoria_firmado();
 }
 
 let charco = null;
 let charcoInicializado = false;
 
 async function auditoria_firmado() {
+
+    anio = auditorias_pendientes[0].anio;
+
     if (!charcoInicializado) {
 
-        const input = document.getElementById("subir-programa");
+        const input = document.getElementById("subir-pauditoria");
 
         charco = FilePond.create(input, {
             maxFiles: 1,
@@ -487,12 +493,12 @@ async function auditoria_firmado() {
             labelFileTypeNotAllowed: 'Archivo no válido solo .pdf',
             server: {
                 process: {
-                    url: "database/controller_mantenimientos/controller_mantenimientos.php",
+                    url: "database/controller_auditorias/controller_auditorias.php",
                     method: "POST",
-                    name: 'reporte_programa',
+                    name: 'reporte_pauditoria',
                     withCredentials: false,
                     ondata: (formData) => {
-                        formData.append('trama', JSON.stringify({ accion: 6, anio: mantenimientosPendientes[0].anio }));
+                        formData.append('trama', JSON.stringify({ accion: 6, anio: anio }));
                         return formData;
                     },
                     onload: (response) => {
@@ -502,6 +508,8 @@ async function auditoria_firmado() {
                         } else {
                             mostrar_toast('success', '¡Carga exitosa!', data.resultado.mensaje);
                             charco.removeFiles();
+                            consultar_auditoria(anio);
+                            // consultar_pauditoria_firmado();
                         }
                     },
                     onerror: (err) => {

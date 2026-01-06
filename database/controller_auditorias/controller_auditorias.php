@@ -1,7 +1,6 @@
-<?
-
+<?php
 header('Content-Type: text/html; charset=UTF-8');
-date_default_timezone_set('America/Mexico-City');
+date_default_timezone_set('America/Mexico_City');
 
 $clientejson = json_decode($_POST['trama']);
 
@@ -16,7 +15,7 @@ if ($clientejson->accion == 0) {
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = consultar_reporte($clientejson);
 } elseif ($clientejson->accion == 4) {
-    $respuesta_servidor->resultado = consultar_anio_auditoria($clientejson);
+    $respuesta_servidor->resultado = consultar_anio_auditoria();
 } elseif ($clientejson->accion == 5) {
     $respuesta_servidor->resultado = unir_reportes_auditoria($clientejson);
 } elseif ($clientejson->accion == 6) {
@@ -61,14 +60,14 @@ function guardar_programa_auditoria($valores)
 
     // Validar archivo
     if (
-        !isset($_FILES['reporte_programa']) ||
-        $_FILES['reporte_programa']['error'] !== UPLOAD_ERR_OK
+        !isset($_FILES['reporte_pauditoria']) ||
+        $_FILES['reporte_pauditoria']['error'] !== UPLOAD_ERR_OK
     ) {
         $respuesta->error = "No se recibió ningún archivo válido.";
         return $respuesta;
     }
 
-    $archivo = $_FILES['reporte_programa'];
+    $archivo = $_FILES['reporte_pauditoria'];
 
     $nombreOriginal = pathinfo($archivo['name'], PATHINFO_FILENAME);
     $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
@@ -83,7 +82,7 @@ function guardar_programa_auditoria($valores)
     $nombreLimpio = preg_replace('/[^A-Za-z0-9._-]/', '_', $nombreOriginal);
 
     // Ruta base
-    $base = realpath(__DIR__ . '/../../documentos/mantenimiento/programa');
+    $base = realpath(__DIR__ . '/../../documentos/auditoria/programa');
     if ($base === false) {
         $respuesta->error = "No se encontró la ruta base.";
         return $respuesta;
@@ -124,7 +123,7 @@ function guardar_programa_auditoria($valores)
 
 function consultar_auditoria_firmada($valores)
 {
-    $base = realpath(__DIR__ . '/../../Documentos/mantenimiento/programa');
+    $base = realpath(__DIR__ . '/../../documentos/auditoria/programa');
 
     if ($base === false) {
         return [
@@ -149,7 +148,7 @@ function consultar_auditoria_firmada($valores)
         $host = $_SERVER['HTTP_HOST'];
         $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 
-        $url = "{$protocolo}://{$host}/Inventario_TI/Documentos/mantenimiento/programa/{$valores->anio}/{$archivo}";
+        $url = "{$protocolo}://{$host}/Inventario_TI/documentos/auditoria/programa/{$valores->anio}/{$archivo}";
 
         return [
             "existe" => true,

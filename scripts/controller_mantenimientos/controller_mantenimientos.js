@@ -423,6 +423,7 @@ async function mdl_programar_mantenimiento() {
 
     rellenar_select("Alejandro Cancino Argüello", "select-autorizo");
     rellenar_select("César Ignacio Torres Almeida", "select-elaboro");
+    $('#mdl-btn-conf').prop('disabled', false);
 
     $('#select-cg-elaboro, #select-cg-autorizo').prop('disabled', true)
     $("#mdl-btn-conf").off("click").on("click", function () { programar_mantenimiento() })
@@ -462,6 +463,7 @@ async function programar_mantenimiento() {
     } else if (server.resultado.result === false) {
         mostrar_toast('error', 'Error', server.resultado.error);
         $('#mdl-prog-mant').modal("hide");
+        $('#mdl-btn-conf').prop('disabled', false);
     }/*  else if (server.resultado.duplicado === false) {
         mostrar_toast('error', '¡Error!', 'Ya existe un programa de mantenimiento para el año');
         $('#mdl-prog-mant').modal("hide");
@@ -581,6 +583,7 @@ async function mdl_mantenimiento_info(elemento_mnt) {
 async function mdl_reporte_mantenimiento(elemento_mnt) {
 
     $("#btn-reporte-mant").prop("disabled", false);
+    // document.getElementById("btn-reporte-mant").disabled = false;
 
     await general_select2({
         selectId: 'slc-encargado',
@@ -604,6 +607,7 @@ async function reporte_mantenimiento(elemento_mnt) {
     }
 
     mostrar_toast_cargando("Generando reporte de mantenimiento...")
+    // document.getElementById("btn-reporte-mant").disabled = true;
     $("#btn-reporte-mant").prop("disabled", true);
 
     let server = await server_excel(model);
@@ -616,6 +620,7 @@ async function reporte_mantenimiento(elemento_mnt) {
         mostrar_toast('success', '¡Generación de reporte exitoso!', 'La generación de reporte de mantenimiento se ha realizado correctamente.');
     } else {
         mostrar_toast('error', '¡Error!', 'No se pudo generar el reporte de mantenimiento. Inténtelo nuevamente.');
+        $('#btn-reporte-mant').prop('disabled', false);
     }
 }
 

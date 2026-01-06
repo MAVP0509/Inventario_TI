@@ -462,7 +462,7 @@ function programa_mantenimiento($valores)
     include('../conexion.php');
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    $anio_actual = date("Y") -5;
+    $anio_actual = date("Y") + 1;
     $sql_dev = "SELECT tipo_id FROM vorden_mantenimiento";
     $query_dev = mysqli_query($con, $sql_dev);
 
@@ -766,7 +766,7 @@ function programa_auditoria($valores)
     include('../conexion.php');
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    $anio_actual = date("Y") + 1;
+    $anio_actual = date("Y") -1;
     $sql_dev = "SELECT tipo_id FROM vorden_auditoria";
     $query_dev = mysqli_query($con, $sql_dev);
 
@@ -920,7 +920,7 @@ function programa_auditoria($valores)
 
     if ($base !== false) {
         $fecha = date('Ymd_His'); // Genera una marca de tiempo para el nombre del archivo
-        $nombre_doc = "FO-DSP-TI-04_Programa de Auditoria de Herramientas de Trabajo Región Sur_{$fecha}.xlsx"; // Nombre del archivo generado
+        $nombre_doc = "FO-DSP-TI-04_Programa de Auditoria de Herramientas de Trabajo Región Sur_{$anio_actual}_{$fecha}.xlsx"; // Nombre del archivo generado
         // Define la ruta física donde se guardará el archivo, basada en la estructura del proyecto
         $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . 'documentos_descarga' . DIRECTORY_SEPARATOR . 'auditoria' . DIRECTORY_SEPARATOR . 'programa' . DIRECTORY_SEPARATOR . $nombre_doc;
         $host = $_SERVER['HTTP_HOST'];

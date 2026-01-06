@@ -145,7 +145,8 @@
                                         <button type="button" style="text-align: center" data-toggle="popover"
                                             data-trigger="hover" data-html="true" data-placement="bottom"
                                             data-content="Baja de activo" class="btn bg-gray-dark rounded icon mr-3"
-                                            onclick="mdl_programar_auditoria()"><i class="fa-solid fa-file-invoice"></i> Programar auditoria
+                                            onclick="mdl_programar_auditoria()"><i class="fa-solid fa-file-invoice"></i>
+                                            Programar auditoria
                                         </button>
                                         <button type="button" class="btn btn-lg btn-outline-success mr-3 icon"
                                             data-toggle="popover" data-trigger="hover" data-html="true"
@@ -156,9 +157,12 @@
                                             data-toggle="popover" data-trigger="hover" data-html="true"
                                             data-placement="bottom" data-content="Resguardos firmados"
                                             data-widget="control-sidebar" data-slide="true"
-                                            onclick="abrir_control_sidebar()">
+                                            onclick="consultar_pauditoria_firmado()">
                                             <i class="fa-solid fa-file-signature"></i>
                                         </button>
+                                        <button id="btn-open-pauditoria" type="button" data-widget="control-sidebar"
+                                            data-slide="true" data-target="#control-sidebar-pauditoria"
+                                            style="display:none"></button>
                                     </div>
                                 </div>
                                 <!--Card Body-->
@@ -312,8 +316,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                                     </div>
-                                    <select class="form-control select" id="elaboro-aud"
-                                        name="inp-prog-mant"></select>
+                                    <select class="form-control select" id="elaboro-aud" name="inp-prog-mant"></select>
                                     <div class="invalid-feedback">Por favor, seleccione una persona.</div>
                                 </div>
                                 <h6>Cargo del elaborador</h6>
@@ -330,8 +333,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                                     </div>
-                                    <select class="form-control select" id="autorizo-aud"
-                                        name="inp-prog-mant"></select>
+                                    <select class="form-control select" id="autorizo-aud" name="inp-prog-mant"></select>
                                     <div class="invalid-feedback">Por favor, seleccione una persona.</div>
                                 </div>
                                 <h6>Cargo del autorizador</h6>
