@@ -477,7 +477,6 @@ let charcoInicializado = false;
 
 async function auditoria_firmado() {
 
-    anio = auditorias_pendientes[0].anio;
 
     if (!charcoInicializado) {
 
@@ -498,7 +497,7 @@ async function auditoria_firmado() {
                     name: 'reporte_pauditoria',
                     withCredentials: false,
                     ondata: (formData) => {
-                        formData.append('trama', JSON.stringify({ accion: 6, anio: anio }));
+                        formData.append('trama', JSON.stringify({ accion: 6, anio: auditorias_pendientes[0].anio }));
                         return formData;
                     },
                     onload: (response) => {
@@ -508,8 +507,8 @@ async function auditoria_firmado() {
                         } else {
                             mostrar_toast('success', '¡Carga exitosa!', data.resultado.mensaje);
                             charco.removeFiles();
-                            consultar_auditoria(anio);
-                            // consultar_pauditoria_firmado();
+                            // consultar_auditoria(auditorias_pendientes[0]);
+                            consultar_pauditoria_firmado();
                         }
                     },
                     onerror: (err) => {
