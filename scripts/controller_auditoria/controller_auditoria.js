@@ -72,7 +72,7 @@ async function load_auditoria() {
         // popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
     })
 
-    let server = await server_auditoria({ accion: 4 })
+    let server = await server_auditoria({ accion: 1 })
     if (!server.resultado) {
         return
     } else {
@@ -299,7 +299,7 @@ async function consultar_auditoria(anio) {
 
                         // Acción que quieres ejecutar al hacer clic
                         const elemento_aud = cell.getRow().getData();
-                        mdl_reporte_mantenimiento(elemento_aud);
+                        mdl_descargar_reporte_auditoria(elemento_aud);
 
                         // Rehabilita el botón después de 3 segundos
                         setTimeout(() => {
@@ -450,7 +450,7 @@ async function consultar_pauditoria_firmado() {
     let año_pauditoria = auditorias_pendientes[0].anio;
 
     let model = {
-        accion: 7,
+        accion: 3,
         anio: año_pauditoria
     }
 
@@ -544,6 +544,8 @@ async function auditoria_firmado() {
 }
 
 //TODO: Funciones para el proceso de auditoria (notificación, descarga de reporte, carga de reporte, vista de reporte, información del activo)
+
+//* Funciones para notificación de auditoría (mdl_correo_reporte_auditoria, corre_reporte_auditoria, validar_correo 1 y 2)
 async function mdl_correo_reporte_auditoria(equipo) {
 
     await Promise.all([
@@ -583,12 +585,12 @@ async function correo_reporte_auditoria(datos_equipo) {
         return;
     }
 
-    if (!validar_correo_auditoria($('#inp-aud-correo').val().trim().toLowerCase()) || !validar_correo_auditoria($('#inp-aud-correo-validar').val().trim().toLowerCase())) {
+    if (!validar_correo1($('#inp-aud-correo').val().trim().toLowerCase()) || !validar_correo1($('#inp-aud-correo-validar').val().trim().toLowerCase())) {
         mostrar_toast('warning', 'Aviso', 'Uno o ambos correos no tienen el formato correcto');
         return;
     }
 
-    if (!validar_dos_input($('#inp-aud-correo').val().trim().toLowerCase(), $('#inp-aud-correo-validar').val().trim().toLowerCase())) {
+    if (!validar_correo2($('#inp-aud-correo').val().trim().toLowerCase(), $('#inp-aud-correo-validar').val().trim().toLowerCase())) {
         mostrar_toast('warning', 'Aviso', 'Los correos no coinciden');
         return;
     }
@@ -601,21 +603,21 @@ async function correo_reporte_auditoria(datos_equipo) {
         puerto: location.port */
     }
     //*Variable global para saber si la página esta mostrarndo algun loader
-    mantenimiento_loading = true
+    auditoria_loading = true
     mostrar_toast_cargando('Enviando correo...')
     $('#mdl-correo-rauditoria').modal('hide')
 
     let server = await server_correo(model)
 
-    if (server.resultado) {
+    if (server.resultado === true) {
         mostrar_toast('success', '¡Realizado!', "Correo enviado al usuario")
 
         //* Actualizando la fila sin dibujar de nuevo la tabla
-        /* const row = table.getRow(datos_equipo.id);
+        const row = tabla_aud.getRow(datos_equipo.id);
         if (row) {
             row.update({ correo_enviado: 1 }); //*Agregar await al principio si se requiere forzar renderizado de un boton de habilitado a deshabilitado
-            table.redraw(true);
-        } */
+            tabla_aud.redraw(true);
+        }
 
         return
     } else if (server.resultado == false) {
@@ -627,15 +629,65 @@ async function correo_reporte_auditoria(datos_equipo) {
     }
 }
 
-function validar_correo_auditoria(correo) {
+function validar_correo1(correo) {
     const correo_valido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return correo_valido.test(correo)
 }
 
-function validar_dos_input(texto1, texto2) {
+function validar_correo2(texto1, texto2) {
     if (texto1 === texto2) {
         return true
     } else {
         return false
+    }
+}
+
+//* Funciones para descarga de reporte de auditoria
+async function mdl_descargar_reporte_auditoria(equipo) {
+    $("#btn-reporte-aud").prop("disabled", false);
+    // document.getElementById("btn-reporte-aud").disabled = false;
+
+    await general_select2({
+        selectId: 'saud-encargado',
+        tabla: 'cat_usuarios',
+        campo: 'nombre',
+        dropdownParent: '#mdl-reporte-aud',
+        placeholder: 'Seleccione un encargado'
+    })
+
+    rellenar_select("César Ignacio Torres Almeida", "saud-encargado");
+    $("#btn-reporte-aud").off('click').on('click', function () { reporte_auditoria(equipo) })
+    $("#mdl-reporte-aud").modal("show");
+}
+
+async function reporte_auditoria(equipo) {
+    let model = {
+        accion: 6,
+        elementos: equipo,
+        encargado: $("#saud-encargado").select2('data')[0].text
+    }
+
+    mostrar_toast_cargando("Generando reporte de mantenimiento...")
+    // document.getElementById("btn-reporte-mant").disabled = true;
+    $("#btn-reporte-aud").prop("disabled", true);
+
+    let server = await server_excel(model);
+
+    if (server.resultado.result === true && server.resultado.url) {
+        window.location = server.resultado.url;
+        $('#mdl-reporte-aud').modal("hide");
+
+        const filas = server.resultado.ids.map(id => ({
+            id: id,
+            reporte_descargado: 1,
+            estado: "En proceso"
+        }));
+        table.updateData(filas);
+
+        consultar_mantenimientos_vencidos()
+        mostrar_toast('success', '¡Generación de reporte exitoso!', 'La generación de reporte de mantenimiento se ha realizado correctamente.');
+    } else {
+        mostrar_toast('error', '¡Error!', 'No se pudo generar el reporte de mantenimiento. Inténtelo nuevamente.');
+        $('#btn-reporte-aud').prop('disabled', false);
     }
 }

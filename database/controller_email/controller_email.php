@@ -326,7 +326,7 @@ function correo_reporte_auditoria($valores)
                     </div>
                 </body>
             </html>';
-        $mail->AltBody = 'Mantenimiento de equipos';
+        $mail->AltBody = 'Auditoría de equipos';
 
         // Enviar el correo
         $mail->send();
@@ -336,7 +336,8 @@ function correo_reporte_auditoria($valores)
                 return "Error al enviar el correo";
             } */
 
-        $sql = "UPDATE mantenimiento SET correo_enviado = 1 WHERE id_equipo = '$datos_equipo->id' AND  anio = '$datos_equipo->anio'";
+        $sql = "UPDATE auditoria SET correo_enviado = 1 WHERE id_equipo = '$datos_equipo->id' AND  anio = '$datos_equipo->anio'";
+        // var_dump($sql);
         if(!mysqli_query($con,$sql)){
             return "No se pudo actualizar la BD";
         }

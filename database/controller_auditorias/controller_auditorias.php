@@ -9,19 +9,19 @@ $respuesta_servidor = new stdClass();
 if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_auditoria($clientejson);
 } elseif ($clientejson->accion == 1) {
-    $respuesta_servidor->resultado = guardar_reportes($clientejson);
+    $respuesta_servidor->resultado = consultar_anio_auditoria();
 } elseif ($clientejson->accion == 2) {
     $respuesta_servidor->resultado = validar_reporte_mismo_año($clientejson);
 } elseif ($clientejson->accion == 3) {
-    $respuesta_servidor->resultado = consultar_reporte($clientejson);
+    $respuesta_servidor->resultado = consultar_auditoria_firmada($clientejson);
 } elseif ($clientejson->accion == 4) {
-    $respuesta_servidor->resultado = consultar_anio_auditoria();
+    $respuesta_servidor->resultado = guardar_reportes($clientejson);
 } elseif ($clientejson->accion == 5) {
     $respuesta_servidor->resultado = unir_reportes_auditoria($clientejson);
 } elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = guardar_programa_auditoria($clientejson);
 } elseif ($clientejson->accion == 7) {
-    $respuesta_servidor->resultado = consultar_auditoria_firmada($clientejson);
+    $respuesta_servidor->resultado = consultar_reporte($clientejson);
 }
 
 print(json_encode($respuesta_servidor));

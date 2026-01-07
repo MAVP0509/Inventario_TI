@@ -32,6 +32,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = reporte_mantenimiento($clientejson);
 } elseif ($clientejson->accion == 5) {
     $respuesta_servidor->resultado = programa_auditoria($clientejson);
+} elseif ($clientejson->accion == 6) {
+    $respuesta_servidor->resultado = reporte_auditoria($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -642,6 +644,7 @@ function reporte_mantenimiento($valores)
     $sql = "SELECT
                 man.id_equipo AS id,
                 man.anio,
+                man.estado,
                 cu.nombre,
                 cu.cargo,
                 cu.region,
@@ -657,7 +660,8 @@ function reporte_mantenimiento($valores)
                 INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
             WHERE
                 cu.nombre = '$usuario' 
-                AND man.anio = '$anio'";
+                AND man.anio = '$anio'
+                AND man.estado = 'Pendiente'";
 
     $query = mysqli_query($con, $sql);
 
@@ -784,7 +788,7 @@ function programa_auditoria($valores)
     include('../conexion.php');
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    $anio_actual = date("Y") - 1;
+    $anio_actual = date("Y") + 1;
     $sql_dev = "SELECT tipo_id FROM vorden_auditoria";
     $query_dev = mysqli_query($con, $sql_dev);
 
@@ -961,4 +965,155 @@ function programa_auditoria($valores)
             'error' => 'No se pudo realizar el programa de auditoria. Inténtalo nuevamente.'
         ];
     }
+}
+
+function reporte_auditoria($valores)
+{
+    include('../conexion.php');
+
+    $usuario = $valores->elementos->usuario;
+    $anio = $valores->elementos->anio;
+
+    $sql = "SELECT
+                aud.id_equipo AS id,
+                aud.anio,
+                aud.estado,
+                cu.nombre,
+                cu.cargo,
+                cu.region,
+                ct.tipo,
+                ca.marca,
+                inv.modelo,
+                inv.num_serie
+            FROM
+                auditoria AS aud
+                INNER JOIN inventario_ti_sur AS inv ON inv.id = aud.id_equipo
+                INNER JOIN cat_usuarios AS cu ON cu.id = inv.fk_usuario
+                INNER JOIN cat_tipo AS ct ON ct.id = inv.fk_tipo 
+                INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
+            WHERE
+                cu.nombre = '$usuario' 
+                AND aud.anio = '$anio'
+                AND aud.estado = 'Pendiente'";
+
+    $query = mysqli_query($con, $sql);
+
+    $datos = [];
+
+    while ($fila = mysqli_fetch_object($query)) {
+        $datos[] = $fila;
+    }
+
+    $spreadsheet = IOFactory::load('FO-DSP-TI-02 Reporte de auditoria a herramientas TI Rev.00.xlsx'); //*Cargando la plantilla del Excel
+    $worksheet = $spreadsheet->getActiveSheet();
+
+    /* 
+    TODO Configuración de impresión
+    * Es necesario para dar un formato, delimitar márgenes para cuando se exporte a pdf, el pdf no este descuadrado
+    */
+    $pageSetup = $worksheet->getPageSetup();
+    $pageSetup->setOrientation(PageSetup::ORIENTATION_PORTRAIT);
+    $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LETTER);
+    $pageSetup->setFitToPage(true);
+    $pageSetup->setFitToWidth(1);
+    $pageSetup->setFitToHeight(0);
+
+    //* ajustando márgenes
+    $pageMargins = $worksheet->getPageMargins();
+    $pageMargins->setTop(0.5);
+    $pageMargins->setBottom(0.5);
+    $pageMargins->setLeft(0.5);
+    $pageMargins->setRight(0.5);
+
+    $worksheet->setCellValue("C8", !empty($valores->elementos->usuario) ? $valores->elementos->usuario : 'NA');
+    $worksheet->setCellValue("K10", !empty($valores->elementos->cargo) ? $valores->elementos->ubicacion : 'NA');
+    $worksheet->setCellValue("G10", !empty($valores->elementos->region) ? $valores->elementos->region : 'NA');
+    // $worksheet->setCellValue("G14", !empty($valores->id) ? $valores->id : 'NA');
+    $fila_inicio = 14;
+    $fila_actual = $fila_inicio;
+    $equipos_base = 3;
+    $ids_equipo = [];
+
+    foreach ($datos as $index => $equipo) {
+        $ids_equipo[] = $equipo->id;
+        // Si excede los equipos base, se inserta 2 filas nuevas
+        if ($index >= $equipos_base) {
+            $worksheet->insertNewRowBefore($fila_actual, 2);
+            // Copia estilos del bloque anterior
+            $worksheet->duplicateStyle(
+                $worksheet->getStyle("B" . ($fila_actual - 2) . ":K" . ($fila_actual - 1)),
+                "B{$fila_actual}:K" . ($fila_actual + 1)
+            );
+        }
+        // ITEM (centrado en las 2 filas)
+        $worksheet->mergeCells("B{$fila_actual}:B" . ($fila_actual + 1));
+        $worksheet->setCellValue("B{$fila_actual}", $index + 1);
+
+        // TIPO
+        $worksheet->mergeCells("C{$fila_actual}:C" . ($fila_actual + 1));
+        $worksheet->setCellValue("C{$fila_actual}", $equipo->tipo);
+
+        // MARCA
+        $worksheet->mergeCells("D{$fila_actual}:D" . ($fila_actual + 1));
+        $worksheet->setCellValue("D{$fila_actual}", $equipo->marca);
+
+        // MODELO
+        $worksheet->mergeCells("E{$fila_actual}:F" . ($fila_actual + 1));
+        $worksheet->setCellValue("E{$fila_actual}", $equipo->modelo);
+
+        // NÚMERO DE SERIE
+        $worksheet->mergeCells("G{$fila_actual}:H" . ($fila_actual + 1));
+        $worksheet->setCellValue("G{$fila_actual}", $equipo->num_serie);
+
+        // ESTADO FÍSICO (vacío)
+        $worksheet->mergeCells("I{$fila_actual}:I" . ($fila_actual + 1));
+        $worksheet->setCellValue("I{$fila_actual}", '');
+
+        // OBSERVACIONES (vacío)
+        $worksheet->mergeCells("J{$fila_actual}:K" . ($fila_actual + 1));
+        $worksheet->setCellValue("J{$fila_actual}", '');
+
+        // Avanzar al siguiente bloque
+        $fila_actual += 2;
+    }
+
+    $worksheet->setCellValue("D69", !empty($valores->encargado) ? $valores->encargado : '');
+    $worksheet->setCellValue("U69", !empty($valores->elementos->usuario) ? $valores->elementos->usuario : '');
+
+    // $workskheet->setCellValue("W{$fila}", $observaciones);
+
+
+    $fecha_doc = date('Ymd_His');
+    $nombre_doc = "FO-DSP-TI-06 Reporte de auditoria a herramientas TI Rev.00_{$fecha_doc}.xlsx";
+
+    $base = realpath(__DIR__ . '/../../../');
+    $host = $_SERVER['HTTP_HOST'];
+    $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+
+    if ($base !== false) {
+        $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . 'documentos_descarga' . DIRECTORY_SEPARATOR . 'auditoria' . DIRECTORY_SEPARATOR . 'reporte' . DIRECTORY_SEPARATOR . $nombre_doc;
+        $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/auditoria/reporte/{$nombre_doc}";
+    }
+
+    $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+    $writer->save($ruta_guardar);
+
+    if (!empty($ids_equipo)) {
+        $ids = implode(',', $ids_equipo);
+        $sql = "UPDATE auditoria 
+                SET reporte_descargado = 1, 
+                    estado = 'En proceso' 
+                WHERE id_equipo IN ($ids)
+                AND  anio = '$anio'";
+
+        if (!mysqli_query($con, $sql)) {
+            return false;
+        }
+    }
+
+    return array(
+        'result' => true,
+        'url' => $url_descarga,
+        'ids' => $ids_equipo
+    );
 }

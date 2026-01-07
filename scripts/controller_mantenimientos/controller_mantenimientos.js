@@ -620,8 +620,9 @@ async function reporte_mantenimiento(elemento_mnt) {
             id: id, 
             reporte_descargado: 1, 
             estado: "En proceso"
-        }))
-        table.updateData(filas)
+        }));
+        table.updateData(filas);
+
         consultar_mantenimientos_vencidos()
         mostrar_toast('success', '¡Generación de reporte exitoso!', 'La generación de reporte de mantenimiento se ha realizado correctamente.');
     } else {
@@ -938,12 +939,9 @@ async function mdl_descargar_reportes_mensuales() {
     $('#mdl-descargar-reportes-mes').modal('show')
 }
 
-
-
 $(document).ready(function () {
     $('[data-toggle="popover"]').popover();
 })
-
 
 function consultar_reportes_mensuales() {
     //console.log(mantenimientosPendientes[0])
@@ -958,7 +956,6 @@ function consultar_reportes_mensuales() {
 
     cargarMeses(mesesCompletados)
 }
-
 
 const mesesNombres = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
