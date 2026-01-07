@@ -441,22 +441,6 @@ function fecha_programa($anio, $mes)
     return $fecha->format('Y-m-d');
 }
 
-/* function ConsultarOrdenMTTO()
-{
-    include('../conexion.php');
-    $sql_dis = "SELECT tipo_id FROM vorden_mantenimiento";
-    $sql_orden = "SELECT orden FROM vorden_mantenimiento ORDER BY orden";
-
-    $SQL = "CALL pprograma_mantenimiento($sql_dis, $sql_orden)";
-    // $SQL = "SELECT * FROM vorden_mantenimiento ORDER BY orden";
-    $query = mysqli_query($con, $SQL);
-    $datos = array();
-    while ($filas = mysqli_fetch_object($query)) {
-        array_push($datos, $filas->tipo_id);
-    }
-    return $datos;
-} */
-
 function programa_mantenimiento($valores)
 {
     include('../conexion.php');
@@ -651,6 +635,8 @@ function programa_mantenimiento($valores)
 function reporte_mantenimiento($valores)
 {
     include('../conexion.php');
+
+    $sql = "SELECT ";
 
     $spreadsheet = IOFactory::load('FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.01.xlsx'); //*Cargando la plantilla del Excel
     $worksheet = $spreadsheet->getActiveSheet();
