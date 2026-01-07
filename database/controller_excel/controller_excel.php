@@ -636,7 +636,36 @@ function reporte_mantenimiento($valores)
 {
     include('../conexion.php');
 
-    $sql = "SELECT ";
+    $usuario = $valores->elementos->usuario;
+    $anio = $valores->elementos->anio;
+
+    $sql = "SELECT
+                man.id_equipo AS id,
+                man.anio,
+                cu.nombre,
+                cu.cargo,
+                cu.region,
+                ct.tipo,
+                ca.marca,
+                inv.modelo,
+                inv.num_serie
+            FROM
+                mantenimiento AS man
+                INNER JOIN inventario_ti_sur AS inv ON inv.id = man.id_equipo
+                INNER JOIN cat_usuarios AS cu ON cu.id = inv.fk_usuario
+                INNER JOIN cat_tipo AS ct ON ct.id = inv.fk_tipo 
+                INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
+            WHERE
+                cu.nombre = '$usuario' 
+                AND man.anio = '$anio'";
+
+    $query = mysqli_query($con, $sql);
+
+    $datos = [];
+
+    while ($fila = mysqli_fetch_object($query)) {
+        $datos[] = $fila;
+    }
 
     $spreadsheet = IOFactory::load('FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.01.xlsx'); //*Cargando la plantilla del Excel
     $worksheet = $spreadsheet->getActiveSheet();
@@ -684,33 +713,30 @@ function reporte_mantenimiento($valores)
         $worksheet->setCellValue("W{$fila}", 'NA'); // Observaciones
     }
 
-    // Determinar fila a llenar según tipo
-    $tipo = !empty($valores->elementos->tipo) ? $valores->elementos->tipo : 'Otros';
-    // var_dump($tipo);
-    // $tipo = preg_replace('/\s+/', ' ', $tipo);
-    // $tipo = ucfirst(strtolower($tipo));
-    $fila = $mapa_filas[$tipo] ?? 26; // 26 = Otros
+    $otros_fila = 26;
+    $ids_equipo = [];
 
-    // Rellenar datos
-    $marca = !empty($valores->elementos->marca) ? $valores->elementos->marca : 'NA';
-    $modelo = !empty($valores->elementos->modelo) ? $valores->elementos->modelo : 'NA';
-    $serie = !empty($valores->elementos->num_serie) ? $valores->elementos->num_serie : 'NA';
-    // $observaciones = !empty($valores->ubicacion) ? $valores->ubicacion : 'NA';
-    $observaciones = false;
-    if ($marca !== 'NA' || $modelo !== 'NA' || $serie !== 'NA') {
-        $worksheet->setCellValue("W{$fila}", '');
-        $observaciones = true;
-    }
+    foreach ($datos as $equipo) {
+        $tipo = trim($equipo->tipo);
 
-    if ($observaciones) {
-        for ($f = 20; $f <= 27; $f++); {
-            $worksheet->setCellValue("W{$f}", '');
+        if (isset($mapa_filas[$tipo])) {
+            $fila = $mapa_filas[$tipo];
+        } else {
+            if ($otros_fila > 27) {
+                continue;
+            }
+
+            $fila = $otros_fila;
+            $otros_fila++;
         }
-    }
 
-    $worksheet->setCellValue("G{$fila}", $marca);
-    $worksheet->setCellValue("L{$fila}", $modelo);
-    $worksheet->setCellValue("Q{$fila}", $serie);
+        $worksheet->setCellValue("G{$fila}", $equipo->marca ?? 'NA');
+        $worksheet->setCellValue("L{$fila}", $equipo->modelo ?? 'NA');
+        $worksheet->setCellValue("Q{$fila}", $equipo->num_serie ?? 'NA');
+        $worksheet->setCellValue("W{$fila}", '');
+
+        $ids_equipo[] = $equipo->id;
+    }
 
     $worksheet->setCellValue("D69", !empty($valores->encargado) ? $valores->encargado : '');
     $worksheet->setCellValue("U69", !empty($valores->elementos->usuario) ? $valores->elementos->usuario : '');
@@ -733,17 +759,23 @@ function reporte_mantenimiento($valores)
     $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
     $writer->save($ruta_guardar);
 
-    $datos = $valores->elementos;
-    $sql = "UPDATE mantenimiento SET reporte_descargado = 1, estado = 'En proceso' WHERE id_equipo = '$datos->id' AND  anio = '$datos->anio'";
+    if (!empty($ids_equipo)) {
+        $ids = implode(',', $ids_equipo);
+        $sql = "UPDATE mantenimiento 
+                SET reporte_descargado = 1, 
+                    estado = 'En proceso' 
+                WHERE id_equipo IN ($ids)
+                AND  anio = '$anio'";
 
-
-    if (!mysqli_query($con, $sql)) {
-        return false;
+        if (!mysqli_query($con, $sql)) {
+            return false;
+        }
     }
 
     return array(
         'result' => true,
-        'url' => $url_descarga
+        'url' => $url_descarga,
+        'ids' => $ids_equipo
     );
 }
 
@@ -752,7 +784,7 @@ function programa_auditoria($valores)
     include('../conexion.php');
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    $anio_actual = date("Y") -1;
+    $anio_actual = date("Y") - 1;
     $sql_dev = "SELECT tipo_id FROM vorden_auditoria";
     $query_dev = mysqli_query($con, $sql_dev);
 

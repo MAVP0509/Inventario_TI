@@ -615,7 +615,13 @@ async function reporte_mantenimiento(elemento_mnt) {
     if (server.resultado.result === true && server.resultado.url) {
         window.location = server.resultado.url;
         $('#mdl-reporte-mant').modal("hide");
-        table.updateData([{ id: elemento_mnt.id, reporte_descargado: 1, estado: "En proceso" }])
+
+        const filas = server.resultado.ids.map(id => ({
+            id: id, 
+            reporte_descargado: 1, 
+            estado: "En proceso"
+        }))
+        table.updateData(filas)
         consultar_mantenimientos_vencidos()
         mostrar_toast('success', '¡Generación de reporte exitoso!', 'La generación de reporte de mantenimiento se ha realizado correctamente.');
     } else {
