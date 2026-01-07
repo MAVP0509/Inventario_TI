@@ -264,7 +264,7 @@ async function consultar_informacion(params) {
     })
 
 }
-
+//*Cada que un supervisor es habilitado se ejecuta para actualizar la BD
 async function supervisor_habilitado(model) {
     await server_supervisor(model)
 }
