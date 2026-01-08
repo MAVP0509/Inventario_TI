@@ -442,40 +442,6 @@ async function editar_supervisor() {
 
 }
 
-async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags }) {
-    //try {
-    const response = await server_supervisor({
-        accion: 4,
-        tabla: tabla,
-        campo: campo
-    });
-
-    //console.log('Respuesta del servidor para select2:', response);
-
-    const opciones = response.resultado.map(item => ({
-        id: item[campo] || '',
-        text: item[campo] || ''
-    }));
-
-    const $select = $('#' + selectId);
-    $select.empty().append(new Option('', '', false, false));
-
-    $select.select2({
-        theme: 'bootstrap4',
-        allowClear: true,
-        placeholder: placeholder,
-        tags: tags,
-        dropdownParent: $(dropdownParent),
-        data: opciones
-    });
-
-    $select.val(null).trigger('change');
-
-    //} catch (error) {
-
-    //}
-}
-
 async function mensaje_eliminar() {
 
     if (supervisor_seleccionado.length === 0) {
