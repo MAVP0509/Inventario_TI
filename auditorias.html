@@ -187,36 +187,34 @@
             </section> <!--Container-->
 
 
-            <!--Control-sidebar -->
+            <!--Control-sidebar reporte auditoria -->
             <aside class="control-sidebar control-sidebar-light" id="control-sidebar" style="width: 450px !important;">
                 <div class="p-3 control-sidebar-content d-flex flex-column h-100 overflow-hidden">
-                    <!-- <h4><i class="fa-solid fa-file-invoice"></i> Resguardos firmados</h4>
-                <button type="button" class="btn btn-outline-danger icon"><i class="fa-solid fa-xmark"></i></button> -->
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h4 class="mb-0">
                             <i class="fa-solid fa-file-arrow-up"></i> Subir reporte de auditoria
                         </h4>
                         <button type="button" class="btn btn-danger icon" data-widget="control-sidebar"
-                            data-slide="true" onclick="remover_archivo()">
+                            data-slide="true" onclick="eliminar_archivo()">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
                     <hr class="mb-3">
                     <div class="container-fluid">
                         <div class="row">
-                            <div class="col" id="col-subir-reporte">
+                            <div class="col" id="aud-subir-reporte">
                                 <div class="alert alert-danger position-relative d-flex align-items-start " role="alert"
                                     style="display:none !important; background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;"
-                                    id="alert-reporte">
-                                    El activo ya tiene el reporte de este año, si sube uno, reemplazará el ya existente
+                                    id="alert-aud-reporte">
+                                    El activo ya tiene el reporte de este año, si sube uno, reemplazará el existente
                                     y no será reversible
                                 </div>
                                 <div id="contenedor-filepond">
-                                    <input type="file" id="subir-reporte" name="reporte_mantenimiento">
+                                    <input type="file" id="subir-reporte-aud" name="reporte_aud">
                                 </div>
 
-                                <div id="ver-pdf-reporte">
-                                    <embed id="pdf-reporte-viewer" src="libraries/web/viewer.html"
+                                <div id="pdf-aud">
+                                    <embed id="pdf-ver-aud" src="libraries/web/viewer.html"
                                         style="width: 100%; height: 350px; border: none; margin-top: 20px;"
                                         loading="lazy" referrerpolicy="no-referrer"
                                         sandbox="allow-scripts allow-same-origin allow-downloads"></embed>
@@ -226,7 +224,7 @@
                         </div>
                     </div>
                 </div>
-            </aside>
+            </aside> <!-- sidebar reporte auditoria -->
 
             <!-- Control sidebar programa auditoria -->
             <aside class="control-sidebar control-sidebar-light" id="control-sidebar-pauditoria"
@@ -362,6 +360,62 @@
         </div>
     </div>
 
+    <!--Modal enviar correo reporte-->
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-correo-rauditoria" role="dialog"
+        data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fa-solid fa-envelope-open-text"></i> Correo de mantenimiento</h5>
+                    <!-- <i class="fa-brands fa-optin-monster"></i> -->
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <h6>Usuario asignado</h6>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                            </div>
+                            <select class="form-control select" id="sa-usuario-correo" disabled></select>
+                        </div>
+                        <h6>Cargo del usuario</h6>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa-solid fa-briefcase"></i></span>
+                            </div>
+                            <select class="form-control select" id="sa-cargo-correo" disabled></select>
+                        </div>
+                        <h6>Correo destinatario</h6>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa-solid fa-at"></i></span>
+                            </div>
+                            <input type="input" class="form-control" id="inp-aud-correo" name="mdl-mant-info-inputs"
+                                autocomplete="off">
+                        </div>
+                        <!--<small class="form-text text-muted">Porfavor confirme el correo </small>-->
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa-solid fa-at"></i></span>
+                            </div>
+                            <input type="input" class="form-control" id="inp-aud-correo-validar"
+                                name="mdl-mant-info-inputs" autocomplete="off" placeholder="Confirmar correo">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
+                            class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+                    <button type="button" class="btn btn-success envelope" id="btn-mdl-rauditoria" onclick="">Enviar <i
+                            class="fa-solid fa-envelope"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal de reporte de mantenimiento -->
     <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-reporte-aud" role="dialog" data-backdrop="static"
         data-keyboard="false">
@@ -379,10 +433,18 @@
                         <h6>Encargado de realizar el reporte</h6>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <div class="input-group-text"><i class="fa-solid fa-user"></i></div>
+                                <div class="input-group-text"><i class="fa-solid fa-user-gear"></i></div>
                             </div>
                             <select id="saud-encargado" class="form-control"></select>
                             <div class="invalid-feedback">Por favor, selecione un encargado</div>
+                        </div>
+                        <h6>Puesto del encargado</h6>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text"><i class="fa-regular fa-id-card"></i></div>
+                            </div>
+                            <select id="saud-cargo" class="form-control"></select>
+                            <div class="invalid-feedback">Por favor, selecione un cargo</div>
                         </div>
                     </div>
                 </div>
@@ -392,6 +454,36 @@
                             class="fa-solid fa-arrow-right-from-bracket"></i> Cancelar</button>
                     <button type="button" class="btn btn-success icon" id="btn-reporte-aud"><i
                             class="fa-solid fa-file-arrow-down"></i> Generar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal ver pdf-->
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-ver-pdf" role="dialog" data-backdrop="static"
+        data-keyboard="false">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fa-solid fa-file"></i> Reporte de mantenimiento</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col">
+                                <iframe id="mdl-ver-pdf-reporte" src="libraries/web/viewer.html"
+                                    style="width: 100%; height: 700px; border: none; margin-top: 20px;" loading="lazy"
+                                    allowfullscreen></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
+                            class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
                 </div>
             </div>
         </div>
@@ -516,91 +608,6 @@
         </div>
     </div>
 
-    <!--Modal ver pdf-->
-    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-ver-pdf" role="dialog" data-backdrop="static"
-        data-keyboard="false">
-        <div class="modal-dialog modal-dialog-scrollable modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fa-solid fa-file"></i> Reporte de mantenimiento</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col">
-                                <iframe id="mdl-ver-pdf-reporte" src="libraries/web/viewer.html"
-                                    style="width: 100%; height: 700px; border: none; margin-top: 20px;" loading="lazy"
-                                    allowfullscreen></iframe>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
-                            class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!--Modal enviar correo reporte-->
-    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-correo-rauditoria" role="dialog"
-        data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fa-solid fa-envelope-open-text"></i> Correo de mantenimiento</h5>
-                    <!-- <i class="fa-brands fa-optin-monster"></i> -->
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="container-fluid">
-                        <h6>Usuario asignado</h6>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
-                            </div>
-                            <select class="form-control select" id="sa-usuario-correo" disabled></select>
-                        </div>
-                        <h6>Cargo del usuario</h6>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fa-solid fa-briefcase"></i></span>
-                            </div>
-                            <select class="form-control select" id="sa-cargo-correo" disabled></select>
-                        </div>
-                        <h6>Correo destinatario</h6>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fa-solid fa-at"></i></span>
-                            </div>
-                            <input type="input" class="form-control" id="inp-aud-correo" name="mdl-mant-info-inputs"
-                                autocomplete="off">
-                        </div>
-                        <!--<small class="form-text text-muted">Porfavor confirme el correo </small>-->
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fa-solid fa-at"></i></span>
-                            </div>
-                            <input type="input" class="form-control" id="inp-aud-correo-validar" name="mdl-mant-info-inputs"
-                                autocomplete="off" placeholder="Confirmar correo">
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
-                            class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
-                    <button type="button" class="btn btn-success envelope" id="btn-mdl-rauditoria" onclick="">Enviar <i
-                            class="fa-solid fa-envelope"></i></button>
-                </div>
-            </div>
-        </div>
-    </div>
 </body>
 
 <!--JQuery-->

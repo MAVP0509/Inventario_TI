@@ -974,14 +974,43 @@ function reporte_auditoria($valores)
     $usuario = $valores->elementos->usuario;
     $anio = $valores->elementos->anio;
 
-    $sql = "SELECT aud.id_equipo AS id, aud.anio, cu.nombre, cu.cargo, cu.region, 
+    /*  $sql = "SELECT aud.id_equipo AS id, aud.anio, cu.nombre, cu.cargo, cu.region, 
                    ct.tipo, ca.marca, inv.modelo, inv.num_serie
             FROM auditoria AS aud
             INNER JOIN inventario_ti_sur AS inv ON inv.id = aud.id_equipo
             INNER JOIN cat_usuarios AS cu ON cu.id = inv.fk_usuario
             INNER JOIN cat_tipo AS ct ON ct.id = inv.fk_tipo 
             INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
-            WHERE cu.nombre = '$usuario' AND aud.anio = '$anio'";
+            WHERE cu.nombre = '$usuario' AND aud.anio = '$anio'"; */
+    $sql = "SELECT
+                inv.id AS id,
+                aud.anio,
+                cu.nombre,
+                cu.cargo,
+                cu.region,
+                ct.tipo,
+                ca.marca,
+                inv.modelo,
+                inv.num_serie,
+                CASE 
+                    WHEN aud2.id_equipo IS NULL THEN 'NO AUDITADO'
+                    ELSE 'AUDITADO'
+                END AS estado_auditoria
+            FROM auditoria AS aud
+            INNER JOIN inventario_ti_sur AS inv_aud
+                    ON inv_aud.id = aud.id_equipo
+            INNER JOIN cat_usuarios AS cu
+                    ON cu.id = inv_aud.fk_usuario
+            INNER JOIN inventario_ti_sur AS inv
+                    ON inv.fk_usuario = cu.id
+            INNER JOIN cat_tipo AS ct
+                    ON ct.id = inv.fk_tipo
+            INNER JOIN cat_marca AS ca
+                    ON ca.id = inv.fk_marca
+            LEFT JOIN auditoria AS aud2
+                ON aud2.id_equipo = inv.id
+                AND aud2.anio = aud.anio
+            WHERE cu.nombre = '$usuario' AND aud.anio = '$anio';";
 
     $query = mysqli_query($con, $sql);
     $datos = [];
@@ -1000,7 +1029,7 @@ function reporte_auditoria($valores)
     $total_equipos = count($datos);
     $ids_equipo = [];
 
-    // 1. PROCESO DE FILAS Y ESTILOS
+    // Proceos de filas y estilos
     foreach ($datos as $index => $equipo) {
         $fila_actual = $fila_inicio + $index;
         $ids_equipo[] = $equipo->id;
@@ -1008,48 +1037,52 @@ function reporte_auditoria($valores)
         // Si es el segundo equipo o más, preparamos la fila
         if ($index > 0) {
             $worksheet->insertNewRowBefore($fila_actual, 1);
-            
+
             // Copiar estilo de la fila base (14) a la nueva fila
             $worksheet->duplicateStyle($worksheet->getStyle("B14:K14"), "B{$fila_actual}:K{$fila_actual}");
 
-            // REPLICAR CELDAS COMBINADAS (Esto es lo que falta en tu código)
+            // Replicar celdas combinadas
             $worksheet->mergeCells("E{$fila_actual}:F{$fila_actual}"); // Modelo
             $worksheet->mergeCells("G{$fila_actual}:H{$fila_actual}"); // Número de Serie
             $worksheet->mergeCells("J{$fila_actual}:K{$fila_actual}"); // Observaciones
         }
 
-        // 2. LLENADO DE DATOS
+        // Llenado de datos
         $worksheet->setCellValue("B{$fila_actual}", $index + 1);
         $worksheet->setCellValue("C{$fila_actual}", $equipo->tipo);
         $worksheet->setCellValue("D{$fila_actual}", $equipo->marca);
         $worksheet->setCellValue("E{$fila_actual}", $equipo->modelo);
         $worksheet->setCellValue("G{$fila_actual}", $equipo->num_serie);
-        
-        // Formato visual: Centrar contenido en las celdas combinadas
+
+        // Centrar contenido en las celdas combinadas
         $worksheet->getStyle("B{$fila_actual}:K{$fila_actual}")->getAlignment()->setVertical('center');
     }
 
     // 3. FIRMAS (Cálculo dinámico basado en las filas nuevas)
     $desplazamiento = ($total_equipos > 1) ? ($total_equipos - 1) : 0;
-    $fila_nombres = 25 + $desplazamiento; // Ajusta 25 según tu plantilla de 1 sola fila
+    $fila_nombres = 26 + $desplazamiento;
+    $fila_cargos = 27 + $desplazamiento;
 
     $worksheet->setCellValue("C{$fila_nombres}", !empty($valores->encargado) ? $valores->encargado : '');
+    $worksheet->setCellValue("C{$fila_cargos}", !empty($valores->cargo) ? $valores->cargo : '');
     $worksheet->setCellValue("H{$fila_nombres}", $usuario);
     $worksheet->setCellValue("H" . ($fila_nombres + 1), !empty($valores->elementos->cargo) ? $valores->elementos->cargo : '');
 
-    // Guardado
-    $nombre_doc = "Reporte_Auditoria_" . date('Ymd_His') . ".xlsx";
+    $nombre_doc = "FO-DSP-TI-06 Reporte de auditoria a herramientas TI Rev.00_" . date('Ymd_His') . ".xlsx";
     $base = realpath(__DIR__ . '/../../../');
     $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI/database/controller_excel/documentos_descarga/auditoria/reporte/' . $nombre_doc;
 
     $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
     $writer->save($ruta_guardar);
 
-    // Actualización BD
     if (!empty($ids_equipo)) {
         $ids = implode(',', $ids_equipo);
         mysqli_query($con, "UPDATE auditoria SET reporte_descargado = 1, estado = 'En proceso' WHERE id_equipo IN ($ids) AND anio = '$anio'");
     }
 
-    return ['result' => true, 'url' => "http://" . $_SERVER['HTTP_HOST'] . "/Inventario_TI/database/controller_excel/documentos_descarga/auditoria/reporte/" . $nombre_doc];
+    return [
+        'result' => true,
+        'url' => "http://" . $_SERVER['HTTP_HOST'] . "/Inventario_TI/database/controller_excel/documentos_descarga/auditoria/reporte/" . $nombre_doc,
+        'ids' => $ids_equipo
+    ];
 }

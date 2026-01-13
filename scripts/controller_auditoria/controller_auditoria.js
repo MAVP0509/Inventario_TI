@@ -312,7 +312,8 @@ async function consultar_auditoria(anio) {
                 formatter: subirIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_descargado",
                 cellClick: function (e, cell) {
                     elemento_aud = cell.getRow().getData();
-                    abrir_subir_reporte(elemento_aud.id, elemento_aud.fecha)
+                    reporte_auditoria_firmado(elemento_aud)
+                    // abrir_subir_reporte(elemento_aud.id, elemento_aud.fecha)
                 }
             },
 
@@ -647,13 +648,25 @@ async function mdl_descargar_reporte_auditoria(equipo) {
     $("#btn-reporte-aud").prop("disabled", false);
     // document.getElementById("btn-reporte-aud").disabled = false;
 
-    await general_select2({
-        selectId: 'saud-encargado',
-        tabla: 'cat_usuarios',
-        campo: 'nombre',
-        dropdownParent: '#mdl-reporte-aud',
-        placeholder: 'Seleccione un encargado'
-    })
+    await Promise.all([
+        general_select2({
+            selectId: 'saud-encargado',
+            tabla: 'cat_usuarios',
+            campo: 'nombre',
+            dropdownParent: '#mdl-reporte-aud',
+            placeholder: 'Seleccione un encargado'
+        }),
+
+        general_select2({
+            selectId: 'saud-cargo',
+            tabla: 'cat_usuarios',
+            campo: 'cargo',
+            dropdownParent: '#mdl-reporte-aud',
+            placeholder: 'Seleccione un cargo',
+            sincronizarCampo: 'cargo',
+            sincronizarCon: 'saud-encargado'
+        })
+    ]);
 
     rellenar_select("César Ignacio Torres Almeida", "saud-encargado");
     $("#btn-reporte-aud").off('click').on('click', function () { reporte_auditoria(equipo) })
@@ -664,10 +677,11 @@ async function reporte_auditoria(equipo) {
     let model = {
         accion: 6,
         elementos: equipo,
-        encargado: $("#saud-encargado").select2('data')[0].text
+        encargado: $("#saud-encargado").select2('data')[0].text,
+        cargo: $("#saud-cargo").select2('data')[0].text
     }
 
-    mostrar_toast_cargando("Generando reporte de mantenimiento...")
+    mostrar_toast_cargando("Generando reporte de auditoria...")
     // document.getElementById("btn-reporte-mant").disabled = true;
     $("#btn-reporte-aud").prop("disabled", true);
 
@@ -682,12 +696,131 @@ async function reporte_auditoria(equipo) {
             reporte_descargado: 1,
             estado: "En proceso"
         }));
-        table.updateData(filas);
+        tabla_aud.updateData(filas);
 
         consultar_mantenimientos_vencidos()
-        mostrar_toast('success', '¡Generación de reporte exitoso!', 'La generación de reporte de mantenimiento se ha realizado correctamente.');
+        mostrar_toast('success', '¡Generación de reporte exitoso!', 'La generación de reporte de auditoria se ha realizado correctamente.');
     } else {
-        mostrar_toast('error', '¡Error!', 'No se pudo generar el reporte de mantenimiento. Inténtelo nuevamente.');
+        mostrar_toast('error', '¡Error!', 'No se pudo generar el reporte de auditoria. Inténtelo nuevamente.');
         $('#btn-reporte-aud').prop('disabled', false);
+    }
+}
+
+//* Funciones para subir reporte de auditoria
+
+let charco2;
+let charcoInicializado2;
+
+async function reporte_auditoria_firmado(elemento_aud) {
+    //*Escondiendo el alert
+    document.getElementById('alert-aud-reporte').setAttribute('style', 'display: none !important;  background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;');
+
+    //*Escondiendo el visor de pdf
+    $('#pdf-aud').hide()
+
+    if (charco2) {
+        charco2.destroy();   //* <- Esto destruye la instancia anterior, lo cual es necesario
+    }
+
+    //* Al destruir la instancia es necesario colocarle de nuevo el name al input, sino, no aceptará el archivo el php
+    $('#subir-reporte-aud').attr('name', 'reporte_aud');
+
+    let fileAud = document.getElementById('subir-reporte-aud')
+
+    //datos_documento = [id,fechaMnto]
+    let fecha = fechaMnto.split('-')
+    let anio = {}
+    anio.value = fecha[0]
+    // Create a FilePond instance
+    charco2 = FilePond.create(fileAud, {
+        maxFiles: 1,
+        labelIdle: 'Arrastra y suelta tu archivo .pdf o <span class="filepond--label-action"> Examina </span>',
+        allowMultiple: false,
+        dropOnPage: true,
+        dropValidation: true,
+        instantUpload: false,
+        acceptedFileTypes: ['application/pdf'],
+        labelFileTypeNotAllowed: 'Archivo no válido solo .pdf',
+        server: {
+            process: {
+                url: "database/controller_auditorias/controller_auditorias.php",
+                method: 'POST',
+                name: 'reporte_aud',
+                withCredentials: false,
+                ondata: (formData) => {
+                    const trama = {
+                        accion: 3,
+                        id_equipo: elemento_aud.id,
+                        fecha_mnto: elemento_aud.fecha
+                    };
+                    formData.append('trama', JSON.stringify(trama));
+                    return formData;
+                },
+                onload: (response) => {
+                    try {
+                        const data = JSON.parse(response); // <- convierte string en objeto
+                        if (data.resultado.error) {
+                            //console.error("Error del servidor:", data.resultado.error);
+                            mostrar_toast("error", "Error", data.resultado.error);
+                        } else {
+                            table.updateData([{ id: id, reporte_subido: 1, estado: "Realizado" }])
+                            mostrar_toast("success", "Subido", data.resultado.mensaje)
+                            consultar_informacion(anio)
+                            /* table.replaceData(table.getData())
+                            table.redraw(true) */
+                            //window.location.reload()
+
+
+
+                            charco2.removeFile();
+                        }
+
+                    } catch (e) {
+                        console.error("Error al parsear respuesta:", e);
+                    }
+                },
+                onerror: (error) => {
+                    console.error('Error al subir:', error);
+                    alert("Error al subir archivo.");
+                }
+            },
+        }
+
+
+    });
+
+
+    //* Mostrando pdf cuando se suba
+    let fileToOpen;
+
+    charco2.on('addfile', (error, fileItem) => {
+        if (error) {
+            mostrar_toast('error', 'Error', 'Error al cargar PDF:' + error);
+            return;
+        }
+
+        charcoInicializado2 = fileItem; // <-- guardar archivo
+
+        // Generar URL temporal para el archivo PDF
+        fileToOpen = URL.createObjectURL(fileItem.file);
+
+        const viewer = document.getElementById('pdf-ver-aud');
+        viewer.src = fileToOpen;
+
+        $('#pdf-aud').show()
+
+    });
+
+    let server = await server_mantenimiento({ accion: 2, id_equipo: id, fecha_mnto: fechaMnto })
+
+    if (server.resultado) {
+        document.getElementById('alert-aud-reporte').style.display = 'block'
+    }
+}
+
+function eliminar_archivo() {
+    if (charco2 && charcoInicializado2) {
+        charco2.removeFile(charcoInicializado2);
+        fileItemCargado = null;
     }
 }
