@@ -90,7 +90,7 @@ let auditorias_pendientes
 
 async function consultar_auditoria(anio) {
     const fecha = anio.value;
-    console.log(fecha);
+    // console.log(fecha);
 
     let server = await server_auditoria({ accion: 0, anio: fecha });
 
@@ -349,7 +349,7 @@ async function consultar_auditoria(anio) {
 
         return objeto
     }, {}))
-    console.log(auditorias_pendientes);
+    // console.log(auditorias_pendientes);
 }
 
 async function mdl_programar_auditoria() {

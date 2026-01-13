@@ -108,7 +108,7 @@ function resguardo($valores)
          TODO Reaplicar las combinaciones de celdas en la nueva fila
          * Al insertar nuevas filas, no respeta las combinaciones de celdas de la plantilla
          */
-        //$worksheet->mergeCells("D$fila:E$fila");
+        // //$worksheet->mergeCells("D$fila:E$fila");
         $worksheet->mergeCells("E$fila:F$fila");
         $worksheet->mergeCells("G$fila:H$fila");
         $worksheet->mergeCells("I$fila:J$fila");
@@ -993,8 +993,8 @@ function reporte_auditoria($valores)
                 INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
             WHERE
                 cu.nombre = '$usuario' 
-                AND aud.anio = '$anio'
-                AND aud.estado = 'Pendiente'";
+                AND aud.anio = '$anio'";
+                // AND aud.estado = 'Pendiente'";
 
     $query = mysqli_query($con, $sql);
 
@@ -1026,59 +1026,52 @@ function reporte_auditoria($valores)
     $pageMargins->setRight(0.5);
 
     $worksheet->setCellValue("C8", !empty($valores->elementos->usuario) ? $valores->elementos->usuario : 'NA');
-    $worksheet->setCellValue("K10", !empty($valores->elementos->cargo) ? $valores->elementos->ubicacion : 'NA');
+    // $worksheet->setCellValue("K10", !empty($valores->elementos->cargo) ? $valores->elementos->ubicacion : 'NA');
     $worksheet->setCellValue("G10", !empty($valores->elementos->region) ? $valores->elementos->region : 'NA');
     // $worksheet->setCellValue("G14", !empty($valores->id) ? $valores->id : 'NA');
     $fila_inicio = 14;
+    $equipos_base = 3; // las filas que vienen en la plantilla
     $fila_actual = $fila_inicio;
-    $equipos_base = 3;
     $ids_equipo = [];
 
     foreach ($datos as $index => $equipo) {
         $ids_equipo[] = $equipo->id;
         // Si excede los equipos base, se inserta 2 filas nuevas
         if ($index >= $equipos_base) {
-            $worksheet->insertNewRowBefore($fila_actual, 2);
+            $worksheet->insertNewRowBefore($fila_actual, 1);
             // Copia estilos del bloque anterior
             $worksheet->duplicateStyle(
-                $worksheet->getStyle("B" . ($fila_actual - 2) . ":K" . ($fila_actual - 1)),
-                "B{$fila_actual}:K" . ($fila_actual + 1)
+                $worksheet->getStyle("B" . ($fila_actual - 1) . ":K" . ($fila_actual - 1)),
+                "B{$fila_actual}:K{$fila_actual}"
             );
         }
-        // ITEM (centrado en las 2 filas)
-        $worksheet->mergeCells("B{$fila_actual}:B" . ($fila_actual + 1));
         $worksheet->setCellValue("B{$fila_actual}", $index + 1);
-
-        // TIPO
-        $worksheet->mergeCells("C{$fila_actual}:C" . ($fila_actual + 1));
         $worksheet->setCellValue("C{$fila_actual}", $equipo->tipo);
-
-        // MARCA
-        $worksheet->mergeCells("D{$fila_actual}:D" . ($fila_actual + 1));
         $worksheet->setCellValue("D{$fila_actual}", $equipo->marca);
-
-        // MODELO
-        $worksheet->mergeCells("E{$fila_actual}:F" . ($fila_actual + 1));
         $worksheet->setCellValue("E{$fila_actual}", $equipo->modelo);
-
-        // NÚMERO DE SERIE
-        $worksheet->mergeCells("G{$fila_actual}:H" . ($fila_actual + 1));
         $worksheet->setCellValue("G{$fila_actual}", $equipo->num_serie);
-
         // ESTADO FÍSICO (vacío)
-        $worksheet->mergeCells("I{$fila_actual}:I" . ($fila_actual + 1));
         $worksheet->setCellValue("I{$fila_actual}", '');
-
         // OBSERVACIONES (vacío)
-        $worksheet->mergeCells("J{$fila_actual}:K" . ($fila_actual + 1));
         $worksheet->setCellValue("J{$fila_actual}", '');
 
         // Avanzar al siguiente bloque
-        $fila_actual += 2;
+        $fila_actual ++;
     }
 
-    $worksheet->setCellValue("D69", !empty($valores->encargado) ? $valores->encargado : '');
-    $worksheet->setCellValue("U69", !empty($valores->elementos->usuario) ? $valores->elementos->usuario : '');
+    /* $total_equipos = count($datos);
+
+    if ($total_equipos < $equipos_base) {
+        $filas_sobrantes = ($equipos_base - $total_equipos) * 2;
+        $fila_eliminar = $fila_inicio + ($total_equipos * 2);
+
+        $worksheet->removeRow($fila_eliminar, $filas_sobrantes);
+    } */
+
+   /*  $fila_firmas = $fila_actual + 6;
+
+    $worksheet->setCellValue("D{$fila_firmas}", !empty($valores->encargado) ? $valores->encargado : '');
+    $worksheet->setCellValue("H{$fila_firmas}", !empty($valores->elementos->usuario) ? $valores->elementos->usuario : ''); */
 
     // $workskheet->setCellValue("W{$fila}", $observaciones);
 
