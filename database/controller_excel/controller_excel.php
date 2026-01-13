@@ -974,139 +974,82 @@ function reporte_auditoria($valores)
     $usuario = $valores->elementos->usuario;
     $anio = $valores->elementos->anio;
 
-    $sql = "SELECT
-                aud.id_equipo AS id,
-                aud.anio,
-                aud.estado,
-                cu.nombre,
-                cu.cargo,
-                cu.region,
-                ct.tipo,
-                ca.marca,
-                inv.modelo,
-                inv.num_serie
-            FROM
-                auditoria AS aud
-                INNER JOIN inventario_ti_sur AS inv ON inv.id = aud.id_equipo
-                INNER JOIN cat_usuarios AS cu ON cu.id = inv.fk_usuario
-                INNER JOIN cat_tipo AS ct ON ct.id = inv.fk_tipo 
-                INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
-            WHERE
-                cu.nombre = '$usuario' 
-                AND aud.anio = '$anio'";
-                // AND aud.estado = 'Pendiente'";
+    $sql = "SELECT aud.id_equipo AS id, aud.anio, cu.nombre, cu.cargo, cu.region, 
+                   ct.tipo, ca.marca, inv.modelo, inv.num_serie
+            FROM auditoria AS aud
+            INNER JOIN inventario_ti_sur AS inv ON inv.id = aud.id_equipo
+            INNER JOIN cat_usuarios AS cu ON cu.id = inv.fk_usuario
+            INNER JOIN cat_tipo AS ct ON ct.id = inv.fk_tipo 
+            INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
+            WHERE cu.nombre = '$usuario' AND aud.anio = '$anio'";
 
     $query = mysqli_query($con, $sql);
-
     $datos = [];
-
     while ($fila = mysqli_fetch_object($query)) {
         $datos[] = $fila;
     }
 
-    $spreadsheet = IOFactory::load('FO-DSP-TI-02 Reporte de auditoria a herramientas TI Rev.00.xlsx'); //*Cargando la plantilla del Excel
+    $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load('FO-DSP-TI-02 Reporte de auditoria a herramientas TI Rev.00.xlsx');
     $worksheet = $spreadsheet->getActiveSheet();
 
-    /* 
-    TODO Configuración de impresión
-    * Es necesario para dar un formato, delimitar márgenes para cuando se exporte a pdf, el pdf no este descuadrado
-    */
-    $pageSetup = $worksheet->getPageSetup();
-    $pageSetup->setOrientation(PageSetup::ORIENTATION_PORTRAIT);
-    $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LETTER);
-    $pageSetup->setFitToPage(true);
-    $pageSetup->setFitToWidth(1);
-    $pageSetup->setFitToHeight(0);
-
-    //* ajustando márgenes
-    $pageMargins = $worksheet->getPageMargins();
-    $pageMargins->setTop(0.5);
-    $pageMargins->setBottom(0.5);
-    $pageMargins->setLeft(0.5);
-    $pageMargins->setRight(0.5);
-
-    $worksheet->setCellValue("C8", !empty($valores->elementos->usuario) ? $valores->elementos->usuario : 'NA');
-    // $worksheet->setCellValue("K10", !empty($valores->elementos->cargo) ? $valores->elementos->ubicacion : 'NA');
+    // Encabezados
+    $worksheet->setCellValue("C8", !empty($usuario) ? $usuario : 'NA');
     $worksheet->setCellValue("G10", !empty($valores->elementos->region) ? $valores->elementos->region : 'NA');
-    // $worksheet->setCellValue("G14", !empty($valores->id) ? $valores->id : 'NA');
+
     $fila_inicio = 14;
-    $equipos_base = 3; // las filas que vienen en la plantilla
-    $fila_actual = $fila_inicio;
+    $total_equipos = count($datos);
     $ids_equipo = [];
 
+    // 1. PROCESO DE FILAS Y ESTILOS
     foreach ($datos as $index => $equipo) {
+        $fila_actual = $fila_inicio + $index;
         $ids_equipo[] = $equipo->id;
-        // Si excede los equipos base, se inserta 2 filas nuevas
-        if ($index >= $equipos_base) {
+
+        // Si es el segundo equipo o más, preparamos la fila
+        if ($index > 0) {
             $worksheet->insertNewRowBefore($fila_actual, 1);
-            // Copia estilos del bloque anterior
-            $worksheet->duplicateStyle(
-                $worksheet->getStyle("B" . ($fila_actual - 1) . ":K" . ($fila_actual - 1)),
-                "B{$fila_actual}:K{$fila_actual}"
-            );
+            
+            // Copiar estilo de la fila base (14) a la nueva fila
+            $worksheet->duplicateStyle($worksheet->getStyle("B14:K14"), "B{$fila_actual}:K{$fila_actual}");
+
+            // REPLICAR CELDAS COMBINADAS (Esto es lo que falta en tu código)
+            $worksheet->mergeCells("E{$fila_actual}:F{$fila_actual}"); // Modelo
+            $worksheet->mergeCells("G{$fila_actual}:H{$fila_actual}"); // Número de Serie
+            $worksheet->mergeCells("J{$fila_actual}:K{$fila_actual}"); // Observaciones
         }
+
+        // 2. LLENADO DE DATOS
         $worksheet->setCellValue("B{$fila_actual}", $index + 1);
         $worksheet->setCellValue("C{$fila_actual}", $equipo->tipo);
         $worksheet->setCellValue("D{$fila_actual}", $equipo->marca);
         $worksheet->setCellValue("E{$fila_actual}", $equipo->modelo);
         $worksheet->setCellValue("G{$fila_actual}", $equipo->num_serie);
-        // ESTADO FÍSICO (vacío)
-        $worksheet->setCellValue("I{$fila_actual}", '');
-        // OBSERVACIONES (vacío)
-        $worksheet->setCellValue("J{$fila_actual}", '');
-
-        // Avanzar al siguiente bloque
-        $fila_actual ++;
+        
+        // Formato visual: Centrar contenido en las celdas combinadas
+        $worksheet->getStyle("B{$fila_actual}:K{$fila_actual}")->getAlignment()->setVertical('center');
     }
 
-    /* $total_equipos = count($datos);
+    // 3. FIRMAS (Cálculo dinámico basado en las filas nuevas)
+    $desplazamiento = ($total_equipos > 1) ? ($total_equipos - 1) : 0;
+    $fila_nombres = 25 + $desplazamiento; // Ajusta 25 según tu plantilla de 1 sola fila
 
-    if ($total_equipos < $equipos_base) {
-        $filas_sobrantes = ($equipos_base - $total_equipos) * 2;
-        $fila_eliminar = $fila_inicio + ($total_equipos * 2);
+    $worksheet->setCellValue("C{$fila_nombres}", !empty($valores->encargado) ? $valores->encargado : '');
+    $worksheet->setCellValue("H{$fila_nombres}", $usuario);
+    $worksheet->setCellValue("H" . ($fila_nombres + 1), !empty($valores->elementos->cargo) ? $valores->elementos->cargo : '');
 
-        $worksheet->removeRow($fila_eliminar, $filas_sobrantes);
-    } */
-
-   /*  $fila_firmas = $fila_actual + 6;
-
-    $worksheet->setCellValue("D{$fila_firmas}", !empty($valores->encargado) ? $valores->encargado : '');
-    $worksheet->setCellValue("H{$fila_firmas}", !empty($valores->elementos->usuario) ? $valores->elementos->usuario : ''); */
-
-    // $workskheet->setCellValue("W{$fila}", $observaciones);
-
-
-    $fecha_doc = date('Ymd_His');
-    $nombre_doc = "FO-DSP-TI-06 Reporte de auditoria a herramientas TI Rev.00_{$fecha_doc}.xlsx";
-
+    // Guardado
+    $nombre_doc = "Reporte_Auditoria_" . date('Ymd_His') . ".xlsx";
     $base = realpath(__DIR__ . '/../../../');
-    $host = $_SERVER['HTTP_HOST'];
-    $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI/database/controller_excel/documentos_descarga/auditoria/reporte/' . $nombre_doc;
 
-    if ($base !== false) {
-        $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . 'documentos_descarga' . DIRECTORY_SEPARATOR . 'auditoria' . DIRECTORY_SEPARATOR . 'reporte' . DIRECTORY_SEPARATOR . $nombre_doc;
-        $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/auditoria/reporte/{$nombre_doc}";
-    }
-
-    $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+    $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
     $writer->save($ruta_guardar);
 
+    // Actualización BD
     if (!empty($ids_equipo)) {
         $ids = implode(',', $ids_equipo);
-        $sql = "UPDATE auditoria 
-                SET reporte_descargado = 1, 
-                    estado = 'En proceso' 
-                WHERE id_equipo IN ($ids)
-                AND  anio = '$anio'";
-
-        if (!mysqli_query($con, $sql)) {
-            return false;
-        }
+        mysqli_query($con, "UPDATE auditoria SET reporte_descargado = 1, estado = 'En proceso' WHERE id_equipo IN ($ids) AND anio = '$anio'");
     }
 
-    return array(
-        'result' => true,
-        'url' => $url_descarga,
-        'ids' => $ids_equipo
-    );
+    return ['result' => true, 'url' => "http://" . $_SERVER['HTTP_HOST'] . "/Inventario_TI/database/controller_excel/documentos_descarga/auditoria/reporte/" . $nombre_doc];
 }
