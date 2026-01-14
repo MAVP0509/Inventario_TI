@@ -760,7 +760,19 @@ function reporte_mantenimiento($valores)
     $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
     $writer->save($ruta_guardar);
 
-    if (!empty($ids_equipo)) {
+    $id_equipo = $valores->elementos->id;
+
+    $sql = "UPDATE mantenimiento 
+        SET reporte_descargado = 1,
+            estado = 'En proceso'
+        WHERE id_equipo = '$id_equipo'
+        AND anio = '$anio'";
+
+    if (!mysqli_query($con, $sql)) {
+        return false;
+    }
+
+    /* if (!empty($ids_equipo)) {
         $ids = implode(',', $ids_equipo);
         $sql = "UPDATE mantenimiento 
                 SET reporte_descargado = 1, 
@@ -771,12 +783,12 @@ function reporte_mantenimiento($valores)
         if (!mysqli_query($con, $sql)) {
             return false;
         }
-    }
+    } */
 
     return array(
         'result' => true,
         'url' => $url_descarga,
-        'ids' => $ids_equipo
+        'ids' => $id_equipo
     );
 }
 
@@ -982,32 +994,21 @@ function reporte_auditoria($valores)
     $sql = "SELECT
                 inv.id AS id,
                 aud.anio,
+                aud.estado,
                 cu.nombre,
                 cu.cargo,
                 cu.region,
                 ct.tipo,
                 ca.marca,
                 inv.modelo,
-                inv.num_serie,
-                CASE 
-                    WHEN aud2.id_equipo IS NULL THEN 'NO AUDITADO'
-                    ELSE 'AUDITADO'
-                END AS estado_auditoria
-            FROM auditoria AS aud
-            INNER JOIN inventario_ti_sur AS inv_aud
-                    ON inv_aud.id = aud.id_equipo
-            INNER JOIN cat_usuarios AS cu
-                    ON cu.id = inv_aud.fk_usuario
-            INNER JOIN inventario_ti_sur AS inv
-                    ON inv.fk_usuario = cu.id
-            INNER JOIN cat_tipo AS ct
-                    ON ct.id = inv.fk_tipo
-            INNER JOIN cat_marca AS ca
-                    ON ca.id = inv.fk_marca
-            LEFT JOIN auditoria AS aud2
-                ON aud2.id_equipo = inv.id
-                AND aud2.anio = aud.anio
-            WHERE cu.nombre = '$usuario' AND aud.anio = '$anio';";
+                inv.num_serie
+            FROM inventario_ti_sur AS inv
+            INNER JOIN cat_usuarios AS cu ON cu.id = inv.fk_usuario
+            INNER JOIN cat_tipo AS ct ON ct.id = inv.fk_tipo 
+            INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
+            LEFT JOIN auditoria AS aud 
+                ON aud.id_equipo = inv.id AND aud.anio = '$anio'
+            WHERE cu.nombre = '$usuario'";
 
     $query = mysqli_query($con, $sql);
     $datos = [];
@@ -1072,14 +1073,25 @@ function reporte_auditoria($valores)
     $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
     $writer->save($ruta_guardar);
 
-    if (!empty($ids_equipo)) {
+    $id_equipo = $valores->elementos->id;
+
+    $sql = "UPDATE auditoria 
+        SET reporte_descargado = 1,
+            estado = 'En proceso'
+        WHERE id_equipo = '$id_equipo'
+        AND anio = '$anio'";
+
+    if (!mysqli_query($con, $sql)) {
+        return false;
+    }
+    /* if (!empty($ids_equipo)) {
         $ids = implode(',', $ids_equipo);
         mysqli_query($con, "UPDATE auditoria SET reporte_descargado = 1, estado = 'En proceso' WHERE id_equipo IN ($ids) AND anio = '$anio'");
-    }
+    } */
 
     return [
         'result' => true,
         'url' => "http://" . $_SERVER['HTTP_HOST'] . "/Inventario_TI/database/controller_excel/documentos_descarga/auditoria/reporte/" . $nombre_doc,
-        'ids' => $ids_equipo
+        'ids' => $id_equipo
     ];
 }

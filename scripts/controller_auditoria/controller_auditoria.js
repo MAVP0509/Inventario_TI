@@ -691,12 +691,7 @@ async function reporte_auditoria(equipo) {
         window.location = server.resultado.url;
         $('#mdl-reporte-aud').modal("hide");
 
-        const filas = server.resultado.ids.map(id => ({
-            id: id,
-            reporte_descargado: 1,
-            estado: "En proceso"
-        }));
-        tabla_aud.updateData(filas);
+        tabla_aud.updateData([{ id: elemento_aud.id, reporte_descargado: 1, estado: "En proceso" }]);
 
         consultar_mantenimientos_vencidos()
         mostrar_toast('success', '¡Generación de reporte exitoso!', 'La generación de reporte de auditoria se ha realizado correctamente.');
