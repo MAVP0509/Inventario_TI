@@ -15,7 +15,7 @@ if ($clientejson->accion == 0) {
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = consultar_auditoria_firmada($clientejson);
 } elseif ($clientejson->accion == 4) {
-    $respuesta_servidor->resultado = guardar_reportes($clientejson);
+    $respuesta_servidor->resultado = guardar_reportes_auditoria($clientejson);
 } elseif ($clientejson->accion == 5) {
     $respuesta_servidor->resultado = unir_reportes_auditoria($clientejson);
 } elseif ($clientejson->accion == 6) {
@@ -160,6 +160,113 @@ function consultar_auditoria_firmada($valores)
     return [
         "existe" => false
     ];
+}
+
+function guardar_reportes_auditoria($valores)
+{
+    include("../conexion.php");
+
+    $respuesta = new stdClass();
+    //var_dump($_FILES['reporte_Auditoria']);
+
+    $validacion = validar_reporte_año($valores);
+    if ($validacion && isset($validacion->resultado)) {
+        unlink($validacion->resultado);
+    }
+
+
+    if (isset($_FILES['reporte_aud']) && $_FILES['reporte_aud']['error'] === UPLOAD_ERR_OK) {
+        $nombreOriginal = $_FILES['reporte_aud']['name'];
+        $tmpPath = $_FILES['reporte_aud']['tmp_name'];
+
+        // Validar extensión .xlsx
+        $ext = strtolower(pathinfo($nombreOriginal, PATHINFO_EXTENSION));
+        if ($ext !== 'pdf') {
+            $respuesta->error = "Tipo de archivo no permitido. Solo .pdf";
+            return $respuesta;
+        }
+        $nombreOriginalArreglado = explode(' ', $nombreOriginal);
+        $nombreOriginalArreglado = join('_', $nombreOriginalArreglado);
+        //* Generar nombre único para evitar colisiones
+        $nuevoNombre = $valores->id_equipo . '-' . $nombreOriginalArreglado;
+
+        $fechaAuditoria = explode('-', $valores->fecha_aud);
+        //var_dump($nuevoNombre);
+
+
+        //* Ruta de la carpeta
+        $rutaAnio =  __DIR__ . '/../../Documentos/auditoria/reporte/' . $fechaAuditoria[0];
+        $rutaMes =  __DIR__ . '/../../Documentos/auditoria/reporte/' . $fechaAuditoria[0] . '/' . $fechaAuditoria[1];
+        //$ruta = __DIR__ . '/../../Documentos/Auditoria/reporte/'. $fechaAuditoria[0].'/'. $fechaAuditoria[1].'/'. $valores->id_equipo;
+
+        //* Validando si el año de Auditoria ya tiene su carpeta o no
+        if (is_dir($rutaAnio)) {
+            //* Validando si el mes ya tiene su carpeta
+            if (is_dir($rutaMes)) {
+                $destino = $rutaMes . '/' . $nuevoNombre;
+            } else {
+                //*Se crea la carpeta del mes
+                mkdir($rutaMes, 0777, true);
+                $destino = $rutaMes . '/' . $nuevoNombre;
+            }
+        } else {
+            //* Creación de la carpeta del año
+            mkdir($rutaAnio, 0777, true);
+            //*Se crea la carpeta del mes
+            mkdir($rutaMes, 0777, true);
+
+            //* Ruta destino
+            $destino = $rutaMes . '/' . $nuevoNombre;
+        }
+
+        if (move_uploaded_file($tmpPath, $destino)) {
+
+
+            $añoAuditoria = $fechaAuditoria[0];
+            $sql = "UPDATE auditoria SET reporte_subido = 1, estado = 'Realizado' WHERE id_equipo = '$valores->id_equipo' AND anio = '$añoAuditoria'";
+            if (!mysqli_query($con, $sql)) {
+                return $respuesta->error = "No se pudo registrar en la base datos, favor de avisar a TI";
+            }
+            $respuesta->mensaje = "Archivo guardado correctamente";
+        } else {
+            $respuesta->error = "No se pudo mover el archivo.";
+        }
+    } else {
+        $respuesta->error = "No se recibió ningún archivo válido.";
+    }
+    return $respuesta;
+}
+
+function validar_reporte_año($valores)
+{
+    $respuesta = new stdClass();
+    //var_dump($valores);
+    $fecha = explode('-', $valores->fecha_aud);
+    $año = $fecha[0];
+    $mes = $fecha[1];
+
+    //*ruta física del servidor
+    $carpeta = __DIR__ . '/../../documentos/auditoria/reporte/' . $año . '/' . $mes;
+
+    //* Verifica si existe la carpeta
+    if (is_dir($carpeta)) {
+
+        //* Escanea los archivos, los guarda en un array ignorando sus extensiones
+        $archivos = array_diff(scandir($carpeta), ['.', '..']);
+
+        //*Arma un array de enlaces para acceder al documento 
+        foreach ($archivos as $archivo) {
+            $partes = explode('-', $archivo);
+
+            $idEquipo = $partes[0];
+
+            if ($idEquipo === $valores->id_equipo) {
+                $respuesta->resultado = $carpeta . '/' . $archivo;
+                return $respuesta;
+            }
+        }
+    }
+    return false;
 }
 
 function unir_reportes_auditoria($valores) {}

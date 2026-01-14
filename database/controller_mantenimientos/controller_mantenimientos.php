@@ -77,6 +77,24 @@ function guardar_reportes($valores)
 {
     include("../conexion.php");
 
+    $sql = "SELECT 
+            mant.id_equipo,
+            mant.anio,
+            mant.fecha_programada,
+            cu.nombre
+            FROM
+                mantenimiento AS mant
+                INNER JOIN inventario_ti_sur AS inv ON inv.id = mant.id_equipo
+                INNER JOIN cat_usuarios AS cu ON cu.id = inv.fk_usuario
+            WHERE cu.nombre = '$valores->usuario' AND mant.anio = '$valores->anio'";
+
+    $query = mysqli_query($con, $sql);
+
+    $datos = [];
+    while ($fila = mysqli_fetch_object($query)) {
+        $datos[] = $fila;
+    }
+
     $respuesta = new stdClass();
     //var_dump($_FILES['reporte_mantenimiento']);
 
@@ -84,7 +102,6 @@ function guardar_reportes($valores)
     if ($validacion && isset($validacion->resultado)) {
         unlink($validacion->resultado);
     }
-
 
     if (isset($_FILES['reporte_mantenimiento']) && $_FILES['reporte_mantenimiento']['error'] === UPLOAD_ERR_OK) {
         $nombreOriginal = $_FILES['reporte_mantenimiento']['name'];

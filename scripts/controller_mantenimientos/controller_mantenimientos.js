@@ -334,7 +334,7 @@ async function consultar_informacion(anio) {
                 formatter: uploadIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_descargado",
                 cellClick: function (e, cell) {
                     elemento_mnt = cell.getRow().getData();
-                    abrir_subir_reporte(elemento_mnt.id, elemento_mnt.fecha)
+                    abrir_subir_reporte(elemento_mnt)
                 }
             },
 
@@ -655,7 +655,7 @@ FilePond.registerPlugin(FilePondPluginFileValidateType);
 let pond
 //* Variable utilizada para guardar temporalmente el archivo y asi poder ser eliminado desde otra función
 let fileItemCargado
-async function abrir_subir_reporte(id, fechaMnto) {
+async function abrir_subir_reporte(elemento_mnt) {
     //*Escondiendo el alert
     document.getElementById('alert-reporte').setAttribute('style', 'display: none !important;  background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;');
 
@@ -672,9 +672,10 @@ async function abrir_subir_reporte(id, fechaMnto) {
     let fileReporte = document.getElementById('subir-reporte')
 
     //datos_documento = [id,fechaMnto]
-    let fecha = fechaMnto.split('-')
+    let fecha = elemento_mnt.fecha.split('-')
     let anio = {}
     anio.value = fecha[0]
+    // console.log(anio);
     // Create a FilePond instance
     pond = FilePond.create(fileReporte, {
         maxFiles: 1,
@@ -694,8 +695,10 @@ async function abrir_subir_reporte(id, fechaMnto) {
                 ondata: (formData) => {
                     const trama = {
                         accion: 1,
-                        id_equipo: id,
-                        fecha_mnto: fechaMnto
+                        anio: elemento_mnt.anio,
+                        id_equipo: elemento_mnt.id,
+                        fecha_mnto: elemento_mnt.fecha,
+                        usuario: elemento_mnt.usuario
                     };
                     formData.append('trama', JSON.stringify(trama));
                     return formData;
@@ -707,15 +710,12 @@ async function abrir_subir_reporte(id, fechaMnto) {
                             //console.error("Error del servidor:", data.resultado.error);
                             mostrar_toast("error", "Error", data.resultado.error);
                         } else {
-                            table.updateData([{ id: id, reporte_subido: 1, estado: "Realizado" }])
+                            table.updateData([{ id: elemento_mnt.id, reporte_subido: 1, estado: "Realizado" }])
                             mostrar_toast("success", "Subido", data.resultado.mensaje)
                             consultar_informacion(anio)
                             /* table.replaceData(table.getData())
                             table.redraw(true) */
                             //window.location.reload()
-
-
-
                             pond.removeFile();
                         }
 
@@ -755,7 +755,7 @@ async function abrir_subir_reporte(id, fechaMnto) {
 
     });
 
-    let server = await server_mantenimiento({ accion: 2, id_equipo: id, fecha_mnto: fechaMnto })
+    let server = await server_mantenimiento({ accion: 2, id_equipo: elemento_mnt.id, fecha_mnto: elemento_mnt.fecha })
 
     if (server.resultado) {
         document.getElementById('alert-reporte').style.display = 'block'

@@ -751,7 +751,7 @@ async function reporte_auditoria_firmado(elemento_aud) {
                     const trama = {
                         accion: 3,
                         id_equipo: elemento_aud.id,
-                        fecha_mnto: fecha
+                        fecha_aud: elemento_aud.fecha
                     };
                     formData.append('trama', JSON.stringify(trama));
                     return formData;
@@ -763,14 +763,8 @@ async function reporte_auditoria_firmado(elemento_aud) {
                             //console.error("Error del servidor:", data.resultado.error);
                             mostrar_toast("error", "Error", data.resultado.error);
                         } else {
-                            table.updateData([{ id: id, reporte_subido: 1, estado: "Realizado" }])
                             mostrar_toast("success", "Subido", data.resultado.mensaje)
-                            consultar_informacion(anio)
-                            /* table.replaceData(table.getData())
-                            table.redraw(true) */
-                            //window.location.reload()
-
-
+                            consultar_auditoria(anio);
 
                             charco2.removeFile();
                         }
@@ -785,13 +779,9 @@ async function reporte_auditoria_firmado(elemento_aud) {
                 }
             },
         }
-
-
     });
-
-
     //* Mostrando pdf cuando se suba
-    let fileToOpen;
+    let abrirArchivo;
 
     charco2.on('addfile', (error, fileItem) => {
         if (error) {
@@ -802,10 +792,10 @@ async function reporte_auditoria_firmado(elemento_aud) {
         charcoInicializado2 = fileItem; // <-- guardar archivo
 
         // Generar URL temporal para el archivo PDF
-        fileToOpen = URL.createObjectURL(fileItem.file);
+        abrirArchivo = URL.createObjectURL(fileItem.file);
 
         const viewer = document.getElementById('pdf-ver-aud');
-        viewer.src = fileToOpen;
+        viewer.src = abrirArchivo;
 
         $('#pdf-aud').show()
 
