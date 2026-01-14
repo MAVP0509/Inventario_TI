@@ -1016,6 +1016,32 @@ function reporte_auditoria($valores)
         $datos[] = $fila;
     }
 
+    $telefonos = [];
+    $otros = [];
+
+    foreach ($datos as $equipo) {
+        if (strtolower($equipo->tipo) === 'telefono celular') {
+            $telefonos[] = $equipo;
+        } else {
+            $otros[] = $equipo;
+        }
+    }
+
+    // CASO 1: SOLO un teléfono celular
+    if (count($telefonos) === 1 && empty($otros)) {
+        $equipos_a_reportar = $telefonos;
+    }
+
+    // CASO 2: Hay teléfono(s) y otros dispositivos → descartar teléfonos
+    elseif (!empty($telefonos) && !empty($otros)) {
+        $equipos_a_reportar = $otros;
+    }
+
+    // CASO 3: No hay teléfonos → todos los dispositivos
+    else {
+        $equipos_a_reportar = $otros;
+    }
+
     $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load('FO-DSP-TI-02 Reporte de auditoria a herramientas TI Rev.00.xlsx');
     $worksheet = $spreadsheet->getActiveSheet();
 
@@ -1024,20 +1050,21 @@ function reporte_auditoria($valores)
     $worksheet->setCellValue("G10", !empty($valores->elementos->region) ? $valores->elementos->region : 'NA');
 
     $fila_inicio = 14;
-    $total_equipos = count($datos);
+    $total_equipos = count($$equipos_a_reportar);
     $ids_equipo = [];
 
     // Proceos de filas y estilos
-    foreach ($datos as $index => $equipo) {
+    foreach ($equipos_a_reportar as $index => $equipo) {
         $fila_actual = $fila_inicio + $index;
-        $ids_equipo[] = $equipo->id;
+        // $ids_equipo[] = $equipo->id;
 
         // Si es el segundo equipo o más, preparamos la fila
         if ($index > 0) {
             $worksheet->insertNewRowBefore($fila_actual, 1);
-
             // Copiar estilo de la fila base (14) a la nueva fila
-            $worksheet->duplicateStyle($worksheet->getStyle("B14:K14"), "B{$fila_actual}:K{$fila_actual}");
+            $worksheet->duplicateStyle(
+                $worksheet->getStyle("B14:K14"), 
+                "B{$fila_actual}:K{$fila_actual}");
 
             // Replicar celdas combinadas
             $worksheet->mergeCells("E{$fila_actual}:F{$fila_actual}"); // Modelo
