@@ -642,7 +642,7 @@ function reporte_mantenimiento($valores)
     $anio = $valores->elementos->anio;
 
     $sql = "SELECT
-                man.id_equipo AS id,
+                inv.id AS id,
                 man.anio,
                 man.estado,
                 cu.nombre,
@@ -652,16 +652,13 @@ function reporte_mantenimiento($valores)
                 ca.marca,
                 inv.modelo,
                 inv.num_serie
-            FROM
-                mantenimiento AS man
-                INNER JOIN inventario_ti_sur AS inv ON inv.id = man.id_equipo
-                INNER JOIN cat_usuarios AS cu ON cu.id = inv.fk_usuario
-                INNER JOIN cat_tipo AS ct ON ct.id = inv.fk_tipo 
-                INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
-            WHERE
-                cu.nombre = '$usuario' 
-                AND man.anio = '$anio'
-                AND man.estado = 'Pendiente'";
+            FROM inventario_ti_sur AS inv
+            INNER JOIN cat_usuarios AS cu ON cu.id = inv.fk_usuario
+            INNER JOIN cat_tipo AS ct ON ct.id = inv.fk_tipo 
+            INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
+            LEFT JOIN mantenimiento AS man 
+                ON man.id_equipo = inv.id AND man.anio = '$anio'
+            WHERE cu.nombre = '$usuario'";
 
     $query = mysqli_query($con, $sql);
 
@@ -749,7 +746,7 @@ function reporte_mantenimiento($valores)
 
 
     $fecha_doc = date('Ymd_His');
-    $nombre_doc = "FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.{$fecha_doc}.xlsx";
+    $nombre_doc = "FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.{$valores->elementos->id_usuario}_{$fecha_doc}.xlsx";
 
     $base = realpath(__DIR__ . '/../../../');
     $host = $_SERVER['HTTP_HOST'];

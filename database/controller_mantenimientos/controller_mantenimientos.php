@@ -77,24 +77,6 @@ function guardar_reportes($valores)
 {
     include("../conexion.php");
 
-    $sql = "SELECT 
-            mant.id_equipo,
-            mant.anio,
-            mant.fecha_programada,
-            cu.nombre
-            FROM
-                mantenimiento AS mant
-                INNER JOIN inventario_ti_sur AS inv ON inv.id = mant.id_equipo
-                INNER JOIN cat_usuarios AS cu ON cu.id = inv.fk_usuario
-            WHERE cu.nombre = '$valores->usuario' AND mant.anio = '$valores->anio'";
-
-    $query = mysqli_query($con, $sql);
-
-    $datos = [];
-    while ($fila = mysqli_fetch_object($query)) {
-        $datos[] = $fila;
-    }
-
     $respuesta = new stdClass();
     //var_dump($_FILES['reporte_mantenimiento']);
 
@@ -148,11 +130,13 @@ function guardar_reportes($valores)
         }
 
         if (move_uploaded_file($tmpPath, $destino)) {
-
-
-            $añoMantenimiento = $fechaMantenimiento[0];
-            $sql = "UPDATE mantenimiento SET reporte_subido = 1, estado = 'Realizado' WHERE id_equipo = '$valores->id_equipo' AND anio = '$añoMantenimiento'";
-            if (!mysqli_query($con, $sql)) {
+            $sql = "UPDATE mantenimiento AS m 
+                        INNER JOIN inventario_ti_sur AS i ON i.id = m.id_equipo
+                        INNER JOIN cat_usuarios AS u ON u.id = i.fk_usuario 
+                    SET m.reporte_subido = 1, m.estado = 'Realizado' 
+                    WHERE u.nombre = '$valores->usuario' AND m.anio = '$valores->anio'";
+            $query  = mysqli_query($con, $sql);
+            if (!$query) {
                 return $respuesta->error = "No se pudo registrar en la base datos, favor de avisar a TI";
             }
             $respuesta->mensaje = "Archivo guardado correctamente";
@@ -200,13 +184,12 @@ function validar_reporte_mismo_año($valores)
 function consultar_reporte($valores)
 {
     $respuesta = new stdClass();
-    $fecha = explode('-', $valores->fecha_mnto);
 
+    $fecha = explode('-', $valores->fecha_mnto);
     $año = $fecha[0];
     $mes = $fecha[1];
 
     $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $año . '/' . $mes;
-
     $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/' . $año . '/' . $mes;
 
     if (is_dir($carpeta)) {

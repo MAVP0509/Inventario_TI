@@ -334,7 +334,7 @@ async function consultar_informacion(anio) {
                 formatter: uploadIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_descargado",
                 cellClick: function (e, cell) {
                     elemento_mnt = cell.getRow().getData();
-                    abrir_subir_reporte(elemento_mnt)
+                    abrir_subir_reporte(elemento_mnt);
                 }
             },
 
@@ -342,7 +342,7 @@ async function consultar_informacion(anio) {
                 formatter: eyeIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_subido",
                 cellClick: function (e, cell) {
                     elemento_mnt = cell.getRow().getData();
-                    ver_pdf_reporte(elemento_mnt.id, elemento_mnt.fecha)
+                    ver_pdf_reporte(elemento_mnt);
                 }
             },
             {
@@ -785,14 +785,14 @@ document.addEventListener('FilePond:removefile', (e) => {
 }); */
 
 //*todo Vista del pdf del reporte en caso de existir
-async function ver_pdf_reporte(id, fecha) {
+async function ver_pdf_reporte(elemento_mnt) {
     dominio = window.location.hostname
     puerto = location.port
 
     let model = {
         accion: 3,
-        id_equipo: id,
-        fecha_mnto: fecha
+        id_equipo: elemento_mnt.id,
+        fecha_mnto: elemento_mnt.fecha
     }
 
     let server = await server_mantenimiento(model)
