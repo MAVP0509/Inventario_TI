@@ -728,7 +728,7 @@ async function reporte_auditoria_firmado(elemento_aud) {
     let fileAud = document.getElementById('subir-reporte-aud')
 
     //datos_documento = [id,fechaMnto]
-    let fecha = fechaMnto.split('-')
+    let fecha = elemento_aud.fecha.split('-')
     let anio = {}
     anio.value = fecha[0]
     // Create a FilePond instance
@@ -751,7 +751,7 @@ async function reporte_auditoria_firmado(elemento_aud) {
                     const trama = {
                         accion: 3,
                         id_equipo: elemento_aud.id,
-                        fecha_mnto: elemento_aud.fecha
+                        fecha_mnto: fecha
                     };
                     formData.append('trama', JSON.stringify(trama));
                     return formData;
@@ -811,7 +811,7 @@ async function reporte_auditoria_firmado(elemento_aud) {
 
     });
 
-    let server = await server_mantenimiento({ accion: 2, id_equipo: id, fecha_mnto: fechaMnto })
+    let server = await server_auditoria({ accion: 4, id_equipo: elemento_aud.id, fecha_aud: elemento_aud.fecha })
 
     if (server.resultado) {
         document.getElementById('alert-aud-reporte').style.display = 'block'
