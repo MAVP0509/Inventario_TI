@@ -270,13 +270,13 @@ async function supervisor_habilitado(model) {
 }
 
 //TODO Funciones para un nuevo supervisor
-function nuevo_supervisor() {
+async function nuevo_supervisor() {
     $('.select').each(function () {
         $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
         $(this).removeClass('is-invalid'); // Elimina la clase de validación
     });
 
-    general_select2({
+    await general_select2({
         selectId: 'inp-nombre',
         tabla: 'cat_usuarios',
         campo: 'nombre',
@@ -285,7 +285,7 @@ function nuevo_supervisor() {
         tags: true
     });
 
-    general_select2({
+    await general_select2({
         selectId: 'inp-cargo',
         tabla: 'cat_usuarios',
         campo: 'cargo',
@@ -294,7 +294,7 @@ function nuevo_supervisor() {
         tags: true
     });
 
-    general_select2({
+    await general_select2({
         selectId: 'inp-region',
         tabla: 'supervisor',
         campo: 'region',
@@ -320,8 +320,8 @@ async function insertar_supervisor() {
 
     let model = {
         accion: 0,
-        nombre: $('#inp-nombre').val().trim(),
-        cargo: $('#inp-cargo').val().trim(),
+        nombre: $('#inp-nombre').select2('data')[0].text,
+        cargo: $('#inp-cargo').select2('data')[0].text,
         region: $('#inp-region').val().trim(),
     }
 
@@ -366,6 +366,7 @@ async function mdl_editar_supervisor(params) {
         campo: 'cargo',
         placeholder: 'Selecione un cargo',
         dropdownParent: '#modalEditar',
+        tags: true
     })
 
     await general_select2({
@@ -377,8 +378,8 @@ async function mdl_editar_supervisor(params) {
         tags: true,
     })
 
-    $('#edi-nombre').val(selecreg.nombre).trigger('change');
-    $('#edi-cargo').val(selecreg.cargo).trigger('change');
+    rellenar_select(selecreg.nombre, "edi-nombre")
+    rellenar_select(selecreg.cargo, "edi-cargo")
     $('#edi-region').val(selecreg.region).trigger('change');
 
     $("#modalEditar").modal('show');
@@ -400,8 +401,8 @@ async function editar_supervisor() {
         let model = {
             accion: 1,
             id: selecreg.id,
-            nombre: $('#edi-nombre').val().trim(),
-            cargo: $('#edi-cargo').val().trim(),
+            nombre: $('#edi-nombre').select2('data')[0].text,
+            cargo: $('#edi-cargo').select2('data')[0].text,
             region: $('#edi-region').val().trim(),
         }
 
@@ -422,8 +423,8 @@ async function editar_supervisor() {
                 let model = {
                     accion: 1,
                     id: selecreg.id,
-                    nombre: $('#edi-nombre').val().trim(),
-                    cargo: $('#edi-cargo').val().trim(),
+                    nombre: $('#edi-nombre').select2('data')[0].text,
+                    cargo: $('#edi-cargo').select2('data')[0].text,
                     region: $('#edi-region').val().trim(),
                 }
 
