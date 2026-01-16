@@ -321,14 +321,14 @@ async function consultar_auditoria(anio) {
                 formatter: verIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_subido",
                 cellClick: function (e, cell) {
                     elemento_aud = cell.getRow().getData();
-                    ver_pdf_reporte(elemento_aud.id, elemento_aud.fecha)
+                    consultar_reporte_firmado(elemento_aud);
                 }
             },
             {
                 formatter: editarIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
                 cellClick: function (e, cell) {
                     elemento_aud = cell.getRow().getData();
-                    mdl_mantenimiento_info(elemento_aud);
+                    mdl_auditoria_info(elemento_aud);
                 }
             },
         ],
@@ -514,7 +514,7 @@ async function auditoria_firmado() {
                 process: {
                     url: "database/controller_auditorias/controller_auditorias.php",
                     method: "POST",
-                    name: 'reporte_pauditoria',
+                    consulta_reportes_mesuales: 'reporte_pauditoria',
                     withCredentials: false,
                     ondata: (formData) => {
                         formData.append('trama', JSON.stringify({ accion: 6, anio: auditorias_pendientes[0].anio }));
@@ -820,3 +820,152 @@ document.addEventListener('FilePond:removefile', (e) => {
 })
 
 //* Funciones para visualizar el reporte firmado
+async function consultar_reporte_firmado(elemento_aud) {
+    let model = {
+        accion: 7,
+        id_equipo: elemento_aud.id,
+        fecha_aud: elemento_aud.fecha
+    }
+
+    let server = await server_auditoria(model);
+
+    if (server.resultado.documento) {
+        let ruta = `${location.origin}${server.resultado.documento}`;
+
+        document.getElementById('pdf-reporte-aud').src = ruta;
+        $("#mdl-pdf-aud").modal('show');
+    } else if (server.resultado.aviso) {
+        mostrar_toast('warning', '¡Aviso!', server.resultado.aviso)
+    } else {
+        mostrar_toast('error', '¡Error!', "Hubo un error, consulte al equipo de TI")
+    }
+}
+
+//* Función para consulta de información del activo a auditar
+let seleccionado_aud
+async function mdl_auditoria_info(elemento_aud) {
+    // Busca en el arreglo 'datos_mantenimiento' el registro con el mismo id_equipo
+
+    for (let i = 0; i < datos_auditoria.length; i++) {
+        const element = datos_auditoria[i];
+        if (element.id === elemento_aud.id && element.anio === elemento_aud.anio) {
+            // Guarda el registro completo en una variable global
+            seleccionado_aud = element;
+            break;
+        }
+    }
+    // Llama a varias funciones para cargar los selects con datos dinámicos
+    await Promise.all([
+        general_select2({
+            selectId: 'aud-rubro',
+            tabla: 'cat_rubro',
+            campo: 'rubro',
+            placeholder: 'Selecione un rubro',
+            dropdownParent: '#mdl-mant-info',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Categoría general del activo. Agrupa dispositivos por su tipo funcional, como computadoras, dispositivos móviles, etc."
+        }),
+
+        general_select2({
+            selectId: 'aud-tipo',
+            tabla: 'cat_tipo',
+            campo: 'tipo',
+            placeholder: 'Selecione un tipo',
+            dropdownParent: '#mdl-mant-info',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
+        }),
+
+        general_select2({
+            selectId: 'aud-marca',
+            tabla: 'cat_marca',
+            campo: 'marca',
+            placeholder: 'Seleccione una marca',
+            dropdownParent: '#mdl-mant-info',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Es la marca del activo."
+        }),
+
+        general_select2({
+            selectId: 'aud-ubicacion',
+            tabla: 'inventario_ti_sur',
+            campo: 'ubicacion',
+            placeholder: 'Selecciona una ubicacion',
+            dropdownParent: '#mdl-mant-info',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Indica el lugar específico dentro de la zona donde se encuentra físicamente el dispositivo."
+        }),
+
+        general_select2({
+            selectId: 'aud-usuario',
+            tabla: 'cat_usuarios',
+            campo: 'nombre',
+            placeholder: 'NA',
+            dropdownParent: '#mdl-mant-info',
+        }),
+
+        general_select2({
+            selectId: 'aud-cargo',
+            tabla: 'cat_usuarios',
+            campo: 'cargo',
+            placeholder: 'NA',
+            dropdownParent: '#mdl-mant-info',
+            sincronizarCampo: 'cargo',
+            sincronizarCon: 'select-usuario'
+        }),
+    ])
+
+    rellenar_select(seleccionado_aud.usuario, "aud-usuario");
+    rellenar_select(seleccionado_aud.cargo, 'aud-cargo')
+    rellenar_select(seleccionado_aud.tipo, "aud-tipo");
+    rellenar_select(seleccionado_aud.marca, "aud-marca");
+    rellenar_select(seleccionado_aud.ubicacion, "aud-ubicacion");
+    rellenar_select(seleccionado_aud.rubro, "aud-rubro")
+    $('#aud-modelo').val(seleccionado_aud.modelo)
+    $('#aud-num-serie').val(seleccionado_aud.num_serie)
+    $('#aud-fecha').val(seleccionado_aud.fecha)
+    $('#aud-estatus').val(seleccionado_aud.estado)
+
+    switch (seleccionado_aud.estado) {
+        case "Pendiente":
+            $('#estatus-icon-aud').css('color', '#ff7300')
+            break;
+        case "En proceso":
+            $('#estatus-icon-aud').css('color', '#0385ffff')
+            break;
+        case "Realizado":
+            $('#estatus-icon-aud').css('color', '#28a745')
+            break;
+        case "Vencido":
+            $('#estatus-icon-aud').css('color', '#dc3545')
+            break;
+        default:
+            $('#estatus-icon-aud').css('color', '')
+            break;
+    }
+
+    $('#mdl-aud-info').modal("show")
+
+}
+
+//* Funciones para la descargar mensual de reportes
+
+function consulta_reportes_mesuales() {
+    const meses = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+    let meses_auditados = Object.keys(auditorias_pendientes[0].meses);
+
+    carga_meses(meses_auditados);
+}
+
+const nombre_meses = [
+    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+];
+
+function carga_meses(meses) {
+    
+}

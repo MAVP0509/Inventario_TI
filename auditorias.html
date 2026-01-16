@@ -59,6 +59,324 @@
             z-index: 1040;
             /* Asegura que esté por encima del contenido */
         }
+
+        /* .meses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .mes-card {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            border: 2px solid transparent;
+            transition: 0.2s ease-in-out;
+            font-weight: 500;
+        }
+
+        .mes-card.disponible {
+            background: #007bff;
+            color: white;
+        }
+
+        .mes-card.disponible:hover {
+            background: #0056b3;
+            transform: scale(1.03);
+        }
+
+        .mes-card.no-disponible {
+            background: #e9ecef;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        .mes-card.no-disponible:hover {
+            transform: none;
+        } */
+        /* -------------------------------------------------------- */
+        /* .meses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 18px;
+            padding: 10px;
+        }
+
+        .mes-card {
+            padding: 18px;
+            border-radius: 12px;
+            background: white;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            border: 1px solid #e1e5eb;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
+            transition: all 0.25s ease;
+        }
+
+        .mes-card .mes-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+            transition: 0.2s ease;
+        }
+
+        .mes-card .mes-nombre {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .mes-card .mes-status {
+            margin-top: 5px;
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .mes-card.disponible {
+            border-color: #007bff;
+        }
+
+        .mes-card.disponible .mes-status {
+            background: #007bff;
+            color: white;
+        }
+
+        .mes-card.disponible:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+        }
+
+        .mes-card.disponible:hover .mes-icon {
+            color: #0056b3;
+            transform: scale(1.1);
+        }
+
+        .mes-card.no-disponible {
+            cursor: not-allowed;
+            opacity: 0.55;
+        }
+
+        .mes-card.no-disponible .mes-status {
+            background: #adb5bd;
+            color: white;
+        } */
+        /* --------------------------------------------- */
+
+        /* .meses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 18px;
+            padding: 10px;
+        }
+
+        .mes-card {
+            position: relative;
+            padding: 20px;
+            border-radius: 12px;
+            background: white;
+            border: 1px solid #dfe4ea;
+            text-align: center;
+            cursor: pointer;
+            overflow: hidden;
+            user-select: none;
+            transition: all 0.25s ease;
+        }
+
+
+        .mes-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, #007bff 0%, #0056b3 100%);
+            z-index: 0;
+            transform: translateY(100%);
+
+            transition: transform 0.4s ease;
+        }
+
+
+        .mes-card:hover::before {
+            transform: translateY(0);
+
+        }
+
+        .mes-nombre,
+        .mes-status {
+            position: relative;
+            z-index: 1;
+
+            transition: color 0.3s ease;
+        }
+
+        .mes-nombre {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .mes-status {
+            margin-top: 6px;
+            font-size: 13px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            color: #555;
+            background: #f1f2f6;
+        }
+
+
+        .mes-card.disponible:hover .mes-nombre,
+        .mes-card.disponible:hover .mes-status {
+            color: white;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+
+        .mes-card.no-disponible {
+            cursor: not-allowed;
+            opacity: 0.45;
+        }
+
+        .mes-card.no-disponible:hover::before {
+            transform: translateY(100%);
+
+        }
+
+        .mes-card.no-disponible:hover .mes-nombre,
+        .mes-card.no-disponible:hover .mes-status {
+            color: #444;
+        } */
+        /* ------------------------------------------- */
+
+        .meses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px;
+            padding: 10px;
+        }
+
+        /* ---- CARD BASE (GLASSMORPHISM REAL) ---- */
+        .mes-card {
+            position: relative;
+            padding: 20px;
+            border-radius: 20px;
+
+            backdrop-filter: blur(12px) saturate(160%);
+            background: rgba(255, 255, 255, 0.10);
+
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow:
+                0 4px 15px rgba(0, 0, 0, 0.1),
+                inset 0 0 20px rgba(255, 255, 255, 0.05);
+
+            text-align: center;
+            cursor: pointer;
+            overflow: hidden;
+            user-select: none;
+            transition: all 0.4s ease;
+        }
+
+        /* ---- DEGRADADO FLUIDO (Hover Fill) ---- */
+        .mes-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #1666C5, #0D3D7D);
+            opacity: 0;
+            transform: scale(1.2);
+            transition: opacity 0.45s ease, transform 0.45s ease;
+            z-index: 0;
+        }
+
+        /* Hover: relleno degradado */
+        .mes-card.disponible:hover::before {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* ---- BORDE ANIMADO PREMIUM ---- */
+        .mes-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 2px;
+            background: linear-gradient(120deg, #0D3D7D, #0A2A52, #0D3D7D);
+            background-size: 300% 300%;
+            animation: bordeGlow 6s ease infinite;
+
+            /* máscara para dejar el borde hueco */
+            -webkit-mask:
+                linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        @keyframes bordeGlow {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* ---- TEXTO ---- */
+        .mes-nombre,
+        .mes-status {
+            position: relative;
+            z-index: 3;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .mes-nombre {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1a1a1a;
+            /* oscuro para que se vea siempre */
+            /* text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); */
+        }
+
+        .mes-status {
+            margin-top: 8px;
+            font-size: 13px;
+            padding: 4px 12px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.10);
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        /* Hover: efecto de elevación del texto */
+        .mes-card.disponible:hover .mes-nombre,
+        .mes-card.disponible:hover .mes-status {
+            color: white;
+        }
+
+        /* ---- NO DISPONIBLE ---- */
+        .mes-card.no-disponible {
+            cursor: not-allowed;
+            opacity: 0.35;
+            filter: grayscale(60%);
+        }
+
+        .mes-card.no-disponible:hover::before {
+            opacity: 0;
+        }
     </style>
 
 </head>
@@ -147,10 +465,12 @@
                                             onclick="mdl_programar_auditoria()"><i class="fa-solid fa-file-invoice"></i>
                                             Programar auditoria
                                         </button>
-                                        <button type="button" class="btn btn-lg btn-outline-success mr-3 icon"
-                                            data-toggle="popover" data-trigger="hover" data-html="true"
-                                            data-placement="bottom" data-content="Exportación a Excel" id="btn-excel"
-                                            onclick="imprimir_excel()"><i class="fa-solid fa-file-excel"></i>
+                                        <button type="button" style="text-align: center" data-toggle="popover"
+                                            data-trigger="hover" data-html="true" data-placement="bottom"
+                                            data-content="Descargar reportes mensuales"
+                                            class="btn btn-outline-danger rounded icon mr-3"
+                                            onclick="mdl_descargar_reportes_mensuales()"><i
+                                                class="fa-solid fa-file-pdf fa-lg"></i>
                                         </button>
                                         <button type="button" class="btn btn-lg  btn-outline-info mr-3 icon"
                                             data-toggle="popover" data-trigger="hover" data-html="true"
@@ -416,7 +736,7 @@
         </div>
     </div>
 
-    <!-- Modal de reporte de mantenimiento -->
+    <!-- Modal de reporte de auditoria -->
     <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-reporte-aud" role="dialog" data-backdrop="static"
         data-keyboard="false">
         <div class="modal-dialog modal-dialog-centered">
@@ -465,7 +785,7 @@
         <div class="modal-dialog modal-dialog-scrollable modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="fa-solid fa-file"></i> Reporte de mantenimiento</h5>
+                    <h5 class="modal-title"><i class="fa-solid fa-file"></i> Reporte de auditoria</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -489,13 +809,13 @@
         </div>
     </div>
 
-    <!--Modal info mantenimiento -->
-    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-mant-info" role="dialog" data-backdrop="static"
+    <!--Modal info auditoria -->
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-aud-info" role="dialog" data-backdrop="static"
         data-keyboard="false">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Información</h5>
+                    <h5 class="modal-title">Información de dispositivo</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -510,7 +830,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-desktop"></i></span>
                                     </div>
-                                    <select class="form-control select" id="select-rubro" name="mdl-mant-info-inputs"
+                                    <select class="form-control select" id="aud-rubro" name="mdl-aud-info-inputs"
                                         disabled></select>
                                     <div class="invalid-feedback">Por favor, seleccione un rubro.</div>
                                 </div>
@@ -520,7 +840,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-computer"></i></span>
                                     </div>
-                                    <select class="form-control select" id="select-tipo" name="mdl-mant-info-inputs"
+                                    <select class="form-control select" id="aud-tipo" name="mdl-aud-info-inputs"
                                         disabled></select>
                                 </div>
                                 <!--Marca-->
@@ -529,7 +849,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-trademark"></i></span>
                                     </div>
-                                    <select class="form-control select" id="select-marca" name="mdl-mant-info-inputs"
+                                    <select class="form-control select" id="aud-marca" name="mdl-aud-info-inputs"
                                         disabled></select>
                                 </div>
                                 <!--Modelo-->
@@ -538,7 +858,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-pager"></i></span>
                                     </div>
-                                    <input type="text" class="form-control" id="inp-modelo" name="mdl-mant-info-inputs"
+                                    <input type="text" class="form-control" id="aud-modelo" name="mdl-aud-info-inputs"
                                         placeholder="Modelo del dispositivo" autocomplete="off" disabled>
                                 </div>
                             </div>
@@ -549,34 +869,34 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-square-binary"></i></span>
                                     </div>
-                                    <input type="text" class=" form-control" id="inp-num-serie"
-                                        name="mdl-mant-info-inputs" disabled>
+                                    <input type="text" class=" form-control" id="aud-num-serie"
+                                        name="mdl-aud-info-inputs" disabled>
                                 </div>
 
-                                <h6>Ubicacion</h6>
+                                <h6>Ubicación</h6>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
                                     </div>
-                                    <select class="form-control select" id="select-ubicacion" disabled></select>
+                                    <select class="form-control select" id="aud-ubicacion" disabled></select>
                                 </div>
                                 <!--Fecha-->
-                                <h6 id="lbl-fecha-reg">Fecha de mantenimiento</h6>
+                                <h6 id="lbl-fecha-reg">Fecha de auditoria</h6>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
                                     </div>
-                                    <input type="date" class="form-control" id="inp-fecha" name="mdl-mant-info-inputs"
+                                    <input type="date" class="form-control" id="aud-fecha" name="mdl-aud-info-inputs"
                                         disabled>
                                 </div>
                                 <h6>Estatus</h6>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
-                                        <span id="estatus-icon" class="input-group-text"><i
+                                        <span id="estatus-icon-aud" class="input-group-text"><i
                                                 class="fa-solid fa-circle"></i></span>
                                     </div>
-                                    <input type="input" class="form-control" id="inp-estatus"
-                                        name="mdl-mant-info-inputs" disabled>
+                                    <input type="input" class="form-control" id="aud-estatus" name="mdl-aud-info-inputs"
+                                        disabled>
                                 </div>
                             </div>
 
@@ -587,7 +907,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                             </div>
-                            <select class="form-control select" id="select-usuario" name="mdl-mant-info-inputs"
+                            <select class="form-control select" id="aud-usuario" name="mdl-mant-info-inputs"
                                 disabled></select>
                         </div>
                         <h6>Cargo del usuario</h6>
@@ -595,7 +915,7 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa-solid fa-briefcase"></i></span>
                             </div>
-                            <select class="form-control select" id="select-cargo" name="mdl-mant-info-inputs"
+                            <select class="form-control select" id="aud-cargo" name="mdl-mant-info-inputs"
                                 disabled></select>
                         </div>
                     </div>
@@ -603,6 +923,41 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
                             class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal reportes mensuales-->
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-raud-mens" role="dialog" data-backdrop="static"
+        data-keyboard="false" data-focus="false">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fa-solid fa-download"></i>
+                        <span id="descargar-text-aud">Descarga de reportes mensuales</span>
+                    </h5>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col">
+                                <div id="contenedor-mes" class="meses-grid">
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
+                        class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i>
+                    </button>
                 </div>
             </div>
         </div>

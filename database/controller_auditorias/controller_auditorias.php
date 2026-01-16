@@ -2,6 +2,14 @@
 header('Content-Type: text/html; charset=UTF-8');
 date_default_timezone_set('America/Mexico_City');
 
+require __DIR__ . '/../../vendor/autoload.php';
+
+use Ilovepdf\Ilovepdf;
+
+//TODO Para unir los pdf (9) tarda unos minitos, es necesario aumentar el tiempo
+set_time_limit(300);
+ini_set('max_execution_time', 300);
+
 $clientejson = json_decode($_POST['trama']);
 
 $respuesta_servidor = new stdClass();
@@ -21,7 +29,7 @@ if ($clientejson->accion == 0) {
 } elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = guardar_programa_auditoria($clientejson);
 } elseif ($clientejson->accion == 7) {
-    $respuesta_servidor->resultado = consultar_reporte($clientejson);
+    $respuesta_servidor->resultado = consultar_reporte_auditoria($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -269,4 +277,116 @@ function validar_reporte_año($valores)
     return false;
 }
 
-function unir_reportes_auditoria($valores) {}
+function consultar_reporte_auditoria($valores)
+{
+    $respuesta = new stdClass();
+
+    $fecha = explode('-', $valores->fecha_aud);
+    $año = $fecha[0];
+    $mes = $fecha[1];
+
+    $carpeta = __DIR__ . '/../../documentos/auditoria/reporte/' . $año . '/' . $mes;
+    $carpetaUrl = '/Inventario_TI/documentos/auditoria/reporte/' . $año . '/' . $mes;
+
+    if (is_dir($carpeta)) {
+        $archivos = array_diff(scandir($carpeta), ['.', '..']);
+
+        foreach ($archivos as $archivo) {
+            $partes = explode('-', $archivo);
+            $idEquipo = $partes[0];
+
+            if ($idEquipo === $valores->id_equipo) {
+                $respuesta->documento = $carpetaUrl . '/' . $archivo;
+                //var_dump($archivo);
+                return $respuesta;
+            }
+        }
+    } else {
+        $respuesta->aviso = "El activo no tiene reporte subido";
+    }
+
+    return $respuesta;
+}
+
+function unir_reportes_auditoria($valores)
+{
+    $respuesta = new stdClass();
+
+    $base = realpath(__DIR__ . '/../../../Inventario_TI/documentos/auditoria/reporte/');
+
+    $carpeta_reporte = __DIR__ . '/../../documentos/auditoria/reporte/' . $valores->anio . '/reportes_unidos';
+    $archivo_final = $carpeta_reporte . '/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
+    $url_descarga = $base . $valores->anio . '/reportes_unidos/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
+
+    try {
+        $ilovepdf = new Ilovepdf(
+            'project_public_ecd8df30001f3773a605a14a2c0416c9_I--AV17bdca45d44f5b70e44a9960a810a1ab',
+            'secret_key_181ece80f4c57be30267facf2f3890af_TcklQ6a753e75d95f5b32aef79aac42c0d33c',
+            [
+                'timeout' => 300,
+                'connect_timeout' => 60
+            ]
+        );
+
+        $myTaksMerge = $ilovepdf->newTask('merge');
+        
+        $carpeta = __DIR__ . '/../../documentos/auditoria/reporte/' . $valores->anio . '/' . $valores->mes;
+
+        if (!is_dir($carpeta)) {
+            $respuesta->error = "No se encontró la ruta";
+            return $respuesta;
+        }
+
+        $archivos = array_diff(scandir($carpeta), ['.','..']);
+
+        $ruta = [];
+
+        foreach ($archivos as $archivo) {
+            $ruta_completa = $carpeta . '/' . $archivo;
+
+            if (is_file($ruta_completa) && strtolower(pathinfo($archivo, PATHINFO_EXTENSION)) === 'pdf') {
+                $ruta[] = $ruta_completa;
+            }
+
+            if (empty($ruta)) {
+                $respuesta->error = "No se encontraron los archivos";
+                return $respuesta;
+            }
+
+            foreach ($ruta as $archivo) {
+                $myTaksMerge->addFile($archivo);
+            }
+
+            if (!is_dir($carpeta_reporte)) {
+                mkdir($carpeta_reporte, 0777, true);
+            }
+
+            $myTaksMerge->execute();
+            $myTaksMerge->download($carpeta_reporte);
+
+            $archivo_descargado = $carpeta_reporte. '/merged.pdf';
+            $nuevo_nombre = $archivo_final;
+
+            if (file_exists($archivo_descargado)) {
+                if (rename($archivo_descargado, $nuevo_nombre)) {
+                    $respuesta->mensaje = "Archivos unidos correctamente";
+                } else {
+                    $respuesta->error = "Error al renombrar el archivo";
+                    return $respuesta;
+                }
+            } else {
+                $respuesta->error = "El archivo original no existe";
+                return $respuesta;
+            }
+            $respuesta->ruta = $url_descarga;
+        }
+    } catch (\Ilovepdf\Exceptions\AuthException $e) {
+        $respuesta->error = "Error de autenticación Ilovepdf: " . $e->getMessage();
+    } catch (\Ilovepdf\Exceptions\TaskException $e) {
+        $respuesta->error = "Error en la tarea Ilovepdf: " . $e->getMessage();
+    } catch (\Exception $e) {
+        $respuesta->error = "Error general: " . $e->getMessage();
+    }
+
+    return $respuesta;
+}
