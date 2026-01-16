@@ -135,7 +135,7 @@ async function consultar_auditoria(anio) {
         const data = cell.getRow().getData()
         const disabled = data.reporte_descargado == 0 ? "disabled" : ""
 
-        return `<button type='button' class='btn btn-info icon' ${disabled} data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' data-widget="control-sidebar" data-slide="true" data-target="#control-sidebar"><i class='fa-solid fa-upload fa-lg'></i></button>`;
+        return `<button type='button' class='btn btn-info icon' ${disabled} data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' data-widget="control-sidebar" data-slide="true" data-target="#sidebar-rauditoria"><i class='fa-solid fa-upload fa-lg'></i></button>`;
     }
 
     let archivoIcon = function (cell, formatterParams, onRendered) { //plain text value
@@ -758,7 +758,8 @@ async function reporte_auditoria_firmado(elemento_aud) {
                             //console.error("Error del servidor:", data.resultado.error);
                             mostrar_toast("error", "Error", data.resultado.error);
                         } else {
-                            mostrar_toast("success", "Subido", data.resultado.mensaje)
+                            tabla_aud.updateData([{ id: elemento_aud.id, reporte_subido: 1, estado: "Realizado" }]);
+                            mostrar_toast("success", "Subido", data.resultado.mensaje);
                             consultar_auditoria(anio);
 
                             charco2.removeFile();

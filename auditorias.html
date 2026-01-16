@@ -206,8 +206,7 @@
                                 <div class="alert alert-danger position-relative d-flex align-items-start " role="alert"
                                     style="display:none !important; background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;"
                                     id="alert-aud-reporte">
-                                    El activo ya tiene el reporte de este año, si sube uno, reemplazará el existente
-                                    y no será reversible
+                                    Ya existe un reporte para este año, Si sube uno nuevo, se reemplazará el actual de forma irreversible.
                                 </div>
                                 <div id="contenedor-rauditoria">
                                     <input type="file" id="subir-reporte-aud" name="reporte_aud">
@@ -460,7 +459,7 @@
     </div>
 
     <!--Modal ver pdf-->
-    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-ver-pdf" role="dialog" data-backdrop="static"
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-pdf-aud" role="dialog" data-backdrop="static"
         data-keyboard="false">
         <div class="modal-dialog modal-dialog-scrollable modal-xl">
             <div class="modal-content">
@@ -474,7 +473,7 @@
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col">
-                                <iframe id="mdl-ver-pdf-reporte" src="libraries/web/viewer.html"
+                                <iframe id="pdf-reporte-aud" src="libraries/web/viewer.html"
                                     style="width: 100%; height: 700px; border: none; margin-top: 20px;" loading="lazy"
                                     allowfullscreen></iframe>
                             </div>
