@@ -980,6 +980,17 @@ function reporte_auditoria($valores)
 {
     include('../conexion.php');
 
+    $tipo = mb_strtolower($valores->elementos->tipo);
+    $tipo = str_replace('é', 'e', $tipo);
+
+    if ($tipo === 'telefono celular') {
+        // SOLO celular
+        $filtro_tipo = "AND ct.tipo LIKE 'telefono celular'";
+    } else {
+        // OTROS dispositivos (se excluye celular)
+        $filtro_tipo = "AND ct.tipo NOT LIKE 'telefono celular'";
+    }
+
     $usuario = $valores->elementos->usuario;
     $anio = $valores->elementos->anio;
 
@@ -1008,39 +1019,17 @@ function reporte_auditoria($valores)
             INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
             LEFT JOIN auditoria AS aud 
                 ON aud.id_equipo = inv.id AND aud.anio = '$anio'
-            WHERE cu.nombre = '$usuario'";
-
+            WHERE cu.nombre = '$usuario' $filtro_tipo";
+    // var_dump($sql);
     $query = mysqli_query($con, $sql);
     $datos = [];
     while ($fila = mysqli_fetch_object($query)) {
         $datos[] = $fila;
     }
 
-    $telefonos = [];
+    /* $telefonos = [];
     $otros = [];
-
-    foreach ($datos as $equipo) {
-        if (strtolower($equipo->tipo) === 'telefono celular') {
-            $telefonos[] = $equipo;
-        } else {
-            $otros[] = $equipo;
-        }
-    }
-
-    // CASO 1: SOLO un teléfono celular
-    if (count($telefonos) === 1 && empty($otros)) {
-        $equipos_a_reportar = $telefonos;
-    }
-
-    // CASO 2: Hay teléfono(s) y otros dispositivos → descartar teléfonos
-    elseif (!empty($telefonos) && !empty($otros)) {
-        $equipos_a_reportar = $otros;
-    }
-
-    // CASO 3: No hay teléfonos → todos los dispositivos
-    else {
-        $equipos_a_reportar = $otros;
-    }
+    $tipo = mb_strtolower(trim($equipo->tipo)); */
 
     $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load('FO-DSP-TI-02 Reporte de auditoria a herramientas TI Rev.00.xlsx');
     $worksheet = $spreadsheet->getActiveSheet();
@@ -1050,11 +1039,11 @@ function reporte_auditoria($valores)
     $worksheet->setCellValue("G10", !empty($valores->elementos->region) ? $valores->elementos->region : 'NA');
 
     $fila_inicio = 14;
-    $total_equipos = count($$equipos_a_reportar);
+    $total_equipos = count($datos);
     $ids_equipo = [];
 
     // Proceos de filas y estilos
-    foreach ($equipos_a_reportar as $index => $equipo) {
+    foreach ($datos as $index => $equipo) {
         $fila_actual = $fila_inicio + $index;
         // $ids_equipo[] = $equipo->id;
 
@@ -1119,6 +1108,6 @@ function reporte_auditoria($valores)
     return [
         'result' => true,
         'url' => "http://" . $_SERVER['HTTP_HOST'] . "/Inventario_TI/database/controller_excel/documentos_descarga/auditoria/reporte/" . $nombre_doc,
-        'ids' => $id_equipo
+        'id' => $id_equipo
     ];
 }
