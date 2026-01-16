@@ -17,7 +17,7 @@ if ($clientejson->accion == 0) {
 } elseif ($clientejson->accion == 4) {
     $respuesta_servidor->resultado = guardar_reportes_auditoria($clientejson);
 } elseif ($clientejson->accion == 5) {
-    $respuesta_servidor->resultado = unir_reportes_auditoria($clientejson);
+    $respuesta_servidor->resultado = validar_reporte_año($clientejson);
 } elseif ($clientejson->accion == 6) {
     $respuesta_servidor->resultado = guardar_programa_auditoria($clientejson);
 } elseif ($clientejson->accion == 7) {

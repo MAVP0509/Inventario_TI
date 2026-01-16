@@ -744,7 +744,7 @@ async function reporte_auditoria_firmado(elemento_aud) {
                 withCredentials: false,
                 ondata: (formData) => {
                     const trama = {
-                        accion: 3,
+                        accion: 4,
                         id_equipo: elemento_aud.id,
                         fecha_aud: elemento_aud.fecha
                     };
@@ -779,7 +779,7 @@ async function reporte_auditoria_firmado(elemento_aud) {
     //* Mostrando pdf cuando se suba
     let abrirArchivo;
 
-    charco2.on('addfile', (error, fileItem) => {
+    /* charco2.on('addfile', (error, fileItem) => {
         if (error) {
             mostrar_toast('error', 'Error', 'Error al cargar PDF:' + error);
             return;
@@ -795,9 +795,9 @@ async function reporte_auditoria_firmado(elemento_aud) {
 
         $('#pdf-aud').show()
 
-    });
+    }); */
 
-    let server = await server_auditoria({ accion: 4, id_equipo: elemento_aud.id, fecha_aud: elemento_aud.fecha })
+    let server = await server_auditoria({ accion: 5, id_equipo: elemento_aud.id, fecha_aud: elemento_aud.fecha })
 
     if (server.resultado) {
         document.getElementById('alert-aud-reporte').style.display = 'block'
