@@ -703,21 +703,23 @@ async function reporte_auditoria(equipo) {
 
 //* Funciones para subir reporte de auditoria
 
+FilePond.registerPlugin(FilePondPluginFileValidateType);
+
 let charco2;
 let charcoInicializado2;
 
 async function reporte_auditoria_firmado(elemento_aud) {
-    //*Escondiendo el alert
+    //?Escondiendo el alert
     document.getElementById('alert-aud-reporte').setAttribute('style', 'display: none !important;  background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;');
 
-    //*Escondiendo el visor de pdf
+    //?Escondiendo el visor de pdf
     $('#pdf-aud').hide()
 
     if (charco2) {
-        charco2.destroy();   //* <- Esto destruye la instancia anterior, lo cual es necesario
+        charco2.destroy();   //? <- Esto destruye la instancia anterior, lo cual es necesario
     }
 
-    //* Al destruir la instancia es necesario colocarle de nuevo el name al input, sino, no aceptará el archivo el php
+    //? Al destruir la instancia es necesario colocarle de nuevo el name al input, sino, no aceptará el archivo el php
     $('#subir-reporte-aud').attr('name', 'reporte_aud');
 
     let fileAud = document.getElementById('subir-reporte-aud')
@@ -810,3 +812,11 @@ function eliminar_archivo() {
         fileItemCargado = null;
     }
 }
+
+// ? Cerrando filepond al finalizar la carga del reporte
+document.addEventListener('FilePond:removefile', (e) => {
+    // $('#pdf-aud').hide()
+    $('[data-widget="sidebar-rauditoria"]').ControlSidebar('toggle')
+})
+
+//* Funciones para visualizar el reporte firmado
