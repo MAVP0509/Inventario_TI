@@ -1037,6 +1037,8 @@ function reporte_auditoria($valores)
     // Encabezados
     $worksheet->setCellValue("C8", !empty($usuario) ? $usuario : 'NA');
     $worksheet->setCellValue("G10", !empty($valores->elementos->region) ? $valores->elementos->region : 'NA');
+    $worksheet->setCellValue("C10", !empty($valores->area) ? $valores->area : 'NA');
+    $worksheet->setCellValue("K10", !empty($valores->ubicacion) ? $valores->ubicacion : 'NA');
 
     $fila_inicio = 14;
     $total_equipos = count($datos);

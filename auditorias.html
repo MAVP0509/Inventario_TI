@@ -750,22 +750,45 @@
                 <!-- Body -->
                 <div class="modal-body">
                     <div class="container-fluid">
-                        <h6>Encargado de realizar el reporte</h6>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text"><i class="fa-solid fa-user-gear"></i></div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <h6>Área</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa-solid fa-street-view"></i></div>
+                                    </div>
+                                    <input type="text" id="aud-area" class="form-control" placeholder="Ingrese un área">
+                                    <div class="invalid-feedback">Por favor, ingrese un área</div>
+                                </div>
                             </div>
-                            <select id="saud-encargado" class="form-control"></select>
-                            <div class="invalid-feedback">Por favor, selecione un encargado</div>
-                        </div>
-                        <h6>Puesto del encargado</h6>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text"><i class="fa-regular fa-id-card"></i></div>
+                            <div class="col-sm-6">
+                                <h6>Ubicación</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
+                                    </div>
+                                    <input type="text" id="ubicacion-aud" class="form-control" placeholder="Ingrese una ubicación">
+                                    <div class="invalid-feedback">Por favor, ingrese una ubicación</div>
+                                </div>
                             </div>
-                            <select id="saud-cargo" class="form-control"></select>
-                            <div class="invalid-feedback">Por favor, selecione un cargo</div>
+                            <h6>Encargado de realizar el reporte</h6>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><i class="fa-solid fa-user-gear"></i></div>
+                                </div>
+                                <select id="saud-encargado" class="form-control"></select>
+                                <div class="invalid-feedback">Por favor, selecione un encargado</div>
+                            </div>
+                            <h6>Puesto del encargado</h6>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><i class="fa-regular fa-id-card"></i></div>
+                                </div>
+                                <select id="saud-cargo" class="form-control"></select>
+                                <div class="invalid-feedback">Por favor, selecione un cargo</div>
+                            </div>
                         </div>
+
                     </div>
                 </div>
                 <!-- Footer -->
@@ -956,7 +979,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
-                        class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i>
+                            class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i>
                     </button>
                 </div>
             </div>

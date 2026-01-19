@@ -672,9 +672,18 @@ async function mdl_descargar_reporte_auditoria(equipo) {
 }
 
 async function reporte_auditoria(equipo) {
+    const validar = ["ubicacion-aud", "aud-area", "saud-encargado", "saud-cargo"];
+
+    if (!validar_campos(validar)) {
+        mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
+        return;
+    }
+    
     let model = {
         accion: 6,
         elementos: equipo,
+        ubicacion: $("#ubicacion-aud").val().trim(),
+        area: $("#aud-area").val().trim(),
         encargado: $("#saud-encargado").select2('data')[0].text,
         cargo: $("#saud-cargo").select2('data')[0].text
     }
