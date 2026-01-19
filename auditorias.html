@@ -60,7 +60,7 @@
             /* Asegura que esté por encima del contenido */
         }
 
-        /* .meses-grid {
+        /* .mes-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 12px;
@@ -98,7 +98,7 @@
             transform: none;
         } */
         /* -------------------------------------------------------- */
-        /* .meses-grid {
+        /* .mes-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             gap: 18px;
@@ -123,13 +123,13 @@
             transition: 0.2s ease;
         }
 
-        .mes-card .mes-nombre {
+        .mes-card .nombre-mes {
             font-size: 16px;
             font-weight: 600;
             color: #2c3e50;
         }
 
-        .mes-card .mes-status {
+        .mes-card .estatus-mes {
             margin-top: 5px;
             font-size: 12px;
             padding: 3px 8px;
@@ -142,7 +142,7 @@
             border-color: #007bff;
         }
 
-        .mes-card.disponible .mes-status {
+        .mes-card.disponible .estatus-mes {
             background: #007bff;
             color: white;
         }
@@ -162,13 +162,13 @@
             opacity: 0.55;
         }
 
-        .mes-card.no-disponible .mes-status {
+        .mes-card.no-disponible .estatus-mes {
             background: #adb5bd;
             color: white;
         } */
         /* --------------------------------------------- */
 
-        /* .meses-grid {
+        /* .mes-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 18px;
@@ -206,21 +206,21 @@
 
         }
 
-        .mes-nombre,
-        .mes-status {
+        .nombre-mes,
+        .estatus-mes {
             position: relative;
             z-index: 1;
 
             transition: color 0.3s ease;
         }
 
-        .mes-nombre {
+        .nombre-mes {
             font-size: 16px;
             font-weight: 600;
             color: #2c3e50;
         }
 
-        .mes-status {
+        .estatus-mes {
             margin-top: 6px;
             font-size: 13px;
             padding: 4px 8px;
@@ -231,8 +231,8 @@
         }
 
 
-        .mes-card.disponible:hover .mes-nombre,
-        .mes-card.disponible:hover .mes-status {
+        .mes-card.disponible:hover .nombre-mes,
+        .mes-card.disponible:hover .estatus-mes {
             color: white;
             background: rgba(255, 255, 255, 0.25);
         }
@@ -248,13 +248,13 @@
 
         }
 
-        .mes-card.no-disponible:hover .mes-nombre,
-        .mes-card.no-disponible:hover .mes-status {
+        .mes-card.no-disponible:hover .nombre-mes,
+        .mes-card.no-disponible:hover .estatus-mes {
             color: #444;
         } */
         /* ------------------------------------------- */
 
-        .meses-grid {
+        .mes-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
             gap: 20px;
@@ -262,7 +262,7 @@
         }
 
         /* ---- CARD BASE (GLASSMORPHISM REAL) ---- */
-        .mes-card {
+        .card-mes {
             position: relative;
             padding: 20px;
             border-radius: 20px;
@@ -283,7 +283,7 @@
         }
 
         /* ---- DEGRADADO FLUIDO (Hover Fill) ---- */
-        .mes-card::before {
+        .card-mes::before {
             content: "";
             position: absolute;
             inset: 0;
@@ -295,13 +295,13 @@
         }
 
         /* Hover: relleno degradado */
-        .mes-card.disponible:hover::before {
+        .card-mes.disponible:hover::before {
             opacity: 1;
             transform: scale(1);
         }
 
         /* ---- BORDE ANIMADO PREMIUM ---- */
-        .mes-card::after {
+        .card-mes::after {
             content: "";
             position: absolute;
             inset: 0;
@@ -336,14 +336,14 @@
         }
 
         /* ---- TEXTO ---- */
-        .mes-nombre,
-        .mes-status {
+        .nombre-mes,
+        .estatus-mes {
             position: relative;
             z-index: 3;
             transition: color 0.3s ease, transform 0.3s ease;
         }
 
-        .mes-nombre {
+        .nombre-mes {
             font-size: 17px;
             font-weight: 700;
             color: #1a1a1a;
@@ -351,7 +351,7 @@
             /* text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); */
         }
 
-        .mes-status {
+        .estatus-mes {
             margin-top: 8px;
             font-size: 13px;
             padding: 4px 12px;
@@ -362,19 +362,19 @@
         }
 
         /* Hover: efecto de elevación del texto */
-        .mes-card.disponible:hover .mes-nombre,
-        .mes-card.disponible:hover .mes-status {
+        .card-mes.disponible:hover .nombre-mes,
+        .card-mes.disponible:hover .estatus-mes {
             color: white;
         }
 
         /* ---- NO DISPONIBLE ---- */
-        .mes-card.no-disponible {
+        .card-mes.no-disponible {
             cursor: not-allowed;
             opacity: 0.35;
             filter: grayscale(60%);
         }
 
-        .mes-card.no-disponible:hover::before {
+        .card-mes.no-disponible:hover::before {
             opacity: 0;
         }
     </style>
@@ -469,7 +469,7 @@
                                             data-trigger="hover" data-html="true" data-placement="bottom"
                                             data-content="Descargar reportes mensuales"
                                             class="btn btn-outline-danger rounded icon mr-3"
-                                            onclick="mdl_descargar_reportes_mensuales()"><i
+                                            onclick="mdl_reportes_mensuales()"><i
                                                 class="fa-solid fa-file-pdf fa-lg"></i>
                                         </button>
                                         <button type="button" class="btn btn-lg  btn-outline-info mr-3 icon"
@@ -946,7 +946,7 @@
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col">
-                                <div id="contenedor-mes" class="meses-grid">
+                                <div id="contenedor-mes" class="mes-grid">
 
                                 </div>
                             </div>

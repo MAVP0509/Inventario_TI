@@ -19,7 +19,7 @@ if ($clientejson->accion == 0) {
 } elseif ($clientejson->accion == 1) {
     $respuesta_servidor->resultado = consultar_anio_auditoria();
 } elseif ($clientejson->accion == 2) {
-    $respuesta_servidor->resultado = validar_reporte_mismo_año($clientejson);
+    $respuesta_servidor->resultado = guardar_programa_auditoria($clientejson);
 } elseif ($clientejson->accion == 3) {
     $respuesta_servidor->resultado = consultar_auditoria_firmada($clientejson);
 } elseif ($clientejson->accion == 4) {
@@ -27,9 +27,9 @@ if ($clientejson->accion == 0) {
 } elseif ($clientejson->accion == 5) {
     $respuesta_servidor->resultado = validar_reporte_año($clientejson);
 } elseif ($clientejson->accion == 6) {
-    $respuesta_servidor->resultado = guardar_programa_auditoria($clientejson);
-} elseif ($clientejson->accion == 7) {
     $respuesta_servidor->resultado = consultar_reporte_auditoria($clientejson);
+} elseif ($clientejson->accion == 7) {
+    $respuesta_servidor->resultado = unir_reportes_auditoria($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -312,11 +312,11 @@ function unir_reportes_auditoria($valores)
 {
     $respuesta = new stdClass();
 
-    $base = realpath(__DIR__ . '/../../../Inventario_TI/documentos/auditoria/reporte/');
+    // $base = realpath(__DIR__ . );
 
     $carpeta_reporte = __DIR__ . '/../../documentos/auditoria/reporte/' . $valores->anio . '/reportes_unidos';
     $archivo_final = $carpeta_reporte . '/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
-    $url_descarga = $base . $valores->anio . '/reportes_unidos/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
+    $url_descarga = '/Inventario_TI/documentos/auditoria/reporte/' . $valores->anio . '/reportes_unidos/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
 
     try {
         $ilovepdf = new Ilovepdf(
@@ -329,7 +329,7 @@ function unir_reportes_auditoria($valores)
         );
 
         $myTaksMerge = $ilovepdf->newTask('merge');
-        
+
         $carpeta = __DIR__ . '/../../documentos/auditoria/reporte/' . $valores->anio . '/' . $valores->mes;
 
         if (!is_dir($carpeta)) {
@@ -337,7 +337,7 @@ function unir_reportes_auditoria($valores)
             return $respuesta;
         }
 
-        $archivos = array_diff(scandir($carpeta), ['.','..']);
+        $archivos = array_diff(scandir($carpeta), ['.', '..']);
 
         $ruta = [];
 
@@ -347,39 +347,39 @@ function unir_reportes_auditoria($valores)
             if (is_file($ruta_completa) && strtolower(pathinfo($archivo, PATHINFO_EXTENSION)) === 'pdf') {
                 $ruta[] = $ruta_completa;
             }
-
-            if (empty($ruta)) {
-                $respuesta->error = "No se encontraron los archivos";
-                return $respuesta;
-            }
-
-            foreach ($ruta as $archivo) {
-                $myTaksMerge->addFile($archivo);
-            }
-
-            if (!is_dir($carpeta_reporte)) {
-                mkdir($carpeta_reporte, 0777, true);
-            }
-
-            $myTaksMerge->execute();
-            $myTaksMerge->download($carpeta_reporte);
-
-            $archivo_descargado = $carpeta_reporte. '/merged.pdf';
-            $nuevo_nombre = $archivo_final;
-
-            if (file_exists($archivo_descargado)) {
-                if (rename($archivo_descargado, $nuevo_nombre)) {
-                    $respuesta->mensaje = "Archivos unidos correctamente";
-                } else {
-                    $respuesta->error = "Error al renombrar el archivo";
-                    return $respuesta;
-                }
-            } else {
-                $respuesta->error = "El archivo original no existe";
-                return $respuesta;
-            }
-            $respuesta->ruta = $url_descarga;
         }
+
+        if (empty($ruta)) {
+            $respuesta->error = "No se encontraron los archivos";
+            return $respuesta;
+        }
+
+        foreach ($ruta as $archivo) {
+            $myTaksMerge->addFile($archivo);
+        }
+
+        if (!is_dir($carpeta_reporte)) {
+            mkdir($carpeta_reporte, 0777, true);
+        }
+
+        $myTaksMerge->execute();
+        $myTaksMerge->download($carpeta_reporte);
+
+        $archivo_descargado = $carpeta_reporte . '/merged.pdf';
+        $nuevo_nombre = $archivo_final;
+
+        if (file_exists($archivo_descargado)) {
+            if (rename($archivo_descargado, $nuevo_nombre)) {
+                $respuesta->mensaje = "Archivos unidos correctamente";
+            } else {
+                $respuesta->error = "Error al renombrar el archivo";
+                return $respuesta;
+            }
+        } else {
+            $respuesta->error = "El archivo original no existe";
+            return $respuesta;
+        }
+        $respuesta->ruta = $url_descarga;
     } catch (\Ilovepdf\Exceptions\AuthException $e) {
         $respuesta->error = "Error de autenticación Ilovepdf: " . $e->getMessage();
     } catch (\Ilovepdf\Exceptions\TaskException $e) {

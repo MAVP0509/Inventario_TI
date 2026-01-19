@@ -223,7 +223,7 @@ async function consultar_auditoria(anio) {
                 !excluir.includes(d.estado)
             ).length;
 
-            return `${fecha.toLocaleDateString('es-ES', opciones)} (${pendientes} mantenimientos pendientes)`;
+            return `${fecha.toLocaleDateString('es-ES', opciones)} (${pendientes} auditorias pendientes)`;
 
         },
         groupStartOpen: false,
@@ -496,8 +496,6 @@ let charco = null;
 let charcoInicializado = false;
 
 async function auditoria_firmado() {
-
-
     if (!charcoInicializado) {
 
         const input = document.getElementById("subir-pauditoria");
@@ -517,7 +515,7 @@ async function auditoria_firmado() {
                     consulta_reportes_mesuales: 'reporte_pauditoria',
                     withCredentials: false,
                     ondata: (formData) => {
-                        formData.append('trama', JSON.stringify({ accion: 6, anio: auditorias_pendientes[0].anio }));
+                        formData.append('trama', JSON.stringify({ accion: 2, anio: auditorias_pendientes[0].anio }));
                         return formData;
                     },
                     onload: (response) => {
@@ -691,9 +689,9 @@ async function reporte_auditoria(equipo) {
         window.location = server.resultado.url;
         $('#mdl-reporte-aud').modal("hide");
 
-        tabla_aud.updateData([{ id: elemento_aud.id, reporte_descargado: 1, estado: "En proceso" }]);
+        tabla_aud.updateData([{ id: equipo.id, reporte_descargado: 1, estado: "En proceso" }]);
 
-        consultar_mantenimientos_vencidos()
+        // consultar_auditoria();
         mostrar_toast('success', '¡Generación de reporte exitoso!', 'La generación de reporte de auditoria se ha realizado correctamente.');
     } else {
         mostrar_toast('error', '¡Error!', 'No se pudo generar el reporte de auditoria. Inténtelo nuevamente.');
@@ -762,9 +760,9 @@ async function reporte_auditoria_firmado(elemento_aud) {
                         } else {
                             tabla_aud.updateData([{ id: elemento_aud.id, reporte_subido: 1, estado: "Realizado" }]);
                             mostrar_toast("success", "Subido", data.resultado.mensaje);
-                            consultar_auditoria(anio);
+                            // consultar_auditoria(anio);
 
-                            charco2.removeFile();
+                            charco2.removeFiles();
                         }
 
                     } catch (e) {
@@ -822,7 +820,7 @@ document.addEventListener('FilePond:removefile', (e) => {
 //* Funciones para visualizar el reporte firmado
 async function consultar_reporte_firmado(elemento_aud) {
     let model = {
-        accion: 7,
+        accion: 6,
         id_equipo: elemento_aud.id,
         fecha_aud: elemento_aud.fecha
     }
@@ -953,12 +951,30 @@ async function mdl_auditoria_info(elemento_aud) {
 }
 
 //* Funciones para la descargar mensual de reportes
+async function mdl_reportes_mensuales() {
+    const cont = document.getElementById("contenedor-mes");
+    cont.innerHTML = "";
 
-function consulta_reportes_mesuales() {
-    const meses = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+    let año = auditorias_pendientes[0].anio
+    console.log(auditorias_pendientes[0].anio);
+    $('#descargar-text-aud').text(`Descargar reportes mensuales del año ${año}`)
+
+
+    consulta_reportes_mensuales()
+    $('#mdl-raud-mens').modal('show');
+}
+
+$(document).ready(function () {
+    $('[data-toggle="popover"]').popover();
+})
+
+function consulta_reportes_mensuales() {
+    let meses = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
     let meses_auditados = Object.keys(auditorias_pendientes[0].meses);
 
-    carga_meses(meses_auditados);
+    let meses_completados = meses.filter(e => !meses_auditados.includes(e)).map(Number);
+
+    carga_meses(meses_completados);
 }
 
 const nombre_meses = [
@@ -966,6 +982,47 @@ const nombre_meses = [
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
 
-function carga_meses(meses) {
-    
+function carga_meses(meses = []) {
+    const contenedor = document.getElementById("contenedor-mes");
+    contenedor.innerHTML = "";
+
+    nombre_meses.forEach((mes, i) => {
+        const num_mes = i + 1;
+        let disp = meses.includes(num_mes);
+
+        const card = document.createElement("div");
+        card.className = "card-mes " + (disp ? "disponible" : "no-disponible");
+
+        card.innerHTML = `
+            <div class="nombre-mes">${mes}</div>
+            <div class="estatus-mes">${disp ? "Disponible" : "No disponible"}</div>
+        `;
+
+        if (disp) {
+            let numero_mes = num_mes.toString().padStart(2, '0');
+            card.onclick = () => unir_reportes_mes(numero_mes);
+        }
+
+        contenedor.appendChild(card);
+    });
+}
+
+async function unir_reportes_mes(mes) {
+    auditoria_loading = true;
+
+    alert_cargando('Uniendo reportes, esto tomará un tiempo, por favor espere...');
+
+    let server = await server_auditoria({ accion: 7, anio: auditorias_pendientes[0].anio, mes: mes });
+
+    if (server.resultado.mensaje) {
+        mostrar_toast('success', '¡Éxito!', server.resultado.mensaje);
+
+        let ruta = `${location.origin}${server.resultado.ruta}`;
+        window.open(ruta, '_blank');
+
+    } else if (server.resultado.error) {
+        mostrar_toast('error', '¡Error!', server.resultado.error);
+    } else {
+        mostrar_toast('error', '¡Error!', 'Hubo un problema');
+    }
 }
