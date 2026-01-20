@@ -336,7 +336,7 @@ $(document).ready(function () {
     });
 });
 
-
+//* Función para mostrar alerta de carga
 function alert_cargando(text) {
     Swal.fire({
         title: 'Cargando...',
