@@ -601,3 +601,10 @@ convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Oswald
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Oswaldo_Salmeron_Almeida.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Oswaldo_Salmeron_Almeida.pdf using filter : calc_pdf_Export
 Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Oswaldo_Salmeron_Almeida.pdf
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristobal_Soto_Escalante.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Cristobal_Soto_Escalante.pdf using filter : calc_pdf_Export
+Error: source file could not be loaded
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_Bauza_Valdez.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alan_Bauza_Valdez.pdf using filter : calc_pdf_Export
+Error: source file could not be loaded
+Error: source file could not be loaded
+Error: source file could not be loaded
+Error: source file could not be loaded
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Ernesto_Jurgen_Finkenthal_Vazquez.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Ernesto_Jurgen_Finkenthal_Vazquez.pdf using filter : calc_pdf_Export

@@ -1071,7 +1071,7 @@ async function programa_firmado() {
                     name: 'reporte_programa',
                     withCredentials: false,
                     ondata: (formData) => {
-                        formData.append('trama', JSON.stringify({ accion: 6, anio: auditorias_pendientes[0].anio }));
+                        formData.append('trama', JSON.stringify({ accion: 6, anio: mantenimientosPendientes[0].anio }));
                         return formData;
                     },
                     onload: (response) => {
