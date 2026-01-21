@@ -608,3 +608,10 @@ Error: source file could not be loaded
 Error: source file could not be loaded
 Error: source file could not be loaded
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Ernesto_Jurgen_Finkenthal_Vazquez.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Ernesto_Jurgen_Finkenthal_Vazquez.pdf using filter : calc_pdf_Export
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Janny_Leticia_García_Mendoza.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Janny_Leticia_García_Mendoza.pdf using filter : calc_pdf_Export
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alejandro_Cancino.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alejandro_Cancino.pdf using filter : calc_pdf_Export
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alejandro_Cancino_Argüello.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alejandro_Cancino_Argüello.pdf using filter : calc_pdf_Export
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alejandro_Cancino_Argüello.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alejandro_Cancino_Argüello.pdf using filter : calc_pdf_Export
+Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alejandro_Cancino_Argüello.pdf
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alejandro_Cancino_Argüello.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alejandro_Cancino_Argüello.pdf using filter : calc_pdf_Export
+Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Alejandro_Cancino_Argüello.pdf

@@ -286,7 +286,18 @@ function consultar_para_resguardo($valores)
     include("../conexion.php");
     $respuesta = new stdClass();
 
-    $sql_historico = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, modelo, tag, imei, linea, fecha_entrega FROM inventario_ti_sur WHERE fk_usuario = $valores->usuario;";
+    if ($valores === 0) {
+        // SOLO celular
+        $filtro_tipo = "AND ct.tipo LIKE 'telefono celular'";
+    } else {
+        // OTROS dispositivos (se excluye celular)
+        $filtro_tipo = "AND ct.tipo NOT LIKE 'telefono celular'";
+    }
+
+    $sql_historico = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, modelo, tag, imei, linea, fecha_entrega 
+                        FROM inventario_ti_sur AS inv
+                            INNER JOIN cat_tipo AS ct ON ct.id = inv.fk_tipo
+                        WHERE fk_usuario = '$valores->usuario' $filtro_tipo;";
     $query_historico = mysqli_query($con, $sql_historico);
     $historico = array();
     while ($fila = mysqli_fetch_object($query_historico)) {
