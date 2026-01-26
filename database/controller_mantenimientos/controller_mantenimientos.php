@@ -85,7 +85,6 @@ function guardar_reportes($valores)
         unlink($validacion->resultado);
     }
 
-
     if (isset($_FILES['reporte_mantenimiento']) && $_FILES['reporte_mantenimiento']['error'] === UPLOAD_ERR_OK) {
         $nombreOriginal = $_FILES['reporte_mantenimiento']['name'];
         $tmpPath = $_FILES['reporte_mantenimiento']['tmp_name'];
@@ -131,11 +130,10 @@ function guardar_reportes($valores)
         }
 
         if (move_uploaded_file($tmpPath, $destino)) {
-
-
             $añoMantenimiento = $fechaMantenimiento[0];
             $sql = "UPDATE mantenimiento SET reporte_subido = 1, estado = 'Realizado' WHERE id_equipo = '$valores->id_equipo' AND anio = '$añoMantenimiento'";
-            if (!mysqli_query($con, $sql)) {
+            $query  = mysqli_query($con, $sql);
+            if (!$query) {
                 return $respuesta->error = "No se pudo registrar en la base datos, favor de avisar a TI";
             }
             $respuesta->mensaje = "Archivo guardado correctamente";
@@ -183,13 +181,12 @@ function validar_reporte_mismo_año($valores)
 function consultar_reporte($valores)
 {
     $respuesta = new stdClass();
-    $fecha = explode('-', $valores->fecha_mnto);
 
+    $fecha = explode('-', $valores->fecha_mnto);
     $año = $fecha[0];
     $mes = $fecha[1];
 
     $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $año . '/' . $mes;
-
     $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/' . $año . '/' . $mes;
 
     if (is_dir($carpeta)) {
@@ -281,7 +278,7 @@ function guardar_programa($valores)
 
 function consultar_programa_firmado($valores)
 {
-    $base = realpath(__DIR__ . '/../../Documentos/mantenimiento/programa');
+    $base = realpath(__DIR__ . '/../../documentos/mantenimiento/programa');
 
     if ($base === false) {
         return [
@@ -306,7 +303,7 @@ function consultar_programa_firmado($valores)
         $host = $_SERVER['HTTP_HOST'];
         $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 
-        $url = "{$protocolo}://{$host}/Inventario_TI/Documentos/mantenimiento/programa/{$valores->anio}/{$archivo}";
+        $url = "{$protocolo}://{$host}/Inventario_TI/documentos/mantenimiento/programa/{$valores->anio}/{$archivo}";
 
         return [
             "existe" => true,

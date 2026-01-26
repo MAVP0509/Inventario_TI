@@ -70,15 +70,17 @@ function mostrar_toast(tipo, titulo, mensaje, tiempo) {
     });
 }
 
+//* Función pAra mostrar notificación de carga
 function mostrar_toast_cargando(texto) {
-    Swal.fire({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        showCloseButton: false,
-        timer: undefined, // No cerrar automáticamentekm
-        allowOutsideClick: false,
-        background: '#fff',
+    Swal.fire({ // Se invoca SweetAlert2 para crear el toast
+        toast: true,    // Define el tipo de toast (alerta no modal)
+        position: 'top-end',    // Posición del toast en la pantalla
+        showConfirmButton: false,   //Oculta el botón de confirmación
+        showCloseButton: false, // Oculta el botón de cerrar
+        timer: undefined, // Evita el cierre automático del toast
+        allowOutsideClick: false,   // Bloquea el cierre al hacer clic fuera del toast
+        background: '#fff', // Define el color de fondo
+        // HTML perzonalizado que se mostrará dentro del toast
         html: `
             <div style="display: flex; align-items: center;">
                 <!--<i class="fas fa-spinner fa-spin fa-lg" style="margin-right: 10px; color: #007bff;"></i>-->
@@ -86,6 +88,7 @@ function mostrar_toast_cargando(texto) {
                 <span style="font-weight: 500; margin-left: 8px;">${texto}</span>
             </div>
         `,
+        // Evento que se ejecuta al abrir el toast
         didOpen: () => {
             //Swal.showLoading(); Esto muestra el spinner por default de SweetAlert, pero ya no es necesario, ya que se usa uno de fontAwesome
         }
@@ -154,8 +157,9 @@ function seleccionar_registro(id, lista) {
     // console.log(lista)
 }
 
+//* Función para inicializar componentes Select2
 async function general_select2({ selectId, tabla, campo, data, placeholder, dropdownParent, tags, popoverTitle, popoverContent, placement, sincronizarCon, sincronizarCampo, multiple = false }) {
-    //try {
+
     let opciones = [];
 
     if (data && Array.isArray(data)) {
@@ -200,7 +204,7 @@ async function general_select2({ selectId, tabla, campo, data, placeholder, drop
         data: opciones
     });
 
-    // Para múltiples valores, se asigna [] como valor inicaial
+    // Para múltiples valores, se asigna [] como valor inicaial (No toma el estilo de Boostrap 4)
     $select.val(multiple ? [] : null).trigger('change');
 
     //  Si se pasan datos de popover, aplicarlo
@@ -336,7 +340,7 @@ $(document).ready(function () {
     });
 });
 
-
+//* Función para mostrar alerta de carga
 function alert_cargando(text) {
     Swal.fire({
         title: 'Cargando...',

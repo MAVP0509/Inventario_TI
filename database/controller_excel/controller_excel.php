@@ -32,6 +32,8 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = reporte_mantenimiento($clientejson);
 } elseif ($clientejson->accion == 5) {
     $respuesta_servidor->resultado = programa_auditoria($clientejson);
+} elseif ($clientejson->accion == 6) {
+    $respuesta_servidor->resultado = reporte_auditoria($clientejson);
 }
 
 print(json_encode($respuesta_servidor));
@@ -106,7 +108,7 @@ function resguardo($valores)
          TODO Reaplicar las combinaciones de celdas en la nueva fila
          * Al insertar nuevas filas, no respeta las combinaciones de celdas de la plantilla
          */
-        //$worksheet->mergeCells("D$fila:E$fila");
+        // //$worksheet->mergeCells("D$fila:E$fila");
         $worksheet->mergeCells("E$fila:F$fila");
         $worksheet->mergeCells("G$fila:H$fila");
         $worksheet->mergeCells("I$fila:J$fila");
@@ -441,22 +443,6 @@ function fecha_programa($anio, $mes)
     return $fecha->format('Y-m-d');
 }
 
-/* function ConsultarOrdenMTTO()
-{
-    include('../conexion.php');
-    $sql_dis = "SELECT tipo_id FROM vorden_mantenimiento";
-    $sql_orden = "SELECT orden FROM vorden_mantenimiento ORDER BY orden";
-
-    $SQL = "CALL pprograma_mantenimiento($sql_dis, $sql_orden)";
-    // $SQL = "SELECT * FROM vorden_mantenimiento ORDER BY orden";
-    $query = mysqli_query($con, $SQL);
-    $datos = array();
-    while ($filas = mysqli_fetch_object($query)) {
-        array_push($datos, $filas->tipo_id);
-    }
-    return $datos;
-} */
-
 function programa_mantenimiento($valores)
 {
     include('../conexion.php');
@@ -583,7 +569,9 @@ function programa_mantenimiento($valores)
         // Marca con una 'x' el mes correspondiente al mantenimiento
         $mes_index = $item['mes_index'];
         $columna_mes = $meses_columnas[$mes_index];
-        $worksheet->setCellValue("{$columna_mes}{$fila_inicio}", 'x');
+        $celda = "{$columna_mes}{$fila_inicio}";
+        $worksheet->setCellValue($celda, 'x');
+        $worksheet->getStyle($celda)->getFont()->setBold(true);
 
         $fila_inicio++; // Pasa a la siguiente fila
     }
@@ -650,6 +638,36 @@ function reporte_mantenimiento($valores)
 {
     include('../conexion.php');
 
+    $usuario = $valores->elementos->usuario;
+    $anio = $valores->elementos->anio;
+
+    $sql = "SELECT
+                inv.id AS id,
+                man.anio,
+                man.estado,
+                cu.nombre,
+                cu.cargo,
+                cu.region,
+                ct.tipo,
+                ca.marca,
+                inv.modelo,
+                inv.num_serie
+            FROM inventario_ti_sur AS inv
+            INNER JOIN cat_usuarios AS cu ON cu.id = inv.fk_usuario
+            INNER JOIN cat_tipo AS ct ON ct.id = inv.fk_tipo 
+            INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
+            LEFT JOIN mantenimiento AS man 
+                ON man.id_equipo = inv.id AND man.anio = '$anio'
+            WHERE cu.nombre = '$usuario'";
+
+    $query = mysqli_query($con, $sql);
+
+    $datos = [];
+
+    while ($fila = mysqli_fetch_object($query)) {
+        $datos[] = $fila;
+    }
+
     $spreadsheet = IOFactory::load('FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.01.xlsx'); //*Cargando la plantilla del Excel
     $worksheet = $spreadsheet->getActiveSheet();
 
@@ -696,33 +714,30 @@ function reporte_mantenimiento($valores)
         $worksheet->setCellValue("W{$fila}", 'NA'); // Observaciones
     }
 
-    // Determinar fila a llenar según tipo
-    $tipo = !empty($valores->elementos->tipo) ? $valores->elementos->tipo : 'Otros';
-    // var_dump($tipo);
-    // $tipo = preg_replace('/\s+/', ' ', $tipo);
-    // $tipo = ucfirst(strtolower($tipo));
-    $fila = $mapa_filas[$tipo] ?? 26; // 26 = Otros
+    $otros_fila = 26;
+    $ids_equipo = [];
 
-    // Rellenar datos
-    $marca = !empty($valores->elementos->marca) ? $valores->elementos->marca : 'NA';
-    $modelo = !empty($valores->elementos->modelo) ? $valores->elementos->modelo : 'NA';
-    $serie = !empty($valores->elementos->num_serie) ? $valores->elementos->num_serie : 'NA';
-    // $observaciones = !empty($valores->ubicacion) ? $valores->ubicacion : 'NA';
-    $observaciones = false;
-    if ($marca !== 'NA' || $modelo !== 'NA' || $serie !== 'NA') {
-        $worksheet->setCellValue("W{$fila}", '');
-        $observaciones = true;
-    }
+    foreach ($datos as $equipo) {
+        $tipo = trim($equipo->tipo);
 
-    if ($observaciones) {
-        for ($f = 20; $f <= 27; $f++); {
-            $worksheet->setCellValue("W{$f}", '');
+        if (isset($mapa_filas[$tipo])) {
+            $fila = $mapa_filas[$tipo];
+        } else {
+            if ($otros_fila > 27) {
+                continue;
+            }
+
+            $fila = $otros_fila;
+            $otros_fila++;
         }
-    }
 
-    $worksheet->setCellValue("G{$fila}", $marca);
-    $worksheet->setCellValue("L{$fila}", $modelo);
-    $worksheet->setCellValue("Q{$fila}", $serie);
+        $worksheet->setCellValue("G{$fila}", $equipo->marca ?? 'NA');
+        $worksheet->setCellValue("L{$fila}", $equipo->modelo ?? 'NA');
+        $worksheet->setCellValue("Q{$fila}", $equipo->num_serie ?? 'NA');
+        $worksheet->setCellValue("W{$fila}", '');
+
+        $ids_equipo[] = $equipo->id;
+    }
 
     $worksheet->setCellValue("D69", !empty($valores->encargado) ? $valores->encargado : '');
     $worksheet->setCellValue("U69", !empty($valores->elementos->usuario) ? $valores->elementos->usuario : '');
@@ -731,7 +746,7 @@ function reporte_mantenimiento($valores)
 
 
     $fecha_doc = date('Ymd_His');
-    $nombre_doc = "FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.{$fecha_doc}.xlsx";
+    $nombre_doc = "FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.{$valores->elementos->id_usuario}_{$fecha_doc}.xlsx";
 
     $base = realpath(__DIR__ . '/../../../');
     $host = $_SERVER['HTTP_HOST'];
@@ -745,17 +760,35 @@ function reporte_mantenimiento($valores)
     $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
     $writer->save($ruta_guardar);
 
-    $datos = $valores->elementos;
-    $sql = "UPDATE mantenimiento SET reporte_descargado = 1, estado = 'En proceso' WHERE id_equipo = '$datos->id' AND  anio = '$datos->anio'";
+    $id_equipo = $valores->elementos->id;
 
+    $sql = "UPDATE mantenimiento 
+        SET reporte_descargado = 1,
+            estado = 'En proceso'
+        WHERE id_equipo = '$id_equipo'
+        AND anio = '$anio'";
 
     if (!mysqli_query($con, $sql)) {
         return false;
     }
 
+    /* if (!empty($ids_equipo)) {
+        $ids = implode(',', $ids_equipo);
+        $sql = "UPDATE mantenimiento 
+                SET reporte_descargado = 1, 
+                    estado = 'En proceso' 
+                WHERE id_equipo IN ($ids)
+                AND  anio = '$anio'";
+
+        if (!mysqli_query($con, $sql)) {
+            return false;
+        }
+    } */
+
     return array(
         'result' => true,
-        'url' => $url_descarga
+        'url' => $url_descarga,
+        'ids' => $id_equipo
     );
 }
 
@@ -918,7 +951,7 @@ function programa_auditoria($valores)
 
     if ($base !== false) {
         $fecha = date('Ymd_His'); // Genera una marca de tiempo para el nombre del archivo
-        $nombre_doc = "FO-DSP-TI-04_Programa de Auditoria de Herramientas de Trabajo Región Sur_{$fecha}.xlsx"; // Nombre del archivo generado
+        $nombre_doc = "FO-DSP-TI-04_Programa de Auditoria de Herramientas de Trabajo Región Sur_{$anio_actual}_{$fecha}.xlsx"; // Nombre del archivo generado
         // Define la ruta física donde se guardará el archivo, basada en la estructura del proyecto
         $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . 'documentos_descarga' . DIRECTORY_SEPARATOR . 'auditoria' . DIRECTORY_SEPARATOR . 'programa' . DIRECTORY_SEPARATOR . $nombre_doc;
         $host = $_SERVER['HTTP_HOST'];
@@ -941,4 +974,142 @@ function programa_auditoria($valores)
             'error' => 'No se pudo realizar el programa de auditoria. Inténtalo nuevamente.'
         ];
     }
+}
+
+function reporte_auditoria($valores)
+{
+    include('../conexion.php');
+
+    $tipo = mb_strtolower($valores->elementos->tipo);
+    $tipo = str_replace('é', 'e', $tipo);
+
+    if ($tipo === 'telefono celular') {
+        // SOLO celular
+        $filtro_tipo = "AND ct.tipo LIKE 'telefono celular'";
+    } else {
+        // OTROS dispositivos (se excluye celular)
+        $filtro_tipo = "AND ct.tipo NOT LIKE 'telefono celular'";
+    }
+
+    $usuario = $valores->elementos->usuario;
+    $anio = $valores->elementos->anio;
+
+    /*  $sql = "SELECT aud.id_equipo AS id, aud.anio, cu.nombre, cu.cargo, cu.region, 
+                   ct.tipo, ca.marca, inv.modelo, inv.num_serie
+            FROM auditoria AS aud
+            INNER JOIN inventario_ti_sur AS inv ON inv.id = aud.id_equipo
+            INNER JOIN cat_usuarios AS cu ON cu.id = inv.fk_usuario
+            INNER JOIN cat_tipo AS ct ON ct.id = inv.fk_tipo 
+            INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
+            WHERE cu.nombre = '$usuario' AND aud.anio = '$anio'"; */
+    $sql = "SELECT
+                inv.id AS id,
+                aud.anio,
+                aud.estado,
+                cu.nombre,
+                cu.cargo,
+                cu.region,
+                ct.tipo,
+                ca.marca,
+                inv.modelo,
+                inv.num_serie
+            FROM inventario_ti_sur AS inv
+            INNER JOIN cat_usuarios AS cu ON cu.id = inv.fk_usuario
+            INNER JOIN cat_tipo AS ct ON ct.id = inv.fk_tipo 
+            INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
+            LEFT JOIN auditoria AS aud 
+                ON aud.id_equipo = inv.id AND aud.anio = '$anio'
+            WHERE cu.nombre = '$usuario' $filtro_tipo";
+    // var_dump($sql);
+    $query = mysqli_query($con, $sql);
+    $datos = [];
+    while ($fila = mysqli_fetch_object($query)) {
+        $datos[] = $fila;
+    }
+
+    /* $telefonos = [];
+    $otros = [];
+    $tipo = mb_strtolower(trim($equipo->tipo)); */
+
+    $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load('FO-DSP-TI-02 Reporte de auditoria a herramientas TI Rev.00.xlsx');
+    $worksheet = $spreadsheet->getActiveSheet();
+
+    // Encabezados
+    $worksheet->setCellValue("C8", !empty($usuario) ? $usuario : 'NA');
+    $worksheet->setCellValue("G10", !empty($valores->elementos->region) ? $valores->elementos->region : 'NA');
+    $worksheet->setCellValue("C10", !empty($valores->area) ? $valores->area : 'NA');
+    $worksheet->setCellValue("K10", !empty($valores->ubicacion) ? $valores->ubicacion : 'NA');
+
+    $fila_inicio = 14;
+    $total_equipos = count($datos);
+    $ids_equipo = [];
+
+    // Proceos de filas y estilos
+    foreach ($datos as $index => $equipo) {
+        $fila_actual = $fila_inicio + $index;
+        // $ids_equipo[] = $equipo->id;
+
+        // Si es el segundo equipo o más, preparamos la fila
+        if ($index > 0) {
+            $worksheet->insertNewRowBefore($fila_actual, 1);
+            // Copiar estilo de la fila base (14) a la nueva fila
+            $worksheet->duplicateStyle(
+                $worksheet->getStyle("B14:K14"), 
+                "B{$fila_actual}:K{$fila_actual}");
+
+            // Replicar celdas combinadas
+            $worksheet->mergeCells("E{$fila_actual}:F{$fila_actual}"); // Modelo
+            $worksheet->mergeCells("G{$fila_actual}:H{$fila_actual}"); // Número de Serie
+            $worksheet->mergeCells("J{$fila_actual}:K{$fila_actual}"); // Observaciones
+        }
+
+        // Llenado de datos
+        $worksheet->setCellValue("B{$fila_actual}", $index + 1);
+        $worksheet->setCellValue("C{$fila_actual}", $equipo->tipo);
+        $worksheet->setCellValue("D{$fila_actual}", $equipo->marca);
+        $worksheet->setCellValue("E{$fila_actual}", $equipo->modelo);
+        $worksheet->setCellValue("G{$fila_actual}", $equipo->num_serie);
+
+        // Centrar contenido en las celdas combinadas
+        $worksheet->getStyle("B{$fila_actual}:K{$fila_actual}")->getAlignment()->setVertical('center');
+    }
+
+    // 3. FIRMAS (Cálculo dinámico basado en las filas nuevas)
+    $desplazamiento = ($total_equipos > 1) ? ($total_equipos - 1) : 0;
+    $fila_nombres = 26 + $desplazamiento;
+    $fila_cargos = 27 + $desplazamiento;
+
+    $worksheet->setCellValue("C{$fila_nombres}", !empty($valores->encargado) ? $valores->encargado : '');
+    $worksheet->setCellValue("C{$fila_cargos}", !empty($valores->cargo) ? $valores->cargo : '');
+    $worksheet->setCellValue("H{$fila_nombres}", $usuario);
+    $worksheet->setCellValue("H" . ($fila_nombres + 1), !empty($valores->elementos->cargo) ? $valores->elementos->cargo : '');
+
+    $nombre_doc = "FO-DSP-TI-06 Reporte de auditoria a herramientas TI Rev.00_" . date('Ymd_His') . ".xlsx";
+    $base = realpath(__DIR__ . '/../../../');
+    $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI/database/controller_excel/documentos_descarga/auditoria/reporte/' . $nombre_doc;
+
+    $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+    $writer->save($ruta_guardar);
+
+    $id_equipo = $valores->elementos->id;
+
+    $sql = "UPDATE auditoria 
+        SET reporte_descargado = 1,
+            estado = 'En proceso'
+        WHERE id_equipo = '$id_equipo'
+        AND anio = '$anio'";
+
+    if (!mysqli_query($con, $sql)) {
+        return false;
+    }
+    /* if (!empty($ids_equipo)) {
+        $ids = implode(',', $ids_equipo);
+        mysqli_query($con, "UPDATE auditoria SET reporte_descargado = 1, estado = 'En proceso' WHERE id_equipo IN ($ids) AND anio = '$anio'");
+    } */
+
+    return [
+        'result' => true,
+        'url' => "http://" . $_SERVER['HTTP_HOST'] . "/Inventario_TI/database/controller_excel/documentos_descarga/auditoria/reporte/" . $nombre_doc,
+        'id' => $id_equipo
+    ];
 }

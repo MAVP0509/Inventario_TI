@@ -109,7 +109,7 @@ async function consultar_informacion() {
         }
     });
 
-    datos.forEach(d => d.seleccionado = false);
+    datos.forEach(d => d.seleccionado = false); // Antes de construir la tabla, cada registro recibido del servidor se inicializa con la propiedad seleccionado (controla el estado visual d cada fila)
 
     let squareIcon = function (cell, formatterParams, onRendered) {
         const seleccionado = cell.getRow().getData().seleccionado;
@@ -139,7 +139,7 @@ async function consultar_informacion() {
                 const end = Math.min(currentRowStart + pageSize - 1, totalRows);
                 return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
             },
-            rowFormatter: function (row) {
+            rowFormatter: function (row) {  // Aplica estilos visuales según el estado de selección
                 data = row.getData()
                 if (data.seleccionado === true) {
                     row.getElement().classList.add("bg-primary")
@@ -149,12 +149,12 @@ async function consultar_informacion() {
             },
             columns: [
                 {
-                    formatter: squareIcon, width: 70, hozAlign: "center",
-                    cellClick: function (e, cell) {
-                        let rowData = cell.getRow().getData();
-                        rowData.seleccionado = !rowData.seleccionado;
-                        cell.getRow().reformat();
-                        seleccionar_registro(rowData.id_equipo, equipo_seleccionado)
+                    formatter: squareIcon, width: 70, hozAlign: "center", // Se muestra un ícono dinámico según el estado de selección (fa-square -> no seleccionado, fa-square-check -> seleccionado)
+                    cellClick: function (e, cell) { 
+                        let rowData = cell.getRow().getData();  //Obtiene los datos de la fila
+                        rowData.seleccionado = !rowData.seleccionado;   // Alterna el estado lógico de selección
+                        cell.getRow().reformat();   //Re-renderiza la fila para reflejar el cambio visual (Actualiza la vista)
+                        seleccionar_registro(rowData.id_equipo, equipo_seleccionado)    // Actualiza el arreglo de rubros seleccionados
                     }, headerSort: false, frozen: true, width: 70, hozAlign: "center",
                 },
                 {

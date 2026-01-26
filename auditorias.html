@@ -22,8 +22,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css">
     <!-- 3. Iconos y efectos visuales -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-    <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
-    <link href="https://unpkg.com/filepond-plugin-pdf-preview/dist/filepond-plugin-pdf-preview.css" rel="stylesheet" />
+    <!-- <link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
+    <link href="https://unpkg.com/filepond-plugin-pdf-preview/dist/filepond-plugin-pdf-preview.css" rel="stylesheet" /> -->
 
     <link href="https://cdn.jsdelivr.net/npm/smartwizard@6/dist/css/smart_wizard_all.min.css" rel="stylesheet"
         type="text/css" />
@@ -35,7 +35,6 @@
     <!-- Tippy.js CSS -->
     <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/themes/light.css" />
     <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/perspective-extreme.css" />
-
 
     <style>
         .fa-stack {
@@ -59,6 +58,324 @@
             /* Scroll interno si el contenido se desborda */
             z-index: 1040;
             /* Asegura que esté por encima del contenido */
+        }
+
+        /* .mes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .mes-card {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            border: 2px solid transparent;
+            transition: 0.2s ease-in-out;
+            font-weight: 500;
+        }
+
+        .mes-card.disponible {
+            background: #007bff;
+            color: white;
+        }
+
+        .mes-card.disponible:hover {
+            background: #0056b3;
+            transform: scale(1.03);
+        }
+
+        .mes-card.no-disponible {
+            background: #e9ecef;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        .mes-card.no-disponible:hover {
+            transform: none;
+        } */
+        /* -------------------------------------------------------- */
+        /* .mes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 18px;
+            padding: 10px;
+        }
+
+        .mes-card {
+            padding: 18px;
+            border-radius: 12px;
+            background: white;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            border: 1px solid #e1e5eb;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
+            transition: all 0.25s ease;
+        }
+
+        .mes-card .mes-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+            transition: 0.2s ease;
+        }
+
+        .mes-card .nombre-mes {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .mes-card .estatus-mes {
+            margin-top: 5px;
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .mes-card.disponible {
+            border-color: #007bff;
+        }
+
+        .mes-card.disponible .estatus-mes {
+            background: #007bff;
+            color: white;
+        }
+
+        .mes-card.disponible:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+        }
+
+        .mes-card.disponible:hover .mes-icon {
+            color: #0056b3;
+            transform: scale(1.1);
+        }
+
+        .mes-card.no-disponible {
+            cursor: not-allowed;
+            opacity: 0.55;
+        }
+
+        .mes-card.no-disponible .estatus-mes {
+            background: #adb5bd;
+            color: white;
+        } */
+        /* --------------------------------------------- */
+
+        /* .mes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 18px;
+            padding: 10px;
+        }
+
+        .mes-card {
+            position: relative;
+            padding: 20px;
+            border-radius: 12px;
+            background: white;
+            border: 1px solid #dfe4ea;
+            text-align: center;
+            cursor: pointer;
+            overflow: hidden;
+            user-select: none;
+            transition: all 0.25s ease;
+        }
+
+
+        .mes-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, #007bff 0%, #0056b3 100%);
+            z-index: 0;
+            transform: translateY(100%);
+
+            transition: transform 0.4s ease;
+        }
+
+
+        .mes-card:hover::before {
+            transform: translateY(0);
+
+        }
+
+        .nombre-mes,
+        .estatus-mes {
+            position: relative;
+            z-index: 1;
+
+            transition: color 0.3s ease;
+        }
+
+        .nombre-mes {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .estatus-mes {
+            margin-top: 6px;
+            font-size: 13px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            color: #555;
+            background: #f1f2f6;
+        }
+
+
+        .mes-card.disponible:hover .nombre-mes,
+        .mes-card.disponible:hover .estatus-mes {
+            color: white;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+
+        .mes-card.no-disponible {
+            cursor: not-allowed;
+            opacity: 0.45;
+        }
+
+        .mes-card.no-disponible:hover::before {
+            transform: translateY(100%);
+
+        }
+
+        .mes-card.no-disponible:hover .nombre-mes,
+        .mes-card.no-disponible:hover .estatus-mes {
+            color: #444;
+        } */
+        /* ------------------------------------------- */
+
+        .mes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px;
+            padding: 10px;
+        }
+
+        /* ---- CARD BASE (GLASSMORPHISM REAL) ---- */
+        .card-mes {
+            position: relative;
+            padding: 20px;
+            border-radius: 20px;
+
+            backdrop-filter: blur(12px) saturate(160%);
+            background: rgba(255, 255, 255, 0.10);
+
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow:
+                0 4px 15px rgba(0, 0, 0, 0.1),
+                inset 0 0 20px rgba(255, 255, 255, 0.05);
+
+            text-align: center;
+            cursor: pointer;
+            overflow: hidden;
+            user-select: none;
+            transition: all 0.4s ease;
+        }
+
+        /* ---- DEGRADADO FLUIDO (Hover Fill) ---- */
+        .card-mes::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #1666C5, #0D3D7D);
+            opacity: 0;
+            transform: scale(1.2);
+            transition: opacity 0.45s ease, transform 0.45s ease;
+            z-index: 0;
+        }
+
+        /* Hover: relleno degradado */
+        .card-mes.disponible:hover::before {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* ---- BORDE ANIMADO PREMIUM ---- */
+        .card-mes::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 2px;
+            background: linear-gradient(120deg, #0D3D7D, #0A2A52, #0D3D7D);
+            background-size: 300% 300%;
+            animation: bordeGlow 6s ease infinite;
+
+            /* máscara para dejar el borde hueco */
+            -webkit-mask:
+                linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        @keyframes bordeGlow {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* ---- TEXTO ---- */
+        .nombre-mes,
+        .estatus-mes {
+            position: relative;
+            z-index: 3;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .nombre-mes {
+            font-size: 17px;
+            font-weight: 700;
+            color: #1a1a1a;
+            /* oscuro para que se vea siempre */
+            /* text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3); */
+        }
+
+        .estatus-mes {
+            margin-top: 8px;
+            font-size: 13px;
+            padding: 4px 12px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.10);
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        /* Hover: efecto de elevación del texto */
+        .card-mes.disponible:hover .nombre-mes,
+        .card-mes.disponible:hover .estatus-mes {
+            color: white;
+        }
+
+        /* ---- NO DISPONIBLE ---- */
+        .card-mes.no-disponible {
+            cursor: not-allowed;
+            opacity: 0.35;
+            filter: grayscale(60%);
+        }
+
+        .card-mes.no-disponible:hover::before {
+            opacity: 0;
         }
     </style>
 
@@ -145,20 +462,26 @@
                                         <button type="button" style="text-align: center" data-toggle="popover"
                                             data-trigger="hover" data-html="true" data-placement="bottom"
                                             data-content="Baja de activo" class="btn bg-gray-dark rounded icon mr-3"
-                                            onclick="mdl_programar_auditoria()"><i class="fa-solid fa-file-invoice"></i> Programar auditoria
+                                            onclick="mdl_programar_auditoria()"><i class="fa-solid fa-file-invoice"></i>
+                                            Programar auditoria
                                         </button>
-                                        <button type="button" class="btn btn-lg btn-outline-success mr-3 icon"
-                                            data-toggle="popover" data-trigger="hover" data-html="true"
-                                            data-placement="bottom" data-content="Exportación a Excel" id="btn-excel"
-                                            onclick="imprimir_excel()"><i class="fa-solid fa-file-excel"></i>
+                                        <button type="button" style="text-align: center" data-toggle="popover"
+                                            data-trigger="hover" data-html="true" data-placement="bottom"
+                                            data-content="Descargar reportes mensuales"
+                                            class="btn btn-outline-danger rounded icon mr-3"
+                                            onclick="mdl_reportes_mensuales()"><i
+                                                class="fa-solid fa-file-pdf fa-lg"></i>
                                         </button>
                                         <button type="button" class="btn btn-lg  btn-outline-info mr-3 icon"
                                             data-toggle="popover" data-trigger="hover" data-html="true"
                                             data-placement="bottom" data-content="Resguardos firmados"
                                             data-widget="control-sidebar" data-slide="true"
-                                            onclick="abrir_control_sidebar()">
+                                            onclick="consultar_pauditoria_firmado()">
                                             <i class="fa-solid fa-file-signature"></i>
                                         </button>
+                                        <button id="btn-open-pauditoria" type="button" data-widget="control-sidebar"
+                                            data-slide="true" data-target="#control-sidebar-pauditoria"
+                                            style="display:none"></button>
                                     </div>
                                 </div>
                                 <!--Card Body-->
@@ -183,46 +506,45 @@
             </section> <!--Container-->
 
 
-            <!--Control-sidebar -->
-            <aside class="control-sidebar control-sidebar-light" id="control-sidebar" style="width: 450px !important;">
+            <!--Control-sidebar reporte auditoria -->
+            <aside class="control-sidebar control-sidebar-light" id="sidebar-rauditoria"
+                style="width: 450px !important;">
                 <div class="p-3 control-sidebar-content d-flex flex-column h-100 overflow-hidden">
-                    <!-- <h4><i class="fa-solid fa-file-invoice"></i> Resguardos firmados</h4>
-                <button type="button" class="btn btn-outline-danger icon"><i class="fa-solid fa-xmark"></i></button> -->
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h4 class="mb-0">
                             <i class="fa-solid fa-file-arrow-up"></i> Subir reporte de auditoria
                         </h4>
                         <button type="button" class="btn btn-danger icon" data-widget="control-sidebar"
-                            data-slide="true" onclick="remover_archivo()">
+                            data-slide="true" onclick="eliminar_archivo()">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
                     <hr class="mb-3">
                     <div class="container-fluid">
                         <div class="row">
-                            <div class="col" id="col-subir-reporte">
+                            <div class="col" id="aud-subir-reporte">
                                 <div class="alert alert-danger position-relative d-flex align-items-start " role="alert"
                                     style="display:none !important; background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;"
-                                    id="alert-reporte">
-                                    El activo ya tiene el reporte de este año, si sube uno, reemplazará el ya existente
-                                    y no será reversible
+                                    id="alert-aud-reporte">
+                                    Ya existe un reporte para este año, Si sube uno nuevo, se reemplazará el actual de
+                                    forma irreversible.
                                 </div>
-                                <div id="contenedor-filepond">
-                                    <input type="file" id="subir-reporte" name="reporte_mantenimiento">
+                                <div id="contenedor-rauditoria">
+                                    <input type="file" id="subir-reporte-aud" name="reporte_aud">
                                 </div>
 
-                                <div id="ver-pdf-reporte">
-                                    <embed id="pdf-reporte-viewer" src="libraries/web/viewer.html"
+                                <!-- <div id="pdf-aud">
+                                    <embed id="pdf-ver-aud" src="libraries/web/viewer.html"
                                         style="width: 100%; height: 350px; border: none; margin-top: 20px;"
                                         loading="lazy" referrerpolicy="no-referrer"
                                         sandbox="allow-scripts allow-same-origin allow-downloads"></embed>
-                                </div>
+                                </div> -->
 
                             </div>
                         </div>
                     </div>
                 </div>
-            </aside>
+            </aside> <!-- sidebar reporte auditoria -->
 
             <!-- Control sidebar programa auditoria -->
             <aside class="control-sidebar control-sidebar-light" id="control-sidebar-pauditoria"
@@ -312,8 +634,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                                     </div>
-                                    <select class="form-control select" id="elaboro-aud"
-                                        name="inp-prog-mant"></select>
+                                    <select class="form-control select" id="elaboro-aud" name="inp-prog-mant"></select>
                                     <div class="invalid-feedback">Por favor, seleccione una persona.</div>
                                 </div>
                                 <h6>Cargo del elaborador</h6>
@@ -330,8 +651,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                                     </div>
-                                    <select class="form-control select" id="autorizo-aud"
-                                        name="inp-prog-mant"></select>
+                                    <select class="form-control select" id="autorizo-aud" name="inp-prog-mant"></select>
                                     <div class="invalid-feedback">Por favor, seleccione una persona.</div>
                                 </div>
                                 <h6>Cargo del autorizador</h6>
@@ -360,192 +680,8 @@
         </div>
     </div>
 
-    <!-- Modal de reporte de mantenimiento -->
-    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-reporte-mant" role="dialog" data-backdrop="static"
-        data-keyboard="false">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Reporte de mantenimiento</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <!-- Body -->
-                <div class="modal-body">
-                    <div class="container-fluid">
-                        <h6>Encargado de realizar el reporte</h6>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text"><i class="fa-solid fa-user"></i></div>
-                            </div>
-                            <select id="slc-encargado" class="form-control"></select>
-                            <div class="invalid-feedback">Por favor, selecione un encargado</div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger icon" data-dismiss="modal"><i
-                            class="fa-solid fa-arrow-right-from-bracket"></i> Cancelar</button>
-                    <button type="button" class="btn btn-success icon" id="btn-reporte-mant"><i
-                            class="fa-solid fa-file-arrow-down"></i> Generar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!--Modal info mantenimiento -->
-    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-mant-info" role="dialog" data-backdrop="static"
-        data-keyboard="false">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Información</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col">
-                                <!--Rubro-->
-                                <h6>Rubro</h6>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fa-solid fa-desktop"></i></span>
-                                    </div>
-                                    <select class="form-control select" id="select-rubro" name="mdl-mant-info-inputs"
-                                        disabled></select>
-                                    <div class="invalid-feedback">Por favor, seleccione un rubro.</div>
-                                </div>
-                                <!--Tag-->
-                                <h6>Tipo</h6>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fa-solid fa-computer"></i></span>
-                                    </div>
-                                    <select class="form-control select" id="select-tipo" name="mdl-mant-info-inputs"
-                                        disabled></select>
-                                </div>
-                                <!--Marca-->
-                                <h6>Marca</h6>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fa-solid fa-trademark"></i></span>
-                                    </div>
-                                    <select class="form-control select" id="select-marca" name="mdl-mant-info-inputs"
-                                        disabled></select>
-                                </div>
-                                <!--Modelo-->
-                                <h6>Modelo</h6>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fa-solid fa-pager"></i></span>
-                                    </div>
-                                    <input type="text" class="form-control" id="inp-modelo" name="mdl-mant-info-inputs"
-                                        placeholder="Modelo del dispositivo" autocomplete="off" disabled>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <!--Número de serie-->
-                                <h6>Número de serie</h6>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fa-solid fa-square-binary"></i></span>
-                                    </div>
-                                    <input type="text" class=" form-control" id="inp-num-serie"
-                                        name="mdl-mant-info-inputs" disabled>
-                                </div>
-
-                                <h6>Ubicacion</h6>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
-                                    </div>
-                                    <select class="form-control select" id="select-ubicacion" disabled></select>
-                                </div>
-                                <!--Fecha-->
-                                <h6 id="lbl-fecha-reg">Fecha de mantenimiento</h6>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
-                                    </div>
-                                    <input type="date" class="form-control" id="inp-fecha" name="mdl-mant-info-inputs"
-                                        disabled>
-                                </div>
-                                <h6>Estatus</h6>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                        <span id="estatus-icon" class="input-group-text"><i
-                                                class="fa-solid fa-circle"></i></span>
-                                    </div>
-                                    <input type="input" class="form-control" id="inp-estatus"
-                                        name="mdl-mant-info-inputs" disabled>
-                                </div>
-                            </div>
-
-                        </div>
-                        <h5>Información del usuario asignado</h5>
-                        <h6>Usuario asignado</h6>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
-                            </div>
-                            <select class="form-control select" id="select-usuario" name="mdl-mant-info-inputs"
-                                disabled></select>
-                        </div>
-                        <h6>Cargo del usuario</h6>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text"><i class="fa-solid fa-briefcase"></i></span>
-                            </div>
-                            <select class="form-control select" id="select-cargo" name="mdl-mant-info-inputs"
-                                disabled></select>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
-                            class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!--Modal ver pdf-->
-    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-ver-pdf" role="dialog" data-backdrop="static"
-        data-keyboard="false">
-        <div class="modal-dialog modal-dialog-scrollable modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fa-solid fa-file"></i> Reporte de mantenimiento</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col">
-                                <iframe id="mdl-ver-pdf-reporte" src="libraries/web/viewer.html"
-                                    style="width: 100%; height: 700px; border: none; margin-top: 20px;" loading="lazy"
-                                    allowfullscreen></iframe>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
-                            class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!--Modal enviar correo reporte-->
-    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-correo-reporte" role="dialog"
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-correo-rauditoria" role="dialog"
         data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
@@ -563,21 +699,21 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
                             </div>
-                            <select class="form-control select" id="select-usuario-correo" disabled></select>
+                            <select class="form-control select" id="sa-usuario-correo" disabled></select>
                         </div>
                         <h6>Cargo del usuario</h6>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa-solid fa-briefcase"></i></span>
                             </div>
-                            <select class="form-control select" id="select-cargo-correo" disabled></select>
+                            <select class="form-control select" id="sa-cargo-correo" disabled></select>
                         </div>
                         <h6>Correo destinatario</h6>
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa-solid fa-at"></i></span>
                             </div>
-                            <input type="input" class="form-control" id="inp-correo" name="mdl-mant-info-inputs"
+                            <input type="input" class="form-control" id="inp-aud-correo" name="mdl-mant-info-inputs"
                                 autocomplete="off">
                         </div>
                         <!--<small class="form-text text-muted">Porfavor confirme el correo </small>-->
@@ -585,20 +721,271 @@
                             <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa-solid fa-at"></i></span>
                             </div>
-                            <input type="input" class="form-control" id="inp-correo-validar" name="mdl-mant-info-inputs"
-                                autocomplete="off" placeholder="Confirmar correo">
+                            <input type="input" class="form-control" id="inp-aud-correo-validar"
+                                name="mdl-mant-info-inputs" autocomplete="off" placeholder="Confirmar correo">
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
                             class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
-                    <button type="button" class="btn btn-success envelope" id="btn-mdl-reporte" onclick="">Enviar <i
+                    <button type="button" class="btn btn-success envelope" id="btn-mdl-rauditoria" onclick="">Enviar <i
                             class="fa-solid fa-envelope"></i></button>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Modal de reporte de auditoria -->
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-reporte-aud" role="dialog" data-backdrop="static"
+        data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reporte de auditoria</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <!-- Body -->
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <h6>Área</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa-solid fa-street-view"></i></div>
+                                    </div>
+                                    <input type="text" id="aud-area" class="form-control" placeholder="Ingrese un área">
+                                    <div class="invalid-feedback">Por favor, ingrese un área</div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <h6>Ubicación</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
+                                    </div>
+                                    <input type="text" id="ubicacion-aud" class="form-control" placeholder="Ingrese una ubicación">
+                                    <div class="invalid-feedback">Por favor, ingrese una ubicación</div>
+                                </div>
+                            </div>
+                            <h6>Encargado de realizar el reporte</h6>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><i class="fa-solid fa-user-gear"></i></div>
+                                </div>
+                                <select id="saud-encargado" class="form-control"></select>
+                                <div class="invalid-feedback">Por favor, selecione un encargado</div>
+                            </div>
+                            <h6>Puesto del encargado</h6>
+                            <div class="input-group mb-3">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text"><i class="fa-regular fa-id-card"></i></div>
+                                </div>
+                                <select id="saud-cargo" class="form-control"></select>
+                                <div class="invalid-feedback">Por favor, selecione un cargo</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <!-- Footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal"><i
+                            class="fa-solid fa-arrow-right-from-bracket"></i> Cancelar</button>
+                    <button type="button" class="btn btn-success icon" id="btn-reporte-aud"><i
+                            class="fa-solid fa-file-arrow-down"></i> Generar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal ver pdf-->
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-pdf-aud" role="dialog" data-backdrop="static"
+        data-keyboard="false">
+        <div class="modal-dialog modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fa-solid fa-file"></i> Reporte de auditoria</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col">
+                                <iframe id="pdf-reporte-aud" src="libraries/web/viewer.html"
+                                    style="width: 100%; height: 700px; border: none; margin-top: 20px;" loading="lazy"
+                                    allowfullscreen></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
+                            class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal info auditoria -->
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-aud-info" role="dialog" data-backdrop="static"
+        data-keyboard="false">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Información de dispositivo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col">
+                                <!--Rubro-->
+                                <h6>Rubro</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-desktop"></i></span>
+                                    </div>
+                                    <select class="form-control select" id="aud-rubro" name="mdl-aud-info-inputs"
+                                        disabled></select>
+                                    <div class="invalid-feedback">Por favor, seleccione un rubro.</div>
+                                </div>
+                                <!--Tag-->
+                                <h6>Tipo</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-computer"></i></span>
+                                    </div>
+                                    <select class="form-control select" id="aud-tipo" name="mdl-aud-info-inputs"
+                                        disabled></select>
+                                </div>
+                                <!--Marca-->
+                                <h6>Marca</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-trademark"></i></span>
+                                    </div>
+                                    <select class="form-control select" id="aud-marca" name="mdl-aud-info-inputs"
+                                        disabled></select>
+                                </div>
+                                <!--Modelo-->
+                                <h6>Modelo</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-pager"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" id="aud-modelo" name="mdl-aud-info-inputs"
+                                        placeholder="Modelo del dispositivo" autocomplete="off" disabled>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <!--Número de serie-->
+                                <h6>Número de serie</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-square-binary"></i></span>
+                                    </div>
+                                    <input type="text" class=" form-control" id="aud-num-serie"
+                                        name="mdl-aud-info-inputs" disabled>
+                                </div>
+
+                                <h6>Ubicación</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
+                                    </div>
+                                    <select class="form-control select" id="aud-ubicacion" disabled></select>
+                                </div>
+                                <!--Fecha-->
+                                <h6 id="lbl-fecha-reg">Fecha de auditoria</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-calendar-days"></i></span>
+                                    </div>
+                                    <input type="date" class="form-control" id="aud-fecha" name="mdl-aud-info-inputs"
+                                        disabled>
+                                </div>
+                                <h6>Estatus</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span id="estatus-icon-aud" class="input-group-text"><i
+                                                class="fa-solid fa-circle"></i></span>
+                                    </div>
+                                    <input type="input" class="form-control" id="aud-estatus" name="mdl-aud-info-inputs"
+                                        disabled>
+                                </div>
+                            </div>
+
+                        </div>
+                        <h5>Información del usuario asignado</h5>
+                        <h6>Usuario asignado</h6>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa-solid fa-user-large"></i></span>
+                            </div>
+                            <select class="form-control select" id="aud-usuario" name="mdl-mant-info-inputs"
+                                disabled></select>
+                        </div>
+                        <h6>Cargo del usuario</h6>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><i class="fa-solid fa-briefcase"></i></span>
+                            </div>
+                            <select class="form-control select" id="aud-cargo" name="mdl-mant-info-inputs"
+                                disabled></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
+                            class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal reportes mensuales-->
+    <div class="modal fade" tabindex="-1" aria-hidden="false" id="mdl-raud-mens" role="dialog" data-backdrop="static"
+        data-keyboard="false" data-focus="false">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fa-solid fa-download"></i>
+                        <span id="descargar-text-aud">Descarga de reportes mensuales</span>
+                    </h5>
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col">
+                                <div id="contenedor-mes" class="mes-grid">
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="mdl-btn-can">Cerrar <i
+                            class="fa-solid fa-arrow-right-from-bracket  fa-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 <!--JQuery-->

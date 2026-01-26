@@ -3,14 +3,14 @@ function server_auditoria(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
-            url: "database/controller_mantenimientos/controller_mantenimientos.php",
+            url: "database/controller_auditorias/controller_auditorias.php",
             data: {
                 trama: JSON.stringify(model)
             },
             success: function (respose) {
                 try {
                     resolve(JSON.parse(respose))
-                    if (mantenimiento_loading) {
+                    if (auditoria_loading) {
                         Swal.close()
                         auditoria_loading = !auditoria_loading
                     }
@@ -41,6 +41,25 @@ function server_excel(model) {
     })
 }
 
+function server_correo(model) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: "POST",
+            url: "database/controller_email/controller_email.php",
+            data: {
+                trama: JSON.stringify(model)
+            },
+            success: function (respose) {
+                try {
+                    resolve(JSON.parse(respose))
+                } catch (error) {
+                    reject(error)
+                }
+            }
+        })
+    })
+}
+
 async function load_auditoria() {
     await general_select2({
         selectId: 'select-anio-auditoria',
@@ -53,7 +72,7 @@ async function load_auditoria() {
         // popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
     })
 
-    let server = await server_auditoria({ accion: 4 })
+    let server = await server_auditoria({ accion: 1 })
     if (!server.resultado) {
         return
     } else {
@@ -67,9 +86,11 @@ async function load_auditoria() {
 let datos_auditoria = [];
 let tabla_aud;
 let elemento_aud;
+let auditorias_pendientes
 
 async function consultar_auditoria(anio) {
     const fecha = anio.value;
+    // console.log(fecha);
 
     let server = await server_auditoria({ accion: 0, anio: fecha });
 
@@ -114,7 +135,7 @@ async function consultar_auditoria(anio) {
         const data = cell.getRow().getData()
         const disabled = data.reporte_descargado == 0 ? "disabled" : ""
 
-        return `<button type='button' class='btn btn-info icon' ${disabled} data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' data-widget="control-sidebar" data-slide="true" data-target="#control-sidebar"><i class='fa-solid fa-upload fa-lg'></i></button>`;
+        return `<button type='button' class='btn btn-info icon' ${disabled} data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' data-widget="control-sidebar" data-slide="true" data-target="#sidebar-rauditoria"><i class='fa-solid fa-upload fa-lg'></i></button>`;
     }
 
     let archivoIcon = function (cell, formatterParams, onRendered) { //plain text value
@@ -202,7 +223,7 @@ async function consultar_auditoria(anio) {
                 !excluir.includes(d.estado)
             ).length;
 
-            return `${fecha.toLocaleDateString('es-ES', opciones)} (${pendientes} mantenimientos pendientes)`;
+            return `${fecha.toLocaleDateString('es-ES', opciones)} (${pendientes} auditorias pendientes)`;
 
         },
         groupStartOpen: false,
@@ -265,7 +286,7 @@ async function consultar_auditoria(anio) {
                 formatter: correoIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "correo_enviado",
                 cellClick: function (e, cell) {
                     elemento_aud = cell.getRow().getData();
-                    mdl_correo_reporte_mantenimiento(elemento_aud)
+                    mdl_correo_reporte_auditoria(elemento_aud)
                 },
             },
             {
@@ -278,7 +299,7 @@ async function consultar_auditoria(anio) {
 
                         // Acción que quieres ejecutar al hacer clic
                         const elemento_aud = cell.getRow().getData();
-                        mdl_reporte_mantenimiento(elemento_aud);
+                        mdl_descargar_reporte_auditoria(elemento_aud);
 
                         // Rehabilita el botón después de 3 segundos
                         setTimeout(() => {
@@ -291,7 +312,8 @@ async function consultar_auditoria(anio) {
                 formatter: subirIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_descargado",
                 cellClick: function (e, cell) {
                     elemento_aud = cell.getRow().getData();
-                    abrir_subir_reporte(elemento_aud.id, elemento_aud.fecha)
+                    reporte_auditoria_firmado(elemento_aud)
+                    // abrir_subir_reporte(elemento_aud.id, elemento_aud.fecha)
                 }
             },
 
@@ -299,18 +321,36 @@ async function consultar_auditoria(anio) {
                 formatter: verIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_subido",
                 cellClick: function (e, cell) {
                     elemento_aud = cell.getRow().getData();
-                    ver_pdf_reporte(elemento_aud.id, elemento_aud.fecha)
+                    consultar_reporte_firmado(elemento_aud);
                 }
             },
             {
                 formatter: editarIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
                 cellClick: function (e, cell) {
                     elemento_aud = cell.getRow().getData();
-                    mdl_mantenimiento_info(elemento_aud);
+                    mdl_auditoria_info(elemento_aud);
                 }
             },
         ],
     });
+
+    auditorias_pendientes = Object.values(datos_auditoria.reduce((objeto, item) => {
+        if (item.estado == "Realizado") return objeto
+
+        let anio = item.anio
+        let mes = item.fecha.split('-')[1]
+
+        // Si aún no existe el año, inicializamos su propiedad meses
+        if (!objeto[anio]) {
+            objeto[anio] = { anio: anio, meses: {} };
+        }
+
+        //si ya existe este mes, incrementa su valor, sino lo inicia en 0 y suma 1
+        objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
+
+        return objeto
+    }, {}))
+    // console.log(auditorias_pendientes);
 }
 
 async function mdl_programar_auditoria() {
@@ -363,6 +403,7 @@ async function mdl_programar_auditoria() {
 
     rellenar_select("Alejandro Cancino Argüello", "autorizo-aud");
     rellenar_select("César Ignacio Torres Almeida", "elaboro-aud");
+    $('#btn-conf-aud').prop('disabled', false);
 
     $('#cg-elaboro-aud, #cg-autorizo-aud').prop('disabled', true)
     $("#btn-conf-aud").off("click").on("click", function () { programar_auditoria() })
@@ -389,7 +430,7 @@ async function programar_auditoria() {
     }
 
     mostrar_toast_cargando('Programando auditoria...')
-    $('#mdl-btn-conf').prop('disabled', true);
+    $('#btn-conf-aud').prop('disabled', true);
 
     let server = await server_excel(model);
 
@@ -397,16 +438,600 @@ async function programar_auditoria() {
         window.location = server.resultado.url;
         mostrar_toast('success', '¡Programa de auditoria exitosa!', 'El programa de auditoria se generó correctamente.');
         $('#mdl-prog-aud').modal("hide");
-        load()
+        load_auditoria()
 
     } else {
         mostrar_toast('error', 'Error', server.resultado.error);
         $('#mdl-prog-aud').modal("hide");
-    }/*  else if (server.resultado.duplicado === false) {
-        mostrar_toast('error', '¡Error!', 'Ya existe un programa de auditoria para el año');
-        $('#mdl-prog-mant').modal("hide");
-    } */
-    // console.log(auditoriasPendientes);
+    }
+}
+
+async function consultar_pauditoria_firmado() {
+
+    let año_pauditoria = auditorias_pendientes[0].anio;
+
+    let model = {
+        accion: 3,
+        anio: año_pauditoria
+    }
+
+    let server = await server_auditoria(model);
+
+    const PDF = document.getElementById('lista-pdfs-pauditoria');
+
+    if (server.resultado.existe === true) {
+        document.getElementById('alert-pauditoria').style.display = 'block';
+
+        const ruta = server.resultado.url;
+        const nombreArchivo = server.resultado.archivo;
+        const item = `
+            <div class="card mb-2 shadow-sm" style="width: 100%;">
+                <div class="card-body d-flex align-items-center p-2">
+                    <div class="text-danger mr-3" style="font-size: 2rem;">
+                        <i class="fa-solid fa-file-pdf"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <strong>${nombreArchivo}</strong><br>
+                        
+                        <button type="button" class="btn btn-outline-dark btn-sm mt-1" onclick="window.open('${ruta}', '_blank')">
+                            <i class="fa-solid fa-eye"></i> Ver
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        PDF.innerHTML = item;
+    } else {
+        document.getElementById('alert-pauditoria').style.display = 'none';
+        PDF.innerHTML = '';
+    }
+
+    document.getElementById('btn-open-pauditoria').click();
+
+    auditoria_firmado();
+}
+
+let charco = null;
+let charcoInicializado = false;
+
+async function auditoria_firmado() {
+    if (!charcoInicializado) {
+
+        const input = document.getElementById("subir-pauditoria");
+
+        charco = FilePond.create(input, {
+            maxFiles: 1,
+            acceptedFileTypes: ['application/pdf'],
+            labelIdle: 'Arrastre y suelta un archivo .pdf o <span class="filepond--label-action"> Examina </span>',
+            allowMultiple: false,
+            dropOnPage: false,
+            instantUpload: false,
+            labelFileTypeNotAllowed: 'Archivo no válido solo .pdf',
+            server: {
+                process: {
+                    url: "database/controller_auditorias/controller_auditorias.php",
+                    method: "POST",
+                    consulta_reportes_mesuales: 'reporte_pauditoria',
+                    withCredentials: false,
+                    ondata: (formData) => {
+                        formData.append('trama', JSON.stringify({ accion: 2, anio: auditorias_pendientes[0].anio }));
+                        return formData;
+                    },
+                    onload: (response) => {
+                        let data = JSON.parse(response);
+                        if (data.resultado.error) {
+                            mostrar_toast('error', '¡Error!', data.resultado.error);
+                        } else {
+                            mostrar_toast('success', '¡Carga exitosa!', data.resultado.mensaje);
+                            charco.removeFiles();
+                            // consultar_auditoria(auditorias_pendientes[0]);
+                            consultar_pauditoria_firmado();
+                        }
+                    },
+                    onerror: (err) => {
+                        console.error('Error al subir: ', err);
+                    }
+                }
+            }
+        });
+
+        charcoInicializado = true;
+    } else {
+        charco.removeFiles();
+    }
+}
+
+//TODO: Funciones para el proceso de auditoria (notificación, descarga de reporte, carga de reporte, vista de reporte, información del activo)
+
+//* Funciones para notificación de auditoría (mdl_correo_reporte_auditoria, corre_reporte_auditoria, validar_correo 1 y 2)
+async function mdl_correo_reporte_auditoria(equipo) {
+
+    await Promise.all([
+        general_select2({
+            selectId: 'sa-usuario-correo',
+            tabla: 'cat_usuarios',
+            campo: 'nombre',
+            placeholder: 'NA',
+            dropdownParent: '#mdl-correo-rauditoria',
+        }),
+
+        general_select2({
+            selectId: 'sa-cargo-correo',
+            tabla: 'cat_usuarios',
+            campo: 'cargo',
+            placeholder: 'NA',
+            dropdownParent: '#mdl-correo-rauditoria',
+            sincronizarCampo: 'cargo',
+            sincronizarCon: 'sa-usuario-correo'
+        })
+    ])
+    rellenar_select(equipo.usuario, "sa-usuario-correo");
+    rellenar_select(equipo.cargo, 'sa-cargo-correo')
+    $('#inp-aud-correo').val(equipo.correo_usuario)
+    $('#inp-aud-correo-validar').val('')
+
+    $('#btn-mdl-rauditoria').off('click').on('click', () => { correo_reporte_auditoria(equipo); });
+
+    $('#mdl-correo-rauditoria').modal('show');
+}
+
+async function correo_reporte_auditoria(datos_equipo) {
+    const validar = ['inp-aud-correo', 'inp-aud-correo-validar'];
+
+    if (!validar_campos(validar)) {
+        mostrar_toast('warning', 'Aviso', 'Rellena los campos. Inténtelo nuevamente.');
+        return;
+    }
+
+    if (!validar_correo1($('#inp-aud-correo').val().trim().toLowerCase()) || !validar_correo1($('#inp-aud-correo-validar').val().trim().toLowerCase())) {
+        mostrar_toast('warning', 'Aviso', 'Uno o ambos correos no tienen el formato correcto');
+        return;
+    }
+
+    if (!validar_correo2($('#inp-aud-correo').val().trim().toLowerCase(), $('#inp-aud-correo-validar').val().trim().toLowerCase())) {
+        mostrar_toast('warning', 'Aviso', 'Los correos no coinciden');
+        return;
+    }
+
+    let model = {
+        accion: 2,
+        correo: $('#inp-aud-correo').val().trim().toLowerCase(),
+        datos: datos_equipo,
+        /* dominio: window.location.hostname,
+        puerto: location.port */
+    }
+    //*Variable global para saber si la página esta mostrarndo algun loader
+    auditoria_loading = true
+    mostrar_toast_cargando('Enviando correo...')
+    $('#mdl-correo-rauditoria').modal('hide')
+
+    let server = await server_correo(model)
+
+    if (server.resultado === true) {
+        mostrar_toast('success', '¡Realizado!', "Correo enviado al usuario")
+
+        //* Actualizando la fila sin dibujar de nuevo la tabla
+        const row = tabla_aud.getRow(datos_equipo.id);
+        if (row) {
+            row.update({ correo_enviado: 1 }); //*Agregar await al principio si se requiere forzar renderizado de un boton de habilitado a deshabilitado
+            tabla_aud.redraw(true);
+        }
+
+        return
+    } else if (server.resultado == false) {
+        mostrar_toast('error', '¡Error!', "Hubo un problema con el servidor")
+        return
+    } else {
+        mostrar_toast('error', '¡Error!', 'Hubo un problema con el servidor')
+        return
+    }
+}
+
+function validar_correo1(correo) {
+    const correo_valido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return correo_valido.test(correo)
+}
+
+function validar_correo2(texto1, texto2) {
+    if (texto1 === texto2) {
+        return true
+    } else {
+        return false
+    }
+}
+
+//* Funciones para descarga de reporte de auditoria
+async function mdl_descargar_reporte_auditoria(equipo) {
+    $("#btn-reporte-aud").prop("disabled", false);
+    // document.getElementById("btn-reporte-aud").disabled = false;
+
+    await Promise.all([
+        general_select2({
+            selectId: 'saud-encargado',
+            tabla: 'cat_usuarios',
+            campo: 'nombre',
+            dropdownParent: '#mdl-reporte-aud',
+            placeholder: 'Seleccione un encargado'
+        }),
+
+        general_select2({
+            selectId: 'saud-cargo',
+            tabla: 'cat_usuarios',
+            campo: 'cargo',
+            dropdownParent: '#mdl-reporte-aud',
+            placeholder: 'Seleccione un cargo',
+            sincronizarCampo: 'cargo',
+            sincronizarCon: 'saud-encargado'
+        })
+    ]);
+
+    rellenar_select("César Ignacio Torres Almeida", "saud-encargado");
+    $("#btn-reporte-aud").off('click').on('click', function () { reporte_auditoria(equipo) })
+    $("#mdl-reporte-aud").modal("show");
+}
+
+async function reporte_auditoria(equipo) {
+    const validar = ["ubicacion-aud", "aud-area", "saud-encargado", "saud-cargo"];
+
+    if (!validar_campos(validar)) {
+        mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
+        return;
+    }
+    
+    let model = {
+        accion: 6,
+        elementos: equipo,
+        ubicacion: $("#ubicacion-aud").val().trim(),
+        area: $("#aud-area").val().trim(),
+        encargado: $("#saud-encargado").select2('data')[0].text,
+        cargo: $("#saud-cargo").select2('data')[0].text
+    }
+
+    mostrar_toast_cargando("Generando reporte de auditoria...")
+    // document.getElementById("btn-reporte-mant").disabled = true;
+    $("#btn-reporte-aud").prop("disabled", true);
+
+    let server = await server_excel(model);
+
+    if (server.resultado.result === true && server.resultado.url) {
+        window.location = server.resultado.url;
+        $('#mdl-reporte-aud').modal("hide");
+
+        tabla_aud.updateData([{ id: equipo.id, reporte_descargado: 1, estado: "En proceso" }]);
+
+        // consultar_auditoria();
+        mostrar_toast('success', '¡Generación de reporte exitoso!', 'La generación de reporte de auditoria se ha realizado correctamente.');
+    } else {
+        mostrar_toast('error', '¡Error!', 'No se pudo generar el reporte de auditoria. Inténtelo nuevamente.');
+        $('#btn-reporte-aud').prop('disabled', false);
+    }
+}
+
+//* Funciones para subir reporte de auditoria
+
+FilePond.registerPlugin(FilePondPluginFileValidateType);
+
+let charco2;
+let charcoInicializado2;
+
+async function reporte_auditoria_firmado(elemento_aud) {
+    //?Escondiendo el alert
+    document.getElementById('alert-aud-reporte').setAttribute('style', 'display: none !important;  background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;');
+
+    //?Escondiendo el visor de pdf
+    $('#pdf-aud').hide()
+
+    if (charco2) {
+        charco2.destroy();   //? <- Esto destruye la instancia anterior, lo cual es necesario
+    }
+
+    //? Al destruir la instancia es necesario colocarle de nuevo el name al input, sino, no aceptará el archivo el php
+    $('#subir-reporte-aud').attr('name', 'reporte_aud');
+
+    let fileAud = document.getElementById('subir-reporte-aud')
+
+    //datos_documento = [id,fechaMnto]
+    let fecha = elemento_aud.fecha.split('-')
+    let anio = {}
+    anio.value = fecha[0]
+    // Create a FilePond instance
+    charco2 = FilePond.create(fileAud, {
+        maxFiles: 1,
+        labelIdle: 'Arrastra y suelta tu archivo .pdf o <span class="filepond--label-action"> Examina </span>',
+        allowMultiple: false,
+        dropOnPage: true,
+        dropValidation: true,
+        instantUpload: false,
+        acceptedFileTypes: ['application/pdf'],
+        labelFileTypeNotAllowed: 'Archivo no válido solo .pdf',
+        server: {
+            process: {
+                url: "database/controller_auditorias/controller_auditorias.php",
+                method: 'POST',
+                name: 'reporte_aud',
+                withCredentials: false,
+                ondata: (formData) => {
+                    const trama = {
+                        accion: 4,
+                        id_equipo: elemento_aud.id,
+                        fecha_aud: elemento_aud.fecha
+                    };
+                    formData.append('trama', JSON.stringify(trama));
+                    return formData;
+                },
+                onload: (response) => {
+                    try {
+                        const data = JSON.parse(response); // <- convierte string en objeto
+                        if (data.resultado.error) {
+                            //console.error("Error del servidor:", data.resultado.error);
+                            mostrar_toast("error", "Error", data.resultado.error);
+                        } else {
+                            tabla_aud.updateData([{ id: elemento_aud.id, reporte_subido: 1, estado: "Realizado" }]);
+                            mostrar_toast("success", "Subido", data.resultado.mensaje);
+                            // consultar_auditoria(anio);
+
+                            charco2.removeFiles();
+                        }
+
+                    } catch (e) {
+                        console.error("Error al parsear respuesta:", e);
+                    }
+                },
+                onerror: (error) => {
+                    console.error('Error al subir:', error);
+                    alert("Error al subir archivo.");
+                }
+            },
+        }
+    });
+    //* Mostrando pdf cuando se suba
+    let abrirArchivo;
+
+    /* charco2.on('addfile', (error, fileItem) => {
+        if (error) {
+            mostrar_toast('error', 'Error', 'Error al cargar PDF:' + error);
+            return;
+        }
+
+        charcoInicializado2 = fileItem; // <-- guardar archivo
+
+        // Generar URL temporal para el archivo PDF
+        abrirArchivo = URL.createObjectURL(fileItem.file);
+
+        const viewer = document.getElementById('pdf-ver-aud');
+        viewer.src = abrirArchivo;
+
+        $('#pdf-aud').show()
+
+    }); */
+
+    let server = await server_auditoria({ accion: 5, id_equipo: elemento_aud.id, fecha_aud: elemento_aud.fecha })
+
+    if (server.resultado) {
+        document.getElementById('alert-aud-reporte').style.display = 'block'
+    }
+}
+
+function eliminar_archivo() {
+    if (charco2 && charcoInicializado2) {
+        charco2.removeFile(charcoInicializado2);
+        fileItemCargado = null;
+    }
+}
+
+// ? Cerrando filepond al finalizar la carga del reporte
+document.addEventListener('FilePond:removefile', (e) => {
+    // $('#pdf-aud').hide()
+    $('[data-widget="sidebar-rauditoria"]').ControlSidebar('toggle')
+})
+
+//* Funciones para visualizar el reporte firmado
+async function consultar_reporte_firmado(elemento_aud) {
+    let model = {
+        accion: 6,
+        id_equipo: elemento_aud.id,
+        fecha_aud: elemento_aud.fecha
+    }
+
+    let server = await server_auditoria(model);
+
+    if (server.resultado.documento) {
+        let ruta = `${location.origin}${server.resultado.documento}`;
+
+        document.getElementById('pdf-reporte-aud').src = ruta;
+        $("#mdl-pdf-aud").modal('show');
+    } else if (server.resultado.aviso) {
+        mostrar_toast('warning', '¡Aviso!', server.resultado.aviso)
+    } else {
+        mostrar_toast('error', '¡Error!', "Hubo un error, consulte al equipo de TI")
+    }
+}
+
+//* Función para consulta de información del activo a auditar
+let seleccionado_aud
+async function mdl_auditoria_info(elemento_aud) {
+    // Busca en el arreglo 'datos_mantenimiento' el registro con el mismo id_equipo
+
+    for (let i = 0; i < datos_auditoria.length; i++) {
+        const element = datos_auditoria[i];
+        if (element.id === elemento_aud.id && element.anio === elemento_aud.anio) {
+            // Guarda el registro completo en una variable global
+            seleccionado_aud = element;
+            break;
+        }
+    }
+    // Llama a varias funciones para cargar los selects con datos dinámicos
+    await Promise.all([
+        general_select2({
+            selectId: 'aud-rubro',
+            tabla: 'cat_rubro',
+            campo: 'rubro',
+            placeholder: 'Selecione un rubro',
+            dropdownParent: '#mdl-mant-info',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Categoría general del activo. Agrupa dispositivos por su tipo funcional, como computadoras, dispositivos móviles, etc."
+        }),
+
+        general_select2({
+            selectId: 'aud-tipo',
+            tabla: 'cat_tipo',
+            campo: 'tipo',
+            placeholder: 'Selecione un tipo',
+            dropdownParent: '#mdl-mant-info',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
+        }),
+
+        general_select2({
+            selectId: 'aud-marca',
+            tabla: 'cat_marca',
+            campo: 'marca',
+            placeholder: 'Seleccione una marca',
+            dropdownParent: '#mdl-mant-info',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Es la marca del activo."
+        }),
+
+        general_select2({
+            selectId: 'aud-ubicacion',
+            tabla: 'inventario_ti_sur',
+            campo: 'ubicacion',
+            placeholder: 'Selecciona una ubicacion',
+            dropdownParent: '#mdl-mant-info',
+            tags: true,
+            popoverTitle: "Descripción",
+            popoverContent: "Indica el lugar específico dentro de la zona donde se encuentra físicamente el dispositivo."
+        }),
+
+        general_select2({
+            selectId: 'aud-usuario',
+            tabla: 'cat_usuarios',
+            campo: 'nombre',
+            placeholder: 'NA',
+            dropdownParent: '#mdl-mant-info',
+        }),
+
+        general_select2({
+            selectId: 'aud-cargo',
+            tabla: 'cat_usuarios',
+            campo: 'cargo',
+            placeholder: 'NA',
+            dropdownParent: '#mdl-mant-info',
+            sincronizarCampo: 'cargo',
+            sincronizarCon: 'select-usuario'
+        }),
+    ])
+
+    rellenar_select(seleccionado_aud.usuario, "aud-usuario");
+    rellenar_select(seleccionado_aud.cargo, 'aud-cargo')
+    rellenar_select(seleccionado_aud.tipo, "aud-tipo");
+    rellenar_select(seleccionado_aud.marca, "aud-marca");
+    rellenar_select(seleccionado_aud.ubicacion, "aud-ubicacion");
+    rellenar_select(seleccionado_aud.rubro, "aud-rubro")
+    $('#aud-modelo').val(seleccionado_aud.modelo)
+    $('#aud-num-serie').val(seleccionado_aud.num_serie)
+    $('#aud-fecha').val(seleccionado_aud.fecha)
+    $('#aud-estatus').val(seleccionado_aud.estado)
+
+    switch (seleccionado_aud.estado) {
+        case "Pendiente":
+            $('#estatus-icon-aud').css('color', '#ff7300')
+            break;
+        case "En proceso":
+            $('#estatus-icon-aud').css('color', '#0385ffff')
+            break;
+        case "Realizado":
+            $('#estatus-icon-aud').css('color', '#28a745')
+            break;
+        case "Vencido":
+            $('#estatus-icon-aud').css('color', '#dc3545')
+            break;
+        default:
+            $('#estatus-icon-aud').css('color', '')
+            break;
+    }
+
+    $('#mdl-aud-info').modal("show")
+
+}
+
+//* Funciones para la descargar mensual de reportes
+async function mdl_reportes_mensuales() {
+    const cont = document.getElementById("contenedor-mes");
+    cont.innerHTML = "";
+
+    let año = auditorias_pendientes[0].anio
+    console.log(auditorias_pendientes[0].anio);
+    $('#descargar-text-aud').text(`Descargar reportes mensuales del año ${año}`)
 
 
+    consulta_reportes_mensuales()
+    $('#mdl-raud-mens').modal('show');
+}
+
+$(document).ready(function () {
+    $('[data-toggle="popover"]').popover();
+})
+
+function consulta_reportes_mensuales() {
+    let meses = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+    let meses_auditados = Object.keys(auditorias_pendientes[0].meses);
+
+    let meses_completados = meses.filter(e => !meses_auditados.includes(e)).map(Number);
+
+    carga_meses(meses_completados);
+}
+
+const nombre_meses = [
+    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+];
+
+function carga_meses(meses = []) {
+    const contenedor = document.getElementById("contenedor-mes");
+    contenedor.innerHTML = "";
+
+    nombre_meses.forEach((mes, i) => {
+        const num_mes = i + 1;
+        let disp = meses.includes(num_mes);
+
+        const card = document.createElement("div");
+        card.className = "card-mes " + (disp ? "disponible" : "no-disponible");
+
+        card.innerHTML = `
+            <div class="nombre-mes">${mes}</div>
+            <div class="estatus-mes">${disp ? "Disponible" : "No disponible"}</div>
+        `;
+
+        if (disp) {
+            let numero_mes = num_mes.toString().padStart(2, '0');
+            card.onclick = () => unir_reportes_mes(numero_mes);
+        }
+
+        contenedor.appendChild(card);
+    });
+}
+
+async function unir_reportes_mes(mes) {
+    auditoria_loading = true;
+
+    alert_cargando('Uniendo reportes, esto tomará un tiempo, por favor espere...');
+
+    let server = await server_auditoria({ accion: 7, anio: auditorias_pendientes[0].anio, mes: mes });
+
+    if (server.resultado.mensaje) {
+        mostrar_toast('success', '¡Éxito!', server.resultado.mensaje);
+
+        let ruta = `${location.origin}${server.resultado.ruta}`;
+        window.open(ruta, '_blank');
+
+    } else if (server.resultado.error) {
+        mostrar_toast('error', '¡Error!', server.resultado.error);
+    } else {
+        mostrar_toast('error', '¡Error!', 'Hubo un problema');
+    }
 }

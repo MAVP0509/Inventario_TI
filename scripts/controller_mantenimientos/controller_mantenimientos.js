@@ -334,7 +334,7 @@ async function consultar_informacion(anio) {
                 formatter: uploadIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_descargado",
                 cellClick: function (e, cell) {
                     elemento_mnt = cell.getRow().getData();
-                    abrir_subir_reporte(elemento_mnt.id, elemento_mnt.fecha)
+                    abrir_subir_reporte(elemento_mnt);
                 }
             },
 
@@ -342,7 +342,7 @@ async function consultar_informacion(anio) {
                 formatter: eyeIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_subido",
                 cellClick: function (e, cell) {
                     elemento_mnt = cell.getRow().getData();
-                    ver_pdf_reporte(elemento_mnt.id, elemento_mnt.fecha)
+                    ver_pdf_reporte(elemento_mnt);
                 }
             },
             {
@@ -423,6 +423,7 @@ async function mdl_programar_mantenimiento() {
 
     rellenar_select("Alejandro Cancino Argüello", "select-autorizo");
     rellenar_select("César Ignacio Torres Almeida", "select-elaboro");
+    $('#mdl-btn-conf').prop('disabled', false);
 
     $('#select-cg-elaboro, #select-cg-autorizo').prop('disabled', true)
     $("#mdl-btn-conf").off("click").on("click", function () { programar_mantenimiento() })
@@ -462,12 +463,12 @@ async function programar_mantenimiento() {
     } else if (server.resultado.result === false) {
         mostrar_toast('error', 'Error', server.resultado.error);
         $('#mdl-prog-mant').modal("hide");
+        $('#mdl-btn-conf').prop('disabled', false);
     }/*  else if (server.resultado.duplicado === false) {
         mostrar_toast('error', '¡Error!', 'Ya existe un programa de mantenimiento para el año');
         $('#mdl-prog-mant').modal("hide");
     } */
 }
-
 
 let selecreg
 async function mdl_mantenimiento_info(elemento_mnt) {
@@ -581,6 +582,9 @@ async function mdl_mantenimiento_info(elemento_mnt) {
 
 async function mdl_reporte_mantenimiento(elemento_mnt) {
 
+    $("#btn-reporte-mant").prop("disabled", false);
+    // document.getElementById("btn-reporte-mant").disabled = false;
+
     await general_select2({
         selectId: 'slc-encargado',
         tabla: 'cat_usuarios',
@@ -590,12 +594,12 @@ async function mdl_reporte_mantenimiento(elemento_mnt) {
     })
 
     rellenar_select("César Ignacio Torres Almeida", "slc-encargado");
-    $("#btn-reporte-mant").prop("disabled", false);
     $("#btn-reporte-mant").off('click').on('click', function () { reporte_mantenimiento(elemento_mnt) })
     $("#mdl-reporte-mant").modal("show");
 }
 
 async function reporte_mantenimiento(elemento_mnt) {
+
     let model = {
         accion: 4,
         elementos: elemento_mnt,
@@ -603,17 +607,22 @@ async function reporte_mantenimiento(elemento_mnt) {
     }
 
     mostrar_toast_cargando("Generando reporte de mantenimiento...")
+    // document.getElementById("btn-reporte-mant").disabled = true;
     $("#btn-reporte-mant").prop("disabled", true);
+
     let server = await server_excel(model);
 
     if (server.resultado.result === true && server.resultado.url) {
         window.location = server.resultado.url;
         $('#mdl-reporte-mant').modal("hide");
+
         table.updateData([{ id: elemento_mnt.id, reporte_descargado: 1, estado: "En proceso" }])
+
         consultar_mantenimientos_vencidos()
         mostrar_toast('success', '¡Generación de reporte exitoso!', 'La generación de reporte de mantenimiento se ha realizado correctamente.');
     } else {
         mostrar_toast('error', '¡Error!', 'No se pudo generar el reporte de mantenimiento. Inténtelo nuevamente.');
+        $('#btn-reporte-mant').prop('disabled', false);
     }
 }
 
@@ -641,7 +650,7 @@ FilePond.registerPlugin(FilePondPluginFileValidateType);
 let pond
 //* Variable utilizada para guardar temporalmente el archivo y asi poder ser eliminado desde otra función
 let fileItemCargado
-async function abrir_subir_reporte(id, fechaMnto) {
+async function abrir_subir_reporte(elemento_mnt) {
     //*Escondiendo el alert
     document.getElementById('alert-reporte').setAttribute('style', 'display: none !important;  background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;');
 
@@ -658,9 +667,10 @@ async function abrir_subir_reporte(id, fechaMnto) {
     let fileReporte = document.getElementById('subir-reporte')
 
     //datos_documento = [id,fechaMnto]
-    let fecha = fechaMnto.split('-')
+    let fecha = elemento_mnt.fecha.split('-')
     let anio = {}
     anio.value = fecha[0]
+    // console.log(anio);
     // Create a FilePond instance
     pond = FilePond.create(fileReporte, {
         maxFiles: 1,
@@ -680,8 +690,8 @@ async function abrir_subir_reporte(id, fechaMnto) {
                 ondata: (formData) => {
                     const trama = {
                         accion: 1,
-                        id_equipo: id,
-                        fecha_mnto: fechaMnto
+                        id_equipo: elemento_mnt.id,
+                        fecha_mnto: elemento_mnt.fecha
                     };
                     formData.append('trama', JSON.stringify(trama));
                     return formData;
@@ -693,15 +703,12 @@ async function abrir_subir_reporte(id, fechaMnto) {
                             //console.error("Error del servidor:", data.resultado.error);
                             mostrar_toast("error", "Error", data.resultado.error);
                         } else {
-                            table.updateData([{ id: id, reporte_subido: 1, estado: "Realizado" }])
+                            table.updateData([{ id: elemento_mnt.id, reporte_subido: 1, estado: "Realizado" }])
                             mostrar_toast("success", "Subido", data.resultado.mensaje)
                             consultar_informacion(anio)
                             /* table.replaceData(table.getData())
                             table.redraw(true) */
                             //window.location.reload()
-
-
-
                             pond.removeFile();
                         }
 
@@ -741,7 +748,7 @@ async function abrir_subir_reporte(id, fechaMnto) {
 
     });
 
-    let server = await server_mantenimiento({ accion: 2, id_equipo: id, fecha_mnto: fechaMnto })
+    let server = await server_mantenimiento({ accion: 2, id_equipo: elemento_mnt.id, fecha_mnto: elemento_mnt.fecha })
 
     if (server.resultado) {
         document.getElementById('alert-reporte').style.display = 'block'
@@ -771,14 +778,14 @@ document.addEventListener('FilePond:removefile', (e) => {
 }); */
 
 //*todo Vista del pdf del reporte en caso de existir
-async function ver_pdf_reporte(id, fecha) {
+async function ver_pdf_reporte(elemento_mnt) {
     dominio = window.location.hostname
     puerto = location.port
 
     let model = {
         accion: 3,
-        id_equipo: id,
-        fecha_mnto: fecha
+        id_equipo: elemento_mnt.id,
+        fecha_mnto: elemento_mnt.fecha
     }
 
     let server = await server_mantenimiento(model)
@@ -804,7 +811,7 @@ async function ver_pdf_reporte(id, fecha) {
 async function mdl_correo_reporte_mantenimiento(equipo) {
     let fecha = equipo.fecha.split('-')
     let mes = fecha[1]
-    
+
     //let valido = mesesPendientes.find
     //console.log(mesesPendientes)
 
@@ -925,12 +932,9 @@ async function mdl_descargar_reportes_mensuales() {
     $('#mdl-descargar-reportes-mes').modal('show')
 }
 
-
-
 $(document).ready(function () {
     $('[data-toggle="popover"]').popover();
 })
-
 
 function consultar_reportes_mensuales() {
     //console.log(mantenimientosPendientes[0])
@@ -945,7 +949,6 @@ function consultar_reportes_mensuales() {
 
     cargarMeses(mesesCompletados)
 }
-
 
 const mesesNombres = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
@@ -1041,7 +1044,7 @@ async function consultar_programa_firmado() {
     }
 
     document.getElementById('btn-open-programa').click();
-    
+
     programa_firmado();
 }
 
