@@ -135,6 +135,7 @@ $('.ComprobarContraseña').on('input', function (e) {
     validar_contraseña()
 })
 
+//* Función para validar contraseña
 function validar_contraseña() {
     let regcontraseña = document.getElementById('reg-contraseña').value;
     let confcontraseña = document.getElementById('conf-contraseña').value;
@@ -264,7 +265,6 @@ window.addEventListener('load', function () {
 
     localStorage.clear()
 })
-
 
 
 //TODO Función para el formulario de ingreso y sus funciones derivadas
