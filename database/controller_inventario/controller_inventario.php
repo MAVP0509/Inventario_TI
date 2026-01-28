@@ -29,8 +29,6 @@ if ($clientejson->accion == 0) {
 
 print(json_encode($respuesta_servidor));
 
-
-
 function insertar_datos($valores)
 {
     include("../conexion.php");
