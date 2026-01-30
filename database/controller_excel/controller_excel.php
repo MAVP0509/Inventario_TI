@@ -305,12 +305,14 @@ function cargar_plantilla()
 }
 
 function bajas($valores)
-{
+{   // Obtiene la información de los activos a dar de baja
     $datos = $valores->tabla_baja;
 
+    // Carga la plantilla base del documento de baja
     $spreadsheet = IOFactory::load('Baja FO-DSP BAJA.xlsx');
     $worksheet = $spreadsheet->getActiveSheet();
 
+    // Configuración de impresión del documento
     $pageSetup = $worksheet->getPageSetup();
     $pageSetup->setOrientation(PageSetup::ORIENTATION_PORTRAIT);
     $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LETTER);
@@ -318,12 +320,14 @@ function bajas($valores)
     $pageSetup->setFitToWidth(1);
     $pageSetup->setFitToHeight(0);
 
+    // Configuración de márgenes del documento
     $pageMargins = $worksheet->getPageMargins();
     $pageMargins->setTop(0.5);
     $pageMargins->setBottom(0.5);
     $pageMargins->setLeft(0.5);
     $pageMargins->setRight(0.5);
 
+    // Filas base donde se insertará información dinámica
     $fila_observaciones = 27;
     $Fila_nombre = 38;
     $fila_cargos = 39;
@@ -332,37 +336,45 @@ function bajas($valores)
     $fila_quincena = 19;
     $fila_reubicacion = 24;
 
+    // Cantidad de activos a dar de baja
     $cantidad_filas = count($datos);
-    // $fila_final = $fila_inicial + $cantidad_filas - 1;
 
+    // Generación de filas dinámicas
     foreach ($datos as $item) {
+        // Inserta nuevas filas si la cantidad de activos es diferente a la plantilla base
         if ($cantidad_filas != 15) {
             $worksheet->insertNewRowBefore($fila_inicial, 1);   // Solo inserta después de la primera
         }
-
+        // Une celdas para la descripción del activo
         $worksheet->mergeCells("D$fila_inicial:H$fila_inicial");
-
+        
+        // Duplica el estilo de la fila base para mantener formato consistente
         $worksheet->duplicateStyle($worksheet->getStyle("B16:K16"), "B$fila_inicial:K$fila_inicial");
 
+        // Permite que el texto se ajuste automáticamente
         $worksheet->getStyle("B$fila_inicial:K$fila_inicial")->getAlignment()->setWrapText(true);
         $worksheet->getRowDimension($fila_inicial)->setRowHeight(-1);
 
+        // Asegura que el texto no sea negrita
         $worksheet->getStyle("B$fila_inicial:K$fila_inicial")->getFont()->setBold(false);
 
+        // Asignación de valores por columna
         $worksheet->setCellValue("B$fila_inicial", $item->rownum);
         $worksheet->setCellValue("C$fila_inicial", $item->motivo_baja_id);
         $worksheet->setCellValue("D$fila_inicial", $item->descripcion);
         $worksheet->setCellValue("I$fila_inicial", !empty($item->lote) ? $item->lote : '');
         $worksheet->setCellValue("J$fila_inicial", $item->ubicacion);
         $worksheet->setCellValue("K$fila_inicial", $item->af);
-
+        
+        // Avanza a la siguiente fila
         $fila_inicial++;
     }
-
+    // Elimina la fila sobrante generada por la inserción dinámica
     if (count($datos) > 0) {
-        $worksheet->removeRow($fila_inicial);   // Elimina la fila_inicial extra
+        $worksheet->removeRow($fila_inicial);
     }
 
+    //* Campos dependientes del motivo de baja
     if ($valores->motivo == '5') {
         $worksheet->setCellValue('F12', $valores->otro);
     }
@@ -379,9 +391,11 @@ function bajas($valores)
         $worksheet->setCellValue("E$reubicacion", $valores->reubicacion);
     }
 
+    // Inserta observaciones considerando el número de activos
     $observaciones = $fila_observaciones + ($cantidad_filas - 1);
     $worksheet->setCellValue("B$observaciones", $valores->observaciones);
 
+    // Inserta nombres de responsables
     $nombres = $Fila_nombre + ($cantidad_filas - 1);
     $worksheet->setCellValue("C$nombres", $valores->emisor);
     $worksheet->setCellValue("E$nombres", $valores->supervisor);
@@ -389,14 +403,15 @@ function bajas($valores)
     $worksheet->setCellValue("I$nombres", $valores->autorizo);
     $worksheet->getStyle("C$nombres")->getAlignment()->setWrapText(true);
 
+    // Inserta cargos de los responsables
     $cargos = $fila_cargos + ($cantidad_filas - 1);
-
     $worksheet->setCellValue("C$cargos", $valores->cg_emisor);
     $worksheet->setCellValue("E$cargos", $valores->cg_supervisor);
     $worksheet->setCellValue("G$cargos", $valores->cg_vobo);
     $worksheet->setCellValue("I$cargos", $valores->cg_autorizo);
     $worksheet->getStyle("C$cargos")->getAlignment()->setWrapText(true);
 
+    // Genera el nombre dinámico del archivo
     $nombre_doc = explode(" ", $valores->motivo);
     $nombre_doc = join("_", $nombre_doc);
     $fecha = date('Ymd_His');
@@ -409,11 +424,14 @@ function bajas($valores)
 
     if ($base !== false) {
         // DIRECTORY_SEPARATOR para compatibilidad entre SO
+        //Contruye la ruta física y la URL pública de descarga
         $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . 'documentos_descarga' . DIRECTORY_SEPARATOR . 'bajas' . DIRECTORY_SEPARATOR  . $nombreArchivo;
         $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/bajas/{$nombreArchivo}";
+
+        // Guarda el archivo Excel en el servidor
         $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-        // $writer->save('php://output');
         $writer->save($ruta_guardar);
+        
         return [
             'result' => true,
             'url' => $url_descarga
