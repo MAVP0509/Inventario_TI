@@ -34,9 +34,21 @@ function consultar_distintos($valores)
                     ['id' => 'Bodega', 'estatus' => 'Bodega']
                 ];
                 return $datos;
-            /* case "region":
-                $sql = "SELECT DISTINCT `$campo` from `$tabla` WHERE `$campo` <> 'Baja';";
-                break; */
+            case "anio_mantenimiento":
+                //*Retornara el año actual y el siguiente, si ya existe el año actual, retornara solo el siguiente
+                $sql = "SELECT
+                          IF(
+                            EXISTS (
+                              SELECT 1
+                              FROM mantenimiento
+                              WHERE anio = YEAR(CURDATE())
+                            ),
+                            YEAR(CURDATE()) + 1,
+                            YEAR(CURDATE())
+                          ) AS anio_mantenimiento;
+                                    
+                        ";
+                break;
             case "zona":
             case "ubicacion":
             case "evento":
@@ -51,6 +63,7 @@ function consultar_distintos($valores)
     }
 
     $query = mysqli_query($con, $sql);
+    
     /* if (!$query) {
         throw new Exception("Error en la consulta: " . mysqli_error($con));
     } */
