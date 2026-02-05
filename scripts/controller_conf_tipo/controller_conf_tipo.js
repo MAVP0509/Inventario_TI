@@ -137,8 +137,8 @@ async function consultar_informacion(){
 let datoSelected = ""
 selected = false
 function mdl_editar_tipo(params) {
-    for (let i = 0; i < datos_tipos.length; i++) {
-        let element = datos_tipos[i]
+    for (let i = 0; i < datos_tipo.length; i++) {
+        let element = datos_tipo[i]
 
         if (element.id === params.id) {
             datoSelected = element
