@@ -377,6 +377,14 @@ async function mdl_programar_mantenimiento() {
 
     await Promise.all([
         general_select2({
+            selectId: 'select-año',
+            tabla: 'mantenimiento',
+            campo: 'anio_mantenimiento',
+            placeholder: 'Selecione un año',
+            dropdownParent: '#mdl-prog-mant',
+            tags: false,
+        }), 
+        general_select2({
             selectId: 'select-elaboro',
             tabla: 'cat_usuarios',
             campo: 'nombre',
@@ -426,6 +434,7 @@ async function mdl_programar_mantenimiento() {
     $('#mdl-btn-conf').prop('disabled', false);
 
     $('#select-cg-elaboro, #select-cg-autorizo').prop('disabled', true)
+
     $("#mdl-btn-conf").off("click").on("click", function () { programar_mantenimiento() })
 
     $('#mdl-prog-mant').modal("show")
@@ -442,6 +451,7 @@ async function programar_mantenimiento() {
 
     let model = {
         accion: 3,
+        anio : $('#select-año').select2('data')[0].text,
         elaboro: $('#select-elaboro').select2('data')[0].text,
         cg_elaboro: $('#select-cg-elaboro').select2('data')[0].text,
         autorizo: $('#select-autorizo').select2('data')[0].text,

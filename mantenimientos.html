@@ -624,7 +624,7 @@
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Programar mantenimiento</h5>
+                    <h5 class="modal-title"><i class="fa-solid fa-file-lines"></i> Programar mantenimiento</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -633,6 +633,16 @@
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col-12">
+                                <!--Seleccionar año-->
+                                <h6>Año del mantenimiento</h6>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
+                                    </div>
+                                    <select class="form-control select" id="select-año"
+                                        name="inp-prog-mant"></select>
+                                    <div class="invalid-feedback">Por favor, seleccione un año.</div>
+                                </div>
                                 <h6>Elaboró</h6>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">

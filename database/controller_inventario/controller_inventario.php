@@ -29,8 +29,6 @@ if ($clientejson->accion == 0) {
 
 print(json_encode($respuesta_servidor));
 
-
-
 function insertar_datos($valores)
 {
     include("../conexion.php");
@@ -405,16 +403,23 @@ function verificar_nuevos_id($valor)
 
 function traspaso($valores)
 {
-
     include("../conexion.php");
+
+    // Datos generales por defecto
     $fecha = date('Y-m-d');
     $zona = "Región Sur";
     $ubicacion = "Bodega";
-    $usuario = '5';
-    $datos = [];
-    $nuevo = [];
+    $usuario = '5'; // Usuario por defecto para activos en Bodega
+
+    $datos = [];    // Para almacenar el estado anterior de los activos
+    $nuevo = [];    // Para almacenar el estado nuevo despué del traspaso
+
+    // Valida si se envían varios IDs de activos
     if (is_array($valores->id)) {
+        // Convierte IDs a cadena separada por comas para consultar SQL
         $ids = implode(",", array_map('intval', $valores->id));
+
+        // Consulta para obtener información actual del los activos
         $sql = "SELECT num_serie, 
                     fk_usuario, 
                     zona, 
@@ -434,36 +439,42 @@ function traspaso($valores)
 
         $query = mysqli_query($con, $sql);
 
+        // Guardar información actual en $datos
         while ($fila = mysqli_fetch_assoc($query)) {
             array_push($datos, $fila);
         }
 
+        // Actualización de los activos segpus el estatus
         if ($valores->estatus == 'Bodega') {
+            // Si el estatus es Bodega, asignar valores por defecto
             $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$usuario', zona = '$zona', ubicacion = '$ubicacion', fecha_entrega = '$fecha' WHERE id IN ($ids)";
         } else {
+            // Si es otro estatus, usar los valores seleccionados para el usuario
             $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$valores->usuario', zona = '$valores->zona', ubicacion = '$valores->ubicacion', fecha_entrega = '$fecha' WHERE id IN ($ids)";
         }
         // var_dump($sql_datos);
         mysqli_query($con, $sql_datos);
 
-
+        // Consultar nuevamente los activos para obtener el estado actualizado
         $query_nuevo = mysqli_query($con, $sql);
         while ($fila = mysqli_fetch_assoc($query_nuevo)) {
             array_push($nuevo, $fila);
         }
-        // var_dump($sql_datos);
+        // Retorna información anterior y nueva de los activos (para histórico)
         return [
             'anterior' => $datos,
             'nuevo' => $nuevo
         ];
     } else {
+        // En caso de un solo envio de activo
         $sql = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, modelo, tag, imei, linea, fecha_entrega FROM inventario_ti_sur WHERE id = '$valores->id'";
         $query = mysqli_query($con, $sql);
+
         $datos = [];
         while ($fila = mysqli_fetch_assoc($query)) {
             $datos[] = $fila;
         }
-
+        // Retorna información del activo único
         return $datos;
     }
 }
