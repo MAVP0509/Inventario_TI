@@ -6,7 +6,7 @@ function server_bajas(model) {
             data: {
                 trama: JSON.stringify(model)
             },
-            success: function(response) {
+            success: function (response) {
                 //console.log(response);
                 try {
                     resolve(JSON.parse(response))
@@ -21,9 +21,9 @@ function server_bajas(model) {
 
 let datos = []
 let table
-async function consultar_informacion(){
-    let server = await server_bajas({accion : 0})
-    datos =server.resultado
+async function consultar_informacion() {
+    let server = await server_bajas({ accion: 0 })
+    datos = server.resultado
 
     //* Idioma Español
     Tabulator.extendModule("localize", "langs", {
@@ -60,40 +60,56 @@ async function consultar_informacion(){
     });
 
 
-     table = new Tabulator('#tbl', {
-        layout:"fitData",
+    table = new Tabulator('#tbl', {
+        layout: "fitData",
         locale: "es",
         data: datos,
         pagination: true,               //paginate the data
-        height: "800px",
-        paginationSize: 15,                //allow 10 rows per page of data
+        maxHeight: "750px",
+        paginationSize: 10,                //allow 10 rows per page of data
         paginationSizeSelector: [10, 15, 20],
         paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
             const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
-             const end = Math.min(currentRowStart + pageSize - 1, totalRows);
+            const end = Math.min(currentRowStart + pageSize - 1, totalRows);
             return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
         },
         movableColumns: true,              //allow column order to be changed
         paginationButtonCount: 3,
-        columns:[
-            {title:"Zona", field:"zona",hozAlign: "center", headerSort: false,headerHozAlign: "center", headerFilter: "list",
-                    headerFilterParams: {
-                        valuesLookup: true, clearable: true // se auto genera a partir de los valores únicos de la columna
-                    },},
-            {title:"Rubro", field:"rubro", hozAlign: "center", headerSort: false,headerHozAlign: "center", headerFilter: "input"},
-            {title:"Activo Fijo", field:"af", hozAlign: "center", headerSort: false,headerHozAlign: "center", headerFilter: "input"},
-            {title:"Tipo", field:"tipo",  hozAlign: "center", headerSort: false,headerHozAlign: "center", headerFilter: "input"},
-            {title:"Marca", field:"marca",  hozAlign: "center", headerSort: false,headerHozAlign: "center", headerFilter: "input"},
-            {title:"Modelo", field:"modelo",  hozAlign: "center", headerSort: false,headerHozAlign: "center", headerFilter: "input"},
-            {title:"Num_serie", field:"num_serie",  hozAlign: "center", headerSort: false,headerHozAlign: "center", headerFilter: "input"},
-            {title:"IMEI", field:"imei",  hozAlign: "center", width:120,headerSort: false, headerHozAlign: "center", headerFilter: "input"},
-            {title:"Ubicación", field:"ubicacion",  hozAlign: "center", headerSort: false,headerHozAlign: "center", headerFilter: "input"},
-            {title:"TAG", field:"tag",  hozAlign: "center", width : 170, headerSort: false,headerHozAlign: "center", headerFilter: "input"},
-            {title:"Usuario", field:"usuario",  hozAlign: "center", headerSort: false,headerHozAlign: "center", headerFilter: "input"},
-            {title:"Cargo", field:"posicion",  hozAlign: "center", headerSort: false,headerHozAlign: "center", headerFilter: "input"},
-            {title:"Fecha de baja", field:"fecha_entrega",  hozAlign: "center", headerSort: false,headerHozAlign: "center", frozen:true, sorter: "date",headerFilter: "input"},
+        columns: [
+            {
+                title: "Zona", field: "zona", hozAlign: "center", headerSort: false, headerHozAlign: "center", /* headerFilter: "list", */
+                headerFilterParams: {
+                    valuesLookup: true, clearable: true // se auto genera a partir de los valores únicos de la columna
+                },
+            },
+            { title: "Rubro", field: "rubro", hozAlign: "center", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
+            { title: "Activo Fijo", field: "af", hozAlign: "center", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
+            { title: "Tipo", field: "tipo", hozAlign: "center", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
+            { title: "Marca", field: "marca", hozAlign: "center", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
+            { title: "Modelo", field: "modelo", hozAlign: "center", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
+            { title: "Num_serie", field: "num_serie", hozAlign: "center", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
+            { title: "IMEI", field: "imei", hozAlign: "center", width: 120, headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
+            { title: "TAG", field: "tag", hozAlign: "center", width: 170, headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
+            { title: "Fecha de baja", field: "fecha_entrega", hozAlign: "center", headerSort: false, headerHozAlign: "center", frozen: true, sorter: "date", /* headerFilter: "input" */ },
 
         ],
     })
+
+    let searchInput = document.getElementById("buscador-tabla-bajas")
+
+    searchInput.addEventListener("keyup", function () {
+        let query = searchInput.value.toLowerCase();
+
+        // Función de filtro personalizada
+        table.setFilter(function (data) {
+            // Recorre todas las propiedades de la fila
+            for (var key in data) {
+                if (data[key] && data[key].toString().toLowerCase().includes(query)) {
+                    return true; // Coincidencia encontrada
+                }
+            }
+            return false; // No hay coincidencia
+        });
+    });
 }
 

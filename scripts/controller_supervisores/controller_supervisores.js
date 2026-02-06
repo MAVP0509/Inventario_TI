@@ -117,7 +117,7 @@ async function consultar_informacion(params) {
                 }, headerSort: false, frozen: true
             },
             {
-                title: "Nombre", field: "nombre", headerHozAlign: "center", headerFilter: "input", headerSort: false, cellClick: function (e, cell) {
+                title: "Nombre", field: "nombre", headerHozAlign: "center", /* headerFilter: "input", */ headerSort: false, cellClick: function (e, cell) {
                     // Alternar estado de seleccionado
                     let rowData = cell.getRow().getData();
                     rowData.seleccionado = !rowData.seleccionado;
@@ -126,7 +126,7 @@ async function consultar_informacion(params) {
                 }
             },
             {
-                title: "Cargo", field: "cargo", headerHozAlign: "center", headerFilter: "input", headerSort: false, cellClick: function (e, cell) {
+                title: "Cargo", field: "cargo", headerHozAlign: "center", /* headerFilter: "input", */ headerSort: false, cellClick: function (e, cell) {
                     // Alternar estado de seleccionado
                     let rowData = cell.getRow().getData();
                     rowData.seleccionado = !rowData.seleccionado;
@@ -135,7 +135,7 @@ async function consultar_informacion(params) {
                 }
             },
             {
-                title: "Región", field: "region", headerHozAlign: "center", headerSort: false, width: 100, hozAlign: "center", headerFilter: "list",
+                title: "Región", field: "region", headerHozAlign: "center", headerSort: false, width: 100, hozAlign: "center", /* headerFilter: "list", */
                 headerFilterParams: {
                     valuesLookup: true, clearable: true // se auto genera a partir de los valores únicos de la columna
                 }, cellClick: function (e, cell) {
@@ -148,13 +148,14 @@ async function consultar_informacion(params) {
             },
             {
                 title: "Habilitado",
-                field: "habilitado", headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "1": "Activo", "0": "Inactivo" }, clearable: true },
+                field: "habilitado", headerHozAlign: "center", /* headerFilter: "list", */ headerFilterParams: { values: { "1": "Habilitado", "0": "Inhabilitado" }, clearable: true },
                 formatter: function (cell, formatterParams, onRendered) {
                     let value = cell.getValue();
                     let icon = value === "1" ? "fa-solid fa-toggle-on fa-2xl" : "fa-solid fa-toggle-off fa-2xl";
                     let color = value === "0" ? "#dc3545" : "#28a745";
+                    let valor = value === "1" ? "Habilitado": "Inhabilitado"
                     regionesSinSupervisor(table)
-                    return `<span class="custom-toggle"><i class="${icon}" style="color:${color}; font-size: 1.5em;"></i></span>`;
+                    return `<span class="custom-toggle"><i class="${icon}"  style="color:${color}; font-size: 1.5em;"></i></span>`;
                 },
                 cellClick: function (e, cell) {
                     const tableData = table.getData();
@@ -262,6 +263,23 @@ async function consultar_informacion(params) {
         ],
 
     })
+
+    let searchInput = document.getElementById("buscador-tabla-supervisores")
+
+    searchInput.addEventListener("keyup", function () {
+        let query = searchInput.value.toLowerCase();
+
+        // Función de filtro personalizada
+        table.setFilter(function (data) {
+            // Recorre todas las propiedades de la fila
+            for (var key in data) {
+                if (data[key] && data[key].toString().toLowerCase().includes(query)) {
+                    return true; // Coincidencia encontrada
+                }
+            }
+            return false; // No hay coincidencia
+        });
+    });
 
 }
 //*Cada que un supervisor es habilitado se ejecuta para actualizar la BD

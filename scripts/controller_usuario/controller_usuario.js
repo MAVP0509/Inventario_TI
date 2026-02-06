@@ -151,7 +151,7 @@ async function consultar_usuarios() {
                 }, headerSort: false, frozen: true
             },
             {
-                title: "Nombre", field: "nombre", cellClick:
+                title: "Nombre", field: "nombre", headerSort: false, cellClick:
                     function (e, cell) {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
@@ -160,7 +160,7 @@ async function consultar_usuarios() {
                     }
             },
             {
-                title: "Correo", field: "correo", cellClick:
+                title: "Correo", field: "correo", headerSort: false, cellClick:
                     function (e, cell) {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
@@ -169,7 +169,7 @@ async function consultar_usuarios() {
                     }
             },
             {
-                title: "Edad", field: "edad", cellClick:
+                title: "Edad", field: "edad", headerSort: false, cellClick:
                     function (e, cell) {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
@@ -178,7 +178,7 @@ async function consultar_usuarios() {
                     }
             },
             {
-                title: "Teléfono", field: "telefono", cellClick:
+                title: "Teléfono", field: "telefono",headerSort: false, cellClick:
                     function (e, cell) {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
@@ -187,7 +187,7 @@ async function consultar_usuarios() {
                     }
             },
             {
-                title: "Fecha de Nacimiento", field: "fecha_nac", cellClick:
+                title: "Fecha de Nacimiento", field: "fecha_nac", headerSort: false,cellClick:
                     function (e, cell) {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
@@ -196,7 +196,7 @@ async function consultar_usuarios() {
                     }
             },
             {
-                title: "Rol", field: "rol"
+                title: "Rol", field: "rol",headerSort: false,
             },
             {
                 formatter: editIcon, width: 60, hozAlign: "center",
@@ -208,6 +208,23 @@ async function consultar_usuarios() {
             },
         ],
     })
+
+    let searchInput = document.getElementById("buscador-tabla-usuarios")
+
+    searchInput.addEventListener("keyup", function () {
+        let query = searchInput.value.toLowerCase();
+
+        // Función de filtro personalizada
+        table.setFilter(function (data) {
+            // Recorre todas las propiedades de la fila
+            for (var key in data) {
+                if (data[key] && data[key].toString().toLowerCase().includes(query)) {
+                    return true; // Coincidencia encontrada
+                }
+            }
+            return false; // No hay coincidencia
+        });
+    });
 }
 
 

@@ -82,6 +82,11 @@ async function load_auditoria() {
 
     }
 }
+//* Limpiar el input del buscador si cambia el año de la tabla
+$('#select-anio-auditoria').on('change', () =>{
+    $('#buscador-tabla-auditoria').val('')
+})
+
 
 let datos_auditoria = [];
 let tabla_aud;
@@ -145,7 +150,7 @@ async function consultar_auditoria(anio) {
         const data = cell.getRow().getData()
         const disabled = data.correo_enviado == 0 ? "disabled" : ""
 
-        return `<button type='button' class='btn btn-success icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Reporte de mantenimiento' onclick=''><i class='fa-solid fa-file-excel fa-lg'></i></button>`;
+        return `<button type='button' class='btn btn-success icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Reporte de auditoría' onclick=''><i class='fa-solid fa-file-excel fa-lg'></i></button>`;
     }
 
     let verIcon = function (cell, formatterParams, onRendered) { //plain text value
@@ -223,18 +228,18 @@ async function consultar_auditoria(anio) {
                 !excluir.includes(d.estado)
             ).length;
 
-            return `${fecha.toLocaleDateString('es-ES', opciones)} (${pendientes} auditorias pendientes)`;
+            return `${fecha.toLocaleDateString('es-ES', opciones)} (${pendientes} auditorías pendientes)`;
 
         },
         groupStartOpen: false,
         groupToggleElement: "header",
         columns: [
             {
-                title: "Fecha", field: "fecha", width: 115, headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input", sorter: "date",
+                title: "Fecha", field: "fecha", width: 115, headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */ sorter: "date",
             },
             {
                 title: "Tipo",
-                field: "tipo", width: 130, headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input",
+                field: "tipo", width: 130, headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */
                 formatter: function (cell, formatterParams, onRendered) {
                     let data = cell.getData();
                     return `${data.tipo}<br><small>${data.marca}<br><small>${data.modelo}`;
@@ -242,12 +247,12 @@ async function consultar_auditoria(anio) {
             },
             {
                 title: "Número de serie",
-                field: "num_serie", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input"
+                field: "num_serie", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input" */
 
             },
             {
                 title: "Usuario",
-                field: "usuario", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input",
+                field: "usuario", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */
                 formatter: function (cell, formatterParams, onRendered) {
                     let data = cell.getData(); // Obtiene toda la fila
                     return `${data.usuario}<br><small>${data.cargo}</small>`;
@@ -256,7 +261,7 @@ async function consultar_auditoria(anio) {
             },
             {
                 title: "Ubicación",
-                field: "ubicacion", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "list",
+                field: "ubicacion", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "list", */
                 headerFilterParams: {
                     valuesLookup: true, clearable: true,
                 }
@@ -276,10 +281,10 @@ async function consultar_auditoria(anio) {
                     "Realizado": `<i class="fa-solid fa-circle" style="color: #28a745;"></i> Realizado`,
                     "Vencido": `<i class="fa-solid fa-circle fa-beat-fade" style="color: #dc3545;"></i> Vencido`,
                 },
-                headerFilter: "list",
+                /* headerFilter: "list",
                 headerFilterParams: {
                     valuesLookup: true, clearable: true,
-                }, headerSort: false,
+                }, */ headerSort: false,
 
             },
             {
@@ -351,11 +356,36 @@ async function consultar_auditoria(anio) {
         return objeto
     }, {}))
     // console.log(auditorias_pendientes);
+
+    let searchInput = document.getElementById("buscador-tabla-auditoria")
+
+    searchInput.addEventListener("keyup", function () {
+        let query = searchInput.value.toLowerCase();
+
+        // Función de filtro personalizada
+        tabla_aud.setFilter(function (data) {
+            // Recorre todas las propiedades de la fila
+            for (var key in data) {
+                if (data[key] && data[key].toString().toLowerCase().includes(query)) {
+                    return true; // Coincidencia encontrada
+                }
+            }
+            return false; // No hay coincidencia
+        });
+    });
 }
 
 async function mdl_programar_auditoria() {
 
     await Promise.all([
+        general_select2({
+            selectId: 'select-año',
+            tabla: 'auditoria',
+            campo: 'anio_auditoria',
+            placeholder: 'Selecione un año',
+            dropdownParent: '#mdl-prog-aud',
+            tags: false,
+        }),
         general_select2({
             selectId: 'elaboro-aud',
             tabla: 'cat_usuarios',

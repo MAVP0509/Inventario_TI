@@ -129,7 +129,7 @@ async function consultar_informacion() {
             locale: "es",
             data: datos,
             pagination: true,
-            height: "800px",
+            height: "750px",
             paginationSize: 10,
             paginationSizeSelector: [10, 25, 35, true],
             movableColumns: true,              //allow column order to be changed
@@ -158,147 +158,147 @@ async function consultar_informacion() {
                     }, headerSort: false, frozen: true, width: 70, hozAlign: "center",
                 },
                 {
-                    title: "Zona", field: "zona", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "list",
-                    headerFilterParams: {
+                    title: "Zona", field: "zona", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "list", */
+                    /* headerFilterParams: {
                         valuesLookup: true, clearable: true, // se auto genera a partir de los valores únicos de la columna
                         elementAttributes: {
                             autocomplete: "off",
                             type: "text"
                         }
-                    },
+                    }, */
                 },
                 {
-                    title: "Rubro", field: "rubro", headerHozAlign: "center", headerFilter: "input", headerSort: false,
-                    headerFilterParams: {
+                    title: "Rubro", field: "rubro", headerHozAlign: "center", /* headerFilter: "input", */ headerSort: false,
+                    /* headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
                             type: "text",
                             name: "tbtor-filter"
                         }
-                    }
+                    } */
                 },
                 {
-                    title: "Activo fijo", field: "af", headerSort: false, headerHozAlign: "center", hozAlign: "center", headerFilter: "input",
-                    headerFilterParams: {
+                    title: "Activo fijo", field: "af", headerSort: false, headerHozAlign: "center", hozAlign: "center", /* headerFilter: "input", */
+                    /* headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
                             type: "text",
                             name: "tbtor-filter"
                         }
-                    }
+                    } */
                 },
                 {
-                    title: "Tipo de dispositivo", field: "tipo", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center",
-                    headerFilterParams: {
+                    title: "Tipo de dispositivo", field: "tipo", headerHozAlign: "center", /* headerFilter: "input", */ headerSort: false, hozAlign: "center",
+                    /* headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
                             type: "text",
                             name: "tbtor-filter"
                         }
-                    }
+                    } */
                 },
                 {
-                    title: "Marca", field: "marca", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center",
-                    headerFilterParams: {
+                    title: "Marca", field: "marca", headerHozAlign: "center", /* headerFilter: "input", */ headerSort: false, hozAlign: "center",
+                    /* headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
                             type: "text",
                             name: "tbtor-filter"
                         }
-                    }
+                    } */
                 },
                 {
-                    title: "Modelo", field: "modelo", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center",
-                    headerFilterParams: {
+                    title: "Modelo", field: "modelo", headerHozAlign: "center", /* headerFilter: "input", */ headerSort: false, hozAlign: "center",
+                    /* headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
                             type: "text",
                             name: "tbtor-filter"
                         }
-                    }
+                    } */
                 },
                 {
-                    title: "Numero de serie", field: "num_serie", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center",
-                    headerFilterParams: {
+                    title: "Numero de serie", field: "num_serie", headerHozAlign: "center", /* headerFilter: "input", */ headerSort: false, hozAlign: "center",
+                    /* headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
                             type: "text",
                             name: "tbtor-filter"
                         }
-                    }
+                    } */
                 },
                 {
-                    title: "Ubicación", field: "ubicacion", headerHozAlign: "center", headerFilter: "list", headerSort: false, hozAlign: "center",
-                    headerFilterParams: {
+                    title: "Ubicación", field: "ubicacion", headerHozAlign: "center", /* headerFilter: "list", */ headerSort: false, hozAlign: "center",
+                    /* headerFilterParams: {
                         valuesLookup: true, clearable: true, // se auto genera a partir de los valores únicos de la columna
                         elementAttributes: {
                             autocomplete: "off",
                             type: "text"
                         }
-                    },
+                    }, */
                 },
                 {
-                    title: "TAG", field: "tag", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", width: 170,
-                    headerFilterParams: {
+                    title: "TAG", field: "tag", headerHozAlign: "center", /* headerFilter: "input", */ headerSort: false, hozAlign: "center", width: 170,
+                    /* headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
                             type: "text",
                             name: "tbtor-filter"
                         }
-                    }
+                    } */
                 },
                 {
-                    title: "IMEI", field: "imei", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", width: 170,
-                    headerFilterParams: {
+                    title: "IMEI", field: "imei", headerHozAlign: "center", /* headerFilter: "input", */ headerSort: false, hozAlign: "center", width: 170,
+                    /* headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
                             type: "text",
                             name: "tbtor-filter"
                         }
-                    }
+                    } */
                 },
                 {
-                    title: "Linea", field: "linea", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", width: 170,
-                    headerFilterParams: {
+                    title: "Linea", field: "linea", headerHozAlign: "center", /* headerFilter: "input", */ headerSort: false, hozAlign: "center", width: 170,
+                    /* headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
                             type: "text",
                             name: "tbtor-filter"
                         }
-                    }
+                    } */
                 },
                 {
-                    title: "Usuario", field: "usuario", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center",
-                    headerFilterParams: {
+                    title: "Usuario", field: "usuario", headerHozAlign: "center", /* headerFilter: "input", */ headerSort: false, hozAlign: "center",
+                    /* headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
                             type: "text",
                             name: "tbtor-filter"
                         }
-                    }
+                    } */
                 },
                 {
-                    title: "Cargo del usuario", field: "posicion", headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center",
-                    headerFilterParams: {
+                    title: "Cargo del usuario", field: "posicion", headerHozAlign: "center", /* headerFilter: "input", */ headerSort: false, hozAlign: "center",
+                    /* headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
                             type: "text",
                             name: "tbtor-filter"
                         }
-                    }
+                    } */
                 },
                 {
-                    title: "Fecha de asignación", field: "fecha_entrega", headerHozAlign: "center", sorter: "date", headerFilter: "input", headerSort: false, hozAlign: "center",
-                    headerFilterParams: {
+                    title: "Fecha de asignación", field: "fecha_entrega", headerHozAlign: "center", sorter: "date", /* headerFilter: "input", */ headerSort: false, hozAlign: "center",
+                    /* headerFilterParams: {
                         elementAttributes: {
                             autocomplete: "off",
                             type: "text",
                             name: "tbtor-filter"
                         }
-                    }
+                    } */
                 },
                 {
-                    title: "Estatus", field: "estatus", width: 120, frozen: true, headerHozAlign: "center", headerFilter: "list", headerFilterParams: {
+                    title: "Estatus", field: "estatus", width: 120, frozen: true, headerHozAlign: "center", /* headerFilter: "list", */ headerFilterParams: {
                         values: { "Asignado": "Asignado", "Bodega": "Bodega" }, clearable: true,
                         elementAttributes: {
                             type: "text",
@@ -316,6 +316,7 @@ async function consultar_informacion() {
                 },
 
             ],
+            
 
         });
 
@@ -332,6 +333,23 @@ async function consultar_informacion() {
         Array.from(document.getElementsByName("tbtor-filter")).forEach(input => {
             input.setAttribute("autocomplete", "off");
             input.setAttribute("type", "text");
+        });
+    });
+
+    let searchInput = document.getElementById("buscador-tabla-inventario")
+
+    searchInput.addEventListener("keyup", function () {
+        let query = searchInput.value.toLowerCase();
+
+        // Función de filtro personalizada
+        table.setFilter(function (data) {
+            // Recorre todas las propiedades de la fila
+            for (var key in data) {
+                if (data[key] && data[key].toString().toLowerCase().includes(query)) {
+                    return true; // Coincidencia encontrada
+                }
+            }
+            return false; // No hay coincidencia
         });
     });
 }

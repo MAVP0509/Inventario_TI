@@ -39,7 +39,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link" data-toggle="dropdown" href="#" aria-expanded="false"><i
                             class="fa-solid fa-bell"></i><span class="badge badge-danger navbar-badge"
-                            name="aviso-badge-campana" ></span></a>
+                            name="aviso-badge-campana"></span></a>
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" name="aviso-campana-notificacion"
                         style="left: inherit; right: 0px;">
                         <span class="dropdown-item dropdown-header" name="header-campana-notificacion">Sin
@@ -105,9 +105,12 @@
                                         style=" background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;"
                                         id="alert-edit-rubro">
                                         Asegúrese que cada región tenga al menos un supervisor activo. Regiones sin
-                                        supervisor: <span id="contador-region"> 0</span>
+                                        supervisor: <span id="contador-region">0</span>
 
                                     </div>
+                                    <input class="form-control" id="buscador-tabla-supervisores" type="text"
+                                        placeholder="Buscar por nombre, cargo, región...">
+                                    <br>
                                     <div id="tbl" class="table  table-striped table-bordered table-sm"></div>
                                 </div>
                             </div>
