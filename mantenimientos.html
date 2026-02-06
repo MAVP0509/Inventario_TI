@@ -633,14 +633,30 @@
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col-12">
+                                <div class="alert alert-info" role="alert"
+                                    style="color:#0c5460; background-color:#d1ecf1; border-color:#bee5eb;">
+
+                                    <div style="display:flex; align-items:center; gap:15px; padding-right:3rem;">
+                                        <i class="fa-solid fa-circle-info fa-2xl flex-shrink-0"></i>
+
+                                        <div style="line-height:1.4;">
+                                            Los mantenimientos programados se registrarán automáticamente en el programa
+                                            de auditoría.
+                                        </div>
+                                    </div>
+
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"
+                                        style="position:absolute; top:20%; right:1rem; transform:translateY(-50%);">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
                                 <!--Seleccionar año-->
                                 <h6>Año del mantenimiento</h6>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
                                     </div>
-                                    <select class="form-control select" id="select-año"
-                                        name="inp-prog-mant"></select>
+                                    <select class="form-control select" id="select-año" name="inp-prog-mant"></select>
                                     <div class="invalid-feedback">Por favor, seleccione un año.</div>
                                 </div>
                                 <h6>Elaboró</h6>
@@ -679,6 +695,15 @@
                                         name="inp-prog-mant"></select>
                                     <div class="invalid-feedback">Por favor, seleccione una persona.</div>
                                 </div>
+                                <div class="alert alert-danger position-relative d-flex align-items-start " role="alert"
+                                    style="background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;">
+                                    <button type='button' class='btn icon toggle-select me-2' id="check-editar">
+                                        <i class='fa-regular fa-square fa-lg' id="check-editar-icon"></i>
+                                    </button>
+                                    Descargar también programa de auditoría
+                                </div>
+                                <!-- Nota: botón único con ícono (check) para descargar también auditoría -->
+
                             </div>
                             <!-- <div class="col-6">
                                 <div id="tbl-tipos"></div>

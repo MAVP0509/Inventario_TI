@@ -437,6 +437,32 @@ async function mdl_programar_mantenimiento() {
 
     $("#mdl-btn-conf").off("click").on("click", function () { programar_mantenimiento() })
 
+    // Inicializar botón que simula checkbox para descargar auditoría
+    // Soporta tanto el nuevo `#check-editar`/`#check-editar-icon` como el antiguo `#btn-download-aud`
+    const audIcon = $('#check-editar-icon').length ? $('#check-editar-icon') : $('#btn-download-aud-icon');
+    const audBtn = $('#check-editar').length ? $('#check-editar') : $('#btn-download-aud');
+    if (audIcon.length) {
+        audIcon.removeClass('fa-solid fa-square-check').addClass('fa-regular fa-square');
+    }
+    audBtn.off('click').on('click', function () {
+        if (!audIcon.length) return;
+        const msg = $('#download-aud-message');
+        if (audIcon.hasClass('fa-solid')) {
+            // desmarcar
+            audIcon.removeClass('fa-solid fa-square-check').addClass('fa-regular fa-square');
+            // ocultar texto explicativo
+            if (msg.length) msg.hide();
+            // mantener el botón confirmar habilitado
+            $('#mdl-btn-conf').prop('disabled', false);
+        } else {
+            // marcar
+            audIcon.removeClass('fa-regular fa-square').addClass('fa-solid fa-square-check');
+            // mostrar texto explicativo
+            if (msg.length) msg.show();
+            $('#mdl-btn-conf').prop('disabled', false);
+        }
+    });
+
     $('#mdl-prog-mant').modal("show")
 }
 
@@ -458,26 +484,75 @@ async function programar_mantenimiento() {
         cg_autorizo: $('#select-cg-autorizo').select2('data')[0].text,
 
     }
+    // Leer si el usuario desea también descargar el programa de auditoría desde el modal
+    let downloadBoth = false;
+    // Soportar tanto el nuevo botón `check-editar-icon` como el antiguo `btn-download-aud-icon`
+    const audIconEl = document.getElementById('check-editar-icon') || document.getElementById('btn-download-aud-icon');
+    if (audIconEl) {
+        // si tiene la clase de 'checked' (fa-solid fa-square-check) consideramos marcado
+        downloadBoth = audIconEl.classList.contains('fa-solid') && audIconEl.classList.contains('fa-square-check');
+    }
 
     mostrar_toast_cargando('Programando mantenimiento...')
     $('#mdl-btn-conf').prop('disabled', true);
 
     let server = await server_excel(model);
 
-    if (server.resultado.result === true && server.resultado.url) {
-        window.location = server.resultado.url;
-        mostrar_toast('success', '¡Programa de mantenimiento exitosa!', 'Rellena los campos. Inténtelo nuevamente.');
-        $('#mdl-prog-mant').modal("hide");
-        load()
+    function downloadFile(url) {
+        try {
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.target = '_blank';
+            a.rel = 'noopener';
+            // Intentar forzar descarga cuando sea posible
+            a.download = '';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } catch (e) {
+            // Fallback a abrir en nueva pestaña
+            window.open(url, '_blank');
+        }
+    }
 
-    } else if (server.resultado.result === false) {
+    if (server && server.resultado && server.resultado.result === true && server.resultado.url) {
+        // Descargar programa de mantenimiento (sin navegar fuera de la página)
+        downloadFile(server.resultado.url);
+
+        // Si el usuario pidió ambos, generar también el programa de auditoría y abrirlo en nueva pestaña
+        if (downloadBoth) {
+            try {
+                let modelAud = {
+                    accion: 5,
+                    elaboro: model.elaboro,
+                    cg_elaboro: model.cg_elaboro,
+                    autorizo: model.autorizo,
+                    cg_autorizo: model.cg_autorizo,
+                };
+                let serverAud = await server_excel(modelAud);
+                if (serverAud && serverAud.resultado && serverAud.resultado.result === true && serverAud.resultado.url) {
+                    downloadFile(serverAud.resultado.url);
+                } else if (serverAud && serverAud.resultado && serverAud.resultado.result === false) {
+                    mostrar_toast('warning', 'Aviso', 'No se pudo generar el programa de auditoría: ' + (serverAud.resultado.error || ''));
+                }
+            } catch (e) {
+                console.error('Error al generar programa de auditoría', e);
+            }
+        }
+
+        mostrar_toast('success', '¡Programa de mantenimiento exitoso!', 'El programa se ha generado correctamente.');
+        $('#mdl-prog-mant').modal("hide");
+        load();
+
+    } else if (server && server.resultado && server.resultado.result === false) {
         mostrar_toast('error', 'Error', server.resultado.error);
         $('#mdl-prog-mant').modal("hide");
         $('#mdl-btn-conf').prop('disabled', false);
-    }/*  else if (server.resultado.duplicado === false) {
-        mostrar_toast('error', '¡Error!', 'Ya existe un programa de mantenimiento para el año');
-        $('#mdl-prog-mant').modal("hide");
-    } */
+    } else {
+        mostrar_toast('error', 'Error', 'No se pudo generar el programa. Inténtalo nuevamente.');
+        $('#mdl-btn-conf').prop('disabled', false);
+    }
 }
 
 let selecreg
