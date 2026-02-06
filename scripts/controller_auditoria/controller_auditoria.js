@@ -452,6 +452,7 @@ async function programar_auditoria() {
 
     let model = {
         accion: 5,
+        anio: $('#select-año').select2('data')[0].text,
         elaboro: $('#elaboro-aud').select2('data')[0].text,
         cg_elaboro: $('#cg-elaboro-aud').select2('data')[0].text,
         autorizo: $('#autorizo-aud').select2('data')[0].text,

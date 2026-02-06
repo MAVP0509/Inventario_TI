@@ -1089,7 +1089,8 @@ function programa_auditoria($valores)
     include('../conexion.php');
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    $anio_actual = date("Y") + 1;
+    /* $anio_actual = date("Y") + 1; */
+    $anio_actual = $valores->anio;
     $sql_dev = "SELECT tipo_id FROM vorden_auditoria";
     $query_dev = mysqli_query($con, $sql_dev);
 
