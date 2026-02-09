@@ -391,7 +391,7 @@ async function mdl_editar_supervisor(params) {
         selectId: 'edi-region',
         tabla: 'supervisor',
         campo: 'region',
-        placeholder: 'Seleccione una region',
+        placeholder: 'Seleccione una región',
         dropdownParent: '#modalEditar',
         tags: true,
     })

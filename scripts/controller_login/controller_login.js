@@ -2,11 +2,16 @@
 sessionStorage.clear()
 
 
-/* const originalSetItem = sessionStorage.setItem;
-sessionStorage.setItem = function(key, value) {
-    console.log(`🔍 sessionStorage.setItem -> ${key}:`, value);
-    originalSetItem.apply(this, arguments);
-} */
+async function load(){
+    await general_select2({
+        selectId: 'select-region',
+        tabla: 'supervisor',
+        campo: 'region',
+        placeholder: 'Seleccione una región',
+        dropdownParent: '#registro-form',
+        tags: false,
+    })
+}
 
 let respuesta = ""
 function server_usuario(model) {
@@ -69,13 +74,11 @@ async function registrarUsu() {
         "regcorreo",
         "reg-contraseña",
         "conf-contraseña",
-        "telefono",
-        "fechanac",
-        "conf-contraseña"
+        "select-region"
     ]
 
     if (!validar_campos(validacion)) {
-        mostrar_toast('error', 'Error', 'Rellena todos los campos correctamente para continuar. Inténtalo de nuevo.');
+        mostrar_toast('warning', 'Advertencia', 'Rellena todos los campos correctamente para continuar. Inténtalo de nuevo.');
         return;
     }
     try {
@@ -84,9 +87,7 @@ async function registrarUsu() {
             nombre: $("#nombre").val().trim(),
             correo: $("#regcorreo").val().trim(),
             contraseña: $("#reg-contraseña").val().trim(),
-            edad: $("#edad").val().trim(),
-            telefono: $("#telefono").val().trim(),
-            fecha_nac: $("#fechanac").val().trim(),
+            region: $("#select-region").select2('data')[0].text
         };
 
 
@@ -95,36 +96,14 @@ async function registrarUsu() {
         if (respuesta.resultado === true) {
             localStorage.setItem('registroExitoso', '¡Usuario Registrado!');
             window.location.href = "login.html"
-        } else if (respuesta.resultado === false) {
-            mostrar_toast('warning', 'Inventario TI', 'El correo ya está registrado');
+        } else if (respuesta.resultado.error) {
+            mostrar_toast('warning', 'Inventario TI', respuesta.resultado.error);
 
         }
     } catch (error) {
         mostrar_toast('error', 'Inventario TI', 'No se puedo conectar al servidor');
     }
 
-}
-
-//* Función para validar la edad del usuario
-let vEdad = false
-function calcularEdad() {
-    let fechaNacimiento = new Date(document.getElementById('fechanac').value);
-    let hoy = new Date();
-    let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
-
-    let mes = hoy.getMonth() - fechaNacimiento.getMonth();
-
-    if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
-        edad--;
-    }
-
-    document.getElementById('edad').value = edad;
-
-    if (edad < 18) {
-        vEdad = false
-    } else {
-        vEdad = true
-    }
 }
 
 //Comprueba en tiempo real las contraseñas
@@ -185,22 +164,6 @@ function validar_contraseña() {
 
 }
 
-//*Función para comprobar que el telefono sea uno válido
-let tel = false
-$('#telefono').on('input', function () {
-    this.value = this.value.replace(/[^0-9]/g, '')
-    valTel = $(this).val();
-    if (valTel.length < 10 || valTel.length === 0) {
-        document.getElementById('error-mensageTel').style = "display : block; color:red;"
-        tel = false
-        //document.getElementById('btn-reg').disabled= true;
-    } else {
-        document.getElementById('error-mensageTel').style = "display : none;"
-        tel = true
-        //document.getElementById('btn-reg').disabled= false;
-    }
-});
-
 //*Función para comprobar que el nombre del registro sea uno válido
 let nombre = false
 $('#nombre').on('input', function (e) {
@@ -216,20 +179,6 @@ $('#nombre').on('input', function (e) {
 
 });
 
-//*Función para comprobar que se ingresó una fecha
-let fecha = false
-$('#fechanac').on('input', function (e) {
-    //validar_nombre(e.currentTarget.value)
-    const regexFecha = /^\d{4}-\d{2}-\d{2}$/
-    if (!regexFecha.test(e.currentTarget.value)) {
-        document.getElementById('error-mensageFecha').style = 'display : block; color:red;'
-        fecha = false
-    } else {
-        document.getElementById('error-mensageFecha').style = ' display : none;'
-        fecha = true
-    }
-
-});
 
 //*Función para ver las contraseñas del registro
 function togglePasswords() {
@@ -278,7 +227,7 @@ async function validar_ingreso() {
         ];
 
         if (!validar_campos(validacion)) {
-            mostrar_toast('error', 'Error', 'Rellene los campos. Inténtelo nuevamente.');
+            mostrar_toast('warning', 'Advertencia', 'Rellene los campos. Inténtelo nuevamente.');
             return;
         }
 
@@ -293,7 +242,7 @@ async function validar_ingreso() {
 
         let resp = JSON.parse(respuesta)
         if (resp.resultado === false) {
-            mostrar_toast('error', 'Inventario TI', "Usuario/contraseña no válidos");
+            mostrar_toast('warning', 'Inventario TI', "Usuario/contraseña no válidos");
             let inputs = document.getElementsByName("inputInit");
             for (let i = 0; i < inputs.length; i++) {
                 const element = inputs[i].value = "";
@@ -301,7 +250,7 @@ async function validar_ingreso() {
         } else {
             sessionStorage.setItem("user", respuesta)
             sessionStorage.setItem("log", 'true')
-            sessionStorage.setItem("rol", resp.resultado[5])
+            sessionStorage.setItem("rol", resp.resultado[3])
             sessionStorage.setItem("bienvenido", "Bienvenido " + resp.resultado[0])
             sessionStorage.setItem("alert-mnto", true)
             window.location.href = "inventario.html";
@@ -311,7 +260,7 @@ async function validar_ingreso() {
             }
         }
     } catch (error) {
-        mostrar_toast('error', 'Inventario TI', "No se pudo conectar al servidor");
+        mostrar_toast('error', 'Error', "No se pudo conectar al servidor");
     }
 
 }
@@ -376,6 +325,21 @@ function toggleForms(showRegister = false, showRecovery = false) {
     const register = document.getElementById("colnone");
     const recover = document.getElementById("colrep");
 
+    let inputs_login = document.getElementsByName('inputInit')
+    let inputs_registro = document.getElementsByName('inputReg')
+    // Itera sobre cada input para limpiar su estado de error
+    for (let i = 0; i < inputs_login.length; i++) {
+
+        inputs_login[i].classList.remove('is-invalid'); // Elimina la clase de validación
+    }
+    for (let i = 0; i < inputs_registro.length; i++) {
+
+        inputs_registro[i].classList.remove('is-invalid'); // Elimina la clase de validación
+        inputs_registro[i].value = ''
+        
+
+    }
+
     const allForms = [login, register, recover];
     let elToShow = login;
     if (showRecovery) elToShow = recover;
@@ -408,7 +372,6 @@ $(document).ready(function () {
     // Añadimos el evento input al campo de confirmación de contraseña
     document.getElementById('conf-contraseña').addEventListener('input', validar_contraseña);
     document.getElementById('reg-contraseña').addEventListener('input', validar_contraseña);
-    document.getElementById('fechanac').addEventListener('input', calcularEdad);
     document.getElementById('toggle-password-icon').addEventListener('click', togglePasswords);
     document.getElementById('toggle-password-icon-log').addEventListener('click', ver_contraseña);
 
