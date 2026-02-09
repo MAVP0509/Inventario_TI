@@ -32,6 +32,16 @@
       display: block;
     }
   </style>
+  <script>
+    //*Si el usuario no es administradoe lo redirecciona al inventario
+    window.addEventListener('load', function () {
+      let usuario = JSON.parse(sessionStorage.getItem('user'))
+      let rol = usuario.resultado[3]
+      if (!(rol === 'admin')) {
+        window.location.href = 'inventario'
+      }
+    })
+  </script>
   <title>Inventario TI</title>
 </head>
 
@@ -279,18 +289,13 @@
               <span class="input-group-text"><i id="ver-passReg" class="fa-solid fa-eye-slash"
                   style="cursor: pointer;"></i></span>
             </div>
-            <input type="password" class="form-control" id="contraseniaReg" 
-                  data-html="true" 
-                  data-toggle="popover" 
-                  data-trigger="focus"
-                  title="Crea una contraseña segura" 
-                  data-content="<ul class='list-group'>
+            <input type="password" class="form-control" id="contraseniaReg" data-html="true" data-toggle="popover"
+              data-trigger="focus" title="Crea una contraseña segura" data-content="<ul class='list-group'>
                                     <li class='list-group-item' id='minlongitud'>Que tenga al menos 8 caracteres.</li>
                                     <li class='list-group-item' id='lestrasmm'>Que incluya letras mayúsculas y minúsculas.</li>
                                     <li class='list-group-item' id='numeros'>Que incluya números.</li>
                                     <li class='list-group-item' id='caracteresp'>Que incluya caracteres especiales como * () # @, etc.</li>
-                                </ul>"
-                  placeholder="Contraseña" name="insertMdl">
+                                </ul>" placeholder="Contraseña" name="insertMdl">
             <div class="invalid-feedback">Por favor, ingrese una contraseña.</div>
             <div class="warning-feedback" name="warning-pass"></div>
           </div>

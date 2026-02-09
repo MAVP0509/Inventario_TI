@@ -19,6 +19,16 @@
   <link rel="stylesheet" href="libraries/Tabulator/tabulator_bootstrap4.min.css">
 
   <title>Inventario TI</title>
+
+  <script>
+    window.addEventListener('load', function () {
+      let usuario = JSON.parse(sessionStorage.getItem('user'))
+      let rol = usuario.resultado[3]
+      if (!(rol === 'admin')) {
+        window.location.href = 'inventario'
+      }
+    })
+  </script>
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed" onload="consultar_historico()">

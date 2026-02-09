@@ -1,12 +1,3 @@
-//*Si el usuario no es administradoe lo redirecciona al inventario
-$(document).ready(function() {
-    let usuario = JSON.parse(sessionStorage.getItem('user'))
-    let rol = usuario.resultado[3]
-    if(!(rol=== 'admin')){
-        window.location.href = 'inventario'    }
-})
-
-
 let respuesta
 function server_usuario(model) {
     return new Promise((resolve, reject) => {
@@ -306,7 +297,7 @@ async function mdl_nuevo_usuario() {
     let inputs = document.getElementsByName('insertMdl')
     for (let i = 0; i < inputs.length; i++) {
         inputs[i].value = "";
-        inputs[i].classList.remove('is-invalid','is-warning')
+        inputs[i].classList.remove('is-invalid', 'is-warning')
     }
 
     await general_select2({
@@ -349,7 +340,7 @@ async function insertar_usuario() {
         return;
     }
 
-    if(!validar_contraseña("contraseniaReg", "confContraseniaReg")){
+    if (!validar_contraseña("contraseniaReg", "confContraseniaReg")) {
         mostrar_toast('warning', 'Aviso', 'Verifique la contraseña por favor');
         return;
     }
@@ -365,12 +356,12 @@ async function insertar_usuario() {
 
     let server = await server_usuario(model)
 
-    if (server.resultado.error)  {
+    if (server.resultado.error) {
         mostrar_toast('warning', 'Inventario TI', server.resultado.error)
         return
     } else if (server.resultado) {
         mostrar_toast('success', 'Inventario TI', 'Usuario registrado')
-    }else{
+    } else {
         mostrar_toast('error', 'Inventario TI', 'Error del servidor')
         return
     }
