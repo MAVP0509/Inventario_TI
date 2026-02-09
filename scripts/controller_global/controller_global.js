@@ -71,7 +71,7 @@ function mostrar_toast(tipo, titulo, mensaje, tiempo) {
 }
 
 //* Función pAra mostrar notificación de carga
-function mostrar_toast_cargando(texto) {
+/* function mostrar_toast_cargando(texto) {
     Swal.fire({ // Se invoca SweetAlert2 para crear el toast
         toast: true,    // Define el tipo de toast (alerta no modal)
         position: 'top-end',    // Posición del toast en la pantalla
@@ -91,6 +91,73 @@ function mostrar_toast_cargando(texto) {
         // Evento que se ejecuta al abrir el toast
         didOpen: () => {
             //Swal.showLoading(); Esto muestra el spinner por default de SweetAlert, pero ya no es necesario, ya que se usa uno de fontAwesome
+        }
+    });
+} */
+
+let toastCargandoTimer = null;
+let toastCargandoInterval = null;
+
+//* Función global para mostrar notificación de carga
+function mostrar_toast_cargando(texto, opciones = {}) {
+
+    const {
+        delay = 4000,
+        mensajesLargos = [
+            'Espere mientras se completa la operación...',
+            'Esto puede demorar un poco, por favor espere...'
+        ],
+        alternar = true
+    } = opciones;
+
+    // Limpia timers anteriores (por seguridad)
+    clearTimeout(toastCargandoTimer);
+    clearInterval(toastCargandoInterval);
+
+    Swal.fire({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        showCloseButton: false,
+        timer: undefined,
+        allowOutsideClick: false,
+        background: '#fff',
+        html: `
+            <div style="display: flex; align-items: center;">
+                <img src="images/circles.svg" alt="Icono" height="30" width="30">
+                <span id="toast-cargando-texto" style="font-weight: 500; margin-left: 8px;">
+                    ${texto}
+                </span>
+            </div>
+        `,
+        didOpen: () => {
+
+            // Cambia el mensaje después de cierto tiempo
+            toastCargandoTimer = setTimeout(() => {
+
+                if (!Swal.isVisible()) return;
+
+                if (alternar && mensajesLargos.length > 1) {
+                    let index = 0;
+
+                    toastCargandoInterval = setInterval(() => {
+                        if (!Swal.isVisible()) {
+                            clearInterval(toastCargandoInterval);
+                            return;
+                        }
+
+                        document.getElementById('toast-cargando-texto').innerText = mensajesLargos[index];
+
+                        index = (index + 1) % mensajesLargos.length;
+
+                    }, 5000);
+
+                } else if (mensajesLargos.length > 0) {
+                    document.getElementById('toast-cargando-texto').innerText =
+                        mensajesLargos[0];
+                }
+
+            }, delay);
         }
     });
 }
