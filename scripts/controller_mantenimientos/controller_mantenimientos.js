@@ -95,8 +95,11 @@ let mantenimientosPendientes
 async function consultar_informacion(anio) {
 
     const fecha = anio.value
+
+    const usuDatos = JSON.parse(sessionStorage.getItem('user'));
+    const region = usuDatos.resultado[2];
     //load()
-    let server = await server_mantenimiento({ accion: 0, anio: fecha })
+    let server = await server_mantenimiento({ accion: 0, anio: fecha, region: region });
 
     //* Mostrar mensaje
     /* if (!fecha) {
