@@ -497,7 +497,7 @@ async function programar_mantenimiento() {
     ? 'Programando mantenimiento y auditoría...'
     : 'Programando mantenimiento...';
 
-    mostrar_toast_cargando(mensajeInicial, {delay: 3000, mensajesLargo: 'Este proceso puede tardar varios minutos dependiendo de la cantidad de equipos a programar.'});
+    mostrar_toast_cargando(mensajeInicial);
     $('#mdl-btn-conf').prop('disabled', true);
 
     // Enviar al servidor si se desean ambos archivos; el PHP será responsable

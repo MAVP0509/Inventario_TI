@@ -71,7 +71,7 @@ function mostrar_toast(tipo, titulo, mensaje, tiempo) {
 }
 
 //* Función pAra mostrar notificación de carga
-/* function mostrar_toast_cargando(texto) {
+function mostrar_toast_cargando(texto) {
     Swal.fire({ // Se invoca SweetAlert2 para crear el toast
         toast: true,    // Define el tipo de toast (alerta no modal)
         position: 'top-end',    // Posición del toast en la pantalla
@@ -93,9 +93,9 @@ function mostrar_toast(tipo, titulo, mensaje, tiempo) {
             //Swal.showLoading(); Esto muestra el spinner por default de SweetAlert, pero ya no es necesario, ya que se usa uno de fontAwesome
         }
     });
-} */
+}
 
-let toastCargandoTimer = null;
+/* let toastCargandoTimer = null;
 let toastCargandoInterval = null;
 
 //* Función global para mostrar notificación de carga
@@ -146,7 +146,8 @@ function mostrar_toast_cargando(texto, opciones = {}) {
                             return;
                         }
 
-                        document.getElementById('toast-cargando-texto').innerText = mensajesLargos[index];
+                        document.getElementById('toast-cargando-texto').innerText =
+                            mensajesLargos[index];
 
                         index = (index + 1) % mensajesLargos.length;
 
@@ -160,7 +161,7 @@ function mostrar_toast_cargando(texto, opciones = {}) {
             }, delay);
         }
     });
-}
+} */
 
 //* Función para validar que los campos no estén vacios (los vuelve obligatorios)
 function validar_campos(campos) {
