@@ -113,7 +113,7 @@ async function consultar_informacion() {
                 }, headerSort: false, frozen: true
             },
             {
-                title: "Nombre", field: "nombre", headerFilter: "input", headerSort: false, cellClick:
+                title: "Nombre", field: "nombre", /* headerFilter: "input", */ headerSort: false, cellClick:
                     function (e, cell) {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
@@ -122,7 +122,7 @@ async function consultar_informacion() {
                     }
             },
             {
-                title: "Cargo", field: "cargo", headerFilter: "input", headerSort: false, cellClick:
+                title: "Cargo", field: "cargo", /* headerFilter: "input", */ headerSort: false, cellClick:
                     function (e, cell) {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
@@ -131,7 +131,7 @@ async function consultar_informacion() {
                     }
             },
             {
-                title: "Región", field: "region", headerFilter: "input", headerSort: false, cellClick:
+                title: "Región", field: "region", /* headerFilter: "input", */ headerSort: false, cellClick:
                     function (e, cell) {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
@@ -140,7 +140,7 @@ async function consultar_informacion() {
                     }
             },
             {
-                title: "Correo", field: "correo_usuario", headerFilter: "input", headerSort: false, cellClick:
+                title: "Correo", field: "correo_usuario", /* headerFilter: "input", */ headerSort: false, cellClick:
                     function (e, cell) {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
@@ -158,6 +158,23 @@ async function consultar_informacion() {
             },
         ],
     })
+
+    let searchInput = document.getElementById("buscador-tabla-supervisores")
+
+    searchInput.addEventListener("keyup", function () {
+        let query = searchInput.value.toLowerCase();
+
+        // Función de filtro personalizada
+        table.setFilter(function (data) {
+            // Recorre todas las propiedades de la fila
+            for (var key in data) {
+                if (data[key] && data[key].toString().toLowerCase().includes(query)) {
+                    return true; // Coincidencia encontrada
+                }
+            }
+            return false; // No hay coincidencia
+        });
+    });
 }
 
 let datoSelected = ""

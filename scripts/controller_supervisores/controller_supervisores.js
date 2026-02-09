@@ -117,7 +117,7 @@ async function consultar_informacion(params) {
                 }, headerSort: false, frozen: true
             },
             {
-                title: "Nombre", field: "nombre", headerHozAlign: "center", headerFilter: "input", headerSort: false, cellClick: function (e, cell) {
+                title: "Nombre", field: "nombre", headerHozAlign: "center", /* headerFilter: "input", */ headerSort: false, cellClick: function (e, cell) {
                     // Alternar estado de seleccionado
                     let rowData = cell.getRow().getData();
                     rowData.seleccionado = !rowData.seleccionado;
@@ -126,7 +126,7 @@ async function consultar_informacion(params) {
                 }
             },
             {
-                title: "Cargo", field: "cargo", headerHozAlign: "center", headerFilter: "input", headerSort: false, cellClick: function (e, cell) {
+                title: "Cargo", field: "cargo", headerHozAlign: "center", /* headerFilter: "input", */ headerSort: false, cellClick: function (e, cell) {
                     // Alternar estado de seleccionado
                     let rowData = cell.getRow().getData();
                     rowData.seleccionado = !rowData.seleccionado;
@@ -135,7 +135,7 @@ async function consultar_informacion(params) {
                 }
             },
             {
-                title: "Región", field: "region", headerHozAlign: "center", headerSort: false, width: 100, hozAlign: "center", headerFilter: "list",
+                title: "Región", field: "region", headerHozAlign: "center", headerSort: false, width: 100, hozAlign: "center", /* headerFilter: "list", */
                 headerFilterParams: {
                     valuesLookup: true, clearable: true // se auto genera a partir de los valores únicos de la columna
                 }, cellClick: function (e, cell) {
@@ -148,13 +148,14 @@ async function consultar_informacion(params) {
             },
             {
                 title: "Habilitado",
-                field: "habilitado", headerHozAlign: "center", headerFilter: "list", headerFilterParams: { values: { "1": "Activo", "0": "Inactivo" }, clearable: true },
+                field: "habilitado", headerHozAlign: "center", /* headerFilter: "list", */ headerFilterParams: { values: { "1": "Habilitado", "0": "Inhabilitado" }, clearable: true },
                 formatter: function (cell, formatterParams, onRendered) {
                     let value = cell.getValue();
                     let icon = value === "1" ? "fa-solid fa-toggle-on fa-2xl" : "fa-solid fa-toggle-off fa-2xl";
                     let color = value === "0" ? "#dc3545" : "#28a745";
+                    let valor = value === "1" ? "Habilitado": "Inhabilitado"
                     regionesSinSupervisor(table)
-                    return `<span class="custom-toggle"><i class="${icon}" style="color:${color}; font-size: 1.5em;"></i></span>`;
+                    return `<span class="custom-toggle"><i class="${icon}"  style="color:${color}; font-size: 1.5em;"></i></span>`;
                 },
                 cellClick: function (e, cell) {
                     const tableData = table.getData();
@@ -263,130 +264,37 @@ async function consultar_informacion(params) {
 
     })
 
-}
+    let searchInput = document.getElementById("buscador-tabla-supervisores")
 
+    searchInput.addEventListener("keyup", function () {
+        let query = searchInput.value.toLowerCase();
 
-//*TODO Controlar el switch de la tabla para activar o desactivar supervisores
-
-/* $('#tabla1 tbody').on('change', '.switch-toggle', function () {
-
-    const switchElement = $(this);
-    const id = switchElement.data('id');
-    const isChecked = switchElement.is(':checked');
-
-    const table = $('#tabla1').DataTable();
-    const rowData = table.row(switchElement.closest('tr')).data();
-    const region = rowData.region;
-
-    const data = table.rows().data();
-
-    // Contar cuántos están habilitados en la misma región
-    let habilitadosEnRegion = 0;
-
-    data.each(function (item) {
-        if (item.region === region && parseInt(item.habilitado) === 1) {
-            habilitadosEnRegion++;
-        }
-    }); 
-   
-
-    if (isChecked) {
-        // Validar: si ya hay uno habilitado en la región, deshabilitarlo
-        if (habilitadosEnRegion >= 1) {
-            data.each(function (item, index) {
-                if (item.region === region && item.id !== id && parseInt(item.habilitado) === 1) {
-                    // Deshabilitar visualmente
-                    const rowIdx = table.row(function (idx, data, node) {
-                        return data.id === item.id;
-                    });
-                    const checkbox = $(table.row(rowIdx).node()).find('.switch-toggle');
-                    checkbox.prop('checked', false);
-
-                    // Actualizar en DataTable y backend
-                    item.habilitado = 0;
-                    supervisor_habilitado({
-                        accion: 3,
-                        id: item.id,
-                        habilitado: 0
-                    });
-
-                    // También actualiza su botón
-                const oldEditButton = $(table.row(rowIdx).node()).find('button');
-                oldEditButton.prop('disabled', false);
-                oldEditButton.removeAttr('data-toggle data-trigger data-html title data-content');
-                oldEditButton.popover('dispose');
+        // Función de filtro personalizada
+        table.setFilter(function (data) {
+            // Recorre todas las propiedades de la fila
+            for (var key in data) {
+                if (data[key] && data[key].toString().toLowerCase().includes(query)) {
+                    return true; // Coincidencia encontrada
                 }
-            });
-
-        }
-
-        // Actualizar actual habilitado
-        rowData.habilitado = 1;
-        supervisor_habilitado({
-            accion: 3,
-            id: id,
-            habilitado: 1
+            }
+            return false; // No hay coincidencia
         });
+    });
 
-        const editButton = switchElement.closest('tr').find('button');
-        editButton.prop('disabled', true);
-        editButton.attr({
-            'data-toggle': 'popover',
-            'data-placement': 'top',
-            'data-trigger': 'hover',
-            'data-html': 'true',
-            'data-content': '<div class="bg-warning text-dark p-1 rounded">Deshabilite para editar</div>',
-        });
-        editButton.popover(); // Inicializa el popover
-
-    } else {
-
-        // Si este es el único habilitado, no permitir deshabilitar
-        if (habilitadosEnRegion <= 1) {
-            mostrar_toast('warning', 'Advertencia', 'Debe haber un supervisor habilitado por región.');
-            switchElement.prop('checked', true);
-            return;
-        }
-        // Actualizar y guardar
-        rowData.habilitado = 0;
-        supervisor_habilitado({
-            accion: 3,
-            id: id,
-            habilitado: 0
-        });
-
-         // Rehabilitar el botón y quitar el popover
-        const editButton = switchElement.closest('tr').find('button');
-        editButton.prop('disabled', false);
-        editButton.removeAttr('data-toggle data-trigger data-html title data-content');
-        editButton.popover('dispose');
-
-
-         checkbox.prop('checked', true);
-        // Actualizar en DataTable y backend
-        primerSupervisor.habilitado = 1;
-        supervisor_habilitado({
-            accion: 3,
-            id: primerSupervisor.id,
-            habilitado: 1
-        }); 
-
-    }
-});
- */
-
+}
+//*Cada que un supervisor es habilitado se ejecuta para actualizar la BD
 async function supervisor_habilitado(model) {
     await server_supervisor(model)
 }
 
 //TODO Funciones para un nuevo supervisor
-function nuevo_supervisor() {
+async function nuevo_supervisor() {
     $('.select').each(function () {
         $(this).val(null).trigger('change'); // Restablece el valor y actualiza visualmente
         $(this).removeClass('is-invalid'); // Elimina la clase de validación
     });
 
-    general_select2({
+    await general_select2({
         selectId: 'inp-nombre',
         tabla: 'cat_usuarios',
         campo: 'nombre',
@@ -395,7 +303,7 @@ function nuevo_supervisor() {
         tags: true
     });
 
-    general_select2({
+    await general_select2({
         selectId: 'inp-cargo',
         tabla: 'cat_usuarios',
         campo: 'cargo',
@@ -404,7 +312,7 @@ function nuevo_supervisor() {
         tags: true
     });
 
-    general_select2({
+    await general_select2({
         selectId: 'inp-region',
         tabla: 'supervisor',
         campo: 'region',
@@ -430,8 +338,8 @@ async function insertar_supervisor() {
 
     let model = {
         accion: 0,
-        nombre: $('#inp-nombre').val().trim(),
-        cargo: $('#inp-cargo').val().trim(),
+        nombre: $('#inp-nombre').select2('data')[0].text,
+        cargo: $('#inp-cargo').select2('data')[0].text,
         region: $('#inp-region').val().trim(),
     }
 
@@ -476,19 +384,20 @@ async function mdl_editar_supervisor(params) {
         campo: 'cargo',
         placeholder: 'Selecione un cargo',
         dropdownParent: '#modalEditar',
+        tags: true
     })
 
     await general_select2({
         selectId: 'edi-region',
         tabla: 'supervisor',
         campo: 'region',
-        placeholder: 'Seleccione una region',
+        placeholder: 'Seleccione una región',
         dropdownParent: '#modalEditar',
         tags: true,
     })
 
-    $('#edi-nombre').val(selecreg.nombre).trigger('change');
-    $('#edi-cargo').val(selecreg.cargo).trigger('change');
+    rellenar_select(selecreg.nombre, "edi-nombre")
+    rellenar_select(selecreg.cargo, "edi-cargo")
     $('#edi-region').val(selecreg.region).trigger('change');
 
     $("#modalEditar").modal('show');
@@ -510,8 +419,8 @@ async function editar_supervisor() {
         let model = {
             accion: 1,
             id: selecreg.id,
-            nombre: $('#edi-nombre').val().trim(),
-            cargo: $('#edi-cargo').val().trim(),
+            nombre: $('#edi-nombre').select2('data')[0].text,
+            cargo: $('#edi-cargo').select2('data')[0].text,
             region: $('#edi-region').val().trim(),
         }
 
@@ -532,8 +441,8 @@ async function editar_supervisor() {
                 let model = {
                     accion: 1,
                     id: selecreg.id,
-                    nombre: $('#edi-nombre').val().trim(),
-                    cargo: $('#edi-cargo').val().trim(),
+                    nombre: $('#edi-nombre').select2('data')[0].text,
+                    cargo: $('#edi-cargo').select2('data')[0].text,
                     region: $('#edi-region').val().trim(),
                 }
 
@@ -550,40 +459,6 @@ async function editar_supervisor() {
         )
     }
 
-}
-
-async function general_select2({ selectId, tabla, campo, placeholder, dropdownParent, tags }) {
-    //try {
-    const response = await server_supervisor({
-        accion: 4,
-        tabla: tabla,
-        campo: campo
-    });
-
-    //console.log('Respuesta del servidor para select2:', response);
-
-    const opciones = response.resultado.map(item => ({
-        id: item[campo] || '',
-        text: item[campo] || ''
-    }));
-
-    const $select = $('#' + selectId);
-    $select.empty().append(new Option('', '', false, false));
-
-    $select.select2({
-        theme: 'bootstrap4',
-        allowClear: true,
-        placeholder: placeholder,
-        tags: tags,
-        dropdownParent: $(dropdownParent),
-        data: opciones
-    });
-
-    $select.val(null).trigger('change');
-
-    //} catch (error) {
-
-    //}
 }
 
 async function mensaje_eliminar() {

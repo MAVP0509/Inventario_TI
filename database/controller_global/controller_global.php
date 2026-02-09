@@ -49,10 +49,27 @@ function consultar_distintos($valores)
                                     
                         ";
                 break;
+            case "anio_auditoria":
+                //*Retornara el año actual y el siguiente, si ya existe el año actual, retornara solo el siguiente
+                $sql = "SELECT
+                          IF(
+                            EXISTS (
+                              SELECT 1
+                              FROM auditoria
+                              WHERE anio = YEAR(CURDATE())
+                            ),
+                            YEAR(CURDATE()) + 1,
+                            YEAR(CURDATE())
+                          ) AS anio_auditoria;
+                                    
+                        ";
+                break;
             case "zona":
             case "ubicacion":
             case "evento":
             case "anio":
+            case "rol":
+            case "region":
                 // case "cargo":
                 $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE  `$campo` <> 'NA'";
                 break;

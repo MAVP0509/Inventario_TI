@@ -14,9 +14,7 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = editar_supervisor($clientejson);
 } elseif ($clientejson->accion == 2) {
     $respuesta_servidor->resultado = consultar_supervisor($clientejson);
-} elseif ($clientejson->accion == 3) {
-    $respuesta_servidor->resultado = desactivar_supervisor($clientejson);
-} elseif ($clientejson->accion == 4) {
+}  elseif ($clientejson->accion == 4) {
     $respuesta_servidor->resultado = consultar_distintos($clientejson->tabla, $clientejson->campo);
 } elseif ($clientejson->accion == 5) {
     $respuesta_servidor->resultado = eliminar_supervisor($clientejson);
@@ -107,36 +105,6 @@ function consultar_supervisor()
 }
 
 //* Desactivar supervisores
-function desactivar_supervisor($valores)
-{
-    include("../conexion.php");
-    $sql = "UPDATE supervisor SET habilitado = '$valores->habilitado' where id='$valores->id';";
-    return mysqli_query($con, $sql);
-}
-
-//* Función para rellenar selects2 en la pestaña supervisores
-function consultar_distintos($tabla, $campo)
-{
-    include("../conexion.php");
-    //Validación para evitar inyecciones
-    $tabla = mysqli_real_escape_string($con, $tabla);
-    $campo = mysqli_real_escape_string($con, $campo);
-
-    $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE  `$campo` <> 'NA'";
-    $query = mysqli_query($con, $sql);
-
-    $datos = [];
-    while ($fila = mysqli_fetch_assoc($query)) {
-        $valor = $fila[$campo];
-        $datos[] = [
-            'id' => $valor,
-            $campo => $valor
-        ];
-    }
-
-    return $datos;
-}
-
 function eliminar_supervisor($valores)
 {
     include("../conexion.php");

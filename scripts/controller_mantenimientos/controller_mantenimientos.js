@@ -82,6 +82,11 @@ async function load() {
     }
 }
 
+//* Limpiar el input del buscador si cambia el año de la tabla
+$('#select-anio-mantenimiento').on('change', () =>{
+    $('#buscador-tabla-mantenimiento').val('')
+})
+
 let datos_mantenimiento = []
 let elemento_mnt
 let table
@@ -252,11 +257,11 @@ async function consultar_informacion(anio) {
                 }, */
         columns: [
             {
-                title: "Fecha", field: "fecha", width: 115, headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input", sorter: "date",
+                title: "Fecha", field: "fecha", width: 115, headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */ sorter: "date",
             },
             {
                 title: "Tipo",
-                field: "tipo", width: 130, headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input",
+                field: "tipo", width: 130, headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */
                 formatter: function (cell, formatterParams, onRendered) {
                     let data = cell.getData();
                     return `${data.tipo}<br><small>${data.marca}<br><small>${data.modelo}`;
@@ -264,12 +269,12 @@ async function consultar_informacion(anio) {
             },
             {
                 title: "Número de serie",
-                field: "num_serie", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input"
+                field: "num_serie", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input" */
 
             },
             {
                 title: "Usuario",
-                field: "usuario", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input",
+                field: "usuario", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */
                 formatter: function (cell, formatterParams, onRendered) {
                     let data = cell.getData(); // Obtiene toda la fila
                     return `${data.usuario}<br><small>${data.cargo}</small>`;
@@ -278,7 +283,7 @@ async function consultar_informacion(anio) {
             },
             {
                 title: "Ubicación",
-                field: "ubicacion", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "list",
+                field: "ubicacion", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "list", */
                 headerFilterParams: {
                     valuesLookup: true, clearable: true,
                 }
@@ -286,7 +291,7 @@ async function consultar_informacion(anio) {
             },
             {
                 title: "Estatus",
-                field: "estado", hozAlign: "center", formatter: "lookup", headerHozAlign: "center", formatter: "lookup", width: 150,
+                field: "estado", hozAlign: "center", formatter: "lookup", headerSort: false, headerHozAlign: "center", formatter: "lookup", width: 150,
                 headerFilterParams: {
                     valuesLookup: true, clearable: true,
                 },
@@ -298,10 +303,10 @@ async function consultar_informacion(anio) {
                     "Realizado": `<i class="fa-solid fa-circle" style="color: #28a745;"></i> Realizado`,
                     "Vencido": `<i class="fa-solid fa-circle fa-beat-fade" style="color: #dc3545;"></i> Vencido`,
                 },
-                headerFilter: "list",
+                /* headerFilter: "list",
                 headerFilterParams: {
                     valuesLookup: true, clearable: true,
-                }, headerSort: false,
+                }, headerSort: false, */
 
             },
             {
@@ -371,6 +376,23 @@ async function consultar_informacion(anio) {
 
         return objeto
     }, {}))
+
+    let searchInput = document.getElementById("buscador-tabla-mantenimiento")
+
+    searchInput.addEventListener("keyup", function () {
+        let query = searchInput.value.toLowerCase();
+
+        // Función de filtro personalizada
+        table.setFilter(function (data) {
+            // Recorre todas las propiedades de la fila
+            for (var key in data) {
+                if (data[key] && data[key].toString().toLowerCase().includes(query)) {
+                    return true; // Coincidencia encontrada
+                }
+            }
+            return false; // No hay coincidencia
+        });
+    });
 }
 
 async function mdl_programar_mantenimiento() {

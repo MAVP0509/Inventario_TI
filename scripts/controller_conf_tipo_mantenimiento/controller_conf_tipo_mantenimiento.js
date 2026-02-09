@@ -107,9 +107,9 @@ async function consultar_orden_tipo(params) {
                     console.log(orden_seleccionado);
                 }, headerSort: false, frozen: true
             },
-            { title: "Orden", field: "orden", headerHozAlign: "center", hozAlign: "center", width: 80 },
+            { title: "Orden", field: "orden", headerHozAlign: "center", hozAlign: "center", width: 90 },
             {
-                title: "Tipos de activos", field: "tipo", headerHozAlign: "center", hozAlign: "center",
+                title: "Tipos de activos", field: "tipo",headerSort: false, headerHozAlign: "center", hozAlign: "center",headerFilter: "input",
                 cellClick: function (e, cell) {
                     let rowData = cell.getRow().getData();
                     rowData.seleccionado = !rowData.seleccionado;
