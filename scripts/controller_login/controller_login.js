@@ -366,7 +366,6 @@ function toggleForms(showRegister = false, showRecovery = false) {
 
 //TODO Función para llamar las funciones de validación y ver las contraseñas
 $(document).ready(function () {
-    console.log("Inicializando popover...");
     $('[data-toggle="popover"]').popover();
 
     // Añadimos el evento input al campo de confirmación de contraseña

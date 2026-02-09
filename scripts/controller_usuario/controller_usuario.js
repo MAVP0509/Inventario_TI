@@ -1,17 +1,25 @@
+//*Si el usuario no es administradoe lo redirecciona al inventario
+$(document).ready(function() {
+    let usuario = JSON.parse(sessionStorage.getItem('user'))
+    let rol = usuario.resultado[3]
+    if(!(rol=== 'admin')){
+        window.location.href = 'inventario'    }
+})
+
 
 let respuesta
 function server_usuario(model) {
-    return new Promise ((resolve,reject)=>{
+    return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
             url: "database/controller_usuario/controller_usuario.php",
             data: {
-                trama:JSON.stringify(model) 
+                trama: JSON.stringify(model)
             },
-            success: function(response){
+            success: function (response) {
                 try {
                     resolve(JSON.parse(response))
-                    respuesta=response
+                    respuesta = response
                     //console.log(response)
                 } catch (error) {
                     reject(error)
@@ -21,20 +29,20 @@ function server_usuario(model) {
     })
 }
 
-function server_email(model){
-    return new Promise ((resolve,reject)=>{
+function server_email(model) {
+    return new Promise((resolve, reject) => {
         $.ajax({
             type: "POST",
             url: "database/controller_email/controller_email.php",
             data: {
-                trama:JSON.stringify(model)
+                trama: JSON.stringify(model)
             },
-            success: function(response){
+            success: function (response) {
                 Swal.close()
                 respuesta = response
                 try {
                     resolve(JSON.parse(response))
-                    console.log(JSON.parse(response))   
+                    console.log(JSON.parse(response))
                 } catch (error) {
                     reject(error)
                 }
@@ -44,17 +52,7 @@ function server_email(model){
 }
 
 
-$(document).ready(function (){
-    document.getElementById('fechanacReg').addEventListener('input',calcular_edadreg);
-    document.getElementById('fechanac').addEventListener('input',calcular_edadedit);
-    document.getElementById('ver-passReg').addEventListener('click', ver_contraseña);
 
-    $('#tbl-usuario').on('mouseover', '.icon', function() {
-        $(this).find('i').addClass('fa-bounce');  // Agregar una clase extra si lo deseas
-    }).on('mouseout', '.icon', function() {
-        $(this).find('i').removeClass('fa-bounce');
-    });
-})
 
 
 let datos = []
@@ -62,11 +60,11 @@ let elemento
 let table
 let usuario_seleccionado = []
 async function consultar_usuarios() {
-    
-    let server = await server_usuario({accion : 2})
+
+    let server = await server_usuario({ accion: 2 })
 
     datos = server.resultado
-          
+
     //* Idioma Español
     Tabulator.extendModule("localize", "langs", {
         "es": {
@@ -169,7 +167,7 @@ async function consultar_usuarios() {
                     }
             },
             {
-                title: "Edad", field: "edad", headerSort: false, cellClick:
+                title: "Región", field: "region", headerSort: false, cellClick:
                     function (e, cell) {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
@@ -178,25 +176,7 @@ async function consultar_usuarios() {
                     }
             },
             {
-                title: "Teléfono", field: "telefono",headerSort: false, cellClick:
-                    function (e, cell) {
-                        let rowData = cell.getRow().getData()
-                        rowData.seleccionado = !rowData.seleccionado
-                        cell.getRow().reformat();
-                        seleccionar_registro(rowData.id, usuario_seleccionado)
-                    }
-            },
-            {
-                title: "Fecha de Nacimiento", field: "fecha_nac", headerSort: false,cellClick:
-                    function (e, cell) {
-                        let rowData = cell.getRow().getData()
-                        rowData.seleccionado = !rowData.seleccionado
-                        cell.getRow().reformat();
-                        seleccionar_registro(rowData.id, usuario_seleccionado)
-                    }
-            },
-            {
-                title: "Rol", field: "rol",headerSort: false,
+                title: "Rol", field: "rol", headerSort: false,
             },
             {
                 formatter: editIcon, width: 60, hozAlign: "center",
@@ -229,54 +209,54 @@ async function consultar_usuarios() {
 
 
 let usuSelect = ""
-let modalEdit 
+let modalEdit
 async function mdl_editar_usuario(params) {
 
     for (let i = 0; i < datos.length; i++) {
         const element = datos[i];
 
-        if(element.id===params.id){
+        if (element.id === params.id) {
 
             usuSelect = element;
             break;
         }
-        
+
     }
 
-    document.getElementById('nombre').value=usuSelect.nombre
-    document.getElementById('correo').value=usuSelect.correo
-    document.getElementById('telefono').value=usuSelect.telefono
-    document.getElementById('fechanac').value=usuSelect.fecha_nac
-    document.getElementById('edad').value=usuSelect.edad
-    document.getElementById('fecha_reg').value=usuSelect.fecha_reg
-    document.getElementById('contraseña').value=usuSelect.contraseña
+    document.getElementById('nombre').value = usuSelect.nombre
+    document.getElementById('correo').value = usuSelect.correo
+    document.getElementById('telefono').value = usuSelect.telefono
+    document.getElementById('fechanac').value = usuSelect.fecha_nac
+    document.getElementById('edad').value = usuSelect.edad
+    document.getElementById('fecha_reg').value = usuSelect.fecha_reg
+    document.getElementById('contraseña').value = usuSelect.contraseña
 
     $("#modalEditar").modal('show')
 }
 
 async function editar_usuario() {
     let model = {
-        accion : 1,
-        id : usuSelect.id,
-        nombre : $('#nombre').val().trim(),
-        correo : $('#correo').val().trim(),
-        telefono : $('#telefono').val().trim(),
-        fecha_nac : $('#fechanac').val().trim(),
-        edad : $('#edad').val().trim(),
-        fecha_reg : $('#fecha_reg').val().trim(),
-        contraseña : $('#contraseña').val().trim()
+        accion: 1,
+        id: usuSelect.id,
+        nombre: $('#nombre').val().trim(),
+        correo: $('#correo').val().trim(),
+        telefono: $('#telefono').val().trim(),
+        fecha_nac: $('#fechanac').val().trim(),
+        edad: $('#edad').val().trim(),
+        fecha_reg: $('#fecha_reg').val().trim(),
+        contraseña: $('#contraseña').val().trim()
     }
 
     let server = await server_usuario(model)
 
-    if(server.resultado === true){
+    if (server.resultado === true) {
         mostrar_toast('success', 'Inventario TI', 'Usuario editado')
-    }else if(server.resultado === false){
+    } else if (server.resultado === false) {
         mostrar_toast('error', 'Inventario TI', 'Error en la consulta')
-    } 
+    }
 
     consultar_usuarios()
-    
+
     $("#modalEditar").modal('hide')
 }
 
@@ -285,29 +265,29 @@ async function mensaje_eliminar() {
 
     if (usuario_seleccionado.length === 0) {
         mostrar_toast('warning', 'Inventario TI', 'Por favor, selecciona al menos un usuario para continuar')
-        
-    }else{
+
+    } else {
         mostrar_alert('warning', `¿Está seguro de eliminar ${usuario_seleccionado.length} usuario(s)?`, false, eliminar_usuario);
     }
 }
 
 async function eliminar_usuario() {
-        let model = {
-            accion : 3,
-            id : usuario_seleccionado
-        }
+    let model = {
+        accion: 3,
+        id: usuario_seleccionado
+    }
 
-        let response = await server_usuario(model);
-        
-        if (response.resultado) {
-            mostrar_toast('success', 'Inventario TI', 'Usuario(s) eliminado(s) correctamente')
+    let response = await server_usuario(model);
 
-            consultar_usuarios();
-        } else {
-            mostrar_toast('error', 'Inventario TI', 'Error en la consulta');
-        }
-        deseleccionar_todos()
-        
+    if (response.resultado) {
+        mostrar_toast('success', 'Inventario TI', 'Usuario(s) eliminado(s) correctamente')
+
+        consultar_usuarios();
+    } else {
+        mostrar_toast('error', 'Inventario TI', 'Error en la consulta');
+    }
+    deseleccionar_todos()
+
 }
 
 function deseleccionar_todos() {
@@ -324,10 +304,30 @@ function deseleccionar_todos() {
 
 async function mdl_nuevo_usuario() {
     let inputs = document.getElementsByName('insertMdl')
-        for (let i = 0; i < inputs.length; i++) {
-            const element = inputs[i].value = "";
-        }
-    
+    for (let i = 0; i < inputs.length; i++) {
+        inputs[i].value = "";
+        inputs[i].classList.remove('is-invalid','is-warning')
+    }
+
+    await general_select2({
+        selectId: 'select-regionReg',
+        tabla: 'supervisor',
+        campo: 'region',
+        placeholder: 'Seleccione una región',
+        dropdownParent: '#modalInsertar',
+        tags: false,
+    })
+
+    await general_select2({
+        selectId: 'select-rolReg',
+        tabla: 'usuario',
+        campo: 'rol',
+        placeholder: 'Seleccione un rol',
+        dropdownParent: '#modalInsertar',
+        tags: false,
+    });
+
+
     $("#modalInsertar").modal('show')
 }
 
@@ -337,82 +337,97 @@ async function insertar_usuario() {
     const validacion = [
         "nombreReg",
         "correoReg",
-        "telefonoReg", 
-        "fechanacReg",
-        "contraseñaReg",
+        "select-regionReg",
+        "select-rolReg",
+        "contraseniaReg",
+        "confContraseniaReg"
     ];
 
     // Validar campos
     if (!validar_campos(validacion)) {
-        mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente');
+        mostrar_toast('warning', 'Aviso', 'Rellena los campos. Inténtelo nuevamente');
         return;
     }
-    
-        let model = {
-        accion : 0,
-        nombre : $('#nombreReg').val().trim(),
-        correo : $('#correoReg').val().trim(),
-        telefono : $('#telefonoReg').val().trim(),
-        fecha_nac : $('#fechanacReg').val().trim(),
-        edad : $('#edadReg').val().trim(),
-        contraseña : $('#contraseña').val().trim()
-        }
 
-        let server = await server_usuario(model)
-
-        if(server.resultado === true){
-            mostrar_toast('success', 'Inventario TI', 'Usuario registrado correctamente')
-        }else if(server.resultado === false){
-            mostrar_toast('warning', 'Inventario TI', 'El correo ya está registrado')
-            return;
-        } 
-    
-        consultar_usuarios()
-        $("#modalInsertar").modal('hide')
-}
-
-
-function calcular_edadreg(){
-    let fechaNacimiento = new Date(document.getElementById('fechanacReg').value);
-    let hoy = new Date();
-    let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
-    
-    let mes = hoy.getMonth() - fechaNacimiento.getMonth();
-
-    if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
-        edad--;
+    if(!validar_contraseña("contraseniaReg", "confContraseniaReg")){
+        mostrar_toast('warning', 'Aviso', 'Verifique la contraseña por favor');
+        return;
     }
 
-    document.getElementById('edadReg').value = edad;
-}
-
-function calcular_edadedit(){
-    let fechaNacimiento = new Date(document.getElementById('fechanac').value);
-    let hoy = new Date();
-    let edad = hoy.getFullYear() - fechaNacimiento.getFullYear();
-    
-    let mes = hoy.getMonth() - fechaNacimiento.getMonth();
-
-    if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNacimiento.getDate())) {
-        edad--;
+    let model = {
+        accion: 0,
+        nombre: $('#nombreReg').val().trim(),
+        correo: $('#correoReg').val().trim(),
+        region: $('#select-regionReg').val().trim(),
+        rol: $('#select-rolReg').val().trim(),
+        contraseña: $('#contraseniaReg').val().trim()
     }
 
-    document.getElementById('edad').value = edad;
+    let server = await server_usuario(model)
+
+    if (server.resultado.error)  {
+        mostrar_toast('warning', 'Inventario TI', server.resultado.error)
+        return
+    } else if (server.resultado) {
+        mostrar_toast('success', 'Inventario TI', 'Usuario registrado')
+    }else{
+        mostrar_toast('error', 'Inventario TI', 'Error del servidor')
+        return
+    }
+
+    consultar_usuarios()
+    $("#modalInsertar").modal('hide')
 }
 
-function ver_contraseña(){
-    let regPasswordInput = document.getElementById('contraseñaReg')
-    let iconReg = document.getElementById('ver-passReg')    
+
+function ver_contraseña() {
+    let regPasswordInput = document.getElementById('contraseniaReg')
+    let regPasswordInputConf = document.getElementById('confContraseniaReg')
+    let iconReg = document.getElementById('ver-passReg')
+
+
 
     if (regPasswordInput.type === 'password') {
         regPasswordInput.type = 'text';
-        iconReg.classList.remove('fa-eye-slash');  
+        regPasswordInputConf.type = 'text'
+        iconReg.classList.remove('fa-eye-slash');
         iconReg.classList.add('fa-eye');
-    } else if(regPasswordInput.type === 'text'){
+    } else if (regPasswordInput.type === 'text') {
         regPasswordInput.type = 'password';
+        regPasswordInputConf.type = 'password'
         iconReg.classList.remove('fa-eye');
         iconReg.classList.add('fa-eye-slash');
     }
+}
+
+//* Función para validar contraseña
+function validar_contraseña(inp1, inp2) {
+    let regcontraseña = document.getElementById(inp1).value;
+    let confcontraseña = document.getElementById(inp2).value;
+
+    if (!(regcontraseña === confcontraseña)) {
+        $(`#${inp1}`).addClass('is-warning')
+        $(`#${inp2}`).addClass('is-warning')
+        $('[name="warning-pass"]').text('La contraseñas no coinciden')
+        return false
+    }
+
+    let minlongitud = regcontraseña.length >= 8;
+    let letrasmay = /[A-Z]/.test(regcontraseña);
+    let letrasmin = /[a-z]/.test(regcontraseña);
+    let numeros = /\d/.test(regcontraseña);
+    let especialesc = /[()*#@.]/.test(regcontraseña);
+
+    let cumpleRequisitos = minlongitud && letrasmay && letrasmin && numeros && especialesc;
+
+    if (!cumpleRequisitos) {
+        $(`#${inp1}`).addClass('is-warning')
+        $(`#${inp2}`).addClass('is-warning')
+        $('[name="warning-pass"]').text('La contraseña no cumple con los requisitos')
+        return false;
+    }
+    return true;
+
 }
 
 
@@ -421,21 +436,21 @@ async function desactivar_usuariomsg(params) {
     for (let i = 0; i < datos.length; i++) {
         const element = datos[i];
 
-        if(element.id===params.value){
+        if (element.id === params.value) {
             usuDes = element;
             break;
         }
-        
+
     }
-    mostrar_alert('warning', '¿Está seguro de eliminar este usuario?', false ,desactivar_usuario)
+    mostrar_alert('warning', '¿Está seguro de eliminar este usuario?', false, desactivar_usuario)
 }
 
 async function desactivar_usuario(params) {
-    let model ={
-        accion : 3,
-        id : usuDes.id
+    let model = {
+        accion: 3,
+        id: usuDes.id
     }
-    
+
     let r = await server_usuario(model)
 
     if (r.resultado) {
@@ -443,7 +458,7 @@ async function desactivar_usuario(params) {
         let table = $("#tbl-usuario").DataTable()
         table.destroy()
         consultar_usuarios()
-        
+
     } else {
         mostrar_toast('error', 'Inventario TI', 'Error en la consulta')
     }
@@ -452,130 +467,29 @@ async function desactivar_usuario(params) {
 
 
 
-// *Función para comprobar el nombre en el modal de registrar usuario
-let nombre= false
-$('#nombreReg').on('input', function(e) {
-    //validar_nombre(e.currentTarget.value)
-    const regexNombre = /^[a-zA-ZáéíóúÁÉÍÓÚüÜ\s]{3,}$/
-    if(!regexNombre.test(e.currentTarget.value)){
-        document.getElementById('error-mensajeNombre').style = 'display : block; color:red;'
-        nombre=false
-    }else{
-        document.getElementById('error-mensajeNombre').style = ' display : none;'
-        nombre=true
-    }
-    
-}); 
-
-
-//*Función para comprobar el correo en el modal de registrar usuario
-let email=false
-$('#correoReg').on('input',function(e){
-    const regexEmail = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-    if(!regexEmail.test(e.currentTarget.value)){
-        document.getElementById('error-mensajeEmail').style = 'display : block; color:red;'
-        email=false
-    }else{
-        document.getElementById('error-mensajeEmail').style = ' display : none;'
-        email=true
-    }
-}
-)
-
-let tel= false
-$('#telefonoReg').on('input', function() {
-    this.value= this.value.replace(/[^0-9]/g, '')
-    valTel = $(this).val();
-    if (valTel.length < 10 ||valTel.length === 0) {
-        document.getElementById('error-mensageTel').style = "display : block; color:red;"
-        tel=false
-    } else {
-        document.getElementById('error-mensageTel').style = "display : none;"
-        tel=true
-    }
-});
-
-
-//* Función para comprobar la fecha de nacimiento en el modal de registrar usuario
-let fecha= false
-$('#fechanacReg').on('input', function(e) {
-    //validar_nombre(e.currentTarget.value)
-    const regexFecha = /^\d{4}-\d{2}-\d{2}$/
-    if(!regexFecha.test(e.currentTarget.value)){
-        document.getElementById('error-mensageFecha').style = 'display : block; color:red;'
-        fecha=false
-    }else{
-        document.getElementById('error-mensageFecha').style = ' display : none;'
-        fecha=true
-    }
-    
-});
-
-
-let pass= false
-$('#contraseñaReg').on('input', function(e) {
-    //validar_nombre(e.currentTarget.value)
-    const regexPass = /^(?!\s*$).{2,}$/
-    if(!regexPass.test(e.currentTarget.value)){
-        document.getElementById('error-mensagePass').style = 'display : block; color:red;'
-        pass=false
-    }else{
-        document.getElementById('error-mensagePass').style = ' display : none;'
-        pass=true
-    }
-    
-});
-
-
-
 async function recuperar_contraseña() {
-    let model ={
-        accion : 0,
-        correo : $("#correo").val().trim(),
-        dominio : window.location.hostname,
-        puerto : location.port
+    let model = {
+        accion: 0,
+        correo: $("#correo").val().trim(),
+        dominio: window.location.hostname,
+        puerto: location.port
     }
-    
+
     let response = await server_email(model);
-    
-    if(response.resultado === true) {
+
+    if (response.resultado === true) {
         mostrar_toast('success', 'Correo Enviado', 'Se enviado un correo al usuario para recuperar su contraseña')
         console.log(window.location.hostname);
     } else {
         mostrar_toast('error', 'Error', 'No se envio el correo al usuario')
     }
-    
-}
-
-
-
-function crear_word() {
-    const enlace = document.createElement('a');
-    enlace.href = 'database/controller_word2/controller_word2.php'; // ← cambia esto
-    enlace.download = 'Pruebas.docx'; // nombre sugerido
-    document.body.appendChild(enlace);
-    enlace.click();
-    document.body.removeChild(enlace);
 
 }
 
-/* function mostrar_toast_cargando(texto) {
-    Swal.fire({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        showCloseButton: false,
-        timer: undefined, // No cerrar automáticamente
-        allowOutsideClick: false,
-        background: '#fff',
-        html: `
-            <div style="display: flex; align-items: center;">
-                <i class="fas fa-spinner fa-spin fa-lg" style="margin-right: 10px; color: #007bff;"></i>
-                <span style="font-weight: 500;">Cargando...</span>
-            </div>
-        `,
-        didOpen: () => {
-            //Swal.showLoading(); // Esto muestra el spinner
-        }
-    });
-} */
+
+
+
+$(document).ready(function () {
+    $('[data-toggle="popover"]').popover()
+    document.getElementById('ver-passReg').addEventListener('click', ver_contraseña);
+})

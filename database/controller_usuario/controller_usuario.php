@@ -23,17 +23,23 @@ print(json_encode($respuesta_servidor));//? envía la respuesta de la base de da
 //* Creación de un nuevo usuario
 function insertar_usuario($valores){
     include("../conexion.php");
+
+    $respuesta = new stdClass();
+
     $registro =date("Y-m-d H:i:s");//*Guarda la fecha y hora en la que se hace el registro
     $hashed_contraseña = password_hash($valores->contraseña, PASSWORD_BCRYPT); //*Encripta la contraseña ingresada
-    $sql = "INSERT INTO usuario(nombre,correo,contraseña,edad,telefono,fecha_nac,fecha_reg,habilitado) VALUES ('$valores->nombre',
-    '$valores->correo','$hashed_contraseña','$valores->edad','$valores->telefono','$valores->fecha_nac','$registro',1)";
+    $sql = "INSERT INTO usuario(nombre,correo,contraseña,region,rol,fecha_reg,habilitado) VALUES ('$valores->nombre',
+    '$valores->correo','$hashed_contraseña','$valores->region','$valores->rol','$registro',1)";
 
     $sql_val_mail="SELECT * FROM usuario WHERE correo= '$valores->correo'"; //* Confirma si el correo ya existe en la base de datos
     if(mysqli_query($con,$sql_val_mail)-> num_rows > 0){
-        return false;
-    }else{
-        return mysqli_query($con,$sql); //* No encontró el correo así que si registró el usuario
+        $respuesta->error = 'El correo ya esta registrado';
+        return $respuesta;
     }
+    if(!mysqli_query($con,$sql)){
+        return false; //* No encontró el correo así que si registró el usuario
+    }
+    return true;
 }
 
 //* Edita un usuario ya existente

@@ -1,3 +1,11 @@
+//*Si el usuario no es administradoe lo redirecciona al inventario
+$(document).ready(function() {
+    let usuario = JSON.parse(sessionStorage.getItem('user'))
+    let rol = usuario.resultado[3]
+    if(!(rol=== 'admin')){
+        window.location.href = 'inventario'    }
+})
+
 let respuesta_historico
 
 function server_historico(model) {
