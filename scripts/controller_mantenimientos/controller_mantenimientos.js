@@ -301,7 +301,7 @@ function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
         })
         const data = cell.getRow().getData()
         const disabled = data.reporte_descargado == 0 ? "disabled" : ""
-        return `<button type='button' class='btn btn-info icon' ${disabled} data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' data-widget="control-sidebar" data-slide="true" data-target="#sidebar-rauditoria"><i class='fa-solid fa-upload fa-lg'></i></button>`;
+        return `<button type='button' class='btn btn-info icon' ${disabled} data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' data-widget="control-sidebar" data-slide="true" data-target="#control-sidebar"><i class='fa-solid fa-upload fa-lg'></i></button>`;
     }
 
     let fileIcon = function (cell, formatterParams, onRendered) {
@@ -310,7 +310,7 @@ function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
         })
         const data = cell.getRow().getData()
         const disabled = data.correo_enviado == 0 ? "disabled" : ""
-        return `<button type='button' class='btn btn-success icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Reporte de auditoría'><i class='fa-solid fa-file-excel fa-lg'></i></button>`;
+        return `<button type='button' class='btn btn-success icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Reporte de mantenimiento'><i class='fa-solid fa-file-excel fa-lg'></i></button>`;
     }
 
     let eyeIcon = function (cell, formatterParams, onRendered) {
@@ -398,7 +398,7 @@ function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
                 if (button && !button.disabled) {
                     button.disabled = true;
                     const elemento_mnt = cell.getRow().getData();
-                    mdl_descargar_reportes_mensuales(elemento_mnt);
+                    mdl_reporte_mantenimiento(elemento_mnt);
                     setTimeout(() => {
                         button.disabled = false;
                     }, 3000);
@@ -506,7 +506,7 @@ function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
 
     // Calcular auditorías pendientes
     if (tabId === 'todas' || tabId === 'user') {
-        auditorias_pendientes = Object.values(datos.reduce((objeto, item) => {
+        mantenimientosPendientes = Object.values(datos.reduce((objeto, item) => {
             if (item.estado == "Realizado") return objeto
             let anio = item.anio
             let mes = item.fecha.split('-')[1]
@@ -1224,7 +1224,7 @@ async function abrir_subir_reporte(elemento_mnt) {
                         } else {
                             table.updateData([{ id: elemento_mnt.id, reporte_subido: 1, estado: "Realizado" }])
                             mostrar_toast("success", "Subido", data.resultado.mensaje)
-                            consultar_informacion(anio)
+                            consultar_mantenimiento(anio)
                             /* table.replaceData(table.getData())
                             table.redraw(true) */
                             //window.location.reload()
