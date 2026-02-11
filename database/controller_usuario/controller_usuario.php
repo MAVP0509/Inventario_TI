@@ -45,8 +45,8 @@ function insertar_usuario($valores){
 //* Edita un usuario ya existente
 function editar_usuario($valores){
     include("../conexion.php");
-    $sql = "UPDATE usuario SET nombre='$valores->nombre', correo='$valores->correo', contraseña='$valores->contraseña',
-    edad='$valores->edad', telefono='$valores->telefono',fecha_nac='$valores->fecha_nac', fecha_reg = '$valores->fecha_reg' WHERE id='$valores->id';";
+    $sql = "UPDATE usuario SET nombre='$valores->nombre', correo='$valores->correo', region='$valores->region',
+    rol='$valores->rol' WHERE id='$valores->id';";
     return mysqli_query($con,$sql);
 }
 

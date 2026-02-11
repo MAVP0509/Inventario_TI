@@ -253,7 +253,7 @@ async function validar_ingreso() {
             sessionStorage.setItem("rol", resp.resultado[3])
             sessionStorage.setItem("bienvenido", "Bienvenido " + resp.resultado[0])
             sessionStorage.setItem("alert-mnto", true)
-            window.location.href = "inventario.html";
+            window.location.href = "dashboard.html";
             let inputs = document.getElementsByName('inputInit')
             for (let i = 0; i < inputs.length; i++) {
                 const element = inputs[i].value = "";

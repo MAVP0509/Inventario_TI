@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="images/x-icon" href="images/diavaz.jfif">
+
+    <!-- 1. Bootstrap base -->
+    <link rel="stylesheet" href="libraries/bootstrap-4.6.2-dist/css/bootstrap-grid.min.css">
+    <!-- 2. Plugins basados en Bootstrap (como AdminLTE, Tempus Dominus, Select2, Tabulator) -->
+    <link rel="stylesheet" href="dist/css/adminlte.min.css">
+    <!--Fontawesome-->
+    <link rel="stylesheet" href="libraries/fontawesome-free-6.7.2-web/css/all.min.css">
+    <!--dashboard css-->
+    <link rel="stylesheet" href="./css/dashboard.css">
+
+
+    <title>Inventario TI</title>
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+    <div class="wrapper">
+
+        <!-- Preloader -->
+        <div class="preloader flex-column justify-content-center align-items-center">
+            <img src="images/diavaz.jfif" alt="DiavazLogo" height="60" width="60"><br>
+            <img src="images/blocks-shuffle-5.svg" alt="Icono" height="60" width="60">
+        </div>
+
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light fixed-top">
+
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <!--Notificaciones-->
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#" aria-expanded="false"><i
+                            class="fa-solid fa-bell"></i><span class="badge badge-danger navbar-badge"
+                            name="aviso-badge-campana"></span></a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" name="aviso-campana-notificacion"
+                        style="left: inherit; right: 0px;">
+                        <span class="dropdown-item dropdown-header" name="header-campana-notificacion">Sin
+                            Notificaciones</span>
+                        <div class="dropdown-divider" name="header-divider-campana-notificacion"></div>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" role="button" onclick="cerrar_sesionmsg()" id="log-out"><i
+                            class="fa-solid fa-door-closed fa-xl"></i></a>
+                </li>
+            </ul>
+        </nav>
+
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <a href="#" class="brand-link">
+                <img src="images/diavaz.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">Inventario TI</span>
+            </a>
+            <div id="sidebar-container"></div>
+        </aside>
+
+        <!--Contenedor Wrapper. Contenidos de la pagina-->
+        <div class="content-wrapper">
+            <!--Contenedor Header-->
+            <div class="content-header">
+                <div class="container fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="m-0">Tabla Inventario TI</h1>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <section class="content">
+                <div class="container-fluid">
+
+                    <!-- <div class="content-header">
+                        <div class="container fluid">
+                            <div class="row mb-2">
+                                <div class="col-sm-6">
+                                    <h1 class="m-0"><i class="fa-solid fa-chart-simple"></i> Dashboard</h1>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div> -->
+
+                    <section class="content">
+                        <div class="container-fluid">
+
+                            <!-- ── KPI CARDS ──────────────────────────── -->
+                            <div class="row">
+
+                                <!-- Pendiente -->
+                                <div class="col-6 col-md-3">
+                                    <div
+                                        class="card card-body kpi-card pendiente d-flex flex-row align-items-center py-3 mb-3">
+                                        <div class="kpi-icon pendiente mr-3">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div>
+                                            <div class="kpi-value" id="kpi-pendiente">—</div>
+                                            <div class="kpi-label">Pendiente</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- En proceso -->
+                                <div class="col-6 col-md-3">
+                                    <div
+                                        class="card card-body kpi-card proceso d-flex flex-row align-items-center py-3 mb-3">
+                                        <div class="kpi-icon proceso mr-3">
+                                            <i class="fas fa-spinner"></i>
+                                        </div>
+                                        <div>
+                                            <div class="kpi-value" id="kpi-proceso">—</div>
+                                            <div class="kpi-label">En Proceso</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Finalizado -->
+                                <div class="col-6 col-md-3">
+                                    <div
+                                        class="card card-body kpi-card finalizado d-flex flex-row align-items-center py-3 mb-3">
+                                        <div class="kpi-icon finalizado mr-3">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                        <div>
+                                            <div class="kpi-value" id="kpi-finalizado">—</div>
+                                            <div class="kpi-label">Finalizado</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Vencido -->
+                                <div class="col-6 col-md-3">
+                                    <div
+                                        class="card card-body kpi-card vencido d-flex flex-row align-items-center py-3 mb-3">
+                                        <div class="kpi-icon vencido mr-3">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                        <div>
+                                            <div class="kpi-value" id="kpi-vencido">—</div>
+                                            <div class="kpi-label">Vencido</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div><!-- /row kpis -->
+
+                            <!-- ── GRÁFICA PRINCIPAL ───────────────────── -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+
+                                        <div class="card-header">
+                                            <div class="card-header-tabs-row">
+
+                                                <!-- Título -->
+                                                <div>
+                                                    <h3 class="card-title mb-0" id="chart-titulo">
+                                                        <i class="fas fa-chart-bar mr-2 text-primary"></i>
+                                                        Todas las regiones — Mantenimientos &amp; Auditorías
+                                                    </h3><br>
+                                                    <small class="text-muted">Agrupado por mes y estado </small>
+                                                </div>
+
+                                                <!-- Filtro tipo -->
+                                                <div class="btn-group tipo-group" role="group">
+                                                    <button type="button" class="btn btn-sm btn-primary active-tipo"
+                                                        onclick="setTipo('ambos', this)">
+                                                        Ambos
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                                        onclick="setTipo('mantenimiento', this)">
+                                                        <i class="fas fa-wrench mr-1"></i>Mantenimiento
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                                        onclick="setTipo('auditoria', this)">
+                                                        <i class="fas fa-clipboard-check mr-1"></i>Auditoría
+                                                    </button>
+                                                </div>
+
+                                            </div>
+                                        </div><!-- /card-header -->
+
+                                        <div class="card-body pb-2">
+
+                                            <!-- Tabs región -->
+                                            <div class="d-flex align-items-center justify-content-between flex-wrap mb-3"
+                                                style="gap:8px">
+                                                <ul class="nav region-pills mb-0">
+                                                    <li class="nav-item">
+                                                        <a class="nav-link active" href="#" data-region="todas"
+                                                            onclick="setRegion('todas', this); return false;">
+                                                            <i class="fas fa-globe-americas mr-1"></i>Todas
+                                                        </a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" href="#" data-region="norte"
+                                                            onclick="setRegion('norte', this); return false;">
+                                                            <i class="fas fa-compass mr-1"></i>Norte
+                                                        </a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" href="#" data-region="sur"
+                                                            onclick="setRegion('sur', this); return false;">
+                                                            <i class="fas fa-map-marker-alt mr-1"></i>Sur
+                                                        </a>
+                                                    </li>
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" href="#" data-region="tampico"
+                                                            onclick="setRegion('tampico', this); return false;">
+                                                            <i class="fas fa-anchor mr-1"></i>Tampico
+                                                        </a>
+                                                    </li>
+                                                </ul>
+
+                                                <!-- Leyenda estados -->
+                                                <div>
+                                                    <span class="legend-item">
+                                                        <span class="legend-dot"
+                                                            style="background:#ffc107"></span>Pendiente
+                                                    </span>
+                                                    <span class="legend-item">
+                                                        <span class="legend-dot" style="background:#17a2b8"></span>En
+                                                        proceso
+                                                    </span>
+                                                    <span class="legend-item">
+                                                        <span class="legend-dot"
+                                                            style="background:#28a745"></span>Finalizado
+                                                    </span>
+                                                    <span class="legend-item">
+                                                        <span class="legend-dot"
+                                                            style="background:#dc3545"></span>Vencido
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Gráfica -->
+                                            <div id="chart-main"></div>
+
+                                        </div><!-- /card-body -->
+                                    </div><!-- /card -->
+                                </div>
+                            </div><!-- /row gráfica -->
+
+                            <!-- ── TABLA RESUMEN ──────────────────────── -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card collapsed-card">
+                                        <div class="card-header">
+                                            <h3 class="card-title">
+                                                <i class="fas fa-table mr-2 text-secondary"></i>
+                                                Resumen por Región
+                                            </h3>
+                                            <div class="card-tools">
+                                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-hover mb-0">
+                                                    <thead class="thead-light">
+                                                        <tr>
+                                                            <th>Región</th>
+                                                            <th>Tipo</th>
+                                                            <th>Mes</th>
+                                                            <th>Pendiente</th>
+                                                            <th>En Proceso</th>
+                                                            <th>Finalizado</th>
+                                                            <th>Vencido</th>
+                                                            <th>Total</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="tabla-body"></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!-- /row tabla -->
+
+                        </div><!-- /container-fluid -->
+                    </section>
+
+                </div>
+
+            </section> <!--Container-->
+        </div>
+
+    </div>
+</body>
+
+<!--JQuery-->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" defer></script>
+
+<!-- Bootstrap y Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+    integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"
+    defer></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"
+    integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"
+    defer></script>
+
+<!--Admin LTE-->
+<script src="dist/js/adminlte.min.js" defer></script>
+
+<!--Apex charts-->
+<!-- ApexCharts -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+
+<!--Scripts-->
+<script src="scripts/controller_acceso/controller_acceso.js?v=1.0.1" defer></script>
+<script src="scripts/controller_global/controller_global.js?v=1.0.2" defer></script>
+<script src="scripts/controller_dashboard/controller_dashboard.js?v=1.0.0" defer></script>
+
+</html>

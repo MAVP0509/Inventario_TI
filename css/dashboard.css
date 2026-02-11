@@ -1,0 +1,198 @@
+/* ── Ajustes sobre AdminLTE ──────────────────── */
+
+/* KPI cards con borde superior de color (igual a info-box de AdminLTE) */
+.kpi-card {
+    border-top: 3px solid transparent;
+    transition: transform .15s, box-shadow .15s;
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, .10) !important;
+}
+
+.kpi-card.pendiente {
+    border-top-color: #ffc107;
+}
+
+.kpi-card.proceso {
+    border-top-color: #17a2b8;
+}
+
+.kpi-card.finalizado {
+    border-top-color: #28a745;
+}
+
+.kpi-card.vencido {
+    border-top-color: #dc3545;
+}
+
+.kpi-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.kpi-icon.pendiente {
+    background: #fff3cd;
+    color: #ffc107;
+}
+
+.kpi-icon.proceso {
+    background: #d1ecf1;
+    color: #17a2b8;
+}
+
+.kpi-icon.finalizado {
+    background: #d4edda;
+    color: #28a745;
+}
+
+.kpi-icon.vencido {
+    background: #f8d7da;
+    color: #dc3545;
+}
+
+.kpi-value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    color: #343a40;
+}
+
+.kpi-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: #6c757d;
+    margin-top: 2px;
+}
+
+/* Tabs de región estilo pills */
+.region-pills .nav-link {
+    border-radius: 20px !important;
+    font-size: 12px;
+    padding: 4px 14px;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+    margin-right: 4px;
+    transition: all .2s;
+}
+
+.region-pills .nav-link.active,
+.region-pills .nav-link:hover {
+    color: #fff;
+    border-color: transparent;
+}
+
+.region-pills .nav-link[data-region="todas"].active,
+.region-pills .nav-link[data-region="todas"]:hover {
+    background: #007bff;
+}
+
+.region-pills .nav-link[data-region="norte"].active,
+.region-pills .nav-link[data-region="norte"]:hover {
+    background: #6610f2;
+}
+
+.region-pills .nav-link[data-region="sur"].active,
+.region-pills .nav-link[data-region="sur"]:hover {
+    background: #28a745;
+}
+
+.region-pills .nav-link[data-region="tampico"].active,
+.region-pills .nav-link[data-region="tampico"]:hover {
+    background: #fd7e14;
+}
+
+/* Botones tipo – reusar btn-group de Bootstrap */
+.tipo-group .btn {
+    font-size: 12px;
+}
+
+/* Leyenda custom */
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: #6c757d;
+    margin-right: 12px;
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    display: inline-block;
+}
+
+/* Badges tabla */
+.badge-pendiente {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.badge-proceso {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.badge-finalizado {
+    background: #d4edda;
+    color: #155724;
+}
+
+.badge-vencido {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Region tag */
+.tag-norte {
+    background: #e8e3fb;
+    color: #6610f2;
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-size: 11px;
+}
+
+.tag-sur {
+    background: #d4edda;
+    color: #155724;
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-size: 11px;
+}
+
+.tag-tampico {
+    background: #fde8d8;
+    color: #7d3c10;
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-size: 11px;
+}
+
+/* Chart container */
+#chart-main {
+    min-height: 350px;
+}
+
+/* Tabla scroll en móvil */
+.table-responsive {
+    border-radius: 0;
+}
+
+/* Separador suave entre secciones */
+.card-header-tabs-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+}
