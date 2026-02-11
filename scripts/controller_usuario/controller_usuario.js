@@ -1,4 +1,3 @@
-let respuesta
 function server_usuario(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -10,7 +9,6 @@ function server_usuario(model) {
             success: function (response) {
                 try {
                     resolve(JSON.parse(response))
-                    respuesta = response
                     //console.log(response)
                 } catch (error) {
                     reject(error)
@@ -19,7 +17,7 @@ function server_usuario(model) {
         })
     })
 }
-
+//*Conexión para mandar correos
 function server_email(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -30,7 +28,6 @@ function server_email(model) {
             },
             success: function (response) {
                 Swal.close()
-                respuesta = response
                 try {
                     resolve(JSON.parse(response))
                     console.log(JSON.parse(response))
@@ -43,13 +40,11 @@ function server_email(model) {
 }
 
 
-
-
-
 let datos = []
 let elemento
 let table
 let usuario_seleccionado = []
+//*Generar la tabla
 async function consultar_usuarios() {
 
     let server = await server_usuario({ accion: 2 })
@@ -158,7 +153,8 @@ async function consultar_usuarios() {
                     }
             },
             {
-                title: "Región", field: "region", headerSort: false, cellClick:
+                title: "Región", field: "region", width: 100, headerSort: false, hozAlign: "center", headerHozAlign: "center",
+                cellClick:
                     function (e, cell) {
                         let rowData = cell.getRow().getData()
                         rowData.seleccionado = !rowData.seleccionado
@@ -167,7 +163,7 @@ async function consultar_usuarios() {
                     }
             },
             {
-                title: "Rol", field: "rol", headerSort: false,
+                title: "Rol", field: "rol", width: 100, headerSort: false, hozAlign: "center", headerHozAlign: "center"
             },
             {
                 formatter: editIcon, width: 60, hozAlign: "center",
@@ -200,42 +196,56 @@ async function consultar_usuarios() {
 
 
 let usuSelect = ""
-let modalEdit
 async function mdl_editar_usuario(params) {
+    usuSelect = params
+    await general_select2({
+        selectId: 'select-regionEdit',
+        tabla: 'supervisor',
+        campo: 'region',
+        placeholder: 'Seleccione una región',
+        dropdownParent: '#modalEditar',
+        tags: false,
+    })
 
-    for (let i = 0; i < datos.length; i++) {
-        const element = datos[i];
+    await general_select2({
+        selectId: 'select-rolEdit',
+        tabla: 'usuario',
+        campo: 'rol',
+        placeholder: 'Seleccione un rol',
+        dropdownParent: '#modalEditar',
+        tags: false,
+    });
 
-        if (element.id === params.id) {
 
-            usuSelect = element;
-            break;
-        }
-
-    }
-
-    document.getElementById('nombre').value = usuSelect.nombre
-    document.getElementById('correo').value = usuSelect.correo
-    document.getElementById('telefono').value = usuSelect.telefono
-    document.getElementById('fechanac').value = usuSelect.fecha_nac
-    document.getElementById('edad').value = usuSelect.edad
-    document.getElementById('fecha_reg').value = usuSelect.fecha_reg
-    document.getElementById('contraseña').value = usuSelect.contraseña
+    document.getElementById('nombre').value = params.nombre
+    document.getElementById('correo').value = params.correo
+    rellenar_select(params.region, "select-regionEdit")
+    rellenar_select(params.rol, "select-rolEdit")
+    document.getElementById('contraseña').value = params.contraseña
 
     $("#modalEditar").modal('show')
 }
 
 async function editar_usuario() {
+
+    const validacion = [
+        "nombre",
+        "correo",
+        "select-regionEdit",
+        "select-rolEdit"
+    ];
+    if (!validar_campos(validacion)) {
+        mostrar_toast('warning', 'Aviso', 'Rellena los campos. Inténtelo nuevamente');
+        return;
+    }
+
     let model = {
         accion: 1,
         id: usuSelect.id,
         nombre: $('#nombre').val().trim(),
         correo: $('#correo').val().trim(),
-        telefono: $('#telefono').val().trim(),
-        fecha_nac: $('#fechanac').val().trim(),
-        edad: $('#edad').val().trim(),
-        fecha_reg: $('#fecha_reg').val().trim(),
-        contraseña: $('#contraseña').val().trim()
+        region: $('#select-regionEdit').val().trim(),
+        rol: $('#select-rolEdit').val().trim(),
     }
 
     let server = await server_usuario(model)
@@ -243,7 +253,7 @@ async function editar_usuario() {
     if (server.resultado === true) {
         mostrar_toast('success', 'Inventario TI', 'Usuario editado')
     } else if (server.resultado === false) {
-        mostrar_toast('error', 'Inventario TI', 'Error en la consulta')
+        mostrar_toast('error', 'Inventario TI', 'No pudo realizarse la acción')
     }
 
     consultar_usuarios()

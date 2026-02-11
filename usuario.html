@@ -150,12 +150,13 @@
     <div class="modal-dialog modal-dialog-scrollable">
       <div class="modal-content">
         <div class="modal-header">
-          <h4 class="modal-title">Editar</h4>
+          <h4 class="modal-title"><i class="fa-solid fa-user-pen"></i> Editar</h4>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
+          <!--Nombre-->
           <label for="nombre" style="display: block;">Nombre</label>
           <div class="input-group mb-3">
             <div class="input-group-prepend">
@@ -163,6 +164,7 @@
             </div>
             <input type="text" class="form-control" id="nombre" autocomplete="off">
           </div>
+          <!--Correo-->
           <label for="correo">Correo</label>
           <div class="input-group mb-3">
             <div class="input-group-prepend">
@@ -171,35 +173,26 @@
 
             <input type="email" class="form-control" id="correo" autocomplete="off">
           </div>
-          <label for="telefono" class="form-label">Telefono</label>
+          <!--Región-->
+          <label for="telefono" class="form-label">Región</label>
           <div class="input-group mb-3">
             <div class="input-group-prepend">
-              <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+              <span class="input-group-text"><i class="fa-solid fa-map-location-dot"></i></span>
             </div>
+            <select class="form-control select" id="select-regionEdit"></select>
+          </div>
 
-            <input type="tel" class="form-control" id="telefono" maxlength="10" autocomplete="off">
-          </div>
-          <label for="fechanac" class="form-label">Fecha de nacimiento</label>
+          <!--Rol-->
+          <label for="sselect-rolEdit" class="form-label">Rol</label>
           <div class="input-group mb-3">
             <div class="input-group-prepend">
-              <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
+              <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
             </div>
-            <input type="date" class="form-control" id="fechanac">
+            <select class="form-control select" id="select-rolEdit"></select>
+            <div class="invalid-feedback">Por favor, seleccione un rol.</div>
           </div>
-          <label for="edad" class="form-label">Edad</label>
-          <div class="input-group mb-3">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><i class="fa-solid fa-image-portrait"></i></span>
-            </div>
-            <input type="number" class="form-control" id="edad" disabled>
-          </div>
-          <label for="fecha_reg" class="form-label">Fecha de registro</label>
-          <div class="input-group mb-3">
-            <div class="input-group-prepend">
-              <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
-            </div>
-            <input type="datetime" class="form-control" id="fecha_reg" disabled>
-          </div>
+
+          <!--Contraseña-->
           <label for="contraseña" class="form-label">Contraseña</label>
           <div class="input-group mb-3 ">
             <div class="input-group-prepend">
@@ -277,7 +270,7 @@
           <!--Rol-->
           <div class="input-group mb-3">
             <div class="input-group-prepend">
-              <span class="input-group-text"><i class="fa-solid fa-map-location-dot"></i></span>
+              <span class="input-group-text"><i class="fa-solid fa-key"></i></span>
             </div>
             <select class="form-control select" id="select-rolReg" name="insertMdl"></select>
             <div class="invalid-feedback">Por favor, seleccione un rol.</div>
