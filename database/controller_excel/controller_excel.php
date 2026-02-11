@@ -461,198 +461,6 @@ function fecha_programa($anio, $mes)
     return $fecha->format('Y-m-d');
 }
 
-/* function programa_mantenimiento($valores)
-{
-    include('../conexion.php');
-    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-
-    //$anio_actual = date("Y") + 1;
-    $anio_actual = $valores->anio;
-    $sql_dev = "SELECT tipo_id FROM vorden_mantenimiento";
-    $query_dev = mysqli_query($con, $sql_dev);
-
-    $datos_dev = [];
-    while ($filas = mysqli_fetch_object($query_dev)) {
-        $datos_dev[] = $filas->tipo_id;
-    }
-    // var_dump($datos_dev);
-    $dev = implode(',', $datos_dev);
-
-    if (empty($dev)) {
-        return [
-            'result' => false,
-            'error' => 'No hay un orden de mantenimiento de dispositivos. Específica un orden en la configuración.'
-        ];
-    }
-
-    // Consulta SQL que obtiene todos los registros de la vista, en un orden específico según ID
-    $sql_inv = "CALL pprograma_mantenimiento('$dev', '$dev')";
-    // var_dump($sql_inv);
-    $query = mysqli_query($con, $sql_inv);
-
-    $datos = []; // Crea un arreglo vacío para almacenar los datos
-
-    if ($query) {
-        while ($fila =  mysqli_fetch_assoc($query)) { // Recorre los resultados fila por fila
-            $datos[] = $fila; // Agrega cada fila al arreglo $datos
-        }
-
-        while (mysqli_next_result($con)) {
-            mysqli_use_result($con);
-        }
-    }
-
-    // Define las columnas de Excel correspondientes a los meses del año
-    $meses_columnas = ['H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'];
-
-    // Recorre cada dispositivo y le asigna un índice de mes basado en su posición
-    foreach ($datos as $i => &$dispositivo) {
-        $mes_index = $i % 12;
-        $mes = $mes_index + 1;
-        $fecha_programada = fecha_programa($anio_actual, $mes);
-        //  Se saca el residuo al dividir $i entre 12, 
-        //  a su vez añadiendo un nuevo campo al $dispositivo llamado mes_index,
-        //  indicando en qué mes le tocará mantenimiento.
-        $dispositivo['mes_index'] = $i % 12;
-        $id_equipo = $dispositivo['id_equipo'];
-        $estado = 'Pendiente';
-
-        $sql_insert = "INSERT INTO mantenimiento(id_equipo, anio, fecha_programada, estado, correo_enviado, reporte_descargado,reporte_subido)
-                        VALUES ('$id_equipo','$anio_actual', '$fecha_programada', '$estado',0,0,0)";
-
-        try {
-            mysqli_query($con, $sql_insert);
-        } catch (mysqli_sql_exception $e) {
-            if ($e->getCode() == 1062) {
-                return array(
-                    'result' => false,
-                    'error' => 'Ya existe un programa de mantenimiento para el año'
-                );
-            }
-        }
-    }
-
-    unset($dispositivo); // Libera la variable de referencia
-
-    // usort() ordena un arreglo en base a una función de comparación definida
-    // fuction($a, $b) es la función a usar que recibe dos parámetros; son dos elementos del arreglo $datos a comparar entre sí.
-    usort($datos, function ($a, $b) {
-        return $a['mes_index'] <=> $b['mes_index'];
-    });
-
-    // Carga la plantilla Excel base del programa de mantenimiento
-    $spreadsheet = IOFactory::load('FO-DSP-TI-03 Programa de Mantenimiento Preventivo Infraestructura TI Región XX Rev.00.xlsx');
-    $worksheet = $spreadsheet->getActiveSheet(); // Obtiene la hoja activa
-
-    $pageSetup = $worksheet->getPageSetup();
-    $pageSetup->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);   //  Orientación horizontal
-    $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LETTER);  //  Establece el tamaño del papel
-    $pageSetup->setFitToPage(true); //  Ajusta el contenido a una sola página
-    $pageSetup->setFitToWidth(1);   //  Ajusta el contenido al ancho de una página.
-    $pageSetup->setFitToHeight(0);  //  Permite que la altura no esté limitada (varias páginas verticales)
-
-    $pageMargins = $worksheet->getPageMargins();
-    $pageMargins->setTop(0.3);
-    $pageMargins->setBottom(0.3);
-    $pageMargins->setLeft(0.2);
-    $pageMargins->setRight(0.2);
-
-    // Define las filas base donde se empezará a escribir la tabla
-    $fila_inicio = 13;
-    $fila_nombre = 21;
-    $fila_cargo = 22;
-    $fila_fecha = 24;
-    $filas = count($datos); // Cuenta cuántos dispositivos hay
-
-    foreach ($datos as $index => $item) { // Recorre cada dispositivo
-        // var_dump($item);
-        // $fila_actual = $fila_inicio + $index;
-        if ($index >= 3) { // A partir del cuarto dispositivo, inserta una nueva fila
-            $worksheet->insertNewRowBefore($fila_inicio, 1); // Inserta nueva fila antes de la actual
-
-            $worksheet->duplicateStyle($worksheet->getStyle("B14:S14"), "B{$fila_inicio}:S{$fila_inicio}");
-        }
-
-        // Configura el estilo de texto para que se ajuste automáticamente
-        $worksheet->getStyle("B{$fila_inicio}:S{$fila_inicio}")->getAlignment()->setWrapText(true);
-        $worksheet->getRowDimension($fila_inicio)->setRowHeight(-1);
-
-        // Escribe los valores de cada campo en las tablas correspondientes
-        $worksheet->setCellValue("B{$fila_inicio}", $index + 1);
-        $worksheet->setCellValue("C{$fila_inicio}", $item['tipo']);
-        $worksheet->setCellValue("D{$fila_inicio}", $item['nombre']);
-        $worksheet->setCellValue("E{$fila_inicio}", $item['ubicacion']);
-        $worksheet->setCellValue("F{$fila_inicio}", $item['modelo']);
-        $worksheet->setCellValue("G{$fila_inicio}", $item['num_serie']);
-
-        // Marca con una 'x' el mes correspondiente al mantenimiento
-        $mes_index = $item['mes_index'];
-        $columna_mes = $meses_columnas[$mes_index];
-        $celda = "{$columna_mes}{$fila_inicio}";
-        $worksheet->setCellValue($celda, 'x');
-        $worksheet->getStyle($celda)->getFont()->setBold(true);
-
-        $fila_inicio++; // Pasa a la siguiente fila
-    }
-
-    // Calcula la fila donde se pondrán los nombres (según cuántos registros hay)
-    $nombres = $fila_nombre + ($filas - 3);
-
-    // Escribe los nombres de quien elaboró y autorizó
-    $worksheet->setCellValue("C$nombres", $valores->elaboro);
-    $worksheet->setCellValue("G$nombres", $valores->autorizo);
-    $worksheet->getStyle("C$nombres")->getAlignment()->setWrapText(true); // Ajuste de texto
-
-    // Calcula la fila donde van los cargos
-    $cargos = $fila_cargo + ($filas - 3);
-
-    // Escribe los cargos correspondientes
-    $worksheet->setCellValue("C$cargos", $valores->cg_elaboro);
-    $worksheet->setCellValue("G$cargos", $valores->cg_autorizo);
-    $worksheet->getStyle("C$cargos")->getAlignment()->setWrapText(true);
-
-    // Calcula la fila de la fecha
-    $fechas = $fila_fecha + ($filas - 3);
-    $worksheet->setCellValue("D$fechas", date('Y-m-d'));
-    $worksheet->getStyle("C$fechas")->getAlignment()->setWrapText(true);
-
-    $base = realpath(__DIR__ . '/../../../Inventario_TI/database/controller_excel/documentos_descarga/mantenimiento/programa/');
-
-
-    if ($base !== false) {
-
-        // Carpeta por año del programa
-        $carpeta_anual = $base . DIRECTORY_SEPARATOR . $anio_actual;
-        if (!is_dir($carpeta_anual)) {
-            mkdir($carpeta_anual, 0777, true);
-        }
-
-        $fecha = date('Ymd_His'); // Genera una marca de tiempo para el nombre del archivo
-        $nombre_doc = "FO-DSP-TI-03_Programa de Mantenimiento Preventivo TI Región Sur_{$anio_actual}_{$fecha}.xlsx"; // Nombre del archivo generado
-        // Define la ruta física donde se guardará el archivo, basada en la estructura del proyecto
-        $ruta_guardar = $carpeta_anual . DIRECTORY_SEPARATOR . $nombre_doc;
-        // Guardar Excel
-        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $writer->save($ruta_guardar); // Guarda el archivo en la ruta definida
-
-        $host = $_SERVER['HTTP_HOST'];
-        $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-        // Construye la URL de descarga del archivo generado
-        $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/mantenimiento/programa/{$anio_actual}/{$nombre_doc}";
-        // Retorna un arreglo con el resultado y la URL para descargar el archivo
-        return [
-            'result' => true,
-            'url' => $url_descarga,
-            // 'duplicados' => $duplicados
-        ];
-    } else {
-        return [
-            'result' => false,
-            'error' => 'No se pudo realizar el programa de mantenimiento. Inténtalo nuevamente.'
-        ];
-    }
-} */
-
 function programa_mantenimiento($valores)
 {
     include('../conexion.php');
@@ -749,7 +557,7 @@ function programa_mantenimiento($valores)
         } elseif (isset($dispositivo['fk_tipo'])) {
             $device_tipo_id = (int)$dispositivo['fk_tipo'];
         }
-        $device_tipo_name = mb_strtolower(trim($dispositivo['tipo'] ?? ''));
+        $device_tipo_nombre = mb_strtolower(trim($dispositivo['tipo'] ?? ''));
 
         // Insertar mantenimiento solo si no existe ya registro para el año y si el tipo no es teléfono celular
         if (!$mantenimiento_exist) {
@@ -774,7 +582,7 @@ function programa_mantenimiento($valores)
                     $should_aud = true;
                 }
             } else {
-                if (in_array($device_tipo_name, $tipos_aud_names, true)) {
+                if (in_array($device_tipo_nombre, $tipos_aud_names, true)) {
                     $should_aud = true;
                 }
             }
@@ -912,11 +720,27 @@ function programa_mantenimiento($valores)
         $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
         // Construye la URL de descarga del archivo generado
         $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/mantenimiento/programa/{$anio_actual}/{$nombre_doc}";
-        // Retorna un arreglo con el resultado y la URL para descargar el archivo
+        // Preparar lista de URLs (mantenimiento siempre se agrega)
+        $urls = [$url_descarga];
+
+        // Si el cliente solicitó ambos programas, generar el de auditoría también
+        if (!empty($valores->descargar_ambos) && $valores->descargar_ambos == 1) {
+            // Reutilizamos la función que genera el programa de auditoría
+            $aud_result = programa_auditoria($valores);
+            if (is_array($aud_result) && !empty($aud_result['result']) && $aud_result['result'] === true) {
+                if (!empty($aud_result['url'])) {
+                    $urls[] = $aud_result['url'];
+                } elseif (!empty($aud_result['urls']) && is_array($aud_result['urls'])) {
+                    $urls = array_merge($urls, $aud_result['urls']);
+                }
+            }
+        }
+
+        // Retorna el resultado y las URLs generadas (uno o varios archivos)
         return [
             'result' => true,
             'url' => $url_descarga,
-            // 'duplicados' => $duplicados
+            'urls' => $urls
         ];
     } else {
         return [

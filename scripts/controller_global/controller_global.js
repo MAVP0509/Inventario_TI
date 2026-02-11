@@ -95,6 +95,74 @@ function mostrar_toast_cargando(texto) {
     });
 }
 
+/* let toastCargandoTimer = null;
+let toastCargandoInterval = null;
+
+//* Función global para mostrar notificación de carga
+function mostrar_toast_cargando(texto, opciones = {}) {
+
+    const {
+        delay = 4000,
+        mensajesLargos = [
+            'Espere mientras se completa la operación...',
+            'Esto puede demorar un poco, por favor espere...'
+        ],
+        alternar = true
+    } = opciones;
+
+    // Limpia timers anteriores (por seguridad)
+    clearTimeout(toastCargandoTimer);
+    clearInterval(toastCargandoInterval);
+
+    Swal.fire({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        showCloseButton: false,
+        timer: undefined,
+        allowOutsideClick: false,
+        background: '#fff',
+        html: `
+            <div style="display: flex; align-items: center;">
+                <img src="images/circles.svg" alt="Icono" height="30" width="30">
+                <span id="toast-cargando-texto" style="font-weight: 500; margin-left: 8px;">
+                    ${texto}
+                </span>
+            </div>
+        `,
+        didOpen: () => {
+
+            // Cambia el mensaje después de cierto tiempo
+            toastCargandoTimer = setTimeout(() => {
+
+                if (!Swal.isVisible()) return;
+
+                if (alternar && mensajesLargos.length > 1) {
+                    let index = 0;
+
+                    toastCargandoInterval = setInterval(() => {
+                        if (!Swal.isVisible()) {
+                            clearInterval(toastCargandoInterval);
+                            return;
+                        }
+
+                        document.getElementById('toast-cargando-texto').innerText =
+                            mensajesLargos[index];
+
+                        index = (index + 1) % mensajesLargos.length;
+
+                    }, 5000);
+
+                } else if (mensajesLargos.length > 0) {
+                    document.getElementById('toast-cargando-texto').innerText =
+                        mensajesLargos[0];
+                }
+
+            }, delay);
+        }
+    });
+} */
+
 //* Función para validar que los campos no estén vacios (los vuelve obligatorios)
 function validar_campos(campos) {
     // Inicializa una variable booleana que indica si todos los campos son válidos

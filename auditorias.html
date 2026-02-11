@@ -486,7 +486,7 @@
                                 </div>
                                 <!--Card Body-->
 
-                                <div class="card-body">
+                                <!-- <div class="card-body">
                                     <label>Año de auditoría</label>
                                     <div class="input-group mb-3">
                                         <div class="input-group-prepend">
@@ -499,6 +499,52 @@
                                         placeholder="Buscar por equipo, año, fecha, estado...">
                                     <br>
                                     <div id="tbl-aud" style="overflow-x: auto; width: 100%;"></div>
+                                </div> -->
+                                <div class="card-body">
+                                    <label>Año de auditoría</label>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
+                                        </div>
+                                        <select class="form-control select" id="select-anio-auditoria"
+                                            onchange="consultar_auditoria(this)"></select>
+                                    </div>
+
+                                    <!-- Card con tabs para admin -->
+                                    <div class="card card-primary card-outline card-outline-tabs" id="card-admin"
+                                        style="display: none;">
+                                        <div class="card-header p-0 border-bottom-0">
+                                            <ul class="nav nav-tabs" id="custom-tabs" role="tablist">
+                                                <!-- Los tabs se generarán dinámicamente aquí -->
+                                            </ul>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="tab-content" id="custom-tabs-content">
+                                                <!-- El contenido de los tabs se generará dinámicamente aquí -->
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Card simple para usuarios normales -->
+                                    <div class="card" id="card-user" style="display: none;">
+                                        <div class="card-header">
+                                            <h3 class="card-title">
+                                                <i class="fas fa-clipboard-list mr-1"></i>
+                                                Auditoría de Mantenimiento
+                                                <span id="badge-region" class="badge badge-success ml-2"></span>
+                                            </h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="input-group mb-3">
+                                                <input type="text" class="form-control" id="buscador-tabla-user"
+                                                    placeholder="Buscar por equipo, año, fecha, estado...">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                                </div>
+                                            </div>
+                                            <div id="tbl-user" style="overflow-x: auto; width: 100%;"></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -637,8 +683,7 @@
                                     <div class="input-group-prepend">
                                         <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
                                     </div>
-                                    <select class="form-control select" id="select-año"
-                                        name="inp-prog-mant"></select>
+                                    <select class="form-control select" id="select-año" name="inp-prog-mant"></select>
                                     <div class="invalid-feedback">Por favor, seleccione un año.</div>
                                 </div>
                                 <h6>Elaboró</h6>

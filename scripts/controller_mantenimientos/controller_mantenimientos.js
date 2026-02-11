@@ -95,8 +95,11 @@ let mantenimientosPendientes
 async function consultar_informacion(anio) {
 
     const fecha = anio.value
+
+    const usuDatos = JSON.parse(sessionStorage.getItem('user'));
+    const region = usuDatos.resultado[2];
     //load()
-    let server = await server_mantenimiento({ accion: 0, anio: fecha })
+    let server = await server_mantenimiento({ accion: 0, anio: fecha, region: region });
 
     //* Mostrar mensaje
     /* if (!fecha) {
@@ -490,7 +493,7 @@ async function mdl_programar_mantenimiento() {
 
 async function programar_mantenimiento() {
 
-    const validar = ['select-elaboro', 'select-autorizo']
+    const validar = ['select-elaboro', 'select-autorizo', 'select-año']
 
     if (!validar_campos(validar)) {
         mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
@@ -508,62 +511,42 @@ async function programar_mantenimiento() {
     }
     // Leer si el usuario desea también descargar el programa de auditoría desde el modal
     let downloadBoth = false;
-    // Soportar tanto el nuevo botón `check-editar-icon` como el antiguo `btn-download-aud-icon`
+
     const audIconEl = document.getElementById('check-editar-icon') || document.getElementById('btn-download-aud-icon');
     if (audIconEl) {
         // si tiene la clase de 'checked' (fa-solid fa-square-check) consideramos marcado
         downloadBoth = audIconEl.classList.contains('fa-solid') && audIconEl.classList.contains('fa-square-check');
     }
 
-    mostrar_toast_cargando('Programando mantenimiento...')
+    const mensajeInicial = downloadBoth
+    ? 'Programando mantenimiento y auditoría...'
+    : 'Programando mantenimiento...';
+
+    mostrar_toast_cargando(mensajeInicial);
     $('#mdl-btn-conf').prop('disabled', true);
+
+    // Enviar al servidor si se desean ambos archivos; el PHP será responsable
+    // de generar uno o ambos y devolver las URLs correspondientes.
+    model.descargar_ambos = downloadBoth ? 1 : 0;
 
     let server = await server_excel(model);
 
-    function downloadFile(url) {
-        try {
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.target = '_blank';
-            a.rel = 'noopener';
-            // Intentar forzar descarga cuando sea posible
-            a.download = '';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        } catch (e) {
-            // Fallback a abrir en nueva pestaña
-            window.open(url, '_blank');
-        }
-    }
-
-    if (server && server.resultado && server.resultado.result === true && server.resultado.url) {
-        // Descargar programa de mantenimiento (sin navegar fuera de la página)
-        downloadFile(server.resultado.url);
-
-        // Si el usuario pidió ambos, generar también el programa de auditoría y abrirlo en nueva pestaña
-        if (downloadBoth) {
-            try {
-                let modelAud = {
-                    accion: 5,
-                    elaboro: model.elaboro,
-                    cg_elaboro: model.cg_elaboro,
-                    autorizo: model.autorizo,
-                    cg_autorizo: model.cg_autorizo,
-                };
-                let serverAud = await server_excel(modelAud);
-                if (serverAud && serverAud.resultado && serverAud.resultado.result === true && serverAud.resultado.url) {
-                    downloadFile(serverAud.resultado.url);
-                } else if (serverAud && serverAud.resultado && serverAud.resultado.result === false) {
-                    mostrar_toast('warning', 'Aviso', 'No se pudo generar el programa de auditoría: ' + (serverAud.resultado.error || ''));
-                }
-            } catch (e) {
-                console.error('Error al generar programa de auditoría', e);
-            }
+    if (server && server.resultado && server.resultado.result === true) {
+        // El servidor puede devolver:
+        // - resultado.urls (array de strings)
+        // - resultado.url (string)
+        if (Array.isArray(server.resultado.urls)) {
+             server.resultado.urls.forEach(url => {
+                const link = document.createElement('iframe');
+                link.style.display = 'none';
+                link.src = url;
+                document.body.appendChild(link);
+             });
+        } else if (server.resultado.url) {
+            window.location = server.resultado.url;
         }
 
-        mostrar_toast('success', '¡Programa de mantenimiento exitoso!', 'El programa se ha generado correctamente.');
+        mostrar_toast('success', '¡Programa generado!', 'Los archivos se han generado correctamente.');
         $('#mdl-prog-mant').modal("hide");
         load();
 
