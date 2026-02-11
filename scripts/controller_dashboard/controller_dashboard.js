@@ -1,6 +1,23 @@
-// ══════════════════════════════════════════
-// DATOS  (reemplaza con tu respuesta PHP/AJAX)
-// ══════════════════════════════════════════
+function server_dashboard(model) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: "POST",
+            url: "database/controller_dashboard/controller_dashboard.php",
+            data: {
+                trama: JSON.stringify(model)
+            },
+            success: function (response) {
+                try {
+                    resolve(JSON.parse(response))
+                    //console.log(response)
+                } catch (error) {
+                    reject(error)
+                }
+            }
+        })
+    })
+}
+
 const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'];
 const MESES_FULL = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'];
 
@@ -64,67 +81,61 @@ const ESTADOS_LABEL = {
     vencido: 'Vencido'
 };
 
+//* Variables globales con valores por defecto
 let tipoActual = 'ambos';
 let regionActual = 'todas';
 let chartInstance = null;
 
-// ══════════════════════════════════════════
-// UTILIDADES
-// ══════════════════════════════════════════
+//* Función que suma los indices de un número indefinido de arrays que sean de la misma longitud
 function sumarArrays(...arrs) {
-    return arrs[0].map((_, i) => arrs.reduce((s, a) => s + a[i], 0));
+    return arrs[0].map((_, index) => arrs.reduce((suma, array) => suma + array[index], 0));
 }
 
+//* Filtrar los datos por región, retornando los datos del mantenimiento y auditoria por mes
 function getDataRegion(region, tipo) {
     const tipos = tipo === 'ambos' ? ['mantenimiento', 'auditoria'] : [tipo];
     const result = { pendiente: [], proceso: [], finalizado: [], vencido: [] };
-    MESES.forEach((_, i) => {
-        ['pendiente', 'proceso', 'finalizado', 'vencido'].forEach(e => {
-            result[e].push(tipos.reduce((s, t) => s + DATA[region][t][e][i], 0));
+    MESES.forEach((_, index) => {
+        ['pendiente', 'proceso', 'finalizado', 'vencido'].forEach(estado => {
+            result[estado].push(tipos.reduce((suma, tipo) => suma + DATA[region][tipo][estado][index], 0));
         });
     });
     return result;
 }
 
-// ══════════════════════════════════════════
-// KPIs
-// ══════════════════════════════════════════
+//*Actualizar kpis
 function actualizarKPIs() {
     const regiones = regionActual === 'todas' ? ['norte', 'sur', 'tampico'] : [regionActual];
     const tipos = tipoActual === 'ambos' ? ['mantenimiento', 'auditoria'] : [tipoActual];
-    const t = { pendiente: 0, proceso: 0, finalizado: 0, vencido: 0 };
+    const valoresKpis = { pendiente: 0, proceso: 0, finalizado: 0, vencido: 0 }; //t
 
-    regiones.forEach(r => tipos.forEach(tp => {
-        ['pendiente', 'proceso', 'finalizado', 'vencido'].forEach(e => {
-            t[e] += DATA[r][tp][e].reduce((a, b) => a + b, 0);
+    regiones.forEach(region => tipos.forEach(tipo => {
+        ['pendiente', 'proceso', 'finalizado', 'vencido'].forEach(estado => {
+            valoresKpis[estado] += DATA[region][tipo][estado].reduce((suma, valor) => suma + valor, 0);
         });
     }));
 
-    document.getElementById('kpi-pendiente').textContent = t.pendiente;
-    document.getElementById('kpi-proceso').textContent = t.proceso;
-    document.getElementById('kpi-finalizado').textContent = t.finalizado;
-    document.getElementById('kpi-vencido').textContent = t.vencido;
+    document.getElementById('kpi-pendiente').textContent = valoresKpis.pendiente;
+    document.getElementById('kpi-proceso').textContent = valoresKpis.proceso;
+    document.getElementById('kpi-finalizado').textContent = valoresKpis.finalizado;
+    document.getElementById('kpi-vencido').textContent = valoresKpis.vencido;
 }
 
-// ══════════════════════════════════════════
-// SERIES PARA APEXCHARTS
-// ══════════════════════════════════════════
+//*Construyendo los datos para mostrarlos en la gráfica
 function construirSeries() {
-    return ['pendiente', 'proceso', 'finalizado', 'vencido'].map(e => {
+    return ['pendiente', 'proceso', 'finalizado', 'vencido'].map(estado => {
         let data;
         if (regionActual === 'todas') {
-            const arrs = ['norte', 'sur', 'tampico'].map(r => getDataRegion(r, tipoActual)[e]);
+            const arrs = ['norte', 'sur', 'tampico'].map(region => getDataRegion(region, tipoActual)[estado]);
             data = sumarArrays(...arrs);
         } else {
-            data = getDataRegion(regionActual, tipoActual)[e];
+            data = getDataRegion(regionActual, tipoActual)[estado];
         }
-        return { name: ESTADOS_LABEL[e], data, color: COLORES[e] };
+        return { name: ESTADOS_LABEL[estado], data, color: COLORES[estado] };
     });
 }
 
-// ══════════════════════════════════════════
-// RENDERIZAR GRÁFICA
-// ══════════════════════════════════════════
+//*Renderizar gráfica
 function renderChart() {
     actualizarKPIs();
     actualizarTabla();
@@ -197,9 +208,7 @@ function renderChart() {
     }
 }
 
-// ══════════════════════════════════════════
-// TABLA RESUMEN
-// ══════════════════════════════════════════
+//*Información de la tabla inferior
 function actualizarTabla() {
     const tbody = document.getElementById('tabla-body');
     const regiones = regionActual === 'todas' ? ['norte', 'sur', 'tampico'] : [regionActual];
