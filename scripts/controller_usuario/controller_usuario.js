@@ -198,6 +198,13 @@ async function consultar_usuarios() {
 let usuSelect = ""
 async function mdl_editar_usuario(params) {
     usuSelect = params
+
+    //* Lista de roles
+    let opcion = [
+        { id: 1, text: 'admin' },
+        { id: 2, text: 'user' },
+    ]
+
     await general_select2({
         selectId: 'select-regionEdit',
         tabla: 'supervisor',
@@ -209,8 +216,7 @@ async function mdl_editar_usuario(params) {
 
     await general_select2({
         selectId: 'select-rolEdit',
-        tabla: 'usuario',
-        campo: 'rol',
+        data: opcion,
         placeholder: 'Seleccione un rol',
         dropdownParent: '#modalEditar',
         tags: false,
@@ -245,7 +251,7 @@ async function editar_usuario() {
         nombre: $('#nombre').val().trim(),
         correo: $('#correo').val().trim(),
         region: $('#select-regionEdit').val().trim(),
-        rol: $('#select-rolEdit').val().trim(),
+        rol: $("#select-rolEdit").select2('data')[0].text,
     }
 
     let server = await server_usuario(model)
@@ -310,6 +316,12 @@ async function mdl_nuevo_usuario() {
         inputs[i].classList.remove('is-invalid', 'is-warning')
     }
 
+    //* Lista de roles
+    let opcion = [
+        { id: 1, text: 'admin' },
+        { id: 2, text: 'user' },
+    ]
+
     await general_select2({
         selectId: 'select-regionReg',
         tabla: 'supervisor',
@@ -321,8 +333,7 @@ async function mdl_nuevo_usuario() {
 
     await general_select2({
         selectId: 'select-rolReg',
-        tabla: 'usuario',
-        campo: 'rol',
+        data: opcion,
         placeholder: 'Seleccione un rol',
         dropdownParent: '#modalInsertar',
         tags: false,
@@ -360,7 +371,7 @@ async function insertar_usuario() {
         nombre: $('#nombreReg').val().trim(),
         correo: $('#correoReg').val().trim(),
         region: $('#select-regionReg').val().trim(),
-        rol: $('#select-rolReg').val().trim(),
+        rol: $("#select-rolReg").select2('data')[0].text,
         contraseña: $('#contraseniaReg').val().trim()
     }
 
