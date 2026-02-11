@@ -90,12 +90,12 @@ $('#select-anio-auditoria').on('change', () =>{
 })
 
 
-let datos_auditoria = []; // MANTENER - usada en otras funciones
-let tabla_aud; // MANTENER - referencia a la tabla principal
-let elemento_aud; // MANTENER - usada en modales y otras funciones
-let auditorias_pendientes; // MANTENER - usada en otras partes
+let datos_auditoria = [];
+let tabla_aud;
+let elemento_aud; 
+let auditorias_pendientes;
 
-// NUEVAS VARIABLES (no afectan las existentes)
+// NUEVAS VARIABLES
 let tablas_por_region = {};
 let datosGlobales = null;
 let tabActual = 'todas'; // Para saber qué tab está activo
@@ -111,7 +111,7 @@ const coloresRegion = [
     'purple', 'indigo', 'pink', 'teal', 'orange'
 ];
 
-// Función principal ORIGINAL - MANTENER LA FIRMA
+// Función principal ORIGINAL
 async function consultar_auditoria(anio) {
     const fecha = anio.value;
     if (!fecha) return;
@@ -141,7 +141,6 @@ async function cargarDatosAdmin(fecha, region) {
         region: '' // Admin ve todas las regiones
     });
 
-    // MANTENER datos_auditoria para compatibilidad
     datos_auditoria = server.resultado;
     datosGlobales = server.resultado; // Copia para tabs
     
@@ -169,7 +168,6 @@ async function cargarDatosUser(fecha, region) {
         region: region 
     });
 
-    // MANTENER datos_auditoria para compatibilidad
     datos_auditoria = server.resultado;
     
     // Crear tabla y guardar como tabla_aud principal
@@ -283,7 +281,7 @@ function construirTabs(regiones, datos) {
     });
 }
 
-// Función para crear tabla - RETORNA la tabla para mantener compatibilidad
+// Función para crear tabla
 function crear_tabla_auditoria(tabId, datos, fecha, mostrarRegion = false) {
     Tabulator.extendModule("localize", "langs", {
         "es": {
@@ -539,7 +537,6 @@ function crear_tabla_auditoria(tabId, datos, fecha, mostrarRegion = false) {
         }, {}));
     }
 
-    // IMPORTANTE: Retornar la tabla para mantener compatibilidad
     return tabla;
 }
 
