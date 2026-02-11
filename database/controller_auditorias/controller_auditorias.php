@@ -38,7 +38,28 @@ function consultar_auditoria($valores)
 {
     include("../conexion.php");
 
-    $sql = "SELECT * FROM vauditoria WHERE anio = '$valores->anio' ORDER BY fecha ASC";
+    $region = $valores->region ?? null;
+    $anio   = $valores->anio ?? null;
+
+    if (!$anio) {
+        return [];
+    }
+
+    if (empty($region)) {
+        // Si no viene región → es admin
+        $sql = "SELECT * 
+                FROM vauditoria 
+                WHERE anio = '$anio' 
+                ORDER BY fecha ASC";
+    } else {
+        // Si viene región → es usuario normal
+        $sql = "SELECT * 
+                FROM vauditoria 
+                WHERE anio = '$anio' 
+                AND zona LIKE '%$region%' 
+                ORDER BY fecha ASC";
+    }
+
     $query = mysqli_query($con, $sql);
 
     $datos = [];

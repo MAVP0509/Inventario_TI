@@ -1,3 +1,5 @@
+// const { use } = require("react");
+
 auditoria_loading = false;
 function server_auditoria(model) {
     return new Promise((resolve, reject) => {
@@ -88,20 +90,201 @@ $('#select-anio-auditoria').on('change', () =>{
 })
 
 
-let datos_auditoria = [];
-let tabla_aud;
-let elemento_aud;
-let auditorias_pendientes
+let datos_auditoria = []; // MANTENER - usada en otras funciones
+let tabla_aud; // MANTENER - referencia a la tabla principal
+let elemento_aud; // MANTENER - usada en modales y otras funciones
+let auditorias_pendientes; // MANTENER - usada en otras partes
 
+// NUEVAS VARIABLES (no afectan las existentes)
+let tablas_por_region = {};
+let datosGlobales = null;
+let tabActual = 'todas'; // Para saber qué tab está activo
+
+// Obtener datos del usuario
+const userData = JSON.parse(sessionStorage.getItem('user'));
+const rol = userData.resultado[3];
+const regionUsuario = userData.resultado[2];
+
+// Colores para las regiones
+const coloresRegion = [
+    'primary', 'success', 'info', 'warning', 'danger', 
+    'purple', 'indigo', 'pink', 'teal', 'orange'
+];
+
+// Función principal ORIGINAL - MANTENER LA FIRMA
 async function consultar_auditoria(anio) {
     const fecha = anio.value;
-    // console.log(fecha);
-
-    let server = await server_auditoria({ accion: 0, anio: fecha });
-
     if (!fecha) return;
 
-    datos_auditoria = server.resultado
+    const usuRegion = JSON.parse(sessionStorage.getItem('user'));
+    const region = usuRegion.resultado[2];
+
+    // Limpiar tablas anteriores
+    tablas_por_region = {};
+    
+    if (rol === 'admin') {
+        await cargarDatosAdmin(fecha, region);
+    } else {
+        await cargarDatosUser(fecha, region);
+    }
+}
+
+// Cargar datos para administrador
+async function cargarDatosAdmin(fecha, region) {
+    // Mostrar card de admin, ocultar card de user
+    document.getElementById('card-admin').style.display = 'block';
+    document.getElementById('card-user').style.display = 'none';
+
+    let server = await server_auditoria({ 
+        accion: 0, 
+        anio: fecha, 
+        region: '' // Admin ve todas las regiones
+    });
+
+    // MANTENER datos_auditoria para compatibilidad
+    datos_auditoria = server.resultado;
+    datosGlobales = server.resultado; // Copia para tabs
+    
+    // Obtener regiones únicas
+    const regionesUnicas = [...new Set(datos_auditoria.map(item => item.zona))].filter(Boolean).sort();
+    
+    // Construir tabs dinámicamente
+    construirTabs(regionesUnicas, datos_auditoria);
+    
+    // Crear tabla "Todas" y guardar como tabla_aud principal
+    tabla_aud = crear_tabla_auditoria('todas', datos_auditoria, fecha, true);
+    tabActual = 'todas';
+}
+
+// Cargar datos para usuario normal
+async function cargarDatosUser(fecha, region) {
+    // Mostrar card de user, ocultar card de admin
+    document.getElementById('card-admin').style.display = 'none';
+    document.getElementById('card-user').style.display = 'block';
+    document.getElementById('badge-region').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${regionUsuario}`;
+
+    let server = await server_auditoria({ 
+        accion: 0, 
+        anio: fecha, 
+        region: region 
+    });
+
+    // MANTENER datos_auditoria para compatibilidad
+    datos_auditoria = server.resultado;
+    
+    // Crear tabla y guardar como tabla_aud principal
+    tabla_aud = crear_tabla_auditoria('user', datos_auditoria, fecha, false);
+}
+
+// Construir tabs dinámicamente
+function construirTabs(regiones, datos) {
+    const navTabs = document.getElementById('custom-tabs');
+    const tabContent = document.getElementById('custom-tabs-content');
+    
+    // Limpiar tabs existentes
+    navTabs.innerHTML = '';
+    tabContent.innerHTML = '';
+    
+    // Calcular pendientes totales
+    const totalPendientes = datos.filter(d => d.estado !== 'Realizado').length;
+    
+    // Tab "Todas las Regiones"
+    const tabTodas = `
+        <li class="nav-item">
+            <a class="nav-link active" id="tab-todas" data-toggle="pill" href="#todas" role="tab">
+                <i class="fas fa-globe"></i> Todas
+                <span class="badge badge-primary ml-1">${datos.length}</span>
+                ${totalPendientes > 0 ? `<span class="badge badge-danger ml-1">${totalPendientes}</span>` : ''}
+            </a>
+        </li>
+    `;
+    
+    const contentTodas = `
+        <div class="tab-pane fade show active" id="todas" role="tabpanel">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" id="buscador-tabla-todas" placeholder="Buscar por equipo, año, fecha, estado...">
+                <div class="input-group-append">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                </div>
+            </div>
+            <div id="tbl-todas" style="overflow-x: auto; width: 100%;"></div>
+        </div>
+    `;
+    
+    navTabs.insertAdjacentHTML('beforeend', tabTodas);
+    tabContent.insertAdjacentHTML('beforeend', contentTodas);
+    
+    // Crear tabs para cada región
+    regiones.forEach((region, index) => {
+        const datosFiltrados = datos.filter(d => (d.zona) === region);
+        const count = datosFiltrados.length;
+        const pendientes = datosFiltrados.filter(d => d.estado !== 'Realizado').length;
+        const color = coloresRegion[index % coloresRegion.length];
+        const regionId = region.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+        
+        const tab = `
+            <li class="nav-item">
+                <a class="nav-link" id="tab-${regionId}" data-toggle="pill" href="#${regionId}" role="tab" data-region="${region}">
+                    <i class="fas fa-map-marker-alt"></i> ${region}
+                    <span class="badge badge-${color} ml-1">${count}</span>
+                    ${pendientes > 0 ? `<span class="badge badge-danger ml-1">${pendientes}</span>` : ''}
+                </a>
+            </li>
+        `;
+        
+        const content = `
+            <div class="tab-pane fade" id="${regionId}" role="tabpanel">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="buscador-tabla-${regionId}" placeholder="Buscar por equipo, año, fecha, estado...">
+                    <div class="input-group-append">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    </div>
+                </div>
+                <div id="tbl-${regionId}" style="overflow-x: auto; width: 100%;"></div>
+            </div>
+        `;
+        
+        navTabs.insertAdjacentHTML('beforeend', tab);
+        tabContent.insertAdjacentHTML('beforeend', content);
+    });
+    
+    // Event listeners para tabs (lazy loading)
+    $('a[data-toggle="pill"]').off('shown.bs.tab').on('shown.bs.tab', function (e) {
+        const tabId = $(e.target).attr('href').substring(1);
+        const region = $(e.target).data('region');
+        
+        // Actualizar tabActual
+        tabActual = tabId;
+        
+        // Actualizar tabla_aud con la tabla del tab activo
+        if (tablas_por_region[tabId]) {
+            tabla_aud = tablas_por_region[tabId];
+            // Actualizar datos_auditoria con los datos filtrados del tab actual
+            datos_auditoria = tabla_aud.getData();
+        }
+        
+        // Si la tabla no ha sido creada, crearla
+        if (!tablas_por_region[tabId]) {
+            let datosFiltrados;
+            let mostrarRegion = false;
+            
+            if (tabId === 'todas') {
+                datosFiltrados = datosGlobales;
+                mostrarRegion = true;
+            } else {
+                datosFiltrados = datosGlobales.filter(d => (d.zona) === region);
+            }
+            
+            const nuevaTabla = crear_tabla_auditoria(tabId, datosFiltrados, null, mostrarRegion);
+            // Actualizar tabla_aud y datos_auditoria
+            tabla_aud = nuevaTabla;
+            datos_auditoria = datosFiltrados;
+        }
+    });
+}
+
+// Función para crear tabla - RETORNA la tabla para mantener compatibilidad
+function crear_tabla_auditoria(tabId, datos, fecha, mostrarRegion = false) {
     Tabulator.extendModule("localize", "langs", {
         "es": {
             "pagination": {
@@ -130,7 +313,7 @@ async function consultar_auditoria(anio) {
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
-        return `<button type='button' class='btn btn-warning icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Información' onclick=''><i class='fa-solid fa-circle-info fa-lg'></i></button>`;
+        return `<button type='button' class='btn btn-warning icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Información'><i class='fa-solid fa-circle-info fa-lg'></i></button>`;
     }
 
     let subirIcon = function (cell, formatterParams, onRendered) {
@@ -139,55 +322,159 @@ async function consultar_auditoria(anio) {
         })
         const data = cell.getRow().getData()
         const disabled = data.reporte_descargado == 0 ? "disabled" : ""
-
         return `<button type='button' class='btn btn-info icon' ${disabled} data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' data-widget="control-sidebar" data-slide="true" data-target="#sidebar-rauditoria"><i class='fa-solid fa-upload fa-lg'></i></button>`;
     }
 
-    let archivoIcon = function (cell, formatterParams, onRendered) { //plain text value
+    let archivoIcon = function (cell, formatterParams, onRendered) {
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
         const data = cell.getRow().getData()
         const disabled = data.correo_enviado == 0 ? "disabled" : ""
-
-        return `<button type='button' class='btn btn-success icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Reporte de auditoría' onclick=''><i class='fa-solid fa-file-excel fa-lg'></i></button>`;
+        return `<button type='button' class='btn btn-success icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Reporte de auditoría'><i class='fa-solid fa-file-excel fa-lg'></i></button>`;
     }
 
-    let verIcon = function (cell, formatterParams, onRendered) { //plain text value
+    let verIcon = function (cell, formatterParams, onRendered) {
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
         const data = cell.getRow().getData()
         const disabled = data.reporte_subido == 0 ? "disabled" : ""
-
-        return `<button type='button' class='btn btn-lock btn-outline-dark icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Ver pdf'><i class='fa-solid fa-eye '></i></button>`;
+        return `<button type='button' class='btn btn-lock btn-outline-dark icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Ver pdf'><i class='fa-solid fa-eye'></i></button>`;
     }
 
-    let correoIcon = function (cell, formatterParams, onRendered) { //plain text value
+    let correoIcon = function (cell, formatterParams, onRendered) {
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
-        /* const data = cell.getRow().getData()
-        const disabled = data.correo_enviado == 1 ? "disabled" : "" */
-        return `<button type='button' class='btn btn-lock btn-danger envelope'  data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Enviar correo'><i class='fa-solid fa-envelope '></i></button>`;
+        return `<button type='button' class='btn btn-lock btn-danger envelope' data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Enviar correo'><i class='fa-solid fa-envelope'></i></button>`;
     }
 
     let menuEstatus = [
-        {
-            label: `<i class="fa-solid fa-circle" style="color: #28a745;"></i> Realizado`
-        },
+        { label: `<i class="fa-solid fa-circle" style="color: #28a745;"></i> Realizado` },
         { label: `<i class="fa-solid fa-circle" style="color: #0385ffff;"></i> En proceso` },
-        {
-            label: `<i class="fa-solid fa-circle" style="color: #ff7300;"></i> Pendiente`
-        },
-        {
-            label: `<i class="fa-solid fa-circle fa-beat-fade" style="color: #dc3545;"></i> Vencido`
-        },
+        { label: `<i class="fa-solid fa-circle" style="color: #ff7300;"></i> Pendiente` },
+        { label: `<i class="fa-solid fa-circle fa-beat-fade" style="color: #dc3545;"></i> Vencido` },
     ]
 
-    tabla_aud = new Tabulator("#tbl-aud", {
+    // Definir columnas base
+    let columnas = [
+        {
+            title: "Fecha", field: "fecha", width: 115, headerHozAlign: "center", headerSort: false, hozAlign: "center", sorter: "date",
+        },
+        {
+            title: "Tipo",
+            field: "tipo", width: 130, headerHozAlign: "center", headerSort: false, hozAlign: "center",
+            formatter: function (cell, formatterParams, onRendered) {
+                let data = cell.getData();
+                return `${data.tipo}<br><small>${data.marca}</small><br><small>${data.modelo}</small>`;
+            }
+        },
+        {
+            title: "Número de serie",
+            field: "num_serie", headerHozAlign: "center", headerSort: false, hozAlign: "center",
+        },
+        {
+            title: "Usuario",
+            field: "usuario", headerHozAlign: "center", headerSort: false, hozAlign: "center",
+            formatter: function (cell, formatterParams, onRendered) {
+                let data = cell.getData();
+                return `${data.usuario}<br><small>${data.cargo}</small>`;
+            }
+        },
+        {
+            title: "Ubicación",
+            field: "ubicacion", headerHozAlign: "center", headerSort: false, hozAlign: "center",
+            headerFilterParams: {
+                valuesLookup: true, clearable: true,
+            }
+        },
+        {
+            title: "Estatus",
+            field: "estado", hozAlign: "center", formatter: "lookup", headerHozAlign: "center", width: 150,
+            headerFilterParams: {
+                valuesLookup: true, clearable: true,
+            },
+            headerMenu: menuEstatus,
+            headerMenuIcon: '<i class="fa-solid fa-circle-question"></i>',
+            formatterParams: {
+                "Pendiente": `<i class="fa-solid fa-circle" style="color: #ff7300;"></i> Pendiente`,
+                "En proceso": `<i class="fa-solid fa-circle" style="color: #0385ffff;"></i> En proceso`,
+                "Realizado": `<i class="fa-solid fa-circle" style="color: #28a745;"></i> Realizado`,
+                "Vencido": `<i class="fa-solid fa-circle fa-beat-fade" style="color: #dc3545;"></i> Vencido`,
+            },
+            headerSort: false,
+        },
+        {
+            formatter: correoIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "correo_enviado",
+            cellClick: function (e, cell) {
+                elemento_aud = cell.getRow().getData();
+                mdl_correo_reporte_auditoria(elemento_aud)
+            },
+        },
+        {
+            formatter: archivoIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "correo_enviado",
+            cellClick: function (e, cell) {
+                const button = cell.getElement().querySelector('button');
+                if (button && !button.disabled) {
+                    button.disabled = true;
+                    const elemento_aud = cell.getRow().getData();
+                    mdl_descargar_reporte_auditoria(elemento_aud);
+                    setTimeout(() => {
+                        button.disabled = false;
+                    }, 3000);
+                }
+            }
+        },
+        {
+            formatter: subirIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_descargado",
+            cellClick: function (e, cell) {
+                elemento_aud = cell.getRow().getData();
+                reporte_auditoria_firmado(elemento_aud)
+            }
+        },
+        {
+            formatter: verIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_subido",
+            cellClick: function (e, cell) {
+                elemento_aud = cell.getRow().getData();
+                consultar_reporte_firmado(elemento_aud);
+            }
+        },
+        {
+            formatter: editarIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
+            cellClick: function (e, cell) {
+                elemento_aud = cell.getRow().getData();
+                mdl_auditoria_info(elemento_aud);
+            }
+        },
+    ];
+
+    // Agregar columna de región si mostrarRegion es true
+    if (mostrarRegion && datosGlobales) {
+        const regiones = [...new Set(datosGlobales.map(item => item.region || item.zona))].filter(Boolean).sort();
+        columnas.splice(4, 0, {
+            title: "Región",
+            field: "region",
+            width: 120,
+            headerHozAlign: "center",
+            hozAlign: "center",
+            headerSort: false,
+            formatter: function(cell) {
+                const region = cell.getValue() || cell.getData().zona;
+                const index = regiones.indexOf(region);
+                const color = coloresRegion[index % coloresRegion.length];
+                
+                return `<span class="badge badge-${color}">
+                            <i class="fas fa-map-marker-alt mr-1"></i>${region}
+                        </span>`;
+            }
+        });
+    }
+
+    // Crear tabla
+    const tabla = new Tabulator(`#tbl-${tabId}`, {
         locale: "es",
-        data: datos_auditoria,
+        data: datos,
         layout: "fitColumns",
         maxHeight: window.innerHeight,
         movableColumns: true,
@@ -195,185 +482,356 @@ async function consultar_auditoria(anio) {
         paginationSize: 15,
         paginationSizeSelector: [15, 25, 35, true],
         paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
-            const totalRows = tabla_aud.getDataCount(); // Asegúrate que 'table' esté accesible
+            const totalRows = tabla.getDataCount();
             const end = Math.min(currentRowStart + pageSize - 1, totalRows);
             return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
         },
         groupBy: function (data) {
-            // Asegura que tenga formato YYYY-MM
             const [año, mes] = data.fecha.split("-");
-            // Creamos una fecha con día explícito
             const fecha = new Date(`${año}-${mes}-01T00:00:00`);
             const opciones = { year: 'numeric', month: 'long' };
-
-            //let excluir = ['Realizado']
-            //const datos = table.getData().filter(d=> d.estado && !excluir.includes(d.estado)).length
-
-
             return `${fecha.toLocaleDateString('es-ES', opciones)}`
         },
         groupHeader: function (value, count, data) {
-            const fila = data[0];  // Primera fila del grupo
-
+            const fila = data[0];
             const [año, mes] = fila.fecha.split("-");
             const fecha = new Date(`${año}-${mes}-01T00:00:00`);
             const opciones = { year: 'numeric', month: 'long' };
-
-            // Excluir estatus
             const excluir = ['Realizado'];
-
-            // Contar pendiente SOLO dentro del grupo actual
-            const pendientes = data.filter(d =>
-                d.estado &&
-                !excluir.includes(d.estado)
-            ).length;
-
+            const pendientes = data.filter(d => d.estado && !excluir.includes(d.estado)).length;
             return `${fecha.toLocaleDateString('es-ES', opciones)} (${pendientes} auditorías pendientes)`;
-
         },
         groupStartOpen: false,
         groupToggleElement: "header",
-        columns: [
-            {
-                title: "Fecha", field: "fecha", width: 115, headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */ sorter: "date",
-            },
-            {
-                title: "Tipo",
-                field: "tipo", width: 130, headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */
-                formatter: function (cell, formatterParams, onRendered) {
-                    let data = cell.getData();
-                    return `${data.tipo}<br><small>${data.marca}<br><small>${data.modelo}`;
-                }
-            },
-            {
-                title: "Número de serie",
-                field: "num_serie", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input" */
+        columns: columnas,
+    });
 
-            },
-            {
-                title: "Usuario",
-                field: "usuario", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */
-                formatter: function (cell, formatterParams, onRendered) {
-                    let data = cell.getData(); // Obtiene toda la fila
-                    return `${data.usuario}<br><small>${data.cargo}</small>`;
-                }
+    // Guardar referencia a la tabla
+    tablas_por_region[tabId] = tabla;
 
-            },
-            {
-                title: "Ubicación",
-                field: "ubicacion", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "list", */
-                headerFilterParams: {
-                    valuesLookup: true, clearable: true,
-                }
-
-            },
-            {
-                title: "Estatus",
-                field: "estado", hozAlign: "center", formatter: "lookup", headerHozAlign: "center", formatter: "lookup", width: 150,
-                headerFilterParams: {
-                    valuesLookup: true, clearable: true,
-                },
-                headerMenu: menuEstatus,
-                headerMenuIcon: '<i class="fa-solid fa-circle-question"></i>',
-                formatterParams: {
-                    "Pendiente": `<i class="fa-solid fa-circle" style="color: #ff7300;"></i> Pendiente`,
-                    "En proceso": `<i class="fa-solid fa-circle" style="color: #0385ffff;"></i> En proceso`,
-                    "Realizado": `<i class="fa-solid fa-circle" style="color: #28a745;"></i> Realizado`,
-                    "Vencido": `<i class="fa-solid fa-circle fa-beat-fade" style="color: #dc3545;"></i> Vencido`,
-                },
-                /* headerFilter: "list",
-                headerFilterParams: {
-                    valuesLookup: true, clearable: true,
-                }, */ headerSort: false,
-
-            },
-            {
-                formatter: correoIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "correo_enviado",
-                cellClick: function (e, cell) {
-                    elemento_aud = cell.getRow().getData();
-                    mdl_correo_reporte_auditoria(elemento_aud)
-                },
-            },
-            {
-                formatter: archivoIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "correo_enviado",
-                cellClick: function (e, cell) {
-                    const button = cell.getElement().querySelector('button');
-                    if (button && !button.disabled) {
-                        // Deshabilita el botón
-                        button.disabled = true;
-
-                        // Acción que quieres ejecutar al hacer clic
-                        const elemento_aud = cell.getRow().getData();
-                        mdl_descargar_reporte_auditoria(elemento_aud);
-
-                        // Rehabilita el botón después de 3 segundos
-                        setTimeout(() => {
-                            button.disabled = false;
-                        }, 3000);
+    // Configurar buscador
+    let searchInput = document.getElementById(`buscador-tabla-${tabId}`);
+    if (searchInput) {
+        searchInput.addEventListener("keyup", function () {
+            let query = searchInput.value.toLowerCase();
+            tabla.setFilter(function (data) {
+                for (var key in data) {
+                    if (data[key] && data[key].toString().toLowerCase().includes(query)) {
+                        return true;
                     }
                 }
-            },
-            {
-                formatter: subirIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_descargado",
-                cellClick: function (e, cell) {
-                    elemento_aud = cell.getRow().getData();
-                    reporte_auditoria_firmado(elemento_aud)
-                    // abrir_subir_reporte(elemento_aud.id, elemento_aud.fecha)
-                }
-            },
-
-            {
-                formatter: verIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_subido",
-                cellClick: function (e, cell) {
-                    elemento_aud = cell.getRow().getData();
-                    consultar_reporte_firmado(elemento_aud);
-                }
-            },
-            {
-                formatter: editarIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
-                cellClick: function (e, cell) {
-                    elemento_aud = cell.getRow().getData();
-                    mdl_auditoria_info(elemento_aud);
-                }
-            },
-        ],
-    });
-
-    auditorias_pendientes = Object.values(datos_auditoria.reduce((objeto, item) => {
-        if (item.estado == "Realizado") return objeto
-
-        let anio = item.anio
-        let mes = item.fecha.split('-')[1]
-
-        // Si aún no existe el año, inicializamos su propiedad meses
-        if (!objeto[anio]) {
-            objeto[anio] = { anio: anio, meses: {} };
-        }
-
-        //si ya existe este mes, incrementa su valor, sino lo inicia en 0 y suma 1
-        objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
-
-        return objeto
-    }, {}))
-    // console.log(auditorias_pendientes);
-
-    let searchInput = document.getElementById("buscador-tabla-auditoria")
-
-    searchInput.addEventListener("keyup", function () {
-        let query = searchInput.value.toLowerCase();
-
-        // Función de filtro personalizada
-        tabla_aud.setFilter(function (data) {
-            // Recorre todas las propiedades de la fila
-            for (var key in data) {
-                if (data[key] && data[key].toString().toLowerCase().includes(query)) {
-                    return true; // Coincidencia encontrada
-                }
-            }
-            return false; // No hay coincidencia
+                return false;
+            });
         });
-    });
+    }
+
+    // Calcular auditorías pendientes
+    if (tabId === 'todas' || tabId === 'user') {
+        auditorias_pendientes = Object.values(datos.reduce((objeto, item) => {
+            if (item.estado == "Realizado") return objeto
+            let anio = item.anio
+            let mes = item.fecha.split('-')[1]
+            if (!objeto[anio]) {
+                objeto[anio] = { anio: anio, meses: {} };
+            }
+            objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
+            return objeto
+        }, {}));
+    }
+
+    // IMPORTANTE: Retornar la tabla para mantener compatibilidad
+    return tabla;
 }
+
+// let datos_auditoria = [];
+// let tabla_aud;
+// let elemento_aud;
+// let auditorias_pendientes
+
+// async function consultar_auditoria(anio) {
+//     const fecha = anio.value;
+//     // console.log(fecha);
+//     const usuDatos = JSON.parse(sessionStorage.getItem('user'));
+//     const rol = usuDatos.resultado[3];
+//     const region = usuDatos.resultado[2];
+
+//     let server = await server_auditoria({ accion: 0, anio: fecha, region: region });
+
+//     if (!fecha) return;
+
+//     datos_auditoria = server.resultado
+//     Tabulator.extendModule("localize", "langs", {
+//         "es": {
+//             "pagination": {
+//                 "first": '<i class="fa-solid fa-angles-right fa-flip-horizontal"></i>',
+//                 "first_title": "Primera página",
+//                 "last": '<i class="fa-solid fa-angles-right"></i>',
+//                 "last_title": "Última página",
+//                 "prev": '<i class="fa-solid fa-angle-right fa-flip-horizontal"></i>',
+//                 "prev_title": "Página anterior",
+//                 "next": '<i class="fa-solid fa-angle-right"></i>',
+//                 "next_title": "Página siguiente",
+//                 "page_size": "Tamaño",
+//             },
+//             "headerFilters": {
+//                 "default": "Filtrar columna...",
+//                 "columns": {}
+//             },
+//             "groups": {
+//                 "item": "ítem",
+//                 "items": "ítems"
+//             },
+//         }
+//     });
+
+//     let editarIcon = function (cell, formatterParams, onRendered) {
+//         onRendered(function () {
+//             $(cell.getElement()).find('[data-toggle="popover"]').popover()
+//         })
+//         return `<button type='button' class='btn btn-warning icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Información' onclick=''><i class='fa-solid fa-circle-info fa-lg'></i></button>`;
+//     }
+
+//     let subirIcon = function (cell, formatterParams, onRendered) {
+//         onRendered(function () {
+//             $(cell.getElement()).find('[data-toggle="popover"]').popover()
+//         })
+//         const data = cell.getRow().getData()
+//         const disabled = data.reporte_descargado == 0 ? "disabled" : ""
+
+//         return `<button type='button' class='btn btn-info icon' ${disabled} data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' data-widget="control-sidebar" data-slide="true" data-target="#sidebar-rauditoria"><i class='fa-solid fa-upload fa-lg'></i></button>`;
+//     }
+
+//     let archivoIcon = function (cell, formatterParams, onRendered) { //plain text value
+//         onRendered(function () {
+//             $(cell.getElement()).find('[data-toggle="popover"]').popover()
+//         })
+//         const data = cell.getRow().getData()
+//         const disabled = data.correo_enviado == 0 ? "disabled" : ""
+
+//         return `<button type='button' class='btn btn-success icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Reporte de auditoría' onclick=''><i class='fa-solid fa-file-excel fa-lg'></i></button>`;
+//     }
+
+//     let verIcon = function (cell, formatterParams, onRendered) { //plain text value
+//         onRendered(function () {
+//             $(cell.getElement()).find('[data-toggle="popover"]').popover()
+//         })
+//         const data = cell.getRow().getData()
+//         const disabled = data.reporte_subido == 0 ? "disabled" : ""
+
+//         return `<button type='button' class='btn btn-lock btn-outline-dark icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Ver pdf'><i class='fa-solid fa-eye '></i></button>`;
+//     }
+
+//     let correoIcon = function (cell, formatterParams, onRendered) { //plain text value
+//         onRendered(function () {
+//             $(cell.getElement()).find('[data-toggle="popover"]').popover()
+//         })
+//         // const data = cell.getRow().getData()
+//         // const disabled = data.correo_enviado == 1 ? "disabled" : ""
+//         return `<button type='button' class='btn btn-lock btn-danger envelope'  data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Enviar correo'><i class='fa-solid fa-envelope '></i></button>`;
+//     }
+
+//     let menuEstatus = [
+//         {
+//             label: `<i class="fa-solid fa-circle" style="color: #28a745;"></i> Realizado`
+//         },
+//         { label: `<i class="fa-solid fa-circle" style="color: #0385ffff;"></i> En proceso` },
+//         {
+//             label: `<i class="fa-solid fa-circle" style="color: #ff7300;"></i> Pendiente`
+//         },
+//         {
+//             label: `<i class="fa-solid fa-circle fa-beat-fade" style="color: #dc3545;"></i> Vencido`
+//         },
+//     ]
+
+//     tabla_aud = new Tabulator("#tbl-aud", {
+//         locale: "es",
+//         data: datos_auditoria,
+//         layout: "fitColumns",
+//         maxHeight: window.innerHeight,
+//         movableColumns: true,
+//         pagination: true,
+//         paginationSize: 15,
+//         paginationSizeSelector: [15, 25, 35, true],
+//         paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
+//             const totalRows = tabla_aud.getDataCount(); // Asegúrate que 'table' esté accesible
+//             const end = Math.min(currentRowStart + pageSize - 1, totalRows);
+//             return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
+//         },
+//         groupBy: function (data) {
+//             // Asegura que tenga formato YYYY-MM
+//             const [año, mes] = data.fecha.split("-");
+//             // Creamos una fecha con día explícito
+//             const fecha = new Date(`${año}-${mes}-01T00:00:00`);
+//             const opciones = { year: 'numeric', month: 'long' };
+
+//             //let excluir = ['Realizado']
+//             //const datos = table.getData().filter(d=> d.estado && !excluir.includes(d.estado)).length
+
+
+//             return `${fecha.toLocaleDateString('es-ES', opciones)}`
+//         },
+//         groupHeader: function (value, count, data) {
+//             const fila = data[0];  // Primera fila del grupo
+
+//             const [año, mes] = fila.fecha.split("-");
+//             const fecha = new Date(`${año}-${mes}-01T00:00:00`);
+//             const opciones = { year: 'numeric', month: 'long' };
+
+//             // Excluir estatus
+//             const excluir = ['Realizado'];
+
+//             // Contar pendiente SOLO dentro del grupo actual
+//             const pendientes = data.filter(d =>
+//                 d.estado &&
+//                 !excluir.includes(d.estado)
+//             ).length;
+
+//             return `${fecha.toLocaleDateString('es-ES', opciones)} (${pendientes} auditorías pendientes)`;
+
+//         },
+//         groupStartOpen: false,
+//         groupToggleElement: "header",
+//         columns: [
+//             {
+//                 title: "Fecha", field: "fecha", width: 115, headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */ sorter: "date",
+//             },
+//             {
+//                 title: "Tipo",
+//                 field: "tipo", width: 130, headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */
+//                 formatter: function (cell, formatterParams, onRendered) {
+//                     let data = cell.getData();
+//                     return `${data.tipo}<br><small>${data.marca}<br><small>${data.modelo}`;
+//                 }
+//             },
+//             {
+//                 title: "Número de serie",
+//                 field: "num_serie", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input" */
+
+//             },
+//             {
+//                 title: "Usuario",
+//                 field: "usuario", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */
+//                 formatter: function (cell, formatterParams, onRendered) {
+//                     let data = cell.getData(); // Obtiene toda la fila
+//                     return `${data.usuario}<br><small>${data.cargo}</small>`;
+//                 }
+
+//             },
+//             {
+//                 title: "Ubicación",
+//                 field: "ubicacion", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "list", */
+//                 headerFilterParams: {
+//                     valuesLookup: true, clearable: true,
+//                 }
+
+//             },
+//             {
+//                 title: "Estatus",
+//                 field: "estado", hozAlign: "center", formatter: "lookup", headerHozAlign: "center", formatter: "lookup", width: 150,
+//                 headerFilterParams: {
+//                     valuesLookup: true, clearable: true,
+//                 },
+//                 headerMenu: menuEstatus,
+//                 headerMenuIcon: '<i class="fa-solid fa-circle-question"></i>',
+//                 formatterParams: {
+//                     "Pendiente": `<i class="fa-solid fa-circle" style="color: #ff7300;"></i> Pendiente`,
+//                     "En proceso": `<i class="fa-solid fa-circle" style="color: #0385ffff;"></i> En proceso`,
+//                     "Realizado": `<i class="fa-solid fa-circle" style="color: #28a745;"></i> Realizado`,
+//                     "Vencido": `<i class="fa-solid fa-circle fa-beat-fade" style="color: #dc3545;"></i> Vencido`,
+//                 },
+//                 /* headerFilter: "list",
+//                 headerFilterParams: {
+//                     valuesLookup: true, clearable: true,
+//                 }, */ headerSort: false,
+
+//             },
+//             {
+//                 formatter: correoIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "correo_enviado",
+//                 cellClick: function (e, cell) {
+//                     elemento_aud = cell.getRow().getData();
+//                     mdl_correo_reporte_auditoria(elemento_aud)
+//                 },
+//             },
+//             {
+//                 formatter: archivoIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "correo_enviado",
+//                 cellClick: function (e, cell) {
+//                     const button = cell.getElement().querySelector('button');
+//                     if (button && !button.disabled) {
+//                         // Deshabilita el botón
+//                         button.disabled = true;
+
+//                         // Acción que quieres ejecutar al hacer clic
+//                         const elemento_aud = cell.getRow().getData();
+//                         mdl_descargar_reporte_auditoria(elemento_aud);
+
+//                         // Rehabilita el botón después de 3 segundos
+//                         setTimeout(() => {
+//                             button.disabled = false;
+//                         }, 3000);
+//                     }
+//                 }
+//             },
+//             {
+//                 formatter: subirIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_descargado",
+//                 cellClick: function (e, cell) {
+//                     elemento_aud = cell.getRow().getData();
+//                     reporte_auditoria_firmado(elemento_aud)
+//                     // abrir_subir_reporte(elemento_aud.id, elemento_aud.fecha)
+//                 }
+//             },
+
+//             {
+//                 formatter: verIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_subido",
+//                 cellClick: function (e, cell) {
+//                     elemento_aud = cell.getRow().getData();
+//                     consultar_reporte_firmado(elemento_aud);
+//                 }
+//             },
+//             {
+//                 formatter: editarIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
+//                 cellClick: function (e, cell) {
+//                     elemento_aud = cell.getRow().getData();
+//                     mdl_auditoria_info(elemento_aud);
+//                 }
+//             },
+//         ],
+//     });
+
+//     auditorias_pendientes = Object.values(datos_auditoria.reduce((objeto, item) => {
+//         if (item.estado == "Realizado") return objeto
+
+//         let anio = item.anio
+//         let mes = item.fecha.split('-')[1]
+
+//         // Si aún no existe el año, inicializamos su propiedad meses
+//         if (!objeto[anio]) {
+//             objeto[anio] = { anio: anio, meses: {} };
+//         }
+
+//         //si ya existe este mes, incrementa su valor, sino lo inicia en 0 y suma 1
+//         objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
+
+//         return objeto
+//     }, {}))
+//     // console.log(auditorias_pendientes);
+
+//     let searchInput = document.getElementById("buscador-tabla-auditoria")
+
+//     searchInput.addEventListener("keyup", function () {
+//         let query = searchInput.value.toLowerCase();
+
+//         // Función de filtro personalizada
+//         tabla_aud.setFilter(function (data) {
+//             // Recorre todas las propiedades de la fila
+//             for (var key in data) {
+//                 if (data[key] && data[key].toString().toLowerCase().includes(query)) {
+//                     return true; // Coincidencia encontrada
+//                 }
+//             }
+//             return false; // No hay coincidencia
+//         });
+//     });
+// }
 
 async function mdl_programar_auditoria() {
 

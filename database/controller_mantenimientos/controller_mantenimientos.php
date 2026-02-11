@@ -46,7 +46,7 @@ function consultar_datos($valores)
     include("../conexion.php");
 
 
-    $sql = "SELECT * FROM vmantenimiento WHERE anio = '$valores->anio' ORDER BY fecha ASC";
+$sql = "SELECT * FROM vmantenimiento WHERE anio = '$valores->anio' AND zona LIKE '%$valores->region%' ORDER BY fecha ASC";
     $query = mysqli_query($con, $sql);
 
 
