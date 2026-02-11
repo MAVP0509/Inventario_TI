@@ -18,50 +18,50 @@ function server_dashboard(model) {
     })
 }
 
-const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'];
-const MESES_FULL = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'];
+const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+const MESES_FULL = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
 const DATA = {
     norte: {
         mantenimiento: {
-            pendiente: [8, 12, 6, 9, 11, 7],
-            proceso: [14, 10, 18, 13, 9, 16],
-            finalizado: [20, 25, 22, 28, 30, 27],
-            vencido: [3, 5, 2, 4, 1, 3]
+            pendiente: [8, 12, 6, 9, 11, 7, 15, 8, 9, 12, 5, 14],
+            proceso: [14, 10, 18, 13, 9, 16, 8, 6, 12, 5, 11, 12],
+            finalizado: [20, 25, 22, 28, 30, 27, 8, 6, 7, 10, 11, 13],
+            vencido: [3, 5, 2, 4, 1, 3, 2, 8, 9, 4, 2, 7]
         },
         auditoria: {
-            pendiente: [5, 7, 4, 6, 8, 5],
-            proceso: [9, 11, 8, 12, 10, 9],
-            finalizado: [15, 18, 16, 20, 22, 19],
-            vencido: [2, 3, 1, 2, 3, 1]
+            pendiente: [5, 7, 4, 6, 8, 5, 14, 12, 13, 14, 10, 12],
+            proceso: [9, 11, 8, 12, 10, 9, 8, 6, 1, 7, 10, 15],
+            finalizado: [15, 18, 16, 20, 22, 19, 12, 15, 16, 14, 13, 15],
+            vencido: [2, 3, 1, 2, 3, 1, 0, 7, 9, 1, 3, 4]
         }
     },
     sur: {
         mantenimiento: {
-            pendiente: [6, 9, 7, 8, 10, 6],
-            proceso: [11, 13, 10, 14, 12, 11],
-            finalizado: [18, 21, 19, 24, 26, 22],
-            vencido: [4, 6, 3, 5, 2, 4]
+            pendiente: [6, 9, 7, 8, 10, 6, 12, 14, 15, 13, 12, 14],
+            proceso: [11, 13, 10, 14, 12, 11, 4, 9, 12, 14, 3, 12],
+            finalizado: [18, 21, 19, 24, 26, 22, 12, 25, 23, 10, 11, 12],
+            vencido: [4, 6, 3, 5, 2, 4, 1, 2, 0, 0, 0, 1]
         },
         auditoria: {
-            pendiente: [4, 6, 5, 7, 6, 4],
-            proceso: [8, 9, 7, 10, 9, 8],
-            finalizado: [13, 16, 14, 18, 19, 16],
-            vencido: [1, 2, 2, 3, 1, 2]
+            pendiente: [4, 6, 5, 7, 6, 4, 12, 12, 14, 15, 10, 12],
+            proceso: [8, 9, 7, 10, 9, 8, 0, 0, 0, 0, 0, 0],
+            finalizado: [13, 16, 14, 18, 19, 16, 0, 0, 0, 0, 0, 0],
+            vencido: [1, 2, 2, 3, 1, 2, 0, 0, 0, 0, 0, 0]
         }
     },
     tampico: {
         mantenimiento: {
-            pendiente: [7, 10, 8, 9, 12, 8],
-            proceso: [13, 15, 11, 14, 10, 13],
-            finalizado: [22, 26, 23, 27, 29, 25],
-            vencido: [5, 4, 3, 6, 2, 4]
+            pendiente: [7, 10, 8, 9, 12, 8, 12, 10, 14, 15, 12, 10],
+            proceso: [13, 15, 11, 14, 10, 13, 1, 2, 4, 3, 1, 6],
+            finalizado: [22, 26, 23, 27, 29, 25, 0, 0, 0, 0, 0, 0],
+            vencido: [5, 4, 3, 6, 2, 4, 1, 2, 3, 4, 0, 5]
         },
         auditoria: {
-            pendiente: [6, 8, 5, 7, 9, 6],
-            proceso: [10, 12, 9, 11, 10, 10],
-            finalizado: [17, 20, 18, 22, 24, 20],
-            vencido: [3, 2, 2, 4, 1, 3]
+            pendiente: [6, 8, 5, 7, 9, 6, 10, 12, 14, 15, 10, 12],
+            proceso: [10, 12, 9, 11, 10, 10, 1, 2, 4, 6, 1, 2],
+            finalizado: [17, 20, 18, 22, 24, 20, 0, 1, 6, 4, 1, 25],
+            vencido: [3, 2, 2, 4, 1, 3, 1, 5, 8, 7, 1, 0]
         }
     }
 };
@@ -97,7 +97,7 @@ function getDataRegion(region, tipo) {
     const result = { pendiente: [], proceso: [], finalizado: [], vencido: [] };
     MESES.forEach((_, index) => {
         ['pendiente', 'proceso', 'finalizado', 'vencido'].forEach(estado => {
-            result[estado].push(tipos.reduce((suma, tipo) => suma + DATA[region][tipo][estado][index], 0));
+            result[estado].push(tipos.reduce((suma, tipo) => suma + DATA[region][tipo][estado][index] || 0, 0));
         });
     });
     return result;
@@ -123,7 +123,9 @@ function actualizarKPIs() {
 
 //*Construyendo los datos para mostrarlos en la gráfica
 function construirSeries() {
+    //*Son 4 barras por mes, pendiente, proceso, finalizado y vencido
     return ['pendiente', 'proceso', 'finalizado', 'vencido'].map(estado => {
+        //*Datos por barra
         let data;
         if (regionActual === 'todas') {
             const arrs = ['norte', 'sur', 'tampico'].map(region => getDataRegion(region, tipoActual)[estado]);
@@ -131,6 +133,7 @@ function construirSeries() {
         } else {
             data = getDataRegion(regionActual, tipoActual)[estado];
         }
+        //*Construcción del objeto de la barra
         return { name: ESTADOS_LABEL[estado], data, color: COLORES[estado] };
     });
 }
@@ -156,7 +159,25 @@ function renderChart() {
                     zoomin: false, zoomout: false, pan: false, reset: false
                 }
             },
-            animations: { enabled: true, easing: 'easeinout', speed: 400 }
+            animations: { enabled: true, easing: 'easeinout', speed: 400 },
+            locales: [{
+                name: 'es',
+                options: {
+                    toolbar: {
+                        exportToSVG: 'Descargar SVG',
+                        exportToPNG: 'Descargar PNG',
+                        exportToCSV: 'Descargar CSV',
+                        menu: 'Menú',
+                        selection: 'Selección',
+                        selectionZoom: 'Zoom de Selección',
+                        zoomIn: 'Aumentar',
+                        zoomOut: 'Disminuir',
+                        pan: 'Panorámica',
+                        reset: 'Restablecer Zoom'
+                    }
+                }
+            }],
+            defaultLocale: 'es' // Esto activa el español
         },
         plotOptions: {
             bar: {
@@ -240,15 +261,14 @@ function actualizarTabla() {
     tbody.innerHTML = filas;
 }
 
-// ══════════════════════════════════════════
-// CONTROLES
-// ══════════════════════════════════════════
+
+//*Controles del dashboard
 function setTipo(tipo, btn) {
     tipoActual = tipo;
     // Resetear estilos btn-group
-    document.querySelectorAll('.tipo-group .btn').forEach(b => {
-        b.classList.remove('btn-primary');
-        b.classList.add('btn-outline-primary');
+    document.querySelectorAll('.tipo-group .btn').forEach(boton => {
+        boton.classList.remove('btn-primary');
+        boton.classList.add('btn-outline-primary');
     });
     btn.classList.remove('btn-outline-primary');
     btn.classList.add('btn-primary');
@@ -258,7 +278,7 @@ function setTipo(tipo, btn) {
 
 function setRegion(region, link) {
     regionActual = region;
-    document.querySelectorAll('.region-pills .nav-link').forEach(l => l.classList.remove('active'));
+    document.querySelectorAll('.region-pills .nav-link').forEach(region => region.classList.remove('active'));
     link.classList.add('active');
     actualizarTitulo();
     renderChart();
@@ -273,9 +293,7 @@ function actualizarTitulo() {
         `<i class="fas fa-chart-bar mr-2 text-primary"></i>${rLabel} — ${tLabel}`;
 }
 
-// ══════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════
+//*renderizar
 $(document).ready(function () {
     renderChart();
 });
