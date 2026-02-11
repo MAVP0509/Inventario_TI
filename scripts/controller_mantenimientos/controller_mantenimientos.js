@@ -83,8 +83,9 @@ async function load() {
 }
 
 //* Limpiar el input del buscador si cambia el año de la tabla
-$('#select-anio-mantenimiento').on('change', () =>{
-    $('#buscador-tabla-mantenimiento').val('')
+$('#select-anio-mantenimiento').on('change', () => {
+    // Limpiar cualquier input de búsqueda de tablas de mantenimientos
+    $("[id^='buscador-tabla-']").each(function() { $(this).val(''); });
 })
 
 let datos_mantenimiento = []
@@ -92,31 +93,177 @@ let elemento_mnt
 let table
 let mantenimientosPendientes
 
-async function consultar_informacion(anio) {
+let tablas_mant_region = {};
+let datos_globales = [];
+let tab_actual = 'todas';
 
-    const fecha = anio.value
+const usuDatos = JSON.parse(sessionStorage.getItem('user'));
+const rolUsuario = usuDatos.resultado[3];
+const regionUsu = usuDatos.resultado[2];
 
-    const usuDatos = JSON.parse(sessionStorage.getItem('user'));
-    const region = usuDatos.resultado[2];
-    //load()
-    let server = await server_mantenimiento({ accion: 0, anio: fecha, region: region });
+const colores_region = [
+    'primary', 'success', 'warning', 'danger', 'info',
+    'purple', 'indigo', 'teal', 'orange', 'pink'
+];
 
-    //* Mostrar mensaje
-    /* if (!fecha) {
-        table = new Tabulator('#tbl01', {
-            locale: "es",
-            layout: "fitColumns",
-            data: [{ mensaje: "Seleccione un año para ver la información de mantenimiento." }],
-            columns: [
-                { title: "Mensaje", field: "mensaje", hozAlign: "center" }
-            ]
-        });
-        return;
-    } */
 
+async function consultar_mantenimiento(anio) {
+    const fecha = anio.value;
     if (!fecha) return;
 
-    datos_mantenimiento = server.resultado
+    tablas_mant_region = {}; // Reiniciar tablas por región
+
+    if (rolUsuario === 'admin') {
+        await mantDatosAdmin(fecha, regionUsu);
+    } else {
+        await mantDatosUser(fecha, regionUsu);
+    }
+}
+
+async function mantDatosAdmin(fecha, region) {
+    document.getElementById('card-mant-admin').style.display = 'block';
+    document.getElementById('card-mant-user').style.display = 'none';
+
+    let server = await server_mantenimiento({ accion: 0, anio: fecha, region: '' });
+
+    datos_mantenimiento = server.resultado;
+    datos_globales = server.resultado;
+
+    const regiones = [...new Set(datos_mantenimiento.map(m => m.zona))].filter(Boolean).sort();
+
+    Tabs(regiones, datos_mantenimiento);
+
+    table = crear_tabla_mantenimiento('todas', datos_mantenimiento, fecha, true);
+    tab_actual = 'todas';
+}
+
+async function mantDatosUser(fecha, region) {
+    // Mostrar card de user, ocultar card de admin
+    document.getElementById('card-mant-admin').style.display = 'none';
+    document.getElementById('card-mant-user').style.display = 'block';
+    document.getElementById('badge-region-mant').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${regionUsu}`;
+
+    let server = await server_mantenimiento({
+        accion: 0,
+        anio: fecha,
+        region: region
+    });
+
+    datos_mantenimiento = server.resultado;
+
+    // Crear tabla y guardar como tabla_aud principal
+    // En el HTML el contenedor para usuarios se llama "tbl-user-mant", por eso usamos 'user-mant' como tabId
+    table = crear_tabla_mantenimiento('user-mant', datos_mantenimiento, fecha, false);
+    tab_actual = 'user-mant';
+}
+
+function Tabs(regiones, datos) {
+    const navTabs = document.getElementById('custom-tabs-mant');
+    const tabContent = document.getElementById('custom-tabs-content-mant');
+
+    // Limpiar tabs existentes
+    navTabs.innerHTML = '';
+    tabContent.innerHTML = '';
+
+    // Calcular pendientes totales
+    const totalPendientes = datos.filter(d => d.estado !== 'Realizado').length;
+
+    // Tab "Todas las Regiones"
+    const tabTodas = `
+        <li class="nav-item">
+            <a class="nav-link active" id="tab-todas" data-toggle="pill" href="#todas" role="tab">
+                <i class="fas fa-globe"></i> Todas
+                <span class="badge badge-primary ml-1">${datos.length}</span>
+                ${totalPendientes > 0 ? `<span class="badge badge-danger ml-1">${totalPendientes}</span>` : ''}
+            </a>
+        </li>
+    `;
+
+    const contentTodas = `
+        <div class="tab-pane fade show active" id="todas" role="tabpanel">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" id="buscador-tabla-todas" placeholder="Buscar por equipo, año, fecha, estado...">
+                <div class="input-group-append">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                </div>
+            </div>
+            <div id="tbl-todas" style="overflow-x: auto; width: 100%;"></div>
+        </div>
+    `;
+
+    navTabs.insertAdjacentHTML('beforeend', tabTodas);
+    tabContent.insertAdjacentHTML('beforeend', contentTodas);
+
+    // Crear tabs para cada región
+    regiones.forEach((region, index) => {
+        const datosFiltrados = datos.filter(d => (d.zona) === region);
+        const count = datosFiltrados.length;
+        const pendientes = datosFiltrados.filter(d => d.estado !== 'Realizado').length;
+        const color = colores_region[index % colores_region.length];
+        const regionId = region.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+        const tab = `
+            <li class="nav-item">
+                <a class="nav-link" id="tab-${regionId}" data-toggle="pill" href="#${regionId}" role="tab" data-region="${region}">
+                    <i class="fas fa-map-marker-alt"></i> ${region}
+                    <span class="badge badge-${color} ml-1">${count}</span>
+                    ${pendientes > 0 ? `<span class="badge badge-danger ml-1">${pendientes}</span>` : ''}
+                </a>
+            </li>
+        `;
+
+        const content = `
+            <div class="tab-pane fade" id="${regionId}" role="tabpanel">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="buscador-tabla-${regionId}" placeholder="Buscar por equipo, año, fecha, estado...">
+                    <div class="input-group-append">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    </div>
+                </div>
+                <div id="tbl-${regionId}" style="overflow-x: auto; width: 100%;"></div>
+            </div>
+        `;
+
+        navTabs.insertAdjacentHTML('beforeend', tab);
+        tabContent.insertAdjacentHTML('beforeend', content);
+    });
+
+    // Event listeners para tabs (lazy loading)
+    $('a[data-toggle="pill"]').off('shown.bs.tab').on('shown.bs.tab', function (e) {
+        const tabId = $(e.target).attr('href').substring(1);
+        const region = $(e.target).data('region');
+
+        // Actualizar tabActual
+        tab_actual = tabId;
+
+        // Actualizar tabla_aud con la tabla del tab activo
+        if (tablas_mant_region[tabId]) {
+            table = tablas_mant_region[tabId];
+            // Actualizar datos_auditoria con los datos filtrados del tab actual
+            datos_mantenimiento = table.getData();
+        }
+
+        // Si la tabla no ha sido creada, crearla
+        if (!tablas_mant_region[tabId]) {
+            let datosFiltrados;
+            let mostrarRegion = false;
+
+            if (tabId === 'todas') {
+                datosFiltrados = datos_globales;
+                mostrarRegion = true;
+            } else {
+                datosFiltrados = datos_globales.filter(d => (d.zona) === region);
+            }
+
+            const nuevaTabla = crear_tabla_mantenimiento(tabId, datosFiltrados, null, mostrarRegion);
+            // Actualizar table y datos_mantenimiento
+            table = nuevaTabla;
+            datos_mantenimiento = datosFiltrados;
+        }
+    });
+}
+
+function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
     Tabulator.extendModule("localize", "langs", {
         "es": {
             "pagination": {
@@ -129,7 +276,6 @@ async function consultar_informacion(anio) {
                 "next": '<i class="fa-solid fa-angle-right"></i>',
                 "next_title": "Página siguiente",
                 "page_size": "Tamaño",
-
             },
             "headerFilters": {
                 "default": "Filtrar columna...",
@@ -146,7 +292,7 @@ async function consultar_informacion(anio) {
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
-        return `<button type='button' class='btn btn-warning icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Información' onclick=''><i class='fa-solid fa-circle-info fa-lg'></i></button>`;
+        return `<button type='button' class='btn btn-warning icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Información'><i class='fa-solid fa-circle-info fa-lg'></i></button>`;
     }
 
     let uploadIcon = function (cell, formatterParams, onRendered) {
@@ -155,248 +301,531 @@ async function consultar_informacion(anio) {
         })
         const data = cell.getRow().getData()
         const disabled = data.reporte_descargado == 0 ? "disabled" : ""
-
-        return `<button type='button' class='btn btn-info icon' ${disabled} data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' data-widget="control-sidebar" data-slide="true" data-target="#control-sidebar"><i class='fa-solid fa-upload fa-lg'></i></button>`;
+        return `<button type='button' class='btn btn-info icon' ${disabled} data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' data-widget="control-sidebar" data-slide="true" data-target="#sidebar-rauditoria"><i class='fa-solid fa-upload fa-lg'></i></button>`;
     }
 
-    let fileIcon = function (cell, formatterParams, onRendered) { //plain text value
+    let fileIcon = function (cell, formatterParams, onRendered) {
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
         const data = cell.getRow().getData()
         const disabled = data.correo_enviado == 0 ? "disabled" : ""
-
-        return `<button type='button' class='btn btn-success icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Reporte de mantenimiento' onclick=''><i class='fa-solid fa-file-excel fa-lg'></i></button>`;
+        return `<button type='button' class='btn btn-success icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Reporte de auditoría'><i class='fa-solid fa-file-excel fa-lg'></i></button>`;
     }
 
-    let eyeIcon = function (cell, formatterParams, onRendered) { //plain text value
+    let eyeIcon = function (cell, formatterParams, onRendered) {
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
         const data = cell.getRow().getData()
         const disabled = data.reporte_subido == 0 ? "disabled" : ""
-
-        return `<button type='button' class='btn btn-lock btn-outline-dark icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Ver pdf'><i class='fa-solid fa-eye '></i></button>`;
+        return `<button type='button' class='btn btn-lock btn-outline-dark icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Ver pdf'><i class='fa-solid fa-eye'></i></button>`;
     }
 
-    let mailIcon = function (cell, formatterParams, onRendered) { //plain text value
+    let mailIcon = function (cell, formatterParams, onRendered) {
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
-        /* const data = cell.getRow().getData()
-        const disabled = data.correo_enviado == 1 ? "disabled" : "" */
-        return `<button type='button' class='btn btn-lock btn-danger envelope'  data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Enviar correo'><i class='fa-solid fa-envelope '></i></button>`;
+        return `<button type='button' class='btn btn-lock btn-danger envelope' data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Enviar correo'><i class='fa-solid fa-envelope'></i></button>`;
     }
 
     let menuEstatus = [
-        {
-            label: `<i class="fa-solid fa-circle" style="color: #28a745;"></i> Realizado`
-        },
+        { label: `<i class="fa-solid fa-circle" style="color: #28a745;"></i> Realizado` },
         { label: `<i class="fa-solid fa-circle" style="color: #0385ffff;"></i> En proceso` },
-        {
-            label: `<i class="fa-solid fa-circle" style="color: #ff7300;"></i> Pendiente`
-        },
-        {
-            label: `<i class="fa-solid fa-circle fa-beat-fade" style="color: #dc3545;"></i> Vencido`
-        },
+        { label: `<i class="fa-solid fa-circle" style="color: #ff7300;"></i> Pendiente` },
+        { label: `<i class="fa-solid fa-circle fa-beat-fade" style="color: #dc3545;"></i> Vencido` },
     ]
 
-    table = new Tabulator('#tbl01', {
+    // Definir columnas base
+    let columnas = [
+        {
+            title: "Fecha", field: "fecha", width: 115, headerHozAlign: "center", headerSort: false, hozAlign: "center", sorter: "date",
+        },
+        {
+            title: "Tipo",
+            field: "tipo", width: 130, headerHozAlign: "center", headerSort: false, hozAlign: "center",
+            formatter: function (cell, formatterParams, onRendered) {
+                let data = cell.getData();
+                return `${data.tipo}<br><small>${data.marca}</small><br><small>${data.modelo}</small>`;
+            }
+        },
+        {
+            title: "Número de serie",
+            field: "num_serie", headerHozAlign: "center", headerSort: false, hozAlign: "center",
+        },
+        {
+            title: "Usuario",
+            field: "usuario", headerHozAlign: "center", headerSort: false, hozAlign: "center",
+            formatter: function (cell, formatterParams, onRendered) {
+                let data = cell.getData();
+                return `${data.usuario}<br><small>${data.cargo}</small>`;
+            }
+        },
+        {
+            title: "Ubicación",
+            field: "ubicacion", headerHozAlign: "center", headerSort: false, hozAlign: "center",
+            headerFilterParams: {
+                valuesLookup: true, clearable: true,
+            }
+        },
+        {
+            title: "Estatus",
+            field: "estado", hozAlign: "center", formatter: "lookup", headerHozAlign: "center", width: 150,
+            headerFilterParams: {
+                valuesLookup: true, clearable: true,
+            },
+            headerMenu: menuEstatus,
+            headerMenuIcon: '<i class="fa-solid fa-circle-question"></i>',
+            formatterParams: {
+                "Pendiente": `<i class="fa-solid fa-circle" style="color: #ff7300;"></i> Pendiente`,
+                "En proceso": `<i class="fa-solid fa-circle" style="color: #0385ffff;"></i> En proceso`,
+                "Realizado": `<i class="fa-solid fa-circle" style="color: #28a745;"></i> Realizado`,
+                "Vencido": `<i class="fa-solid fa-circle fa-beat-fade" style="color: #dc3545;"></i> Vencido`,
+            },
+            headerSort: false,
+        },
+        {
+            formatter: mailIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "correo_enviado",
+            cellClick: function (e, cell) {
+                elemento_mnt = cell.getRow().getData();
+                mdl_correo_reporte_mantenimiento(elemento_mnt)
+            },
+        },
+        {
+            formatter: fileIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "correo_enviado",
+            cellClick: function (e, cell) {
+                const button = cell.getElement().querySelector('button');
+                if (button && !button.disabled) {
+                    button.disabled = true;
+                    const elemento_mnt = cell.getRow().getData();
+                    mdl_descargar_reportes_mensuales(elemento_mnt);
+                    setTimeout(() => {
+                        button.disabled = false;
+                    }, 3000);
+                }
+            }
+        },
+        {
+            formatter: uploadIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_descargado",
+            cellClick: function (e, cell) {
+                elemento_mnt = cell.getRow().getData();
+                abrir_subir_reporte(elemento_mnt)
+            }
+        },
+        {
+            formatter: eyeIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_subido",
+            cellClick: function (e, cell) {
+                elemento_mnt = cell.getRow().getData();
+                ver_pdf_reporte(elemento_mnt);
+            }
+        },
+        {
+            formatter: editIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
+            cellClick: function (e, cell) {
+                elemento_mnt = cell.getRow().getData();
+                mdl_mantenimiento_info(elemento_mnt);
+            }
+        },
+    ];
+
+    // Agregar columna de región si mostrarRegion es true
+    if (mostrarRegion && datos_globales) {
+        const regiones = [...new Set(datos_globales.map(item => item.region || item.zona))].filter(Boolean).sort();
+        columnas.splice(4, 0, {
+            title: "Región",
+            field: "region",
+            width: 120,
+            headerHozAlign: "center",
+            hozAlign: "center",
+            headerSort: false,
+            formatter: function (cell) {
+                const region = cell.getValue() || cell.getData().zona;
+                const index = regiones.indexOf(region);
+                const color = colores_region[index % colores_region.length];
+
+                return `<span class="badge badge-${color}">
+                            <i class="fas fa-map-marker-alt mr-1"></i>${region}
+                        </span>`;
+            }
+        });
+    }
+
+    // Crear tabla
+    const tabla = new Tabulator(`#tbl-${tabId}`, {
         locale: "es",
-        data: datos_mantenimiento,
-        layout: "fitColumns",              //fit columns to width of table
-        //height: window.innerHeight ,
+        data: datos,
+        layout: "fitColumns",
         maxHeight: window.innerHeight,
-        movableColumns: true,              //allow column order to be changed
+        movableColumns: true,
         pagination: true,
         paginationSize: 15,
         paginationSizeSelector: [15, 25, 35, true],
         paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
-            const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
+            const totalRows = tabla.getDataCount();
             const end = Math.min(currentRowStart + pageSize - 1, totalRows);
             return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
         },
-        //paginationButtonCount: 3,
         groupBy: function (data) {
-            // Asegura que tenga formato YYYY-MM
             const [año, mes] = data.fecha.split("-");
-            // Creamos una fecha con día explícito
             const fecha = new Date(`${año}-${mes}-01T00:00:00`);
             const opciones = { year: 'numeric', month: 'long' };
-
-            //let excluir = ['Realizado']
-            //const datos = table.getData().filter(d=> d.estado && !excluir.includes(d.estado)).length
-
-
             return `${fecha.toLocaleDateString('es-ES', opciones)}`
         },
         groupHeader: function (value, count, data) {
-            const fila = data[0];  // Primera fila del grupo
-
+            const fila = data[0];
             const [año, mes] = fila.fecha.split("-");
             const fecha = new Date(`${año}-${mes}-01T00:00:00`);
             const opciones = { year: 'numeric', month: 'long' };
-
-            // Excluir estatus
             const excluir = ['Realizado'];
-
-            // Contar pendiente SOLO dentro del grupo actual
-            const pendientes = data.filter(d =>
-                d.estado &&
-                !excluir.includes(d.estado)
-            ).length;
-
-            return `${fecha.toLocaleDateString('es-ES', opciones)} (${pendientes} mantenimientos pendientes)`;
-
+            const pendientes = data.filter(d => d.estado && !excluir.includes(d.estado)).length;
+            return `${fecha.toLocaleDateString('es-ES', opciones)} (${pendientes} auditorías pendientes)`;
         },
         groupStartOpen: false,
-        groupToggleElement: "header", //* Permite que dando click en cualquier parte del header group, éste se despliegue
-        //headerVisible: false,
-        /*         dataGrouped: function (groups) {
-                    restaurarEstadoDeGrupos();
-                },
-                renderComplete: function () {
-                    restaurarEstadoDeGrupos()
-                }, */
-        columns: [
-            {
-                title: "Fecha", field: "fecha", width: 115, headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */ sorter: "date",
-            },
-            {
-                title: "Tipo",
-                field: "tipo", width: 130, headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */
-                formatter: function (cell, formatterParams, onRendered) {
-                    let data = cell.getData();
-                    return `${data.tipo}<br><small>${data.marca}<br><small>${data.modelo}`;
-                }
-            },
-            {
-                title: "Número de serie",
-                field: "num_serie", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input" */
+        groupToggleElement: "header",
+        columns: columnas,
+    });
 
-            },
-            {
-                title: "Usuario",
-                field: "usuario", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */
-                formatter: function (cell, formatterParams, onRendered) {
-                    let data = cell.getData(); // Obtiene toda la fila
-                    return `${data.usuario}<br><small>${data.cargo}</small>`;
-                }
+    // Guardar referencia a la tabla
+    tablas_mant_region[tabId] = tabla;
 
-            },
-            {
-                title: "Ubicación",
-                field: "ubicacion", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "list", */
-                headerFilterParams: {
-                    valuesLookup: true, clearable: true,
-                }
-
-            },
-            {
-                title: "Estatus",
-                field: "estado", hozAlign: "center", formatter: "lookup", headerSort: false, headerHozAlign: "center", formatter: "lookup", width: 150,
-                headerFilterParams: {
-                    valuesLookup: true, clearable: true,
-                },
-                headerMenu: menuEstatus,
-                headerMenuIcon: '<i class="fa-solid fa-circle-question"></i>',
-                formatterParams: {
-                    "Pendiente": `<i class="fa-solid fa-circle" style="color: #ff7300;"></i> Pendiente`,
-                    "En proceso": `<i class="fa-solid fa-circle" style="color: #0385ffff;"></i> En proceso`,
-                    "Realizado": `<i class="fa-solid fa-circle" style="color: #28a745;"></i> Realizado`,
-                    "Vencido": `<i class="fa-solid fa-circle fa-beat-fade" style="color: #dc3545;"></i> Vencido`,
-                },
-                /* headerFilter: "list",
-                headerFilterParams: {
-                    valuesLookup: true, clearable: true,
-                }, headerSort: false, */
-
-            },
-            {
-                formatter: mailIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "correo_enviado",
-                cellClick: function (e, cell) {
-                    elemento_mnt = cell.getRow().getData();
-                    mdl_correo_reporte_mantenimiento(elemento_mnt)
-                },
-            },
-            {
-                formatter: fileIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "correo_enviado",
-                cellClick: function (e, cell) {
-                    const button = cell.getElement().querySelector('button');
-                    if (button && !button.disabled) {
-                        // Deshabilita el botón
-                        button.disabled = true;
-
-                        // Acción que quieres ejecutar al hacer clic
-                        const elemento_mnt = cell.getRow().getData();
-                        mdl_reporte_mantenimiento(elemento_mnt);
-
-                        // Rehabilita el botón después de 3 segundos
-                        setTimeout(() => {
-                            button.disabled = false;
-                        }, 3000);
+    // Configurar buscador
+    let searchInput = document.getElementById(`buscador-tabla-${tabId}`);
+    if (searchInput) {
+        searchInput.addEventListener("keyup", function () {
+            let query = searchInput.value.toLowerCase();
+            tabla.setFilter(function (data) {
+                for (var key in data) {
+                    if (data[key] && data[key].toString().toLowerCase().includes(query)) {
+                        return true;
                     }
                 }
-            },
-            {
-                formatter: uploadIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_descargado",
-                cellClick: function (e, cell) {
-                    elemento_mnt = cell.getRow().getData();
-                    abrir_subir_reporte(elemento_mnt);
-                }
-            },
-
-            {
-                formatter: eyeIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_subido",
-                cellClick: function (e, cell) {
-                    elemento_mnt = cell.getRow().getData();
-                    ver_pdf_reporte(elemento_mnt);
-                }
-            },
-            {
-                formatter: editIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
-                cellClick: function (e, cell) {
-                    elemento_mnt = cell.getRow().getData();
-                    mdl_mantenimiento_info(elemento_mnt);
-                }
-            },
-        ],
-    })
-    mantenimientosPendientes = Object.values(datos_mantenimiento.reduce((objeto, item) => {
-
-        if (item.estado == "Realizado") return objeto
-
-        let anio = item.anio
-        let mes = item.fecha.split('-')[1]
-
-        // Si aún no existe el año, inicializamos su propiedad meses
-        if (!objeto[anio]) {
-            objeto[anio] = { anio: anio, meses: {} };
-        }
-
-        //si ya existe este mes, incrementa su valor, sino lo inicia en 0 y suma 1
-        objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
-
-        return objeto
-    }, {}))
-
-    let searchInput = document.getElementById("buscador-tabla-mantenimiento")
-
-    searchInput.addEventListener("keyup", function () {
-        let query = searchInput.value.toLowerCase();
-
-        // Función de filtro personalizada
-        table.setFilter(function (data) {
-            // Recorre todas las propiedades de la fila
-            for (var key in data) {
-                if (data[key] && data[key].toString().toLowerCase().includes(query)) {
-                    return true; // Coincidencia encontrada
-                }
-            }
-            return false; // No hay coincidencia
+                return false;
+            });
         });
-    });
+    }
+
+    // Calcular auditorías pendientes
+    if (tabId === 'todas' || tabId === 'user') {
+        auditorias_pendientes = Object.values(datos.reduce((objeto, item) => {
+            if (item.estado == "Realizado") return objeto
+            let anio = item.anio
+            let mes = item.fecha.split('-')[1]
+            if (!objeto[anio]) {
+                objeto[anio] = { anio: anio, meses: {} };
+            }
+            objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
+            return objeto
+        }, {}));
+    }
+
+    return tabla;
 }
+
+// async function consultar_informacion(anio) {
+
+//     const fecha = anio.value
+
+//     const usuDatos = JSON.parse(sessionStorage.getItem('user'));
+//     const region = usuDatos.resultado[2];
+//     //load()
+//     let server = await server_mantenimiento({ accion: 0, anio: fecha, region: region });
+
+//     //* Mostrar mensaje
+//     /* if (!fecha) {
+//         table = new Tabulator('#tbl01', {
+//             locale: "es",
+//             layout: "fitColumns",
+//             data: [{ mensaje: "Seleccione un año para ver la información de mantenimiento." }],
+//             columns: [
+//                 { title: "Mensaje", field: "mensaje", hozAlign: "center" }
+//             ]
+//         });
+//         return;
+//     } */
+
+//     if (!fecha) return;
+
+//     datos_mantenimiento = server.resultado
+//     Tabulator.extendModule("localize", "langs", {
+//         "es": {
+//             "pagination": {
+//                 "first": '<i class="fa-solid fa-angles-right fa-flip-horizontal"></i>',
+//                 "first_title": "Primera página",
+//                 "last": '<i class="fa-solid fa-angles-right"></i>',
+//                 "last_title": "Última página",
+//                 "prev": '<i class="fa-solid fa-angle-right fa-flip-horizontal"></i>',
+//                 "prev_title": "Página anterior",
+//                 "next": '<i class="fa-solid fa-angle-right"></i>',
+//                 "next_title": "Página siguiente",
+//                 "page_size": "Tamaño",
+
+//             },
+//             "headerFilters": {
+//                 "default": "Filtrar columna...",
+//                 "columns": {}
+//             },
+//             "groups": {
+//                 "item": "ítem",
+//                 "items": "ítems"
+//             },
+//         }
+//     });
+
+//     let editIcon = function (cell, formatterParams, onRendered) {
+//         onRendered(function () {
+//             $(cell.getElement()).find('[data-toggle="popover"]').popover()
+//         })
+//         return `<button type='button' class='btn btn-warning icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Información' onclick=''><i class='fa-solid fa-circle-info fa-lg'></i></button>`;
+//     }
+
+//     let uploadIcon = function (cell, formatterParams, onRendered) {
+//         onRendered(function () {
+//             $(cell.getElement()).find('[data-toggle="popover"]').popover()
+//         })
+//         const data = cell.getRow().getData()
+//         const disabled = data.reporte_descargado == 0 ? "disabled" : ""
+
+//         return `<button type='button' class='btn btn-info icon' ${disabled} data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' data-widget="control-sidebar" data-slide="true" data-target="#control-sidebar"><i class='fa-solid fa-upload fa-lg'></i></button>`;
+//     }
+
+//     let fileIcon = function (cell, formatterParams, onRendered) { //plain text value
+//         onRendered(function () {
+//             $(cell.getElement()).find('[data-toggle="popover"]').popover()
+//         })
+//         const data = cell.getRow().getData()
+//         const disabled = data.correo_enviado == 0 ? "disabled" : ""
+
+//         return `<button type='button' class='btn btn-success icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Reporte de mantenimiento' onclick=''><i class='fa-solid fa-file-excel fa-lg'></i></button>`;
+//     }
+
+//     let eyeIcon = function (cell, formatterParams, onRendered) { //plain text value
+//         onRendered(function () {
+//             $(cell.getElement()).find('[data-toggle="popover"]').popover()
+//         })
+//         const data = cell.getRow().getData()
+//         const disabled = data.reporte_subido == 0 ? "disabled" : ""
+
+//         return `<button type='button' class='btn btn-lock btn-outline-dark icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Ver pdf'><i class='fa-solid fa-eye '></i></button>`;
+//     }
+
+//     let mailIcon = function (cell, formatterParams, onRendered) { //plain text value
+//         onRendered(function () {
+//             $(cell.getElement()).find('[data-toggle="popover"]').popover()
+//         })
+//         /* const data = cell.getRow().getData()
+//         const disabled = data.correo_enviado == 1 ? "disabled" : "" */
+//         return `<button type='button' class='btn btn-lock btn-danger envelope'  data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Enviar correo'><i class='fa-solid fa-envelope '></i></button>`;
+//     }
+
+//     let menuEstatus = [
+//         {
+//             label: `<i class="fa-solid fa-circle" style="color: #28a745;"></i> Realizado`
+//         },
+//         { label: `<i class="fa-solid fa-circle" style="color: #0385ffff;"></i> En proceso` },
+//         {
+//             label: `<i class="fa-solid fa-circle" style="color: #ff7300;"></i> Pendiente`
+//         },
+//         {
+//             label: `<i class="fa-solid fa-circle fa-beat-fade" style="color: #dc3545;"></i> Vencido`
+//         },
+//     ]
+
+//     table = new Tabulator('#tbl01', {
+//         locale: "es",
+//         data: datos_mantenimiento,
+//         layout: "fitColumns",              //fit columns to width of table
+//         //height: window.innerHeight ,
+//         maxHeight: window.innerHeight,
+//         movableColumns: true,              //allow column order to be changed
+//         pagination: true,
+//         paginationSize: 15,
+//         paginationSizeSelector: [15, 25, 35, true],
+//         paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
+//             const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
+//             const end = Math.min(currentRowStart + pageSize - 1, totalRows);
+//             return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
+//         },
+//         //paginationButtonCount: 3,
+//         groupBy: function (data) {
+//             // Asegura que tenga formato YYYY-MM
+//             const [año, mes] = data.fecha.split("-");
+//             // Creamos una fecha con día explícito
+//             const fecha = new Date(`${año}-${mes}-01T00:00:00`);
+//             const opciones = { year: 'numeric', month: 'long' };
+
+//             //let excluir = ['Realizado']
+//             //const datos = table.getData().filter(d=> d.estado && !excluir.includes(d.estado)).length
+
+
+//             return `${fecha.toLocaleDateString('es-ES', opciones)}`
+//         },
+//         groupHeader: function (value, count, data) {
+//             const fila = data[0];  // Primera fila del grupo
+
+//             const [año, mes] = fila.fecha.split("-");
+//             const fecha = new Date(`${año}-${mes}-01T00:00:00`);
+//             const opciones = { year: 'numeric', month: 'long' };
+
+//             // Excluir estatus
+//             const excluir = ['Realizado'];
+
+//             // Contar pendiente SOLO dentro del grupo actual
+//             const pendientes = data.filter(d =>
+//                 d.estado &&
+//                 !excluir.includes(d.estado)
+//             ).length;
+
+//             return `${fecha.toLocaleDateString('es-ES', opciones)} (${pendientes} mantenimientos pendientes)`;
+
+//         },
+//         groupStartOpen: false,
+//         groupToggleElement: "header", //* Permite que dando click en cualquier parte del header group, éste se despliegue
+//         //headerVisible: false,
+//         /*         dataGrouped: function (groups) {
+//                     restaurarEstadoDeGrupos();
+//                 },
+//                 renderComplete: function () {
+//                     restaurarEstadoDeGrupos()
+//                 }, */
+//         columns: [
+//             {
+//                 title: "Fecha", field: "fecha", width: 115, headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */ sorter: "date",
+//             },
+//             {
+//                 title: "Tipo",
+//                 field: "tipo", width: 130, headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */
+//                 formatter: function (cell, formatterParams, onRendered) {
+//                     let data = cell.getData();
+//                     return `${data.tipo}<br><small>${data.marca}<br><small>${data.modelo}`;
+//                 }
+//             },
+//             {
+//                 title: "Número de serie",
+//                 field: "num_serie", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input" */
+
+//             },
+//             {
+//                 title: "Usuario",
+//                 field: "usuario", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */
+//                 formatter: function (cell, formatterParams, onRendered) {
+//                     let data = cell.getData(); // Obtiene toda la fila
+//                     return `${data.usuario}<br><small>${data.cargo}</small>`;
+//                 }
+
+//             },
+//             {
+//                 title: "Ubicación",
+//                 field: "ubicacion", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "list", */
+//                 headerFilterParams: {
+//                     valuesLookup: true, clearable: true,
+//                 }
+
+//             },
+//             {
+//                 title: "Estatus",
+//                 field: "estado", hozAlign: "center", formatter: "lookup", headerSort: false, headerHozAlign: "center", formatter: "lookup", width: 150,
+//                 headerFilterParams: {
+//                     valuesLookup: true, clearable: true,
+//                 },
+//                 headerMenu: menuEstatus,
+//                 headerMenuIcon: '<i class="fa-solid fa-circle-question"></i>',
+//                 formatterParams: {
+//                     "Pendiente": `<i class="fa-solid fa-circle" style="color: #ff7300;"></i> Pendiente`,
+//                     "En proceso": `<i class="fa-solid fa-circle" style="color: #0385ffff;"></i> En proceso`,
+//                     "Realizado": `<i class="fa-solid fa-circle" style="color: #28a745;"></i> Realizado`,
+//                     "Vencido": `<i class="fa-solid fa-circle fa-beat-fade" style="color: #dc3545;"></i> Vencido`,
+//                 },
+//                 /* headerFilter: "list",
+//                 headerFilterParams: {
+//                     valuesLookup: true, clearable: true,
+//                 }, headerSort: false, */
+
+//             },
+//             {
+//                 formatter: mailIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "correo_enviado",
+//                 cellClick: function (e, cell) {
+//                     elemento_mnt = cell.getRow().getData();
+//                     mdl_correo_reporte_mantenimiento(elemento_mnt)
+//                 },
+//             },
+//             {
+//                 formatter: fileIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "correo_enviado",
+//                 cellClick: function (e, cell) {
+//                     const button = cell.getElement().querySelector('button');
+//                     if (button && !button.disabled) {
+//                         // Deshabilita el botón
+//                         button.disabled = true;
+
+//                         // Acción que quieres ejecutar al hacer clic
+//                         const elemento_mnt = cell.getRow().getData();
+//                         mdl_reporte_mantenimiento(elemento_mnt);
+
+//                         // Rehabilita el botón después de 3 segundos
+//                         setTimeout(() => {
+//                             button.disabled = false;
+//                         }, 3000);
+//                     }
+//                 }
+//             },
+//             {
+//                 formatter: uploadIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_descargado",
+//                 cellClick: function (e, cell) {
+//                     elemento_mnt = cell.getRow().getData();
+//                     abrir_subir_reporte(elemento_mnt);
+//                 }
+//             },
+
+//             {
+//                 formatter: eyeIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_subido",
+//                 cellClick: function (e, cell) {
+//                     elemento_mnt = cell.getRow().getData();
+//                     ver_pdf_reporte(elemento_mnt);
+//                 }
+//             },
+//             {
+//                 formatter: editIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
+//                 cellClick: function (e, cell) {
+//                     elemento_mnt = cell.getRow().getData();
+//                     mdl_mantenimiento_info(elemento_mnt);
+//                 }
+//             },
+//         ],
+//     })
+//     mantenimientosPendientes = Object.values(datos_mantenimiento.reduce((objeto, item) => {
+
+//         if (item.estado == "Realizado") return objeto
+
+//         let anio = item.anio
+//         let mes = item.fecha.split('-')[1]
+
+//         // Si aún no existe el año, inicializamos su propiedad meses
+//         if (!objeto[anio]) {
+//             objeto[anio] = { anio: anio, meses: {} };
+//         }
+
+//         //si ya existe este mes, incrementa su valor, sino lo inicia en 0 y suma 1
+//         objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
+
+//         return objeto
+//     }, {}))
+
+//     let searchInput = document.getElementById("buscador-tabla-mantenimiento")
+
+//     searchInput.addEventListener("keyup", function () {
+//         let query = searchInput.value.toLowerCase();
+
+//         // Función de filtro personalizada
+//         table.setFilter(function (data) {
+//             // Recorre todas las propiedades de la fila
+//             for (var key in data) {
+//                 if (data[key] && data[key].toString().toLowerCase().includes(query)) {
+//                     return true; // Coincidencia encontrada
+//                 }
+//             }
+//             return false; // No hay coincidencia
+//         });
+//     });
+// }
 
 async function mdl_programar_mantenimiento() {
 
@@ -519,8 +948,8 @@ async function programar_mantenimiento() {
     }
 
     const mensajeInicial = downloadBoth
-    ? 'Programando mantenimiento y auditoría...'
-    : 'Programando mantenimiento...';
+        ? 'Programando mantenimiento y auditoría...'
+        : 'Programando mantenimiento...';
 
     mostrar_toast_cargando(mensajeInicial);
     $('#mdl-btn-conf').prop('disabled', true);
@@ -536,12 +965,12 @@ async function programar_mantenimiento() {
         // - resultado.urls (array de strings)
         // - resultado.url (string)
         if (Array.isArray(server.resultado.urls)) {
-             server.resultado.urls.forEach(url => {
+            server.resultado.urls.forEach(url => {
                 const link = document.createElement('iframe');
                 link.style.display = 'none';
                 link.src = url;
                 document.body.appendChild(link);
-             });
+            });
         } else if (server.resultado.url) {
             window.location = server.resultado.url;
         }

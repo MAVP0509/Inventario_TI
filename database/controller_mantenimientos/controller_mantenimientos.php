@@ -45,17 +45,36 @@ function consultar_datos($valores)
 {
     include("../conexion.php");
 
+    $region = $valores->region ?? null;
+    $anio   = $valores->anio ?? null;
 
-$sql = "SELECT * FROM vmantenimiento WHERE anio = '$valores->anio' AND zona LIKE '%$valores->region%' ORDER BY fecha ASC";
-    $query = mysqli_query($con, $sql);
-
-
-    $array = array();
-    while ($fila = mysqli_fetch_object($query)) {
-        array_push($array, $fila);  //* Se guardan los registros en un array
+    if (!$anio) {
+        return [];
     }
 
-    return $array;
+    if (empty($region)) {
+        // Si no viene región → es admin
+        $sql = "SELECT * 
+                FROM vmantenimiento
+                WHERE anio = '$anio' 
+                ORDER BY fecha ASC";
+    } else {
+        // Si viene región → es usuario normal
+        $sql = "SELECT * 
+                FROM vmantenimiento
+                WHERE anio = '$anio' 
+                AND zona LIKE '%$region%' 
+                ORDER BY fecha ASC";
+    }
+
+    $query = mysqli_query($con, $sql);
+
+    $datos = [];
+    while ($fila = mysqli_fetch_object($query)) {
+        $datos[] = $fila;
+    }
+
+    return $datos;
 }
 
 function consultar_orden()

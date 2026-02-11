@@ -492,13 +492,44 @@
                                             <span class="input-group-text"><i class="fa-solid fa-calendar"></i></span>
                                         </div>
                                         <select class="form-control select" id="select-anio-mantenimiento"
-                                            onchange="consultar_informacion(this)"></select>
+                                            onchange="consultar_mantenimiento(this)"></select>
                                     </div>
-                                    <input class="form-control" id="buscador-tabla-mantenimiento" 
-                                    type="text" 
-                                    placeholder="Buscar por equipo, año, fecha, estado...">
-                                    <br>
-                                    <div id="tbl01"></div>
+
+                                    <!-- Card con tabs para admin -->
+                                    <div class="card card-primary card-outline card-outline-tabs" id="card-mant-admin"
+                                        style="display: none;">
+                                        <div class="card-header p-0 border-bottom-0">
+                                            <ul class="nav nav-tabs" id="custom-tabs-mant" role="tablist">
+                                                <!-- Los tabs se generarán dinámicamente aquí -->
+                                            </ul>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="tab-content" id="custom-tabs-content-mant">
+                                                <!-- El contenido de los tabs se generará dinámicamente aquí -->
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Card simple para usuarios normales -->
+                                    <div class="card" id="card-mant-user" style="display: none;">
+                                        <div class="card-header">
+                                            <h3 class="card-title">
+                                                <i class="fas fa-clipboard-list mr-1"></i>
+                                                Mantenimientos
+                                                <span id="badge-region-mant" class="badge badge-success ml-2"></span>
+                                            </h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="input-group mb-3">
+                                                <input type="text" class="form-control" id="buscador-tabla-user-mant"
+                                                    placeholder="Buscar por equipo, año, fecha, estado...">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                                </div>
+                                            </div>
+                                            <div id="tbl-user-mant" style="overflow-x: auto; width: 100%;"></div>
+                                        </div>
+                                    </div>
                                 </div> <!-- Card body -->
                             </div>
                         </div>
