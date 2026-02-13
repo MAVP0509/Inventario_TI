@@ -36,32 +36,16 @@ function consultar_distintos($valores)
                 return $datos;
             case "anio_mantenimiento":
                 //*Retornara el año actual y el siguiente, si ya existe el año actual, retornara solo el siguiente
-                $sql = "SELECT
-                          IF(
-                            EXISTS (
-                              SELECT 1
-                              FROM mantenimiento
-                              WHERE anio = YEAR(CURDATE())
-                            ),
-                            YEAR(CURDATE()) + 1,
-                            YEAR(CURDATE())
-                          ) AS anio_mantenimiento;
-                                    
+                $sql = "SELECT YEAR(CURDATE()) AS anio_mantenimiento
+                        UNION ALL
+                        SELECT YEAR(CURDATE()) + 1;               
                         ";
                 break;
             case "anio_auditoria":
                 //*Retornara el año actual y el siguiente, si ya existe el año actual, retornara solo el siguiente
-                $sql = "SELECT
-                          IF(
-                            EXISTS (
-                              SELECT 1
-                              FROM auditoria
-                              WHERE anio = YEAR(CURDATE())
-                            ),
-                            YEAR(CURDATE()) + 1,
-                            YEAR(CURDATE())
-                          ) AS anio_auditoria;
-                                    
+                $sql = "SELECT YEAR(CURDATE()) AS anio_auditoria
+                        UNION ALL
+                        SELECT YEAR(CURDATE()) + 1;       
                         ";
                 break;
             case "zona":
