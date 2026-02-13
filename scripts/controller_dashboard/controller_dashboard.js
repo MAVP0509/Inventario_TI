@@ -18,9 +18,12 @@ function server_dashboard(model) {
     })
 }
 
+let datos
 async function consultar_info() {
     let info = await server_dashboard({ accion: 0 })
-    console.table(info)
+    datos = info.resultado
+    //console.log(info)
+    renderChart();
 }
 
 
@@ -103,7 +106,7 @@ function getDataRegion(region, tipo) {
     const result = { pendiente: [], proceso: [], finalizado: [], vencido: [] };
     MESES.forEach((_, index) => {
         ['pendiente', 'proceso', 'finalizado', 'vencido'].forEach(estado => {
-            result[estado].push(tipos.reduce((suma, tipo) => suma + DATA[region][tipo][estado][index] || 0, 0));
+            result[estado].push(tipos.reduce((suma, tipo) => suma + datos[region][tipo][estado][index] || 0, 0));
         });
     });
     return result;
@@ -117,7 +120,7 @@ function actualizarKPIs() {
 
     regiones.forEach(region => tipos.forEach(tipo => {
         ['pendiente', 'proceso', 'finalizado', 'vencido'].forEach(estado => {
-            valoresKpis[estado] += DATA[region][tipo][estado].reduce((suma, valor) => suma + valor, 0);
+            valoresKpis[estado] += datos[region][tipo][estado].reduce((suma, valor) => suma + valor, 0);
         });
     }));
 
@@ -246,10 +249,10 @@ function actualizarTabla() {
     regiones.forEach(r => {
         tipos.forEach(t => {
             MESES_FULL.forEach((mes, i) => {
-                const p = DATA[r][t].pendiente[i];
-                const pr = DATA[r][t].proceso[i];
-                const f = DATA[r][t].finalizado[i];
-                const v = DATA[r][t].vencido[i];
+                const p = datos[r][t].pendiente[i];
+                const pr = datos[r][t].proceso[i];
+                const f = datos[r][t].finalizado[i];
+                const v = datos[r][t].vencido[i];
                 const total = p + pr + f + v;
                 filas += `<tr>
                     <td><span class="tag-${r}">${r.charAt(0).toUpperCase() + r.slice(1)}</span></td>
@@ -299,7 +302,7 @@ function actualizarTitulo() {
         `<i class="fas fa-chart-bar mr-2 text-primary"></i>${rLabel} — ${tLabel}`;
 }
 
-//*renderizar
+/* //*renderizar
 $(document).ready(function () {
     renderChart();
-});
+}); */
