@@ -479,6 +479,12 @@ function programa_mantenimiento($valores)
     // var_dump($datos_dev);
     $dev = implode(',', $datos_dev);
 
+    // Preparar parámetro de región para el procedimiento almacenado (cadena vacía = todas las regiones)
+    $region_param = '';
+    if (!empty($valores->region)) {
+        $region_param = mysqli_real_escape_string($con, $valores->region);
+    }
+
     if (empty($dev)) {
         return [
             'result' => false,
@@ -487,7 +493,8 @@ function programa_mantenimiento($valores)
     }
 
     // Consulta SQL que obtiene todos los registros de la vista, en un orden específico según ID
-    $sql_inv = "CALL pprograma_mantenimiento('$dev', '$dev')";
+    // Ahora se pasa un tercer parámetro opcional de región al procedimiento.
+    $sql_inv = "CALL pprograma_mantenimiento('$dev', '$dev', '$region_param')";
     $query = mysqli_query($con, $sql_inv);
 
     $datos = []; // Crea un arreglo vacío para almacenar los datos
@@ -512,7 +519,7 @@ function programa_mantenimiento($valores)
         $user_rol = mysqli_real_escape_string($con, $valores->rol);
     }
 
-    if (!empty($user_region) && $user_rol !== 'admin' && !empty($datos)) {
+    if (!empty($user_region) && !empty($datos)) {
         // Obtener regiones de los equipos consultando inventario por lote (consulta única)
         $ids = [];
         foreach ($datos as $d) {
@@ -542,45 +549,7 @@ function programa_mantenimiento($valores)
         }
     }
 
-    // Aplicar filtro por región si el cliente envió region y no es admin
-    $user_region = '';
-    $user_rol = '';
-    if (!empty($valores->region)) {
-        $user_region = mysqli_real_escape_string($con, $valores->region);
-    }
-    if (!empty($valores->rol)) {
-        $user_rol = mysqli_real_escape_string($con, $valores->rol);
-    }
-
-    if (!empty($user_region) && $user_rol !== 'admin' && !empty($datos)) {
-        // Obtener regiones de los equipos consultando inventario por lote (consulta única)
-        $ids = [];
-        foreach ($datos as $d) {
-            if (!empty($d['id_equipo'])) $ids[] = (int)$d['id_equipo'];
-        }
-        $ids = array_unique($ids);
-        if (!empty($ids)) {
-            $ids_list = implode(',', $ids);
-            $sql_reg = "SELECT inv.id, cu.region FROM inventario_ti_sur inv INNER JOIN cat_usuarios cu ON cu.id = inv.fk_usuario WHERE inv.id IN ($ids_list)";
-            $qreg = mysqli_query($con, $sql_reg);
-            $map_region = [];
-            if ($qreg) {
-                while ($rreg = mysqli_fetch_assoc($qreg)) {
-                    $map_region[(int)$rreg['id']] = $rreg['region'];
-                }
-            }
-
-            // Filtrar $datos dejando sólo los que pertenezcan a la región del usuario
-            $datos_filtrados = [];
-            foreach ($datos as $d) {
-                $idEq = (int)$d['id_equipo'];
-                if (isset($map_region[$idEq]) && $map_region[$idEq] == $user_region) {
-                    $datos_filtrados[] = $d;
-                }
-            }
-            $datos = $datos_filtrados;
-        }
-    }
+    
 
     // Verificar si ya existen registros para el año; si ya existen, no insertamos, solo generamos documento
     $mantenimiento_exist = false;
@@ -930,7 +899,41 @@ function reporte_mantenimiento($valores)
     $worksheet->setCellValue("G11", !empty($valores->elementos->usuario) ? $valores->elementos->usuario : 'NA');
     $worksheet->setCellValue("G12", !empty($valores->elementos->cargo) ? $valores->elementos->cargo : 'NA');
     $worksheet->setCellValue("G13", !empty($valores->elementos->region) ? $valores->elementos->region : 'NA');
-    // $worksheet->setCellValue("G14", !empty($valores->id) ? $valores->id : 'NA');
+    // Generar número de reporte basado en región + secuencia de mantenimiento
+    $region_val = '';
+    if (!empty($valores->elementos->region)) {
+        $region_val = mysqli_real_escape_string($con, $valores->elementos->region);
+    }
+    // Prefijos por región
+    $prefix = 'MTOUNK';
+    $r_lower = mb_strtolower($region_val);
+    if (strpos($r_lower, 'sur') !== false) {
+        $prefix = 'MTOVHA';
+    } elseif (strpos($r_lower, 'tamp') !== false || strpos($r_lower, 'tampico') !== false) {
+        $prefix = 'MTOTAMP';
+    } elseif (strpos($r_lower, 'norte') !== false || strpos($r_lower, 'prz') !== false || strpos($r_lower, 'prz') !== false) {
+        $prefix = 'MTOPRZ';
+    }
+
+    // Calcular secuencia: contar registros de mantenimiento para la región y año
+    $seq_sql = "SELECT COUNT(*) AS cnt FROM mantenimiento m
+                INNER JOIN inventario_ti_sur inv ON inv.id = m.id_equipo
+                INNER JOIN cat_usuarios cu ON cu.id = inv.fk_usuario
+                WHERE m.anio = '$anio'";
+    if (!empty($region_val)) {
+        $seq_sql .= " AND cu.region = '$region_val'";
+    }
+    $seq_q = mysqli_query($con, $seq_sql);
+    $seq_num = 0;
+    if ($seq_q) {
+        $seq_row = mysqli_fetch_assoc($seq_q);
+        $seq_num = (int)$seq_row['cnt'];
+    }
+    // siguiente número en la secuencia
+    $seq_num++;
+    $seq_formato = str_pad($seq_num, 3, '0', STR_PAD_LEFT);
+    $report_code = $prefix . $seq_formato;
+    $worksheet->setCellValue("G14", $report_code);
 
     // Mapeo de tipo -> fila
     $mapa_filas = [
