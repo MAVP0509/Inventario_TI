@@ -18,6 +18,12 @@ function server_dashboard(model) {
     })
 }
 
+async function consultar_info() {
+    let info = await server_dashboard({ accion: 0 })
+    console.table(info)
+}
+
+
 const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 const MESES_FULL = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 

@@ -14,7 +14,9 @@ if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = editar_supervisor($clientejson);
 } elseif ($clientejson->accion == 2) {
     $respuesta_servidor->resultado = consultar_supervisor($clientejson);
-}  elseif ($clientejson->accion == 4) {
+} elseif ($clientejson->accion == 3) {
+    $respuesta_servidor->resultado = habilitar_supervisor($clientejson);
+} elseif ($clientejson->accion == 4) {
     $respuesta_servidor->resultado = consultar_distintos($clientejson->tabla, $clientejson->campo);
 } elseif ($clientejson->accion == 5) {
     $respuesta_servidor->resultado = eliminar_supervisor($clientejson);
@@ -60,11 +62,11 @@ function editar_supervisor($valores)
         $query_change_supervisor = mysqli_query($con, $sql_change_supervisor);
         $array = array();
         while ($fila = mysqli_fetch_object($query_change_supervisor)) {
-            array_push($array, $fila);  
+            array_push($array, $fila);
         }
 
-         //* Validamos si la nueva region tiene supervisor habilitado, para así deshabilitar el que ya tiene y que el supervisor editado sea el habilitado
-        if(!empty($array)){
+        //* Validamos si la nueva region tiene supervisor habilitado, para así deshabilitar el que ya tiene y que el supervisor editado sea el habilitado
+        if (!empty($array)) {
             $id_habilitado = $array[0]->id;
 
             $sql_update_old_supervisor = "UPDATE supervisor SET habilitado = 0 WHERE id = '$id_habilitado'";
@@ -74,7 +76,7 @@ function editar_supervisor($valores)
             mysqli_query($con, $sql_update_new_supervisor);
 
             $respuesta->resultado = "Supervisor actualizado correctamente";
-        }else{
+        } else {
             //*si la región es nueva y no tiene supervisor o si la región existe pero no tiene habilitado un supervisor
 
             $sql = "UPDATE supervisor SET nombre = '$valores->nombre', cargo = '$valores->cargo', region = '$valores->region', habilitado = 1 WHERE id = '$valores->id' ";
@@ -102,6 +104,14 @@ function consultar_supervisor()
         array_push($array, $fila);  //* Se guardan los registros en un array
     }
     return $array;
+}
+
+function habilitar_supervisor($valores)
+{
+    include("../conexion.php");
+    $sql = "UPDATE supervisor SET habilitado='$valores->habilitado'  WHERE id='$valores->id'";
+    $query = mysqli_query($con, $sql);
+    return $query;
 }
 
 //* Desactivar supervisores

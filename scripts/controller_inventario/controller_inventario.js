@@ -129,7 +129,7 @@ async function consultar_informacion() {
             locale: "es",
             data: datos,
             pagination: true,
-            height: "750px",
+            maxHeight: "750px",
             paginationSize: 10,
             paginationSizeSelector: [10, 25, 35, true],
             movableColumns: true,              //allow column order to be changed
@@ -158,7 +158,7 @@ async function consultar_informacion() {
                     }, headerSort: false, frozen: true, width: 70, hozAlign: "center",
                 },
                 {
-                    title: "Zona", field: "zona", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "list", */
+                    title: "Zona", field: "zona",width:130, headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "list", */
                     /* headerFilterParams: {
                         valuesLookup: true, clearable: true, // se auto genera a partir de los valores únicos de la columna
                         elementAttributes: {
