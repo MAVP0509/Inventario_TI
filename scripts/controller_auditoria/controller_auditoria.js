@@ -85,14 +85,14 @@ async function load_auditoria() {
     }
 }
 //* Limpiar el input del buscador si cambia el año de la tabla
-$('#select-anio-auditoria').on('change', () =>{
+$('#select-anio-auditoria').on('change', () => {
     $('#buscador-tabla-auditoria').val('')
 })
 
 
 let datos_auditoria = [];
 let tabla_aud;
-let elemento_aud; 
+let elemento_aud;
 let auditorias_pendientes;
 
 // NUEVAS VARIABLES
@@ -107,7 +107,7 @@ const regionUsuario = userData.resultado[2];
 
 // Colores para las regiones
 const coloresRegion = [
-    'primary', 'success', 'info', 'warning', 'danger', 
+    'primary', 'success', 'info', 'warning', 'danger',
     'purple', 'indigo', 'pink', 'teal', 'orange'
 ];
 
@@ -121,7 +121,7 @@ async function consultar_auditoria(anio) {
 
     // Limpiar tablas anteriores
     tablas_por_region = {};
-    
+
     if (rol === 'admin') {
         await cargarDatosAdmin(fecha, region);
     } else {
@@ -135,21 +135,21 @@ async function cargarDatosAdmin(fecha, region) {
     document.getElementById('card-admin').style.display = 'block';
     document.getElementById('card-user').style.display = 'none';
 
-    let server = await server_auditoria({ 
-        accion: 0, 
-        anio: fecha, 
+    let server = await server_auditoria({
+        accion: 0,
+        anio: fecha,
         region: '' // Admin ve todas las regiones
     });
 
     datos_auditoria = server.resultado;
     datosGlobales = server.resultado; // Copia para tabs
-    
+
     // Obtener regiones únicas
     const regionesUnicas = [...new Set(datos_auditoria.map(item => item.zona))].filter(Boolean).sort();
-    
+
     // Construir tabs dinámicamente
     construirTabs(regionesUnicas, datos_auditoria);
-    
+
     // Crear tabla "Todas" y guardar como tabla_aud principal
     tabla_aud = crear_tabla_auditoria('todas', datos_auditoria, fecha, true);
     tabActual = 'todas';
@@ -162,14 +162,14 @@ async function cargarDatosUser(fecha, region) {
     document.getElementById('card-user').style.display = 'block';
     document.getElementById('badge-region').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${regionUsuario}`;
 
-    let server = await server_auditoria({ 
-        accion: 0, 
-        anio: fecha, 
-        region: region 
+    let server = await server_auditoria({
+        accion: 0,
+        anio: fecha,
+        region: region
     });
 
     datos_auditoria = server.resultado;
-    
+
     // Crear tabla y guardar como tabla_aud principal
     tabla_aud = crear_tabla_auditoria('user', datos_auditoria, fecha, false);
 }
@@ -178,14 +178,14 @@ async function cargarDatosUser(fecha, region) {
 function construirTabs(regiones, datos) {
     const navTabs = document.getElementById('custom-tabs');
     const tabContent = document.getElementById('custom-tabs-content');
-    
+
     // Limpiar tabs existentes
     navTabs.innerHTML = '';
     tabContent.innerHTML = '';
-    
+
     // Calcular pendientes totales
     const totalPendientes = datos.filter(d => d.estado !== 'Realizado').length;
-    
+
     // Tab "Todas las Regiones"
     const tabTodas = `
         <li class="nav-item">
@@ -196,7 +196,7 @@ function construirTabs(regiones, datos) {
             </a>
         </li>
     `;
-    
+
     const contentTodas = `
         <div class="tab-pane fade show active" id="todas" role="tabpanel">
             <div class="input-group mb-3">
@@ -208,10 +208,10 @@ function construirTabs(regiones, datos) {
             <div id="tbl-todas" style="overflow-x: auto; width: 100%;"></div>
         </div>
     `;
-    
+
     navTabs.insertAdjacentHTML('beforeend', tabTodas);
     tabContent.insertAdjacentHTML('beforeend', contentTodas);
-    
+
     // Crear tabs para cada región
     regiones.forEach((region, index) => {
         const datosFiltrados = datos.filter(d => (d.zona) === region);
@@ -219,7 +219,7 @@ function construirTabs(regiones, datos) {
         const pendientes = datosFiltrados.filter(d => d.estado !== 'Realizado').length;
         const color = coloresRegion[index % coloresRegion.length];
         const regionId = region.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-        
+
         const tab = `
             <li class="nav-item">
                 <a class="nav-link" id="tab-${regionId}" data-toggle="pill" href="#${regionId}" role="tab" data-region="${region}">
@@ -229,7 +229,7 @@ function construirTabs(regiones, datos) {
                 </a>
             </li>
         `;
-        
+
         const content = `
             <div class="tab-pane fade" id="${regionId}" role="tabpanel">
                 <div class="input-group mb-3">
@@ -241,38 +241,38 @@ function construirTabs(regiones, datos) {
                 <div id="tbl-${regionId}" style="overflow-x: auto; width: 100%;"></div>
             </div>
         `;
-        
+
         navTabs.insertAdjacentHTML('beforeend', tab);
         tabContent.insertAdjacentHTML('beforeend', content);
     });
-    
+
     // Event listeners para tabs (lazy loading)
     $('a[data-toggle="pill"]').off('shown.bs.tab').on('shown.bs.tab', function (e) {
         const tabId = $(e.target).attr('href').substring(1);
         const region = $(e.target).data('region');
-        
+
         // Actualizar tabActual
         tabActual = tabId;
-        
+
         // Actualizar tabla_aud con la tabla del tab activo
         if (tablas_por_region[tabId]) {
             tabla_aud = tablas_por_region[tabId];
             // Actualizar datos_auditoria con los datos filtrados del tab actual
             datos_auditoria = tabla_aud.getData();
         }
-        
+
         // Si la tabla no ha sido creada, crearla
         if (!tablas_por_region[tabId]) {
             let datosFiltrados;
             let mostrarRegion = false;
-            
+
             if (tabId === 'todas') {
                 datosFiltrados = datosGlobales;
                 mostrarRegion = true;
             } else {
                 datosFiltrados = datosGlobales.filter(d => (d.zona) === region);
             }
-            
+
             const nuevaTabla = crear_tabla_auditoria(tabId, datosFiltrados, null, mostrarRegion);
             // Actualizar tabla_aud y datos_auditoria
             tabla_aud = nuevaTabla;
@@ -457,11 +457,11 @@ function crear_tabla_auditoria(tabId, datos, fecha, mostrarRegion = false) {
             headerHozAlign: "center",
             hozAlign: "center",
             headerSort: false,
-            formatter: function(cell) {
+            formatter: function (cell) {
                 const region = cell.getValue() || cell.getData().zona;
                 const index = regiones.indexOf(region);
                 const color = coloresRegion[index % coloresRegion.length];
-                
+
                 return `<span class="badge badge-${color}">
                             <i class="fas fa-map-marker-alt mr-1"></i>${region}
                         </span>`;
@@ -524,19 +524,20 @@ function crear_tabla_auditoria(tabId, datos, fecha, mostrarRegion = false) {
     }
 
     // Calcular auditorías pendientes
-    if (tabId === 'todas' || tabId === 'user') {
-        auditorias_pendientes = Object.values(datos.reduce((objeto, item) => {
-            if (item.estado == "Realizado") return objeto
-            let anio = item.anio
-            let mes = item.fecha.split('-')[1]
-            if (!objeto[anio]) {
-                objeto[anio] = { anio: anio, meses: {} };
-            }
-            objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
-            return objeto
-        }, {}));
-    }
+    // if (tabId === 'todas' || tabId === 'user') {
 
+    // }
+    auditorias_pendientes = Object.values(datos.reduce((objeto, item) => {
+        if (item.estado == "Realizado") return objeto
+        let anio = item.anio
+        let mes = item.fecha.split('-')[1]
+        if (!objeto[anio]) {
+            objeto[anio] = { anio: anio, meses: {} };
+        }
+        objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
+        return objeto
+    }, {}));
+    
     return tabla;
 }
 
@@ -891,6 +892,21 @@ async function mdl_programar_auditoria() {
     $('#btn-conf-aud').prop('disabled', false);
 
     $('#cg-elaboro-aud, #cg-autorizo-aud').prop('disabled', true)
+    // Mostrar selector de región sólo para administradores
+    if (rol === 'admin') {
+        $('#region-container-aud').show();
+        await general_select2({
+            selectId: 'select-region-prog-aud',
+            tabla: 'cat_usuarios',
+            campo: 'region',
+            placeholder: 'Seleccione una región',
+            dropdownParent: '#mdl-prog-aud',
+            tags: false,
+        });
+    } else {
+        $('#region-container-aud').hide();
+    }
+
     $("#btn-conf-aud").off("click").on("click", function () { programar_auditoria() })
 
     $('#mdl-prog-aud').modal("show")
@@ -913,6 +929,20 @@ async function programar_auditoria() {
         autorizo: $('#autorizo-aud').select2('data')[0].text,
         cg_autorizo: $('#cg-autorizo-aud').select2('data')[0].text,
 
+    }
+
+    // Agregar rol y región según el usuario
+    model.rol = rol;
+    if (rol === 'admin') {
+        const sel = $('#select-region-prog-aud').select2('data');
+        model.region = (sel && sel.length) ? sel[0].text : '';
+        if (!model.region) {
+            mostrar_toast('error', 'Error', 'Selecciona una región.');
+            $('#btn-conf-aud').prop('disabled', false);
+            return;
+        }
+    } else {
+        model.region = regionUsuario;
     }
 
     mostrar_toast_cargando('Programando auditoria...')
@@ -1164,7 +1194,7 @@ async function reporte_auditoria(equipo) {
         mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
         return;
     }
-    
+
     let model = {
         accion: 6,
         elementos: equipo,
