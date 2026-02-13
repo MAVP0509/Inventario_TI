@@ -488,7 +488,6 @@ function programa_mantenimiento($valores)
 
     // Consulta SQL que obtiene todos los registros de la vista, en un orden específico según ID
     $sql_inv = "CALL pprograma_mantenimiento('$dev', '$dev')";
-    // var_dump($sql_inv);
     $query = mysqli_query($con, $sql_inv);
 
     $datos = []; // Crea un arreglo vacío para almacenar los datos
@@ -500,6 +499,103 @@ function programa_mantenimiento($valores)
 
         while (mysqli_next_result($con)) {
             mysqli_use_result($con);
+        }
+    }
+
+    // Aplicar filtro por región si el cliente envió region y no es admin
+    $user_region = '';
+    $user_rol = '';
+    if (!empty($valores->region)) {
+        $user_region = mysqli_real_escape_string($con, $valores->region);
+    }
+    if (!empty($valores->rol)) {
+        $user_rol = mysqli_real_escape_string($con, $valores->rol);
+    }
+
+    if (!empty($user_region) && $user_rol !== 'admin' && !empty($datos)) {
+        // Obtener regiones de los equipos consultando inventario por lote (consulta única)
+        $ids = [];
+        foreach ($datos as $d) {
+            if (!empty($d['id_equipo'])) $ids[] = (int)$d['id_equipo'];
+        }
+        $ids = array_unique($ids);
+        if (!empty($ids)) {
+            $ids_list = implode(',', $ids);
+            $sql_reg = "SELECT inv.id, cu.region FROM inventario_ti_sur inv INNER JOIN cat_usuarios cu ON cu.id = inv.fk_usuario WHERE inv.id IN ($ids_list)";
+            $qreg = mysqli_query($con, $sql_reg);
+            $map_region = [];
+            if ($qreg) {
+                while ($rreg = mysqli_fetch_assoc($qreg)) {
+                    $map_region[(int)$rreg['id']] = $rreg['region'];
+                }
+            }
+
+            // Filtrar $datos dejando sólo los que pertenezcan a la región del usuario
+            $datos_filtrados = [];
+            foreach ($datos as $d) {
+                $idEq = (int)$d['id_equipo'];
+                if (isset($map_region[$idEq]) && $map_region[$idEq] == $user_region) {
+                    $datos_filtrados[] = $d;
+                }
+            }
+            $datos = $datos_filtrados;
+        }
+    }
+
+    // Verificar si ya existen registros para el año; si ya existen, no insertamos, solo generamos documento
+    $mantenimiento_exist = false;
+    $auditoria_exist = false;
+    $check_m = mysqli_query($con, "SELECT COUNT(*) AS cnt FROM mantenimiento WHERE anio = '$anio_actual'");
+    if ($check_m) {
+        $rowm = mysqli_fetch_assoc($check_m);
+        $mantenimiento_exist = ((int)$rowm['cnt'] > 0);
+    }
+    $check_a = mysqli_query($con, "SELECT COUNT(*) AS cnt FROM auditoria WHERE anio = '$anio_actual'");
+    if ($check_a) {
+        $rowa = mysqli_fetch_assoc($check_a);
+        $auditoria_exist = ((int)$rowa['cnt'] > 0);
+    }
+
+    // Si ya existen registros de mantenimiento para el año, preferimos generar
+    // el programa usando lo que hay en la BD (tabla `mantenimiento`) porque
+    // algunos activos pudieron haberse dado de baja y ya no aparecen en la vista.
+    if ($mantenimiento_exist) {
+        $datos = []; // reconstruir datos a partir de tabla mantenimiento
+
+        // Si el usuario indicó una región y no es admin, filtramos por ella
+        $region_filter_sql = '';
+        if (!empty($user_region) && $user_rol !== 'admin') {
+            $region_filter_sql = "AND cu.region = '$user_region'";
+        }
+
+        $sql_m = "SELECT m.id_equipo,
+                 inv.id AS id_equipo_inv,
+                 COALESCE(ct.tipo, '') AS tipo,
+                 COALESCE(inv.modelo, '') AS nombre,
+                 COALESCE(inv.ubicacion, '') AS ubicacion,
+                 COALESCE(inv.modelo, '') AS modelo,
+                 COALESCE(inv.num_serie, '') AS num_serie,
+                 m.fecha_programada
+                  FROM mantenimiento m
+                  LEFT JOIN inventario_ti_sur inv ON inv.id = m.id_equipo
+                  LEFT JOIN cat_tipo ct ON ct.id = inv.fk_tipo
+                  LEFT JOIN cat_usuarios cu ON cu.id = inv.fk_usuario
+                  WHERE m.anio = '$anio_actual' $region_filter_sql
+                  ORDER BY m.fecha_programada ASC";
+
+        $q2 = mysqli_query($con, $sql_m);
+        if ($q2) {
+            while ($r = mysqli_fetch_assoc($q2)) {
+                $mes = 0;
+                if (!empty($r['fecha_programada'])) {
+                    $mes = (int)date('n', strtotime($r['fecha_programada']));
+                }
+                $r['mes_index'] = max(0, $mes - 1);
+                // Alineamos nombres de campos con lo que espera la plantilla
+                $r['id_equipo'] = $r['id_equipo'] ?? $r['id_equipo_inv'];
+                $r['num_serie'] = $r['num_serie'] ?? '';
+                $datos[] = $r;
+            }
         }
     }
 
@@ -519,20 +615,6 @@ function programa_mantenimiento($valores)
     while ($row = mysqli_fetch_assoc($query_tipos_aud)) {
         $tipos_aud_ids[] = (int)$row['tipo_id'];
         $tipos_aud_names[] = mb_strtolower(trim($row['tipo']));
-    }
-
-    // Verificar si ya existen registros para el año; si ya existen, no insertamos, solo generamos documento
-    $mantenimiento_exist = false;
-    $auditoria_exist = false;
-    $check_m = mysqli_query($con, "SELECT COUNT(*) AS cnt FROM mantenimiento WHERE anio = '$anio_actual'");
-    if ($check_m) {
-        $rowm = mysqli_fetch_assoc($check_m);
-        $mantenimiento_exist = ((int)$rowm['cnt'] > 0);
-    }
-    $check_a = mysqli_query($con, "SELECT COUNT(*) AS cnt FROM auditoria WHERE anio = '$anio_actual'");
-    if ($check_a) {
-        $rowa = mysqli_fetch_assoc($check_a);
-        $auditoria_exist = ((int)$rowa['cnt'] > 0);
     }
 
     // Define las columnas de Excel correspondientes a los meses del año
@@ -946,6 +1028,47 @@ function programa_auditoria($valores)
 
         while (mysqli_next_result($con)) {
             mysqli_use_result($con);
+        }
+    }
+
+    // Si ya existen registros en la tabla 'auditoria' para el año, generar el programa
+    // a partir de lo que hay en BD (tabla auditoria JOIN inventario), para que
+    // los equipos dados de baja (el trigger los elimina) no aparezcan.
+    $auditoria_exist = false;
+    $check_a = mysqli_query($con, "SELECT COUNT(*) AS cnt FROM auditoria WHERE anio = '$anio_actual'");
+    if ($check_a) {
+        $rowa = mysqli_fetch_assoc($check_a);
+        $auditoria_exist = ((int)$rowa['cnt'] > 0);
+    }
+
+    if ($auditoria_exist) {
+        $datos = [];
+        $sql_a = "SELECT aud.id_equipo,
+                 inv.id AS id_equipo_inv,
+                 COALESCE(ct.tipo, '') AS tipo,
+                 COALESCE(inv.modelo, '') AS nombre,
+                 COALESCE(inv.ubicacion, '') AS ubicacion,
+                 COALESCE(inv.modelo, '') AS modelo,
+                 COALESCE(inv.num_serie, '') AS num_serie,
+                 aud.fecha_programada
+                  FROM auditoria aud
+                  LEFT JOIN inventario_ti_sur inv ON inv.id = aud.id_equipo
+                  LEFT JOIN cat_tipo ct ON ct.id = inv.fk_tipo
+                  WHERE aud.anio = '$anio_actual'
+                  ORDER BY aud.fecha_programada ASC";
+
+        $q3 = mysqli_query($con, $sql_a);
+        if ($q3) {
+            while ($r = mysqli_fetch_assoc($q3)) {
+                $mes = 0;
+                if (!empty($r['fecha_programada'])) {
+                    $mes = (int)date('n', strtotime($r['fecha_programada']));
+                }
+                $r['mes_index'] = max(0, $mes - 1);
+                $r['id_equipo'] = $r['id_equipo'] ?? $r['id_equipo_inv'];
+                $r['num_serie'] = $r['num_serie'] ?? '';
+                $datos[] = $r;
+            }
         }
     }
 

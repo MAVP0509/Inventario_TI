@@ -478,7 +478,7 @@ function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
             const opciones = { year: 'numeric', month: 'long' };
             const excluir = ['Realizado'];
             const pendientes = data.filter(d => d.estado && !excluir.includes(d.estado)).length;
-            return `${fecha.toLocaleDateString('es-ES', opciones)} (${pendientes} auditorías pendientes)`;
+            return `${fecha.toLocaleDateString('es-ES', opciones)} (${pendientes} mantenimientos pendientes)`;
         },
         groupStartOpen: false,
         groupToggleElement: "header",
@@ -504,9 +504,11 @@ function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
         });
     }
 
-    // Calcular auditorías pendientes
-    if (tabId === 'todas' || tabId === 'user') {
-        mantenimientosPendientes = Object.values(datos.reduce((objeto, item) => {
+    // Calcular mantenimientos pendientes
+    // if (tabId === 'todas' || tabId === 'user') {
+        
+    // }
+    mantenimientosPendientes = Object.values(datos.reduce((objeto, item) => {
             if (item.estado == "Realizado") return objeto
             let anio = item.anio
             let mes = item.fecha.split('-')[1]
@@ -516,7 +518,6 @@ function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
             objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
             return objeto
         }, {}));
-    }
 
     return tabla;
 }
@@ -830,6 +831,23 @@ function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
 async function mdl_programar_mantenimiento() {
 
     await Promise.all([
+        // Si es admin, cargamos la lista de regiones
+        (async function(){
+            if (rolUsuario === 'admin') {
+                await general_select2({
+                    selectId: 'select-region-prog',
+                    tabla: 'cat_usuarios',
+                    campo: 'region',
+                    placeholder: 'Seleccione una región',
+                    dropdownParent: '#mdl-prog-mant',
+                    tags: false,
+                });
+                $('#region-container').show();
+            } else {
+                // ocultar el contenedor para usuarios normales
+                $('#region-container').hide();
+            }
+        })(),
         general_select2({
             selectId: 'select-año',
             tabla: 'mantenimiento',
@@ -917,12 +935,21 @@ async function mdl_programar_mantenimiento() {
         }
     });
 
+    // Si es admin, mostrar el contenedor de región; si es user, ocultarlo (por si quedó visible)
+    if (rolUsuario === 'admin') {
+        $('#region-container').show();
+    } else {
+        $('#region-container').hide();
+    }
+
     $('#mdl-prog-mant').modal("show")
 }
 
 async function programar_mantenimiento() {
 
-    const validar = ['select-elaboro', 'select-autorizo', 'select-año']
+    const validar = (rolUsuario === 'admin')
+        ? ['select-elaboro', 'select-autorizo', 'select-año', 'select-region-prog']
+        : ['select-elaboro', 'select-autorizo', 'select-año']
 
     if (!validar_campos(validar)) {
         mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
@@ -957,6 +984,15 @@ async function programar_mantenimiento() {
     // Enviar al servidor si se desean ambos archivos; el PHP será responsable
     // de generar uno o ambos y devolver las URLs correspondientes.
     model.descargar_ambos = downloadBoth ? 1 : 0;
+
+    // Añadir rol y región para que el backend aplique restricciones
+    model.rol = rolUsuario;
+    if (rolUsuario === 'admin') {
+        const sel = $('#select-region-prog').select2('data')[0];
+        model.region = sel ? sel.text : ($('#select-region-prog').val() || '');
+    } else {
+        model.region = regionUsu;
+    }
 
     let server = await server_excel(model);
 

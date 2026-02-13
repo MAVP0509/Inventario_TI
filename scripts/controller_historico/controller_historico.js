@@ -91,7 +91,7 @@ async function consultar_historico() {
         },
         columns: [
             {
-                title: "Fecha del evento", field: "fecha_evento", headerSort: false, headerHozAlign: "center", /* headerFilter: "input", */ headerMenu: [
+                title: "Fecha del evento", field: "fecha_evento", headerSort: false, headerHozAlign: "center", headerFilter: "input", headerMenu: [
                     {
                         label: "Fijar columna",
                         action: function (e, column) {
@@ -109,7 +109,7 @@ async function consultar_historico() {
                 ]
             },
             {
-                title: "Usuario del evento", field: "usuario_sesion", headerSort: false, headerHozAlign: "center", /* headerFilter: "list", */
+                title: "Usuario del evento", field: "usuario_sesion", headerSort: false, headerHozAlign: "center", headerFilter: "list",
                 headerFilterParams: {
                     valuesLookup: true, clearable: true // se auto genera a partir de los valores únicos de la columna
                 },
@@ -131,7 +131,7 @@ async function consultar_historico() {
                 ]
             },
             {
-                title: "Evento", field: "evento",  headerSort: false, headerHozAlign: "center", /* headerFilter: "list", */
+                title: "Evento", field: "evento",  headerSort: false, headerHozAlign: "center", headerFilter: "list",
                 headerFilterParams: {
                     valuesLookup: true, clearable: true // se auto genera a partir de los valores únicos de la columna
                 },
@@ -152,11 +152,11 @@ async function consultar_historico() {
                     }
                 ]
             },
-            { title: "Zona", field: "zona", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
-            { title: "Ubicación del dispositivo", field: "ubicacion", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
-            { title: "Nombre del usuario", field: "nombre", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
+            { title: "Zona", field: "zona", headerSort: false, headerHozAlign: "center", headerFilter: "input" },
+            { title: "Ubicación del dispositivo", field: "ubicacion", headerSort: false, headerHozAlign: "center", headerFilter: "input" },
+            { title: "Nombre del usuario", field: "nombre", headerSort: false, headerHozAlign: "center", headerFilter: "input" },
             {
-                title: "Numero de serie", field: "num_serie", headerSort: false, headerHozAlign: "center", /* headerFilter: "input", */ headerMenu: [
+                title: "Numero de serie", field: "num_serie", headerSort: false, headerHozAlign: "center", headerFilter: "input", headerMenu: [
                     {
                         label: "Fijar columna",
                         action: function (e, column) {
@@ -173,15 +173,15 @@ async function consultar_historico() {
                     }
                 ]
             },
-            { title: "Rubro", field: "rubro", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
-            { title: "Tipo de dispositivo", field: "tipo", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
-            { title: "Modelo del dispositivo", field: "modelo", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
-            { title: "Marca del dispositivo", field: "marca", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
-            { title: "Activo fijo", field: "af", headerHozAlign: "center", headerSort: false,/* headerFilter: "input" */ },
-            { title: "TAG", field: "tag", headerHozAlign: "center", headerSort: false,/* headerFilter: "input" */ },
-            { title: "Fecha de asignación", field: "fecha_registro", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
+            { title: "Rubro", field: "rubro", headerSort: false, headerHozAlign: "center", headerFilter: "input" },
+            { title: "Tipo de dispositivo", field: "tipo", headerSort: false, headerHozAlign: "center", headerFilter: "input" },
+            { title: "Modelo del dispositivo", field: "modelo", headerSort: false, headerHozAlign: "center", headerFilter: "input" },
+            { title: "Marca del dispositivo", field: "marca", headerSort: false, headerHozAlign: "center", headerFilter: "input" },
+            { title: "Activo fijo", field: "af", headerHozAlign: "center", headerSort: false,headerFilter: "input" },
+            { title: "TAG", field: "tag", headerHozAlign: "center", headerSort: false,headerFilter: "input" },
+            { title: "Fecha de asignación", field: "fecha_registro", headerSort: false, headerHozAlign: "center", headerFilter: "input" },
             {
-                title: "Estatus", field: "estatus", headerSort: false, /* headerFilter: "list", */
+                title: "Estatus", field: "estatus", headerSort: false, headerFilter: "list",
                 headerFilterParams: {
                     valuesLookup: true, clearable: true // se auto genera a partir de los valores únicos de la columna
                 },
