@@ -892,6 +892,21 @@ async function mdl_programar_auditoria() {
     $('#btn-conf-aud').prop('disabled', false);
 
     $('#cg-elaboro-aud, #cg-autorizo-aud').prop('disabled', true)
+    // Mostrar selector de región sólo para administradores
+    if (rol === 'admin') {
+        $('#region-container-aud').show();
+        await general_select2({
+            selectId: 'select-region-prog-aud',
+            tabla: 'cat_usuarios',
+            campo: 'region',
+            placeholder: 'Seleccione una región',
+            dropdownParent: '#mdl-prog-aud',
+            tags: false,
+        });
+    } else {
+        $('#region-container-aud').hide();
+    }
+
     $("#btn-conf-aud").off("click").on("click", function () { programar_auditoria() })
 
     $('#mdl-prog-aud').modal("show")
@@ -914,6 +929,20 @@ async function programar_auditoria() {
         autorizo: $('#autorizo-aud').select2('data')[0].text,
         cg_autorizo: $('#cg-autorizo-aud').select2('data')[0].text,
 
+    }
+
+    // Agregar rol y región según el usuario
+    model.rol = rol;
+    if (rol === 'admin') {
+        const sel = $('#select-region-prog-aud').select2('data');
+        model.region = (sel && sel.length) ? sel[0].text : '';
+        if (!model.region) {
+            mostrar_toast('error', 'Error', 'Selecciona una región.');
+            $('#btn-conf-aud').prop('disabled', false);
+            return;
+        }
+    } else {
+        model.region = regionUsuario;
     }
 
     mostrar_toast_cargando('Programando auditoria...')

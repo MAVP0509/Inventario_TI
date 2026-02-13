@@ -505,9 +505,6 @@ function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
     }
 
     // Calcular mantenimientos pendientes
-    // if (tabId === 'todas' || tabId === 'user') {
-        
-    // }
     mantenimientosPendientes = Object.values(datos.reduce((objeto, item) => {
             if (item.estado == "Realizado") return objeto
             let anio = item.anio

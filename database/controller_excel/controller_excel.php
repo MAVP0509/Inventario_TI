@@ -542,6 +542,46 @@ function programa_mantenimiento($valores)
         }
     }
 
+    // Aplicar filtro por región si el cliente envió region y no es admin
+    $user_region = '';
+    $user_rol = '';
+    if (!empty($valores->region)) {
+        $user_region = mysqli_real_escape_string($con, $valores->region);
+    }
+    if (!empty($valores->rol)) {
+        $user_rol = mysqli_real_escape_string($con, $valores->rol);
+    }
+
+    if (!empty($user_region) && $user_rol !== 'admin' && !empty($datos)) {
+        // Obtener regiones de los equipos consultando inventario por lote (consulta única)
+        $ids = [];
+        foreach ($datos as $d) {
+            if (!empty($d['id_equipo'])) $ids[] = (int)$d['id_equipo'];
+        }
+        $ids = array_unique($ids);
+        if (!empty($ids)) {
+            $ids_list = implode(',', $ids);
+            $sql_reg = "SELECT inv.id, cu.region FROM inventario_ti_sur inv INNER JOIN cat_usuarios cu ON cu.id = inv.fk_usuario WHERE inv.id IN ($ids_list)";
+            $qreg = mysqli_query($con, $sql_reg);
+            $map_region = [];
+            if ($qreg) {
+                while ($rreg = mysqli_fetch_assoc($qreg)) {
+                    $map_region[(int)$rreg['id']] = $rreg['region'];
+                }
+            }
+
+            // Filtrar $datos dejando sólo los que pertenezcan a la región del usuario
+            $datos_filtrados = [];
+            foreach ($datos as $d) {
+                $idEq = (int)$d['id_equipo'];
+                if (isset($map_region[$idEq]) && $map_region[$idEq] == $user_region) {
+                    $datos_filtrados[] = $d;
+                }
+            }
+            $datos = $datos_filtrados;
+        }
+    }
+
     // Verificar si ya existen registros para el año; si ya existen, no insertamos, solo generamos documento
     $mantenimiento_exist = false;
     $auditoria_exist = false;
@@ -1043,6 +1083,13 @@ function programa_auditoria($valores)
 
     if ($auditoria_exist) {
         $datos = [];
+        // Si el cliente indicó una región y no es admin, aplicamos filtro por región
+        $region_filter_sql = '';
+        if (!empty($valores->region) && !empty($valores->rol) && $valores->rol !== 'admin') {
+            $region_esc = mysqli_real_escape_string($con, $valores->region);
+            $region_filter_sql = "AND cu.region = '$region_esc'";
+        }
+
         $sql_a = "SELECT aud.id_equipo,
                  inv.id AS id_equipo_inv,
                  COALESCE(ct.tipo, '') AS tipo,
@@ -1054,7 +1101,8 @@ function programa_auditoria($valores)
                   FROM auditoria aud
                   LEFT JOIN inventario_ti_sur inv ON inv.id = aud.id_equipo
                   LEFT JOIN cat_tipo ct ON ct.id = inv.fk_tipo
-                  WHERE aud.anio = '$anio_actual'
+                  LEFT JOIN cat_usuarios cu ON cu.id = inv.fk_usuario
+                  WHERE aud.anio = '$anio_actual' $region_filter_sql
                   ORDER BY aud.fecha_programada ASC";
 
         $q3 = mysqli_query($con, $sql_a);
