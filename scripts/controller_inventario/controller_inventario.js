@@ -48,19 +48,6 @@ function server_excel(model) {
     });
 }
 
-window.addEventListener('load', function () {
-    // Leemos el mensaje del registro desde localStorage
-    const mensajeRegistro = sessionStorage.getItem('bienvenido');
-
-    if (mensajeRegistro) {
-        // Si el mensaje existe, mostramos el toast
-        mostrar_toast('success', 'Bienvenido', mensajeRegistro);
-        // Eliminamos el mensaje para evitar que aparezca nuevamente
-        sessionStorage.removeItem('bienvenido');
-    }
-
-})
-
 let datos = [];
 let elemento
 let table

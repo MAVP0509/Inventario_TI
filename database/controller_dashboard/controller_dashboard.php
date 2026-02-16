@@ -9,6 +9,8 @@ $respuesta_servidor = new stdClass();
 
 if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_datos($clientejson);
+} elseif ($clientejson->accion == 1) {
+    $respuesta_servidor->resultado = consultar_año_mantenimiento_mayor();
 }
 
 print(json_encode($respuesta_servidor));
@@ -17,44 +19,88 @@ function consultar_datos($valores)
 {
     include("../conexion.php");
 
-    $anio = date('Y');
-    $sqlMantenimiento = "SELECT * FROM vmantenimiento WHERE anio='$anio'";
-    $sqlAuditoria = "SELECT * FROM vauditoria WHERE anio='$anio'";
-    $queryMantenimiento;
+    $anio = $valores->anio;//date('Y');
+
+
+    // Mapa de zona BD → clave del array
+    $mapaZona = [
+        'Región Norte'  => 'norte',
+        'Región Sur'    => 'sur',
+        'Región Tampico' => 'tampico'
+    ];
+
+    $data = [
+        'norte'   => ['mantenimiento' => estructuraEstados(), 'auditoria' => estructuraEstados()],
+        'sur'     => ['mantenimiento' => estructuraEstados(), 'auditoria' => estructuraEstados()],
+        'tampico' => ['mantenimiento' => estructuraEstados(), 'auditoria' => estructuraEstados()]
+    ];
+
+
+
+    //*  Procesar Mantenimiento 
+    $sqlMantenimiento = "SELECT zona, mes, pendiente, proceso, finalizado, vencido
+                     FROM vdashmant
+                     WHERE anio = '$anio'";
+    $queryMantenimiento = mysqli_query($con, $sqlMantenimiento);
+
+    while ($fila = mysqli_fetch_assoc($queryMantenimiento)) {
+        $region = $mapaZona[$fila['zona']] ?? null;
+        $indice = (int)$fila['mes'] - 1; // mes 1 → índice 0, mes 12 → índice 11
+
+        if (!$region || $indice < 0 || $indice > 11) continue;
+
+        $data[$region]['mantenimiento']['pendiente'][$indice] = (int)$fila['pendiente'];
+        $data[$region]['mantenimiento']['proceso'][$indice] = (int)$fila['proceso'];
+        $data[$region]['mantenimiento']['finalizado'][$indice] = (int)$fila['finalizado'];
+        $data[$region]['mantenimiento']['vencido'][$indice] = (int)$fila['vencido'];
+    }
+
+
+    //* Procesar Auditoría 
+    $sqlAuditoria = "SELECT zona, mes, pendiente, proceso, finalizado, vencido
+                 FROM vdashaud
+                 WHERE anio = '$anio'";
     $queryAuditoria = mysqli_query($con, $sqlAuditoria);
 
-    while($fila = mysqli_query($con, $sqlMantenimiento)){
-    $queryMantenimiento[$fila];
+    while ($fila = mysqli_fetch_assoc($queryAuditoria)) {
+        $region = $mapaZona[$fila['zona']] ?? null;
+        $indice = (int)$fila['mes'] - 1;
+
+        if (!$region || $indice < 0 || $indice > 11) continue;
+
+        $data[$region]['auditoria']['pendiente'][$indice] = (int)$fila['pendiente'];
+        $data[$region]['auditoria']['proceso'][$indice] = (int)$fila['proceso'];
+        $data[$region]['auditoria']['finalizado'][$indice] = (int)$fila['finalizado'];
+        $data[$region]['auditoria']['vencido'][$indice] = (int)$fila['vencido'];
     }
 
-    $infoMantenimiento = mysqli_fetch_assoc($queryMantenimiento);
-    $infoAuditoria = mysqli_fetch_assoc($queryAuditoria);
 
-    $info = [
-        'norte' => [
-            'mantenimiento' => [],
-            'auditoria' => []
-        ],
-        'sur' => [
-            'mantenimiento' => [],
-            'auditoria' => []
-        ],
-        'tampico' => [
-            'mantenimiento' => [],
-            'auditoria' => []
-        ]
+    return $data;
+}
+
+
+//* Estructura base 
+//* 12 ceros, uno por mes
+function estructuraEstados()
+{
+    $ceros = array_fill(0, 12, 0);
+    return [
+        'pendiente'  => $ceros,
+        'proceso'    => $ceros,
+        'finalizado' => $ceros,
+        'vencido'    => $ceros
     ];
-    $estatus = ['pendiente', 'proceso', 'finalizado', 'vencido'];
+}
 
-    foreach ($info as $region => &$proceso) {
-        foreach ($proceso as $tipo => &$estado) {
+function consultar_año_mantenimiento_mayor(){
+    include("../conexion.php");
 
-        }
+    $sql="SELECT MAX(anio) AS anio FROM mantenimiento";
+
+    if(!$query=mysqli_query($con,$sql)){
+    return (['error'=> 'Fallo del servdor']);
     }
 
-    //*Romper la referencia de los foreach
-    unset($proceso);
-    unset($estado);
-    return $infoMantenimiento; 
-    
+    $anio = mysqli_fetch_object($query);
+    return $anio;
 }

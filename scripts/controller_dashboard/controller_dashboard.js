@@ -18,9 +18,48 @@ function server_dashboard(model) {
     })
 }
 
-async function consultar_info() {
-    let info = await server_dashboard({ accion: 0 })
-    console.table(info)
+window.addEventListener('load', function () {
+    // Leemos el mensaje del registro desde localStorage
+    const mensajeRegistro = sessionStorage.getItem('bienvenido');
+
+    if (mensajeRegistro) {
+        // Si el mensaje existe, mostramos el toast
+        mostrar_toast('success', 'Bienvenido', mensajeRegistro);
+        // Eliminamos el mensaje para evitar que aparezca nuevamente
+        sessionStorage.removeItem('bienvenido');
+    }
+
+})
+
+
+async function consultar_anio() {
+    await general_select2({
+        selectId: 'select-dash',
+        tabla: 'mantenimiento',
+        campo: 'anio',
+        placeholder: 'Selecione un año',
+        dropdownParent: '#card-dash',
+        tags: false,
+    }).then(async () => {
+        let server = await server_dashboard({ accion: 1 })
+        if (!server.resultado) {
+            return
+        } else {
+            $('#select-dash').val(server.resultado.anio).trigger('change')
+        }
+    })
+}
+
+let datos
+async function consultar_info(anio) {
+    if(anio.value === ''){
+        return
+    }
+    let server = await server_dashboard({ accion: 0, anio: anio.value })
+    datos = server.resultado
+
+    //console.log(info)
+    renderChart();
 }
 
 
@@ -103,7 +142,7 @@ function getDataRegion(region, tipo) {
     const result = { pendiente: [], proceso: [], finalizado: [], vencido: [] };
     MESES.forEach((_, index) => {
         ['pendiente', 'proceso', 'finalizado', 'vencido'].forEach(estado => {
-            result[estado].push(tipos.reduce((suma, tipo) => suma + DATA[region][tipo][estado][index] || 0, 0));
+            result[estado].push(tipos.reduce((suma, tipo) => suma + datos[region][tipo][estado][index] || 0, 0));
         });
     });
     return result;
@@ -117,7 +156,7 @@ function actualizarKPIs() {
 
     regiones.forEach(region => tipos.forEach(tipo => {
         ['pendiente', 'proceso', 'finalizado', 'vencido'].forEach(estado => {
-            valoresKpis[estado] += DATA[region][tipo][estado].reduce((suma, valor) => suma + valor, 0);
+            valoresKpis[estado] += datos[region][tipo][estado].reduce((suma, valor) => suma + valor, 0);
         });
     }));
 
@@ -246,10 +285,10 @@ function actualizarTabla() {
     regiones.forEach(r => {
         tipos.forEach(t => {
             MESES_FULL.forEach((mes, i) => {
-                const p = DATA[r][t].pendiente[i];
-                const pr = DATA[r][t].proceso[i];
-                const f = DATA[r][t].finalizado[i];
-                const v = DATA[r][t].vencido[i];
+                const p = datos[r][t].pendiente[i];
+                const pr = datos[r][t].proceso[i];
+                const f = datos[r][t].finalizado[i];
+                const v = datos[r][t].vencido[i];
                 const total = p + pr + f + v;
                 filas += `<tr>
                     <td><span class="tag-${r}">${r.charAt(0).toUpperCase() + r.slice(1)}</span></td>
@@ -299,7 +338,7 @@ function actualizarTitulo() {
         `<i class="fas fa-chart-bar mr-2 text-primary"></i>${rLabel} — ${tLabel}`;
 }
 
-//*renderizar
+/* //*renderizar
 $(document).ready(function () {
     renderChart();
-});
+}); */
