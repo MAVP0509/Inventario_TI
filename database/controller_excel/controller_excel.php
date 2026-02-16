@@ -924,40 +924,47 @@ function programa_auditoria($valores)
     $anio_actual = $valores->anio;
     $region = $valores->region ?? '';
 
-    $sql = "
-        SELECT
-            a.id_equipo,
-            ct.tipo,
-            cu.nombre,
-            its.ubicacion,
-            its.modelo,
-            its.num_serie,
-            a.fecha_programada
-        FROM auditoria a
-        JOIN inventario_ti_sur its ON its.id = a.id_equipo
-        JOIN cat_tipo ct ON ct.id = its.fk_tipo
-        JOIN cat_usuarios cu ON cu.id = its.fk_usuario
-        WHERE a.anio = '$anio_actual'
-          AND its.zona LIKE '%$region%'
-        ORDER BY MONTH(a.fecha_programada), its.fk_tipo
-    ";
-
-    $query = mysqli_query($con, $sql);
-
     $aud = [];
-    while ($row = mysqli_fetch_assoc($query)) {
-        // calculamos mes_index a partir de la fecha ya guardada
-        $mes = isset($row['fecha_programada']) ? (int)date('n', strtotime($row['fecha_programada'])) : 1;
-        $row['mes_index'] = $mes - 1; // 0–11
-        $aud[] = $row;
+    $sad = "SELECT tipo_id FROM vorden_auditoria";
+    $qad = mysqli_query($con, $sad);
+    while ($filas = mysqli_fetch_object($qad)) {
+        $aud[] = $filas->tipo_id;
     }
 
     if (empty($aud)) {
         return [
             'result' => false,
-            'error' => 'No hay registros de auditoría para el año seleccionado.'
+            'error' => 'No hay un orden de auditoría configurado.'
         ];
     }
+
+    $ordenA = implode(',', $aud);
+
+    $aud = [];
+    $sac = "CALL pprograma_auditoria('$ordenA', '$ordenA', '$region')";
+    $qac = mysqli_query($con, $sac);
+
+    while ($row = mysqli_fetch_assoc($qac)) {
+        $aud[] = $row; // Agregar la fila al array
+    }
+
+    // Limpiar resultados del stored procedure
+    while (mysqli_next_result($con)) {
+        mysqli_use_result($con);
+    }
+
+    if (empty($aud)) {
+        return [
+            'result' => false,
+            'error' => 'No hay dispositivos para programar en auditoría.'
+        ];
+    }
+
+    // Asignar mes_index (igual que en mantenimiento)
+    foreach ($aud as $i => &$d) {
+        $d['mes_index'] = $i % 12;
+    }
+    unset($d);
 
     // usort() ordena un arreglo en base a una función de comparación definida
     // fuction($a, $b) es la función a usar que recibe dos parámetros; son dos elementos del arreglo $datos a comparar entre sí.

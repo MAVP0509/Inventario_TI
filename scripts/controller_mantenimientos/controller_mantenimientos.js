@@ -833,7 +833,7 @@ async function mdl_programar_mantenimiento() {
             if (rolUsuario === 'admin') {
                 await general_select2({
                     selectId: 'select-region-prog',
-                    tabla: 'cat_usuarios',
+                    tabla: 'supervisor',
                     campo: 'region',
                     placeholder: 'Seleccione una región',
                     dropdownParent: '#mdl-prog-mant',
