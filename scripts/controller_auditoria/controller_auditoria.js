@@ -834,6 +834,23 @@ function crear_tabla_auditoria(tabId, datos, fecha, mostrarRegion = false) {
 async function mdl_programar_auditoria() {
 
     await Promise.all([
+
+        (async function() {
+            if (rol === "admin") {
+                await general_select2({
+                    selectId: 'select-region-prog-aud',
+                    tabla: 'supervisor',
+                    campo: 'region',
+                    placeholder: 'Seleccione una región',
+                    dropdownParent: '#mdl-prog-mant',
+                    tags: false,
+                });
+                $('#region-container-aud').show();
+            } else {
+                // ocultar el contenedor para usuarios normales
+                $('#region-container-aud').hide();
+            }
+        }),
         general_select2({
             selectId: 'select-año',
             tabla: 'auditoria',
@@ -914,7 +931,9 @@ async function mdl_programar_auditoria() {
 
 async function programar_auditoria() {
 
-    const validar = ['elaboro-aud', 'autorizo-aud']
+    const validar = (rol === 'admin') 
+    ? ['elaboro-aud', 'autorizo-aud', 'select-año', 'select-region-prog-aud']
+    : ['elaboro-aud', 'autorizo-aud', 'select-año'];
 
     if (!validar_campos(validar)) {
         mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');

@@ -461,7 +461,8 @@
 
                                         <button type="button" style="text-align: center" data-toggle="popover"
                                             data-trigger="hover" data-html="true" data-placement="bottom"
-                                            data-content="Programar auditoría" class="btn bg-gray-dark rounded icon mr-3"
+                                            data-content="Programar auditoría"
+                                            class="btn bg-gray-dark rounded icon mr-3"
                                             onclick="mdl_programar_auditoria()"><i class="fa-solid fa-file-invoice"></i>
                                             Programar auditoría
                                         </button>
@@ -678,6 +679,18 @@
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col-12">
+                                <div id="region-container-aud">
+                                    <h6>Región</h6>
+                                    <div class="input-group mb-3" style="display:none;">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i
+                                                    class="fa-solid fa-map-marker-alt"></i></span>
+                                        </div>
+                                        <select class="form-control select" id="select-region-prog-aud"
+                                            name="inp-prog-aud"></select>
+                                        <div class="invalid-feedback">Por favor, seleccione una región.</div>
+                                    </div>
+                                </div>
                                 <h6>Año de auditoría</h6>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
@@ -720,14 +733,7 @@
                                         name="inp-prog-mant"></select>
                                     <div class="invalid-feedback">Por favor, seleccione una persona.</div>
                                 </div>
-                                <h6>Región</h6>
-                                <div class="input-group mb-3" id="region-container-aud" style="display:none;">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text"><i class="fa-solid fa-map-marker-alt"></i></span>
-                                    </div>
-                                    <select class="form-control select" id="select-region-prog-aud" name="inp-prog-aud"></select>
-                                    <div class="invalid-feedback">Por favor, seleccione una región.</div>
-                                </div>
+
                             </div>
                             <!-- <div class="col-6">
                                 <div id="tbl-tipos"></div>
