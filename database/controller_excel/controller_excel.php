@@ -48,7 +48,7 @@ function resguardo($valores)
     //todo Desglosamos la información recibida del JS
     //* Array de los equipos del usuario seleccionado
     $datos = $valores->datos;
-    //* Accedemos al nombre del usuario 
+    //* Accedemos al nombre del usuario
     $usuario = $datos[0]->usuario ?? '';
     //*Accedemos al cargo que tiene el usuario
     $cargo = $datos[0]->posicion ?? '';
@@ -77,7 +77,7 @@ function resguardo($valores)
     $spreadsheet = IOFactory::load('FO-DSP-TI-01 Resguardo de herramientas TI Rev.00.xlsx'); //*Cargando la plantilla del Excel
     $worksheet = $spreadsheet->getActiveSheet();
 
-    /* 
+    /*
     TODO Configuración de impresión
     * Es necesario para dar un formato, delimitar márgenes para cuando se exporte a pdf, el pdf no este descuadrado
     */
@@ -106,7 +106,7 @@ function resguardo($valores)
         //* Insertando una fila,  el 1 indica cuantas filas se insertarán
         $worksheet->insertNewRowBefore($fila, 1);
 
-        /* 
+        /*
          TODO Reaplicar las combinaciones de celdas en la nueva fila
          * Al insertar nuevas filas, no respeta las combinaciones de celdas de la plantilla
          */
@@ -128,7 +128,7 @@ function resguardo($valores)
         //* Al copiar el estilo de la fila, el texto lo configura en negritas, asi que se le quita las negritas
         $worksheet->getStyle("A$fila:I$fila")->getFont()->setBold(false);
 
-        //* Rellenamos la fila con sus datos correspondientes 
+        //* Rellenamos la fila con sus datos correspondientes
         if ($cel == 0) {
             $worksheet->setCellValue("B$fila", $num);
             $worksheet->setCellValue("C$fila", $item->tipo);
@@ -150,7 +150,7 @@ function resguardo($valores)
                 $worksheet->mergeCells("G$fila:H$fila");
                 $worksheet->mergeCells("I$fila:J$fila");
 
-                //*  Copiar el estilo de la fila anterior 
+                //*  Copiar el estilo de la fila anterior
                 $worksheet->duplicateStyle($worksheet->getStyle("B17:J17"), "B$fila:J$fila");
 
                 //* Activar negrita solo para la celda del tag
@@ -557,7 +557,11 @@ function programa_mantenimiento($valores)
     // auditoría usa los mismos meses
     foreach ($aud as &$d) {
         $id = $d['id_equipo'];
-        $d['mes_index'] = $mapa_meses[$id];
+        if (isset($mapa_meses[$id])) {
+            $d['mes_index'] = $mapa_meses[$id];
+        } else {
+            $d['mes_index'] = null;
+        }
     }
     unset($d); // Libera la variable de referencia
 
@@ -577,7 +581,7 @@ function programa_mantenimiento($valores)
         }
     }
 
-    //AUDITORIA 
+    //AUDITORIA
     $a_existe = (int)mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) AS cnt FROM auditoria WHERE anio = '$anio_actual'"))['cnt'] > 0;
 
     if (!$a_existe) {
@@ -691,16 +695,31 @@ function programa_mantenimiento($valores)
     $urls = [$url_descarga];
 
     // Si el cliente solicitó ambos programas, generar el de auditoría también
-    if (!empty($descargar_ambos)) {
+    if (!empty($descargar_ambos) && $descargar_ambos == 1) {
         // Reutilizamos la función que genera el programa de auditoría
         $aud_result = programa_auditoria($valores);
-        if (!empty($aud_result['url'])) $urls[] = $aud_result['url'];
+        if (is_array($aud_result) && !empty($aud_result['result']) && $aud_result['result'] === true) {
+            if (!empty($aud_result['url'])) {
+                $urls[] = $aud_result['url'];
+            } elseif (!empty($aud_result['urls']) && is_array($aud_result['urls'])) {
+                $urls = array_merge($urls, $aud_result['urls']);
+            }
+        }
     }
+
+    // Si el cliente solicitó ambos programas, generar el de auditoría también
+    // if ((int)$descargar_ambos === 1) {
+    //     // Reutilizamos la función que genera el programa de auditoría
+    //     $aud_result = programa_auditoria($valores);
+    //     if (!empty($aud_result['url'])) {
+    //         $urls[] = $aud_result['url'];
+    //     }
+    // }
 
     // Retorna el resultado y las URLs generadas (uno o varios archivos)
     return [
         'result' => true,
-        'url' => $url_descarga,
+        // 'url' => $url_descarga,
         'urls' => $urls
     ];
 }
@@ -725,9 +744,9 @@ function reporte_mantenimiento($valores)
                 inv.num_serie
             FROM inventario_ti_sur AS inv
             INNER JOIN cat_usuarios AS cu ON cu.id = inv.fk_usuario
-            INNER JOIN cat_tipo AS ct ON ct.id = inv.fk_tipo 
+            INNER JOIN cat_tipo AS ct ON ct.id = inv.fk_tipo
             INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
-            LEFT JOIN mantenimiento AS man 
+            LEFT JOIN mantenimiento AS man
                 ON man.id_equipo = inv.id AND man.anio = '$anio'
             WHERE cu.nombre = '$usuario'";
 
@@ -742,7 +761,7 @@ function reporte_mantenimiento($valores)
     $spreadsheet = IOFactory::load('FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.01.xlsx'); //*Cargando la plantilla del Excel
     $worksheet = $spreadsheet->getActiveSheet();
 
-    /* 
+    /*
     TODO Configuración de impresión
     * Es necesario para dar un formato, delimitar márgenes para cuando se exporte a pdf, el pdf no este descuadrado
     */
@@ -867,7 +886,7 @@ function reporte_mantenimiento($valores)
 
     $id_equipo = $valores->elementos->id;
 
-    $sql = "UPDATE mantenimiento 
+    $sql = "UPDATE mantenimiento
         SET reporte_descargado = 1,
             estado = 'En proceso'
         WHERE id_equipo = '$id_equipo'
@@ -879,9 +898,9 @@ function reporte_mantenimiento($valores)
 
     /* if (!empty($ids_equipo)) {
         $ids = implode(',', $ids_equipo);
-        $sql = "UPDATE mantenimiento 
-                SET reporte_descargado = 1, 
-                    estado = 'En proceso' 
+        $sql = "UPDATE mantenimiento
+                SET reporte_descargado = 1,
+                    estado = 'En proceso'
                 WHERE id_equipo IN ($ids)
                 AND  anio = '$anio'";
 
@@ -902,116 +921,55 @@ function programa_auditoria($valores)
     include('../conexion.php');
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    /* $anio_actual = date("Y") + 1; */
     $anio_actual = $valores->anio;
-    $sql_dev = "SELECT tipo_id FROM vorden_auditoria";
-    $query_dev = mysqli_query($con, $sql_dev);
+    $region = $valores->region ?? '';
 
-    $datos_dev = [];
-    while ($filas = mysqli_fetch_object($query_dev)) {
-        $datos_dev[] = $filas->tipo_id;
+    $sql = "
+        SELECT
+            a.id_equipo,
+            ct.tipo,
+            cu.nombre,
+            its.ubicacion,
+            its.modelo,
+            its.num_serie,
+            a.fecha_programada
+        FROM auditoria a
+        JOIN inventario_ti_sur its ON its.id = a.id_equipo
+        JOIN cat_tipo ct ON ct.id = its.fk_tipo
+        JOIN cat_usuarios cu ON cu.id = its.fk_usuario
+        WHERE a.anio = '$anio_actual'
+          AND its.zona LIKE '%$region%'
+        ORDER BY MONTH(a.fecha_programada), its.fk_tipo
+    ";
+
+    $query = mysqli_query($con, $sql);
+
+    $aud = [];
+    while ($row = mysqli_fetch_assoc($query)) {
+        // calculamos mes_index a partir de la fecha ya guardada
+        $mes = isset($row['fecha_programada']) ? (int)date('n', strtotime($row['fecha_programada'])) : 1;
+        $row['mes_index'] = $mes - 1; // 0–11
+        $aud[] = $row;
     }
-    // var_dump($datos_dev);
-    $dev = implode(',', $datos_dev);
 
-    if (empty($dev)) {
+    if (empty($aud)) {
         return [
             'result' => false,
-            'error' => 'No hay un orden de auditoria de dispositivos. Específica un orden en la configuración.'
+            'error' => 'No hay registros de auditoría para el año seleccionado.'
         ];
     }
 
-    // Consulta SQL que obtiene todos los registros de la vista, en un orden específico según ID
-    $sql_inv = "CALL pprogramar_auditoria('$dev', '$dev')";
-    // var_dump($sql_inv);
-    $query = mysqli_query($con, $sql_inv);
+    // usort() ordena un arreglo en base a una función de comparación definida
+    // fuction($a, $b) es la función a usar que recibe dos parámetros; son dos elementos del arreglo $datos a comparar entre sí.
+    usort($aud, function ($a, $b) {
+        return $a['mes_index'] <=> $b['mes_index'];
+    });
 
-    $datos = []; // Crea un arreglo vacío para almacenar los datos
-
-    if ($query) {
-        while ($fila =  mysqli_fetch_assoc($query)) { // Recorre los resultados fila por fila
-            $datos[] = $fila; // Agrega cada fila al arreglo $datos
-        }
-
-        while (mysqli_next_result($con)) {
-            mysqli_use_result($con);
-        }
-    }
-
-    // Si ya existen registros en la tabla 'auditoria' para el año, generar el programa
-    // a partir de lo que hay en BD (tabla auditoria JOIN inventario), para que
-    // los equipos dados de baja (el trigger los elimina) no aparezcan.
-    $auditoria_exist = false;
-    $check_a = mysqli_query($con, "SELECT COUNT(*) AS cnt FROM auditoria WHERE anio = '$anio_actual'");
-    if ($check_a) {
-        $rowa = mysqli_fetch_assoc($check_a);
-        $auditoria_exist = ((int)$rowa['cnt'] > 0);
-    }
-
-    if ($auditoria_exist) {
-        $datos = [];
-        // Si el cliente indicó una región y no es admin, aplicamos filtro por región
-        $region_filter_sql = '';
-        if (!empty($valores->region) && !empty($valores->rol) && $valores->rol !== 'admin') {
-            $region_esc = mysqli_real_escape_string($con, $valores->region);
-            $region_filter_sql = "AND cu.region = '$region_esc'";
-        }
-
-        $sql_a = "SELECT aud.id_equipo,
-                 inv.id AS id_equipo_inv,
-                 COALESCE(ct.tipo, '') AS tipo,
-                 COALESCE(inv.modelo, '') AS nombre,
-                 COALESCE(inv.ubicacion, '') AS ubicacion,
-                 COALESCE(inv.modelo, '') AS modelo,
-                 COALESCE(inv.num_serie, '') AS num_serie,
-                 aud.fecha_programada
-                  FROM auditoria aud
-                  LEFT JOIN inventario_ti_sur inv ON inv.id = aud.id_equipo
-                  LEFT JOIN cat_tipo ct ON ct.id = inv.fk_tipo
-                  LEFT JOIN cat_usuarios cu ON cu.id = inv.fk_usuario
-                  WHERE aud.anio = '$anio_actual' $region_filter_sql
-                  ORDER BY aud.fecha_programada ASC";
-
-        $q3 = mysqli_query($con, $sql_a);
-        if ($q3) {
-            while ($r = mysqli_fetch_assoc($q3)) {
-                $mes = 0;
-                if (!empty($r['fecha_programada'])) {
-                    $mes = (int)date('n', strtotime($r['fecha_programada']));
-                }
-                $r['mes_index'] = max(0, $mes - 1);
-                $r['id_equipo'] = $r['id_equipo'] ?? $r['id_equipo_inv'];
-                $r['num_serie'] = $r['num_serie'] ?? '';
-                $datos[] = $r;
-            }
-        }
-    }
+    // Nota: No se insertan registros en la tabla 'auditoria' desde esta función.
+    // La generación del documento se realiza independientemente del estado de la BD.
 
     // Define las columnas de Excel correspondientes a los meses del año
     $meses_columnas = ['H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'];
-
-    // Recorre cada dispositivo y le asigna un índice de mes basado en su posición
-    foreach ($datos as $i => &$dispositivo) {
-        $mes_index = $i % 12;
-        $mes = $mes_index + 1;
-        $fecha_programada = fecha_programa($anio_actual, $mes);
-        //  Se saca el residuo al dividir $i entre 12, 
-        //  a su vez añadiendo un nuevo campo al $dispositivo llamado mes_index,
-        //  indicando en qué mes le tocará auditoria.
-        $dispositivo['mes_index'] = $i % 12;
-        $id_equipo = $dispositivo['id_equipo'];
-        $estado = 'Pendiente';
-        // Nota: No se insertan registros en la tabla 'auditoria' desde esta función.
-        // La generación del documento se realiza independientemente del estado de la BD.
-    }
-
-    unset($dispositivo); // Libera la variable de referencia
-
-    // usort() ordena un arreglo en base a una función de comparación definida
-    // fuction($a, $b) es la función a usar que recibe dos parámetros; son dos elementos del arreglo $datos a comparar entre sí.
-    usort($datos, function ($a, $b) {
-        return $a['mes_index'] <=> $b['mes_index'];
-    });
 
     // Carga la plantilla Excel base del programa de mantenimiento
     $spreadsheet = IOFactory::load('FO-DSP-TI-04 Programa de Auditoria de Herramientas de Trabajo Región XX Rev.00.xlsx');
@@ -1035,9 +993,9 @@ function programa_auditoria($valores)
     $fila_nombre = 21;
     $fila_cargo = 22;
     $fila_fecha = 24;
-    $filas = count($datos); // Cuenta cuántos dispositivos hay
+    $filas = count($aud); // Cuenta cuántos dispositivos hay
 
-    foreach ($datos as $index => $item) { // Recorre cada dispositivo
+    foreach ($aud as $index => $item) { // Recorre cada dispositivo
         // var_dump($item);
         // $fila_actual = $fila_inicio + $index;
         if ($index >= 3) { // A partir del cuarto dispositivo, inserta una nueva fila
@@ -1091,32 +1049,33 @@ function programa_auditoria($valores)
 
     $base = realpath(__DIR__ . '/../../../');
 
-
-    if ($base !== false) {
-        $fecha = date('Ymd_His'); // Genera una marca de tiempo para el nombre del archivo
-        $nombre_doc = "FO-DSP-TI-04_Programa de Auditoria de Herramientas de Trabajo Región Sur_{$anio_actual}_{$fecha}.xlsx"; // Nombre del archivo generado
-        // Define la ruta física donde se guardará el archivo, basada en la estructura del proyecto
-        $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . 'documentos_descarga' . DIRECTORY_SEPARATOR . 'auditoria' . DIRECTORY_SEPARATOR . 'programa' . DIRECTORY_SEPARATOR . $nombre_doc;
-        $host = $_SERVER['HTTP_HOST'];
-        $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-        // Construye la URL de descarga del archivo generado
-        $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/auditoria/programa/{$nombre_doc}";
-        // Crea y guarda el archivo Excel
-        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $writer->save($ruta_guardar); // Guarda el archivo en la ruta definida
-
-        // Retorna un arreglo con el resultado y la URL para descargar el archivo
-        return array(
-            'result' => true,
-            'url' => $url_descarga,
-            // 'duplicados' => $duplicados
-        );
-    } else {
-        return [
-            'result' => false,
-            'error' => 'No se pudo realizar el programa de auditoria. Inténtalo nuevamente.'
-        ];
+    if ($base === false) {
+        return ['result' => false, 'error' => 'No se encontró la carpeta base de auditoría'];
     }
+
+    $carpeta_anual = $base . DIRECTORY_SEPARATOR . $anio_actual;
+    if (!is_dir($carpeta_anual)) {
+        mkdir($carpeta_anual, 0777, true);
+    }
+
+    $nombre_doc = "FO-DSP-TI-04_Programa de Auditoria de Herramientas de Trabajo Región Sur_{$anio_actual}_" . date('Ymd_His') . ".xlsx"; // Nombre del archivo generado
+    // Define la ruta física donde se guardará el archivo, basada en la estructura del proyecto
+    $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . 'documentos_descarga' . DIRECTORY_SEPARATOR . 'auditoria' . DIRECTORY_SEPARATOR . 'programa' . DIRECTORY_SEPARATOR . $nombre_doc;
+
+    // Crea y guarda el archivo Excel
+    IOFactory::createWriter($spreadsheet, 'Xlsx')->save($ruta_guardar); // Guarda el archivo en la ruta definida
+
+    $host = $_SERVER['HTTP_HOST'];
+    $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    // Construye la URL de descarga del archivo generado
+    $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/auditoria/programa/{$nombre_doc}";
+
+    // Retorna un arreglo con el resultado y la URL para descargar el archivo
+    return array(
+        'result' => true,
+        'url' => $url_descarga,
+        // 'duplicados' => $duplicados
+    );
 }
 
 function reporte_auditoria($valores)
@@ -1137,12 +1096,12 @@ function reporte_auditoria($valores)
     $usuario = $valores->elementos->usuario;
     $anio = $valores->elementos->anio;
 
-    /*  $sql = "SELECT aud.id_equipo AS id, aud.anio, cu.nombre, cu.cargo, cu.region, 
+    /*  $sql = "SELECT aud.id_equipo AS id, aud.anio, cu.nombre, cu.cargo, cu.region,
                    ct.tipo, ca.marca, inv.modelo, inv.num_serie
             FROM auditoria AS aud
             INNER JOIN inventario_ti_sur AS inv ON inv.id = aud.id_equipo
             INNER JOIN cat_usuarios AS cu ON cu.id = inv.fk_usuario
-            INNER JOIN cat_tipo AS ct ON ct.id = inv.fk_tipo 
+            INNER JOIN cat_tipo AS ct ON ct.id = inv.fk_tipo
             INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
             WHERE cu.nombre = '$usuario' AND aud.anio = '$anio'"; */
     $sql = "SELECT
@@ -1158,9 +1117,9 @@ function reporte_auditoria($valores)
                 inv.num_serie
             FROM inventario_ti_sur AS inv
             INNER JOIN cat_usuarios AS cu ON cu.id = inv.fk_usuario
-            INNER JOIN cat_tipo AS ct ON ct.id = inv.fk_tipo 
+            INNER JOIN cat_tipo AS ct ON ct.id = inv.fk_tipo
             INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
-            LEFT JOIN auditoria AS aud 
+            LEFT JOIN auditoria AS aud
                 ON aud.id_equipo = inv.id AND aud.anio = '$anio'
             WHERE cu.nombre = '$usuario' $filtro_tipo";
     // var_dump($sql);
@@ -1237,7 +1196,7 @@ function reporte_auditoria($valores)
 
     $id_equipo = $valores->elementos->id;
 
-    $sql = "UPDATE auditoria 
+    $sql = "UPDATE auditoria
         SET reporte_descargado = 1,
             estado = 'En proceso'
         WHERE id_equipo = '$id_equipo'
