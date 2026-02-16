@@ -9,6 +9,8 @@ $respuesta_servidor = new stdClass();
 
 if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_datos($clientejson);
+} elseif ($clientejson->accion == 1) {
+    $respuesta_servidor->resultado = consultar_año_mantenimiento_mayor();
 }
 
 print(json_encode($respuesta_servidor));
@@ -17,7 +19,7 @@ function consultar_datos($valores)
 {
     include("../conexion.php");
 
-    $anio = date('Y');
+    $anio = $valores->anio;//date('Y');
 
 
     // Mapa de zona BD → clave del array
@@ -88,4 +90,17 @@ function estructuraEstados()
         'finalizado' => $ceros,
         'vencido'    => $ceros
     ];
+}
+
+function consultar_año_mantenimiento_mayor(){
+    include("../conexion.php");
+
+    $sql="SELECT MAX(anio) AS anio FROM mantenimiento";
+
+    if(!$query=mysqli_query($con,$sql)){
+    return (['error'=> 'Fallo del servdor']);
+    }
+
+    $anio = mysqli_fetch_object($query);
+    return $anio;
 }

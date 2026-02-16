@@ -18,10 +18,46 @@ function server_dashboard(model) {
     })
 }
 
+window.addEventListener('load', function () {
+    // Leemos el mensaje del registro desde localStorage
+    const mensajeRegistro = sessionStorage.getItem('bienvenido');
+
+    if (mensajeRegistro) {
+        // Si el mensaje existe, mostramos el toast
+        mostrar_toast('success', 'Bienvenido', mensajeRegistro);
+        // Eliminamos el mensaje para evitar que aparezca nuevamente
+        sessionStorage.removeItem('bienvenido');
+    }
+
+})
+
+
+async function consultar_anio() {
+    await general_select2({
+        selectId: 'select-dash',
+        tabla: 'mantenimiento',
+        campo: 'anio',
+        placeholder: 'Selecione un año',
+        dropdownParent: '#card-dash',
+        tags: false,
+    }).then(async () => {
+        let server = await server_dashboard({ accion: 1 })
+        if (!server.resultado) {
+            return
+        } else {
+            $('#select-dash').val(server.resultado.anio).trigger('change')
+        }
+    })
+}
+
 let datos
-async function consultar_info() {
-    let info = await server_dashboard({ accion: 0 })
-    datos = info.resultado
+async function consultar_info(anio) {
+    if(anio.value === ''){
+        return
+    }
+    let server = await server_dashboard({ accion: 0, anio: anio.value })
+    datos = server.resultado
+
     //console.log(info)
     renderChart();
 }

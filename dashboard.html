@@ -12,6 +12,10 @@
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
     <!--Fontawesome-->
     <link rel="stylesheet" href="libraries/fontawesome-free-6.7.2-web/css/all.min.css">
+
+    <link rel="stylesheet" href="libraries/select2/css/select2.min.css">
+    <link rel="stylesheet" href="libraries/select2/css/select2-bootstrap4.min.css">
+
     <!--dashboard css-->
     <link rel="stylesheet" href="./css/dashboard.css">
 
@@ -19,7 +23,7 @@
     <title>Inventario TI</title>
 </head>
 
-<body class="hold-transition sidebar-mini layout-fixed" onload="consultar_info()">
+<body class="hold-transition sidebar-mini layout-fixed" onload="consultar_anio()">
     <div class="wrapper">
 
         <!-- Preloader -->
@@ -159,7 +163,7 @@
                             <!-- ── GRÁFICA PRINCIPAL ───────────────────── -->
                             <div class="row">
                                 <div class="col-12">
-                                    <div class="card">
+                                    <div class="card" id="card-dash">
 
                                         <div class="card-header">
                                             <div class="card-header-tabs-row">
@@ -171,22 +175,28 @@
                                                         Todas las regiones — Mantenimientos &amp; Auditorías
                                                     </h3><br>
                                                     <small class="text-muted">Agrupado por mes y estado </small>
+
                                                 </div>
 
-                                                <!-- Filtro tipo -->
-                                                <div class="btn-group tipo-group" role="group">
-                                                    <button type="button" class="btn btn-sm btn-primary active-tipo"
-                                                        onclick="setTipo('ambos', this)">
-                                                        Ambos
-                                                    </button>
-                                                    <button type="button" class="btn btn-sm btn-outline-primary"
-                                                        onclick="setTipo('mantenimiento', this)">
-                                                        <i class="fas fa-wrench mr-1"></i>Mantenimiento
-                                                    </button>
-                                                    <button type="button" class="btn btn-sm btn-outline-primary"
-                                                        onclick="setTipo('auditoria', this)">
-                                                        <i class="fas fa-clipboard-check mr-1"></i>Auditoría
-                                                    </button>
+                                                <div class="d-flex align-items-center" style="gap:8px">
+                                                    <div style="width: 150px; flex-shrink: 0;">
+                                                        <select class="form-control select" id="select-dash" onchange="consultar_info(this)"></select>
+                                                    </div>
+                                                    <!-- Filtro tipo -->
+                                                    <div class="btn-group tipo-group flex-shrink-0" role="group">
+                                                        <button type="button" class="btn btn-sm btn-primary active-tipo"
+                                                            onclick="setTipo('ambos', this)">
+                                                            Ambos
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-primary"
+                                                            onclick="setTipo('mantenimiento', this)">
+                                                            <i class="fas fa-wrench mr-1"></i>Mantenimiento
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-primary"
+                                                            onclick="setTipo('auditoria', this)">
+                                                            <i class="fas fa-clipboard-check mr-1"></i>Auditoría
+                                                        </button>
+                                                    </div>
                                                 </div>
 
                                             </div>
@@ -316,7 +326,13 @@
 <!--Admin LTE-->
 <script src="dist/js/adminlte.min.js" defer></script>
 
-<!--Apex charts-->
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+
+<!-- Select2 -->
+<script src="libraries/select2/js/select2.min.js" defer></script>
+
+
 <!-- ApexCharts -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
