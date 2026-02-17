@@ -365,7 +365,7 @@ async function mdl_editar(params) {
     //*Mostrar la fecha
     $('#lbl-fecha-reg').show()
     $('#inp-fecha-reg').show()
-
+    $("#btn-mdl-inventario").prop('disabled', false);
     //* Deshabilitando los campos que no deben editarse directamente
     $('#inp-usuario').prop('disabled', true)
     $('#inp-fecha-entrega').prop('disabled', true)

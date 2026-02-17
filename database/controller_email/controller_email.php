@@ -139,6 +139,50 @@ function email_reporte_mantenimiento($valores)
     $mail = new PHPMailer();
 
     $datos_equipo = $valores->datos;
+    $anio = $datos_equipo->anio;
+    $id_equipo = $datos_equipo->id;
+    $region_val = $datos_equipo->zona ?? '';
+
+    // Generar número de reporte basado en región + secuencia de mantenimiento
+    // Prefijos por región
+    $prefijo = 'MTO';
+    $r_lower = mb_strtolower($region_val);
+    if (strpos($r_lower, 'sur') !== false) {
+        $prefijo = 'MTO-VHA-';
+    } elseif (strpos($r_lower, 'tamp') !== false || strpos($r_lower, 'tampico') !== false) {
+        $prefijo = 'MTO-TAMP-';
+    } elseif (strpos($r_lower, 'norte') !== false || strpos($r_lower, 'poza rica') !== false || strpos($r_lower, 'pr') !== false) {
+        $prefijo = 'MTO-PR-';
+    }
+
+    //Verificar su ya tiene folio asignado
+    $check_sql = "SELECT num_reporte FROM mantenimiento WHERE id_equipo = '$id_equipo' AND anio = '$anio'";
+    $check_q = mysqli_query($con, $check_sql);
+    $check_row = mysqli_fetch_assoc($check_q);
+
+    if (!empty($check_row['num_reporte'])) {
+        // Si ya tiene folio, reutilizarlo
+        $report_code = $check_row['num_reporte'];
+    } else {
+        // Generar nuevo folio
+        $seq_sql = "SELECT COUNT(*) AS cnt FROM mantenimiento m
+                INNER JOIN inventario_ti_sur inv ON inv.id = m.id_equipo
+                WHERE m.num_reporte IS NOT NULL
+                AND inv.zona LIKE '%$region_val%'";
+                // Agregar condición : AND m.anio = '$anio' para que el folio reinicie por año
+        $seq_q = mysqli_query($con, $seq_sql);
+        $seq_num = 0;
+        if ($seq_q) {
+            $seq_row = mysqli_fetch_assoc($seq_q);
+            $seq_num = (int)$seq_row['cnt'];
+        }
+        // siguiente número en la secuencia
+        $seq_num++;
+        $seq_formatted = str_pad($seq_num, 3, '0', STR_PAD_LEFT);
+        $report_code = $prefijo . $seq_formatted;
+        // Guardar el folio en la bd
+        mysqli_query($con, "UPDATE mantenimiento SET num_reporte = '$report_code' WHERE id_equipo = '$id_equipo' AND anio = '$anio'");
+    }
 
     try {
         // Configuración del servidor SMTP
@@ -164,7 +208,7 @@ function email_reporte_mantenimiento($valores)
 
         // Contenido del correo
         $mail->isHTML(true); // Usar HTML en el correo
-        $mail->Subject = 'Mantenimiento de equipo: '.$valores->datos->tipo. ' Folio '.$valores->datos->id;
+        $mail->Subject = 'Mantenimiento de equipo: ' . $valores->datos->tipo . ' Folio '. $report_code;
         $mail->Body =
             '<html>
                 <body style="font-family: Arial, sans-serif; background-color: #f9fafc; color: #333; margin: 0; padding: 0;">
