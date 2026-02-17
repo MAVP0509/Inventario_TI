@@ -788,34 +788,46 @@ function reporte_mantenimiento($valores)
         $region_val = mysqli_real_escape_string($con, $valores->elementos->region);
     }
     // Prefijos por región
-    $prefix = 'MTOUNK';
+    $prefijo = 'MTO';
     $r_lower = mb_strtolower($region_val);
     if (strpos($r_lower, 'sur') !== false) {
-        $prefix = 'MTOVHA';
+        $prefijo = 'MTOVHA';
     } elseif (strpos($r_lower, 'tamp') !== false || strpos($r_lower, 'tampico') !== false) {
-        $prefix = 'MTOTAMP';
+        $prefijo = 'MTOTAMP';
     } elseif (strpos($r_lower, 'norte') !== false || strpos($r_lower, 'prz') !== false || strpos($r_lower, 'prz') !== false) {
-        $prefix = 'MTOPRZ';
+        $prefijo = 'MTOPRZ';
     }
 
-    // Calcular secuencia: contar registros de mantenimiento para la región y año
-    $seq_sql = "SELECT COUNT(*) AS cnt FROM mantenimiento m
+    $id_equipo = $valores->elementos->id;
+
+    $check_sql = "SELECT num_reporte FROM mantenimiento WHERE id_equipo = '$id_equipo' AND anio = '$anio'";
+    $check_q = mysqli_query($con, $check_sql);
+    $check_row = mysqli_fetch_assoc($check_q);
+
+    if (!empty($check_row['num_reporte'])) {
+        // Si ya tiene número asignado se reutiliza
+        $report_code = $check_row['num_reporte'];
+    } else {
+        // Generar nuevo número contando reportes ya asignados en esta region y año
+        $seq_sql = "SELECT COUNT(*) AS cnt FROM mantenimiento m
                 INNER JOIN inventario_ti_sur inv ON inv.id = m.id_equipo
-                INNER JOIN cat_usuarios cu ON cu.id = inv.fk_usuario
-                WHERE m.anio = '$anio'";
-    if (!empty($region_val)) {
-        $seq_sql .= " AND cu.region = '$region_val'";
+                WHERE m.anio = '$anio' AND m.num_reporte IS NOT NULL
+                AND inv.zona LIKE '%$region_val%'";
+                // quitar el filtro por anio del conteo, para incrementar y no reinucie por anio
+        $seq_q = mysqli_query($con, $seq_sql);
+        $seq_num = 0;
+        if ($seq_q) {
+            $seq_row = mysqli_fetch_assoc($seq_q);
+            $seq_num = (int)$seq_row['cnt'];
+        }
+        // siguiente número en la secuencia
+        $seq_num++;
+        $seq_formatted = str_pad($seq_num, 3, '0', STR_PAD_LEFT);
+        $report_code = $prefijo . $seq_formatted;
+        // Guardar el número de reporte en la bd
+        mysqli_query($con, "UPDATE mantenimiento SET num_reporte = '$report_code' WHERE id_equipo = '$id_equipo' AND anio = '$anio'");
     }
-    $seq_q = mysqli_query($con, $seq_sql);
-    $seq_num = 0;
-    if ($seq_q) {
-        $seq_row = mysqli_fetch_assoc($seq_q);
-        $seq_num = (int)$seq_row['cnt'];
-    }
-    // siguiente número en la secuencia
-    $seq_num++;
-    $seq_formatted = str_pad($seq_num, 3, '0', STR_PAD_LEFT);
-    $report_code = $prefix . $seq_formatted;
+
     $worksheet->setCellValue("G14", $report_code);
 
     // Mapeo de tipo -> fila
