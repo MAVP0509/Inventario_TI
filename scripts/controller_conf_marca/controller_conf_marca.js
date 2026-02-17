@@ -25,7 +25,7 @@ function server_marca(model) {
 let datos = []
 let elemento
 let table
-let marca_selecionada = []
+let marca_seleccionada = []
 
 async function consultar_informacion() {
     let server = await server_marca({ accion: 2 })
@@ -111,7 +111,7 @@ async function consultar_informacion() {
                     let rowData = cell.getRow().getData();
                     rowData.seleccionado = !rowData.seleccionado;
                     cell.getRow().reformat();
-                    seleccionar_registro(rowData.id, marca_selecionada)
+                    seleccionar_registro(rowData.id, marca_seleccionada)
                 }, headerSort: false, frozen: true
             },
             {
@@ -248,18 +248,18 @@ async function nuevo_marca() {
 
 async function mensaje_eliminar() {
 
-    if (marca_selecionada.length === 0) {
-        mostrar_toast('warning', 'Inventario TI', 'Por favor, selecciona al menos un rubro para continuar')
+    if (marca_seleccionada.length === 0) {
+        mostrar_toast('warning', 'Inventario TI', 'Por favor, selecciona al menos una marca para continuar')
 
     } else {
-        mostrar_alert('warning', `¿Está seguro de eliminar ${marca_selecionada.length} marca(s)?`, false, eliminar_marca);
+        mostrar_alert('warning', `¿Está seguro de eliminar ${marca_seleccionada.length} marca(s)?`, false, eliminar_marca);
     }
 }
 
 async function eliminar_marca() {
     let model = {
         accion: 3,
-        id: marca_selecionada
+        id: marca_seleccionada
     }
 
     let server = await server_marca(model);
@@ -279,8 +279,8 @@ function deseleccionar_todos() {
     //  Resetear propiedad "seleccionado"
     datos.forEach(d => d.seleccionado = false);
 
-    //  Limpiar el array de marca_selecionada
-    marca_selecionada = [];
+    //  Limpiar el array de marca_seleccionada
+    marca_seleccionada = [];
 
     //  Forzar re-renderizado de todas las filas para reflejar los íconos
     table.getRows().forEach(row => row.reformat());
