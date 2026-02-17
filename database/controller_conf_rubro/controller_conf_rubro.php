@@ -26,8 +26,7 @@ function insertar_rubro($valores)
 {
     include("../conexion.php");
     $sql = 'INSERT INTO cat_rubro(rubro) VALUES ("' . $valores->rubro . '")';
-    //$SQLStatement = "CALL pInsertarCatalogo('$sql','CAT_Rubro')";
-    //var_dump($SQLStatement);
+   
     $sql_val_rubro = "SELECT * FROM cat_rubro WHERE rubro = '$valores->rubro'";
     if (mysqli_query($con, $sql_val_rubro)->num_rows > 0) {  //*Consultamos su ya existe el rubro
         return "Este rubro ya existe";

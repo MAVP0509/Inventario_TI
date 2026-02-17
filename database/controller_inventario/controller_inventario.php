@@ -102,7 +102,7 @@ function insertar_datos($valores)
                     WHERE 
                         num_serie = '$val_num_serie'";
 
-    //$SQLStatement = "CALL pInsertarCatalogo('$sql','Insrt_Inventario')";
+   
     $query_select = mysqli_query($con, $sql_select);
     $resultado = mysqli_fetch_assoc($query_select);
     return [
