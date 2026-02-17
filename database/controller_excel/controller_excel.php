@@ -575,8 +575,8 @@ function programa_mantenimiento($valores)
             $fecha = fecha_programa($anio_actual, $mes);
 
             mysqli_query($con, "
-                INSERT INTO mantenimiento(id_equipo,anio,fecha_programada,estado,correo_enviado,reporte_descargado,reporte_subido)
-                VALUES ('{$d['id_equipo']}','$anio_actual','$fecha','Pendiente',0,0,0)
+                INSERT INTO mantenimiento(id_equipo,anio,fecha_programada,estado,correo_enviado,reporte_descargado,reporte_subido, num_reporte)
+                VALUES ('{$d['id_equipo']}','$anio_actual','$fecha','Pendiente',0,0,0, NULL)
             ");
         }
     }

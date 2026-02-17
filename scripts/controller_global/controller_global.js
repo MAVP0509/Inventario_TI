@@ -431,7 +431,11 @@ function alert_cargando(text) {
 }
 
 //todo comprobando los mantenimientos vencidos para notificarlos
-$(window).on('load',consultar_mantenimientos_vencidos)
+// $(window).on('load',consultar_mantenimientos_vencidos);
+window.addEventListener('load', () => {
+    consultar_mantenimientos_vencidos();
+    consultar_auditorias_vencidos();
+})
 
 async function consultar_mantenimientos_vencidos() {
     const alert = sessionStorage.getItem('alert-mnto')
@@ -460,3 +464,23 @@ async function consultar_mantenimientos_vencidos() {
     }
 }
 
+async function consultar_auditorias_vencidos() {
+    const alert = sessionStorage.getItem('alert-mnto')
+    let server = await server_global({ accion: 1 })
+
+    if (server.resultado.total_vencidos  >= 1) {
+        $('[name=notificacion-numero-auditorias]').remove()
+
+        $('#aviso-badge-pestaña-mantenimiento').text(server.resultado.total_vencidos)
+        $('[name="aviso-badge-campana"]').text(server.resultado.total_vencidos)
+        $('[name="header-campana-notificacion"]').text('Tienes '+server.resultado.total_vencidos + (server.resultado.total_vencidos == 1 ? ' notificación' : ' notificaciones'))
+        $('[name="header-divider-campana-notificacion"]').after(`
+                                                            <a href="auditorias.html" class="dropdown-item" name="notificacion-numero-auditoria">
+                                                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                                                            <span class="float-right text-muted text-sm">${server.resultado.total_vencidos + (server.resultado.total_vencidos == 1 ? ' Auditoria vencido' : ' Auditorias vencidos')}</span>
+                                                            <div class="dropdown-divider"></div></a>`)
+        
+    } else {
+        return
+    }
+}
