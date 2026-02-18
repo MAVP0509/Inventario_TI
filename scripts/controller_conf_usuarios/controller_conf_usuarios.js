@@ -308,6 +308,7 @@ async function mdl_nuevo_usuario() {
         tags: true,
     })
 
+    document.getElementById("inp-correo").value='@diavaz.com'
     document.getElementById('mdl-title').textContent = "Nuevo Usuario"
     document.getElementById('mdl-btn-conf').onclick = function () { nuevo_usuario() }
     document.getElementById('mdl-btn-conf').disabled = false
