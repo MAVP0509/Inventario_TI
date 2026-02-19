@@ -96,22 +96,55 @@ function email_recuperacion($destino, $token)
         $mail->Subject = 'Recuperación de contraseña';
         $mail->Body =
             '<html>
-                <body style="font-family: Arial, sans-serif; background-color: #f9fafc; color: #333; margin: 0; padding: 0;">
-                    <div style="max-width: 400px; margin: 40px auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; border: 1px solid #e0e0e0; text-align: center;">
-                    <div style="background-color: #007bff; color: #ffffff; padding: 20px; font-size: 20px; font-weight: bold;">
-                        Notificación de Inventario_TI
-                    </div>
-                    <div style="padding: 20px; text-align: center;">
-                        <h2 style="color: #007bff; margin-bottom: 15px; font-size: 22px;">Recuperación de contraseña</h2>
-                        <p style="font-size: 16px; line-height: 1.6; color: #555;">Hemos recibido una solicitud para recuperar tu contraseña.</p>
-                        <p style="font-size: 16px; line-height: 1.6; color: #555;">Haz clic en el botón de abajo para restablecer tu contraseña:</p>
-                        <a href="' . $reset_link . '" style="display: inline-block; background-color: #007bff; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold; margin-top: 10px;">Restablecer Contraseña</a>
-                        <p style="font-size: 14px; color: #999; margin-top: 20px;">Este mensaje es válido por 5 minutos.<br>Si no solicitaste este cambio, puedes ignorar este correo.</p>
-                    </div>
-                    <div style="background-color: #f9fafc; color: #888; text-align: center; padding: 15px; font-size: 12px; border-top: 1px solid #e0e0e0;">
-                        &copy; ' . $Year . ' Inventario_TI.
-                    </div>
-                    </div>
+                <body style="margin:0; padding:0; background-color:#f4f6f9; font-family: Arial, Helvetica, sans-serif;">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f6f9; padding:40px 0;">
+                        <tr>
+                            <td align="center">
+                                <table width="420" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; border:1px solid #dcdcdc; overflow:hidden;">
+                                    <!-- Header -->
+                                    <tr>
+                                        <td align="center" style="background-color:#0D3D7D; padding:25px;">
+                                            <span style="color:#ffffff; font-size:22px; font-weight:bold; letter-spacing:0.5px;">
+                                                Notificación Inventario TI
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <!-- Body -->
+                                    <tr>
+                                        <td style="padding:30px 30px 10px 30px; text-align:center;">
+                                            <h2 style="color:#0D3D7D; margin:0 0 15px 0; font-size:22px;">
+                                                Recuperación de contraseña
+                                            </h2>
+                                            <p style="font-size:15px; color:#555; line-height:1.6; margin-bottom:10px;">
+                                                Recibimos una solicitud para restablecer la contraseña de tu cuenta en Inventario TI.
+                                            </p>
+                                            <p style="font-size:15px; color:#555; line-height:1.6; margin-bottom:25px;">
+                                                Haz clic en el siguiente botón para continuar:
+                                            </p>
+                                            <!-- Button -->
+                                            <a href="' . $reset_link . '" 
+                                            style="display:inline-block; background-color:#0D3D7D; color:#ffffff; text-decoration:none; padding:14px 28px; border-radius:8px; font-size:15px; font-weight:bold; letter-spacing:0.3px; box-shadow:0 4px 10px rgba(13,61,125,0.3);">
+                                                Restablecer Contraseña
+                                            </a>
+                                            <p style="font-size:13px; color:#888; margin-top:30px; line-height:1.5;">
+                                                Por tu seguridad, este enlace expirará en <strong>5 minutos</strong>. Si el tiempo se agota, deberás solicitar un nuevo enlace desde nuestra plataforma.<br>
+                                            </p>
+                                            <p style="font-size:13px; color:#888; margin-top:30px; line-height:1.5;">
+                                                <strong>¿No solicitaste este cambio?</strong><br>
+                                                No te preocupes, tu contraseña actual sigue siendo segura. Puedes ignorar este correo o contactar al equipo de soporte si crees que alguien está intentando acceder a tu cuenta.
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    <!-- Footer -->
+                                    <tr>
+                                        <td style="background-color:#f9fafc; text-align:center; padding:18px; font-size:12px; color:#999; border-top:1px solid #e6e6e6;">
+                                            &copy; ' . $Year . ' Inventario T.I.
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
                 </body>
             </html>';
         $mail->AltBody = 'Recuperación de contraseña';

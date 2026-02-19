@@ -365,12 +365,12 @@ function consultar_para_resguardo($valores)
     //$respuesta->datos = $datos;
     //return $respuesta;
 
-    // 👉 Enviar a segundo PHP con cURL
+    // Enviar a segundo PHP con cURL
     $datos_para_envio = new stdClass();
     $datos_para_envio->accion = 0;
     $datos_para_envio->datos = $datos;
 
-    $ch = curl_init('http://localhost/Inventario_TI/database/controller_excel/controller_excel.php'); // Reemplaza con tu URL real
+    $ch = curl_init('http://localhost/Inventario_TI/database/controller_excel/controller_excel.php'); // Reemplaza con tu URL
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, [
