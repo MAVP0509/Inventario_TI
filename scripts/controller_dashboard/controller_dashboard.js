@@ -51,7 +51,9 @@ async function consultar_anio() {
 }
 
 let datos
-async function consultar_info(anio) {
+let regionesDisponibles = [];
+
+/* async function consultar_info(anio) {
     if(anio.value === ''){
         return
     }
@@ -60,58 +62,36 @@ async function consultar_info(anio) {
 
     //console.log(info)
     renderChart();
-}
+} */
 
+async function consultar_info(anio) {
+    if (anio.value === '') {
+        return;
+    }
+    let server = await server_dashboard({ accion: 0, anio: anio.value });
+    datos = server.resultado;
+
+    // ── Extraer regiones disponibles ──
+    regionesDisponibles = datos.regiones || [];
+
+    // Validar que haya regiones
+    if (regionesDisponibles.length === 0) {
+        mostrar_toast('warning', 'Sin datos', `No hay información para el año ${anio.value}`);
+        return;
+    }
+
+    // ── Construir Select2 de regiones dinámicamente ──
+    construirSelectRegion();
+
+    renderChart();
+}
 
 const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 const MESES_FULL = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
-const DATA = {
-    norte: {
-        mantenimiento: {
-            pendiente: [8, 12, 6, 9, 11, 7, 15, 8, 9, 12, 5, 14],
-            proceso: [14, 10, 18, 13, 9, 16, 8, 6, 12, 5, 11, 12],
-            finalizado: [20, 25, 22, 28, 30, 27, 8, 6, 7, 10, 11, 13],
-            vencido: [3, 5, 2, 4, 1, 3, 2, 8, 9, 4, 2, 7]
-        },
-        auditoria: {
-            pendiente: [5, 7, 4, 6, 8, 5, 14, 12, 13, 14, 10, 12],
-            proceso: [9, 11, 8, 12, 10, 9, 8, 6, 1, 7, 10, 15],
-            finalizado: [15, 18, 16, 20, 22, 19, 12, 15, 16, 14, 13, 15],
-            vencido: [2, 3, 1, 2, 3, 1, 0, 7, 9, 1, 3, 4]
-        }
-    },
-    sur: {
-        mantenimiento: {
-            pendiente: [6, 9, 7, 8, 10, 6, 12, 14, 15, 13, 12, 14],
-            proceso: [11, 13, 10, 14, 12, 11, 4, 9, 12, 14, 3, 12],
-            finalizado: [18, 21, 19, 24, 26, 22, 12, 25, 23, 10, 11, 12],
-            vencido: [4, 6, 3, 5, 2, 4, 1, 2, 0, 0, 0, 1]
-        },
-        auditoria: {
-            pendiente: [4, 6, 5, 7, 6, 4, 12, 12, 14, 15, 10, 12],
-            proceso: [8, 9, 7, 10, 9, 8, 0, 0, 0, 0, 0, 0],
-            finalizado: [13, 16, 14, 18, 19, 16, 0, 0, 0, 0, 0, 0],
-            vencido: [1, 2, 2, 3, 1, 2, 0, 0, 0, 0, 0, 0]
-        }
-    },
-    tampico: {
-        mantenimiento: {
-            pendiente: [7, 10, 8, 9, 12, 8, 12, 10, 14, 15, 12, 10],
-            proceso: [13, 15, 11, 14, 10, 13, 1, 2, 4, 3, 1, 6],
-            finalizado: [22, 26, 23, 27, 29, 25, 0, 0, 0, 0, 0, 0],
-            vencido: [5, 4, 3, 6, 2, 4, 1, 2, 3, 4, 0, 5]
-        },
-        auditoria: {
-            pendiente: [6, 8, 5, 7, 9, 6, 10, 12, 14, 15, 10, 12],
-            proceso: [10, 12, 9, 11, 10, 10, 1, 2, 4, 6, 1, 2],
-            finalizado: [17, 20, 18, 22, 24, 20, 0, 1, 6, 4, 1, 25],
-            vencido: [3, 2, 2, 4, 1, 3, 1, 5, 8, 7, 1, 0]
-        }
-    }
-};
 
-// Colores que respetan la paleta de Bootstrap / AdminLTE
+
+// Colores para la gráfica
 const COLORES = {
     pendiente: '#ffc107',  // warning
     proceso: '#17a2b8',  // info
@@ -125,6 +105,40 @@ const ESTADOS_LABEL = {
     finalizado: 'Finalizado',
     vencido: 'Vencido'
 };
+
+// ── Nueva función: Construir Select2 de regiones ──
+function construirSelectRegion() {
+    const labels = {
+        norte: 'Región Norte',
+        sur: 'Región Sur',
+        tampico: 'Región Tampico'
+        // Puedes agregar más labels personalizados
+    };
+
+    const select = $('#select-region');
+
+    // Limpiar opciones existentes (menos "Todas")
+    select.find('option:not([value="todas"])').remove();
+
+    // Agregar opciones por cada región disponible
+    regionesDisponibles.forEach(region => {
+        const label = labels[region] || `Región ${region.charAt(0).toUpperCase() + region.slice(1)}`;
+        select.append(`<option value="${region}">${label}</option>`);
+    });
+
+    // Inicializar/Actualizar Select2
+    if (!select.hasClass('select2-hidden-accessible')) {
+        // Primera vez - inicializar
+        select.select2({
+            minimumResultsForSearch: Infinity, // Sin buscador
+            dropdownParent: '#card-dash',
+            placeholder: 'Seleccione región'
+        });
+    } else {
+        // Ya existe - solo actualizar
+        select.trigger('change.select2');
+    }
+}
 
 //* Variables globales con valores por defecto
 let tipoActual = 'ambos';
@@ -149,7 +163,7 @@ function getDataRegion(region, tipo) {
 }
 
 //*Actualizar kpis
-function actualizarKPIs() {
+/* function actualizarKPIs() {
     const regiones = regionActual === 'todas' ? ['norte', 'sur', 'tampico'] : [regionActual];
     const tipos = tipoActual === 'ambos' ? ['mantenimiento', 'auditoria'] : [tipoActual];
     const valoresKpis = { pendiente: 0, proceso: 0, finalizado: 0, vencido: 0 }; //t
@@ -164,10 +178,41 @@ function actualizarKPIs() {
     document.getElementById('kpi-proceso').textContent = valoresKpis.proceso;
     document.getElementById('kpi-finalizado').textContent = valoresKpis.finalizado;
     document.getElementById('kpi-vencido').textContent = valoresKpis.vencido;
+} */
+
+function actualizarKPIs() {
+    // ✅ CORRECTO: Usar regionesDisponibles (regiones que realmente existen)
+    const regiones = regionActual === 'todas' ? regionesDisponibles : [regionActual];
+    const tipos = tipoActual === 'ambos' ? ['mantenimiento', 'auditoria'] : [tipoActual];
+    const valoresKpis = { pendiente: 0, proceso: 0, finalizado: 0, vencido: 0 };
+
+    regiones.forEach(region => {
+        // Validación por si acaso
+        if (!datos[region]) {
+            console.error(`Región "${region}" no existe en datos`);
+            return;
+        }
+
+        tipos.forEach(tipo => {
+            if (!datos[region][tipo]) {
+                console.error(`Tipo "${tipo}" no existe en región "${region}"`);
+                return;
+            }
+
+            ['pendiente', 'proceso', 'finalizado', 'vencido'].forEach(estado => {
+                valoresKpis[estado] += datos[region][tipo][estado].reduce((suma, valor) => suma + valor, 0);
+            });
+        });
+    });
+
+    document.getElementById('kpi-pendiente').textContent = valoresKpis.pendiente;
+    document.getElementById('kpi-proceso').textContent = valoresKpis.proceso;
+    document.getElementById('kpi-finalizado').textContent = valoresKpis.finalizado;
+    document.getElementById('kpi-vencido').textContent = valoresKpis.vencido;
 }
 
 //*Construyendo los datos para mostrarlos en la gráfica
-function construirSeries() {
+/* function construirSeries() {
     //*Son 4 barras por mes, pendiente, proceso, finalizado y vencido
     return ['pendiente', 'proceso', 'finalizado', 'vencido'].map(estado => {
         //*Datos por barra
@@ -179,6 +224,20 @@ function construirSeries() {
             data = getDataRegion(regionActual, tipoActual)[estado];
         }
         //*Construcción del objeto de la barra
+        return { name: ESTADOS_LABEL[estado], data, color: COLORES[estado] };
+    });
+} */
+
+function construirSeries() {
+    return ['pendiente', 'proceso', 'finalizado', 'vencido'].map(estado => {
+        let data;
+        if (regionActual === 'todas') {
+            // ✅ Usar regionesDisponibles
+            const arrs = regionesDisponibles.map(region => getDataRegion(region, tipoActual)[estado]);
+            data = sumarArrays(...arrs);
+        } else {
+            data = getDataRegion(regionActual, tipoActual)[estado];
+        }
         return { name: ESTADOS_LABEL[estado], data, color: COLORES[estado] };
     });
 }
@@ -275,7 +334,7 @@ function renderChart() {
 }
 
 //*Información de la tabla inferior
-function actualizarTabla() {
+/* function actualizarTabla() {
     const tbody = document.getElementById('tabla-body');
     const regiones = regionActual === 'todas' ? ['norte', 'sur', 'tampico'] : [regionActual];
     const tipos = tipoActual === 'ambos' ? ['mantenimiento', 'auditoria'] : [tipoActual];
@@ -290,6 +349,44 @@ function actualizarTabla() {
                 const f = datos[r][t].finalizado[i];
                 const v = datos[r][t].vencido[i];
                 const total = p + pr + f + v;
+                filas += `<tr>
+                    <td><span class="tag-${r}">${r.charAt(0).toUpperCase() + r.slice(1)}</span></td>
+                    <td>${etTipo[t]}</td>
+                    <td>${mes}</td>
+                    <td><span class="badge badge-pendiente">${p}</span></td>
+                    <td><span class="badge badge-proceso">${pr}</span></td>
+                    <td><span class="badge badge-finalizado">${f}</span></td>
+                    <td><span class="badge badge-vencido">${v}</span></td>
+                    <td><strong>${total}</strong></td>
+                </tr>`;
+            });
+        });
+    });
+    tbody.innerHTML = filas;
+} */
+
+function actualizarTabla() {
+    const tbody = document.getElementById('tabla-body');
+    // ✅ Usar regionesDisponibles
+    const regiones = regionActual === 'todas' ? regionesDisponibles : [regionActual];
+    const tipos = tipoActual === 'ambos' ? ['mantenimiento', 'auditoria'] : [tipoActual];
+    const etTipo = {
+        mantenimiento: '<i class="fas fa-wrench mr-1"></i>Mantenimiento',
+        auditoria: '<i class="fas fa-clipboard-check mr-1"></i>Auditoría'
+    };
+
+    let filas = '';
+    regiones.forEach(r => {
+        if (!datos[r]) return; // Validar existencia
+
+        tipos.forEach(t => {
+            MESES_FULL.forEach((mes, i) => {
+                const p = datos[r][t].pendiente[i] || 0;
+                const pr = datos[r][t].proceso[i] || 0;
+                const f = datos[r][t].finalizado[i] || 0;
+                const v = datos[r][t].vencido[i] || 0;
+                const total = p + pr + f + v;
+
                 filas += `<tr>
                     <td><span class="tag-${r}">${r.charAt(0).toUpperCase() + r.slice(1)}</span></td>
                     <td>${etTipo[t]}</td>
@@ -321,10 +418,26 @@ function setTipo(tipo, btn) {
     renderChart();
 }
 
-function setRegion(region, link) {
+/* function setRegion(region, link) {
     regionActual = region;
     document.querySelectorAll('.region-pills .nav-link').forEach(region => region.classList.remove('active'));
     link.classList.add('active');
+    actualizarTitulo();
+    renderChart();
+} */
+
+// ── Modificar setRegion (ya no se usa pero por si acaso) ──
+function setRegion(region, link) {
+    regionActual = region;
+    $('#select-region').val(region).trigger('change');
+    actualizarTitulo();
+    renderChart();
+}
+
+// ── Nueva función para manejar cambio de región ──
+function cambiarRegion(select) {
+    const region = select.value;
+    regionActual = region;
     actualizarTitulo();
     renderChart();
 }

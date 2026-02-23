@@ -180,7 +180,8 @@
 
                                                 <div class="d-flex align-items-center" style="gap:8px">
                                                     <div style="width: 150px; flex-shrink: 0;">
-                                                        <select class="form-control select" id="select-dash" onchange="consultar_info(this)"></select>
+                                                        <select class="form-control select" id="select-dash"
+                                                            onchange="consultar_info(this)"></select>
                                                     </div>
                                                     <!-- Filtro tipo -->
                                                     <div class="btn-group tipo-group flex-shrink-0" role="group">
@@ -207,7 +208,7 @@
                                             <!-- Tabs región -->
                                             <div class="d-flex align-items-center justify-content-between flex-wrap mb-3"
                                                 style="gap:8px">
-                                                <ul class="nav region-pills mb-0">
+                                                <!-- <ul class="nav region-pills mb-0">
                                                     <li class="nav-item">
                                                         <a class="nav-link active" href="#" data-region="todas"
                                                             onclick="setRegion('todas', this); return false;">
@@ -232,8 +233,15 @@
                                                             <i class="fas fa-anchor mr-1"></i>Tampico
                                                         </a>
                                                     </li>
-                                                </ul>
+                                                </ul> -->
 
+                                                <!-- Select de región -->
+                                                <div style="width: 200px; flex-shrink: 0;">
+                                                    <select class="form-control select" id="select-region"
+                                                        onchange="cambiarRegion(this)">
+                                                        <option value="todas" selected>Todas las regiones</option>
+                                                    </select>
+                                                </div>
                                                 <!-- Leyenda estados -->
                                                 <div>
                                                     <span class="legend-item">
