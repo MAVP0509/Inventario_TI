@@ -934,9 +934,9 @@ async function mdl_programar_mantenimiento() {
 
     // Si es admin, mostrar el contenedor de región; si es user, ocultarlo (por si quedó visible)
     if (rolUsuario === 'admin') {
-        $('#region-container').show();
+        $('#region-container-aud').show();
     } else {
-        $('#region-container').hide();
+        $('#region-container-aud').hide();
     }
 
     $('#mdl-prog-mant').modal("show")

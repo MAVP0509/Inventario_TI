@@ -458,7 +458,7 @@ function programa_mantenimiento($valores)
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
     $anio_actual = $valores->anio;
-    $rol = $valores->rol ?? '';
+    // $rol = $valores->rol ?? '';
     $region = $valores->region ?? '';
     $descargar_ambos = !empty($valores->descargar_ambos);
 
@@ -556,7 +556,8 @@ function programa_mantenimiento($valores)
 
     //* Verificar si ya existen registros para el año: si ya existe, no insertamos, solo generamos documento
     //MANTENIMIENTO
-    $m_existe = (int)mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) AS cnt FROM mantenimiento WHERE anio = '$anio_actual'"))['cnt'] > 0;
+    $m_existe = (int)mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) AS cnt FROM mantenimiento m INNER JOIN inventario_ti_sur inv ON  inv.id = m.id_equipo 
+                                                            WHERE anio = '$anio_actual' AND inv.zona LIKE '%$region%'"))['cnt'] > 0;
 
     if (!$m_existe) {
         foreach ($mant as $d) {
@@ -571,7 +572,8 @@ function programa_mantenimiento($valores)
     }
 
     //AUDITORIA
-    $a_existe = (int)mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) AS cnt FROM auditoria WHERE anio = '$anio_actual'"))['cnt'] > 0;
+    $a_existe = (int)mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) AS cnt FROM auditoria a INNER JOIN inventario_ti_sur inv ON inv.id = a.id_equipo 
+                                                            WHERE anio = '$anio_actual' AND inv.zona LIKE '%$region%'"))['cnt'] > 0;
 
     if (!$a_existe) {
         foreach ($aud as $d) {
@@ -670,7 +672,7 @@ function programa_mantenimiento($valores)
     $carpeta_anual = $base . DIRECTORY_SEPARATOR . $anio_actual;
     if (!is_dir($carpeta_anual)) mkdir($carpeta_anual, 0777, true);
 
-    $nombre_doc = "FO-DSP-TI-03_Programa de Mantenimiento Preventivo TI Región Sur_{$anio_actual}_" . date('Ymd_His') . ".xlsx"; // Nombre del archivo generado
+    $nombre_doc = "FO-DSP-TI-03_Programa de Mantenimiento Preventivo TI Región {$region}_{$anio_actual}_" . date('Ymd_His') . ".xlsx"; // Nombre del archivo generado
     // Define la ruta física donde se guardará el archivo, basada en la estructura del proyecto
     $ruta_guardar = $carpeta_anual . DIRECTORY_SEPARATOR . $nombre_doc;
     // Guardar Excel
@@ -787,6 +789,8 @@ function reporte_mantenimiento($valores)
 
     // Inicializar filas con 'NA'
     for ($fila = 20; $fila <= 27; $fila++) {
+        $worksheet->getStyle("G{$fila}:W{$fila}")->getAlignment()->setWrapText(true);
+        // $worksheet->getRowDimension($fila)->setRowHeight(-1);
         $worksheet->setCellValue("G{$fila}", 'NA'); // Marca
         $worksheet->setCellValue("L{$fila}", 'NA'); // Modelo
         $worksheet->setCellValue("Q{$fila}", 'NA'); // Serie
@@ -825,7 +829,7 @@ function reporte_mantenimiento($valores)
 
 
     $fecha_doc = date('Ymd_His');
-    $nombre_doc = "FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.{$valores->elementos->id_usuario}_{$fecha_doc}.xlsx";
+    $nombre_doc = "FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.{$valores->elementos->region}_{$valores->elementos->id_usuario}_{$fecha_doc}.xlsx";
 
     $base = realpath(__DIR__ . '/../../../');
     $host = $_SERVER['HTTP_HOST'];
@@ -1020,7 +1024,7 @@ function programa_auditoria($valores)
         mkdir($carpeta_anual, 0777, true);
     }
 
-    $nombre_doc = "FO-DSP-TI-04_Programa de Auditoria de Herramientas de Trabajo Región Sur_{$anio_actual}_" . date('Ymd_His') . ".xlsx"; // Nombre del archivo generado
+    $nombre_doc = "FO-DSP-TI-04_Programa de Auditoria de Herramientas de Trabajo Región {$region}_{$anio_actual}_" . date('Ymd_His') . ".xlsx"; // Nombre del archivo generado
     // Define la ruta física donde se guardará el archivo, basada en la estructura del proyecto
     $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . 'documentos_descarga' . DIRECTORY_SEPARATOR . 'auditoria' . DIRECTORY_SEPARATOR . 'programa' . DIRECTORY_SEPARATOR . $nombre_doc;
 
@@ -1149,7 +1153,7 @@ function reporte_auditoria($valores)
     $worksheet->setCellValue("H{$fila_nombres}", $usuario);
     $worksheet->setCellValue("H" . ($fila_nombres + 1), !empty($valores->elementos->cargo) ? $valores->elementos->cargo : '');
 
-    $nombre_doc = "FO-DSP-TI-06 Reporte de auditoria a herramientas TI Rev.00_" . date('Ymd_His') . ".xlsx";
+    $nombre_doc = "FO-DSP-TI-06 Reporte de auditoria a herramientas TI Rev.00_{$valores->elementos->region}" . date('Ymd_His') . ".xlsx";
     $base = realpath(__DIR__ . '/../../../');
     $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI/database/controller_excel/documentos_descarga/auditoria/reporte/' . $nombre_doc;
 
