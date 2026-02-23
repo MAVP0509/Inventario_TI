@@ -137,7 +137,7 @@ async function consultar_informacion() {
             columns: [
                 {
                     formatter: squareIcon, width: 70, hozAlign: "center", // Se muestra un ícono dinámico según el estado de selección (fa-square -> no seleccionado, fa-square-check -> seleccionado)
-                    cellClick: function (e, cell) { 
+                    cellClick: function (e, cell) {
                         let rowData = cell.getRow().getData();  //Obtiene los datos de la fila
                         rowData.seleccionado = !rowData.seleccionado;   // Alterna el estado lógico de selección
                         cell.getRow().reformat();   //Re-renderiza la fila para reflejar el cambio visual (Actualiza la vista)
@@ -145,7 +145,7 @@ async function consultar_informacion() {
                     }, headerSort: false, frozen: true, width: 70, hozAlign: "center",
                 },
                 {
-                    title: "Zona", field: "zona",width:130, headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "list", */
+                    title: "Zona", field: "zona", width: 130, headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "list", */
                     /* headerFilterParams: {
                         valuesLookup: true, clearable: true, // se auto genera a partir de los valores únicos de la columna
                         elementAttributes: {
@@ -303,7 +303,7 @@ async function consultar_informacion() {
                 },
 
             ],
-            
+
 
         });
 
@@ -884,7 +884,7 @@ async function mdl_imprimir() {
         check_columnas.dataset.listenerAttached = "true";
     }
 
-    $("#btn-imprimir").off('click').on('click', function () { imprimir_pdf()})
+    $("#btn-imprimir").off('click').on('click', function () { imprimir_pdf() })
     $("#mdl-imprimir").modal("show");
 
 }
@@ -1479,13 +1479,11 @@ async function crear_resguardo() {
     } else if (server.resultado) {
 
         abrir_resguardo(server.resultado.result)
-        await registrar_historico('Generación de resguardo',  server.resultado.resguardo);
+        await registrar_historico('Generación de resguardo', server.resultado.resguardo);
         consultar_informacion();
     } else {
         mostrar_toast('error', 'Aviso', "Hubo un error")
     }
-
-
 }
 
 function abrir_resguardo(datos) {

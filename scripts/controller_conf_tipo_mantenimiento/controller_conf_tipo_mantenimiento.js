@@ -123,7 +123,7 @@ async function consultar_orden_tipo(params) {
 
     table_orden.on("rowMoved", function (row) {
         let orden = table_orden.getData().map(data => data.tipo_id)
-        console.log(orden)
+        //console.log(orden)
         orden_tipos_mantenimiento(orden);
     })
 }

@@ -43,8 +43,6 @@ print(json_encode($respuesta_servidor));
 //* Función para generación de resguardos
 function resguardo($valores)
 {
-
-
     //todo Desglosamos la información recibida del JS
     //* Array de los equipos del usuario seleccionado
     $datos = $valores->datos;
@@ -73,10 +71,8 @@ function resguardo($valores)
     $cel = $datos[0]->cel ?? 0;
     //var_dump($cel);
 
-
     $spreadsheet = IOFactory::load('FO-DSP-TI-01 Resguardo de herramientas TI Rev.00.xlsx'); //*Cargando la plantilla del Excel
     $worksheet = $spreadsheet->getActiveSheet();
-
     /*
     TODO Configuración de impresión
     * Es necesario para dar un formato, delimitar márgenes para cuando se exporte a pdf, el pdf no este descuadrado
@@ -94,7 +90,6 @@ function resguardo($valores)
     $pageMargins->setBottom(0.5);
     $pageMargins->setLeft(0.5);
     $pageMargins->setRight(0.5);
-
 
     $fila = 17;        //* Fila desde donde se empezará a generar la tabla en el formato, funcionará como contador
     $num = 1;          //* Número visual en la tabla, funcionará como contador
@@ -171,8 +166,6 @@ function resguardo($valores)
 
             $fila++; //* Aumentamos el contador para avanzar a la siguiente fila
         }
-
-
         // Activar el ajuste de texto para el rango de celdas (por ejemplo, toda la fila)
         /* $worksheet->getStyle("B$fila:J$fila")->getAlignment()->setWrapText(true);
         $worksheet->getRowDimension($fila)->setRowHeight(-1); */
@@ -186,8 +179,6 @@ function resguardo($valores)
         $worksheet->getStyle("E$fila")->getFont()->setBold(true);
         $worksheet->getStyle("E$fila")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
     }
-
-
 
     $filaFin = $fila - 1; //* Se guarda la fila final para hacer cálculos
 
@@ -231,8 +222,6 @@ function resguardo($valores)
         $worksheet->getStyle("F$filaCargoPemex")->getFont()->setBold(true);
         $worksheet->getStyle("F$filaCargoPemex")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
     }
-
-
 
     //TODO Exportando el nuevo archivo excel
 
