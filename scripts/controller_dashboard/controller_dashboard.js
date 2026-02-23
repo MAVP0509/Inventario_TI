@@ -107,37 +107,31 @@ const ESTADOS_LABEL = {
 };
 
 // ── Nueva función: Construir Select2 de regiones ──
-function construirSelectRegion() {
-    const labels = {
+async function construirSelectRegion() {
+
+    console.log(regionesDisponibles)
+
+    let opciones = regionesDisponibles.map((region, index) => ({ id: index + 1, text: region }))
+
+    opciones.unshift({ id: 0, text: 'Todas las regiones' })
+
+    console.table(opciones)
+
+    await general_select2({
+        selectId: 'select-region',
+        data: opciones,
+        placeholder: 'Selecione una región',
+        dropdownParent: '#card-dash',
+        tags: false,
+    })
+
+    /* const labels = {
         norte: 'Región Norte',
         sur: 'Región Sur',
         tampico: 'Región Tampico'
         // Puedes agregar más labels personalizados
-    };
+    }; */
 
-    const select = $('#select-region');
-
-    // Limpiar opciones existentes (menos "Todas")
-    select.find('option:not([value="todas"])').remove();
-
-    // Agregar opciones por cada región disponible
-    regionesDisponibles.forEach(region => {
-        const label = labels[region] || `Región ${region.charAt(0).toUpperCase() + region.slice(1)}`;
-        select.append(`<option value="${region}">${label}</option>`);
-    });
-
-    // Inicializar/Actualizar Select2
-    if (!select.hasClass('select2-hidden-accessible')) {
-        // Primera vez - inicializar
-        select.select2({
-            minimumResultsForSearch: Infinity, // Sin buscador
-            dropdownParent: '#card-dash',
-            placeholder: 'Seleccione región'
-        });
-    } else {
-        // Ya existe - solo actualizar
-        select.trigger('change.select2');
-    }
 }
 
 //* Variables globales con valores por defecto
@@ -436,7 +430,7 @@ function setRegion(region, link) {
 
 // ── Nueva función para manejar cambio de región ──
 function cambiarRegion(select) {
-    const region = select.value;
+    const region = select.selectedOptions[0].text; 
     regionActual = region;
     actualizarTitulo();
     renderChart();
