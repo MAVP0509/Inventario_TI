@@ -43,7 +43,7 @@ async function consultar_anio() {
     }).then(async () => {
         let server = await server_dashboard({ accion: 1 })
         if (!server.resultado) {
-            return
+            return mostrar_toast('error', 'Error', 'Problema de conexión con el servidor')
         } else {
             $('#select-dash').val(server.resultado.anio).trigger('change')
         }
