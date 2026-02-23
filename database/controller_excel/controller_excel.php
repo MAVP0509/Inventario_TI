@@ -572,7 +572,7 @@ function programa_mantenimiento($valores)
     }
 
     //AUDITORIA
-    $a_existe = (int)mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) AS cnt FROM auditoria a INNER JOIN inventario_ti_sur ON inv.id = a.id_equipo 
+    $a_existe = (int)mysqli_fetch_assoc(mysqli_query($con, "SELECT COUNT(*) AS cnt FROM auditoria a INNER JOIN inventario_ti_sur inv ON inv.id = a.id_equipo 
                                                             WHERE anio = '$anio_actual' AND inv.zona LIKE '%$region%'"))['cnt'] > 0;
 
     if (!$a_existe) {
