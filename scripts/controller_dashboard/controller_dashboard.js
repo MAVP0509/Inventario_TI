@@ -82,7 +82,7 @@ async function consultar_info(anio) {
 
     // ── Construir Select2 de regiones dinámicamente ──
     construirSelectRegion();
-
+    rellenar_select('Todas', "select-region")
     renderChart();
 }
 
@@ -106,16 +106,14 @@ const ESTADOS_LABEL = {
     vencido: 'Vencido'
 };
 
-// ── Nueva función: Construir Select2 de regiones ──
+//* Construir Select2 de regiones 
 async function construirSelectRegion() {
 
-    console.log(regionesDisponibles)
-
+    
     let opciones = regionesDisponibles.map((region, index) => ({ id: index + 1, text: region }))
 
-    opciones.unshift({ id: 0, text: 'Todas las regiones' })
+    opciones.unshift({ id: 0, text: 'Todas' })
 
-    console.table(opciones)
 
     await general_select2({
         selectId: 'select-region',
@@ -125,18 +123,11 @@ async function construirSelectRegion() {
         tags: false,
     })
 
-    /* const labels = {
-        norte: 'Región Norte',
-        sur: 'Región Sur',
-        tampico: 'Región Tampico'
-        // Puedes agregar más labels personalizados
-    }; */
-
 }
 
 //* Variables globales con valores por defecto
 let tipoActual = 'ambos';
-let regionActual = 'todas';
+let regionActual = 'Todas';
 let chartInstance = null;
 
 //* Función que suma los indices de un número indefinido de arrays que sean de la misma longitud
@@ -175,8 +166,8 @@ function getDataRegion(region, tipo) {
 } */
 
 function actualizarKPIs() {
-    // ✅ CORRECTO: Usar regionesDisponibles (regiones que realmente existen)
-    const regiones = regionActual === 'todas' ? regionesDisponibles : [regionActual];
+   
+    const regiones = regionActual === 'Todas' ? regionesDisponibles : [regionActual];
     const tipos = tipoActual === 'ambos' ? ['mantenimiento', 'auditoria'] : [tipoActual];
     const valoresKpis = { pendiente: 0, proceso: 0, finalizado: 0, vencido: 0 };
 
@@ -225,8 +216,8 @@ function actualizarKPIs() {
 function construirSeries() {
     return ['pendiente', 'proceso', 'finalizado', 'vencido'].map(estado => {
         let data;
-        if (regionActual === 'todas') {
-            // ✅ Usar regionesDisponibles
+        if (regionActual === 'Todas') {
+           
             const arrs = regionesDisponibles.map(region => getDataRegion(region, tipoActual)[estado]);
             data = sumarArrays(...arrs);
         } else {
@@ -361,8 +352,8 @@ function renderChart() {
 
 function actualizarTabla() {
     const tbody = document.getElementById('tabla-body');
-    // ✅ Usar regionesDisponibles
-    const regiones = regionActual === 'todas' ? regionesDisponibles : [regionActual];
+    
+    const regiones = regionActual === 'Todas' ? regionesDisponibles : [regionActual];
     const tipos = tipoActual === 'ambos' ? ['mantenimiento', 'auditoria'] : [tipoActual];
     const etTipo = {
         mantenimiento: '<i class="fas fa-wrench mr-1"></i>Mantenimiento',
@@ -437,15 +428,10 @@ function cambiarRegion(select) {
 }
 
 function actualizarTitulo() {
-    const rLabel = regionActual === 'todas' ? 'Todas las regiones'
+    const rLabel = regionActual === 'Todas' ? 'Todas las regiones'
         : regionActual.charAt(0).toUpperCase() + regionActual.slice(1);
     const tLabel = tipoActual === 'ambos' ? 'Mantenimientos &amp; Auditorías'
         : tipoActual === 'mantenimiento' ? 'Mantenimientos' : 'Auditorías';
     document.getElementById('chart-titulo').innerHTML =
         `<i class="fas fa-chart-bar mr-2 text-primary"></i>${rLabel} — ${tLabel}`;
 }
-
-/* //*renderizar
-$(document).ready(function () {
-    renderChart();
-}); */
