@@ -226,8 +226,7 @@ async function consultar_historico() {
 
 async function registrar_historico(evento, params) {
     const usuario = JSON.parse(sessionStorage.getItem('user')); // Obtener usuario en sesión
-    //console.log(params);
-    //const fecha_evento = new Date().toISOString();
+
     let model = {
         accion: 1,
         usuario_sesion: usuario.resultado[0] || '', // Nombre del usuario
@@ -236,8 +235,7 @@ async function registrar_historico(evento, params) {
 
     };
 
-    let resultado = await server_historico(model);
-    //console.log(model);
+    await server_historico(model);
 }
 
 async function consultar_num_serie() {

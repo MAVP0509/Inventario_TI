@@ -412,7 +412,7 @@ function traspaso($valores)
     $usuario = '5'; // Usuario por defecto para activos en Bodega
 
     $datos = [];    // Para almacenar el estado anterior de los activos
-    $nuevo = [];    // Para almacenar el estado nuevo despué del traspaso
+    $nuevo = [];    // Para almacenar el estado nuevo después del traspaso
 
     // Valida si se envían varios IDs de activos
     if (is_array($valores->id)) {
