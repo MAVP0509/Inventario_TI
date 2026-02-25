@@ -14,16 +14,17 @@ if ($clientejson->accion == 0) {
 
 print(json_encode($respuesta_servidor)); //? envía la respuesta de la base de datos a javascript
 
-
 //* Consulta los marca de la tabla marca para mostrarlos en el programa
 function consultar_bajas()
 {
     include("../conexion.php");
-    $sql = "SELECT * FROM  vinventario_ti_sur_bajas;";
+
+    $sql = "SELECT * FROM  vinventario_ti_sur_bajas;";  // Selecciona todos los datos de la vista
     $query = mysqli_query($con, $sql);
-    $array = array();
-    while ($fila = mysqli_fetch_object($query)) {
-        array_push($array, $fila);  //* Se guardan los registros en un array
+
+    $array = array();   // Inicializa un arreglo para almacenar los datos
+    while ($fila = mysqli_fetch_object($query)) {   // Recorre cada fila del resultado de la consulta
+        array_push($array, $fila);  // Se guardan los registros en un array
     }
-    return $array;
+    return $array;  // Retorna el arreglo con todos los registros obtenidos
 }
