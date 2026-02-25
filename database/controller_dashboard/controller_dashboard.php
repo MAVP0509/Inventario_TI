@@ -15,90 +15,14 @@ if ($clientejson->accion == 0) {
 
 print(json_encode($respuesta_servidor));
 
-/* function consultar_datos($valores)
-{
-    include("../conexion.php");
-
-    $anio = $valores->anio;//date('Y');
-
-
-    // Mapa de zona BD → clave del array
-    $mapaZona = [
-        'Región Norte'  => 'norte',
-        'Región Sur'    => 'sur',
-        'Región Tampico' => 'tampico'
-    ];
-
-    $data = [
-        'norte'   => ['mantenimiento' => estructuraEstados(), 'auditoria' => estructuraEstados()],
-        'sur'     => ['mantenimiento' => estructuraEstados(), 'auditoria' => estructuraEstados()],
-        'tampico' => ['mantenimiento' => estructuraEstados(), 'auditoria' => estructuraEstados()]
-    ];
-
-
-
-    //*  Procesar Mantenimiento 
-    $sqlMantenimiento = "SELECT zona, mes, pendiente, proceso, finalizado, vencido
-                     FROM vdashmant
-                     WHERE anio = '$anio'";
-    $queryMantenimiento = mysqli_query($con, $sqlMantenimiento);
-
-    while ($fila = mysqli_fetch_assoc($queryMantenimiento)) {
-        $region = $mapaZona[$fila['zona']] ?? null;
-        $indice = (int)$fila['mes'] - 1; // mes 1 → índice 0, mes 12 → índice 11
-
-        if (!$region || $indice < 0 || $indice > 11) continue;
-
-        $data[$region]['mantenimiento']['pendiente'][$indice] = (int)$fila['pendiente'];
-        $data[$region]['mantenimiento']['proceso'][$indice] = (int)$fila['proceso'];
-        $data[$region]['mantenimiento']['finalizado'][$indice] = (int)$fila['finalizado'];
-        $data[$region]['mantenimiento']['vencido'][$indice] = (int)$fila['vencido'];
-    }
-
-
-    //* Procesar Auditoría 
-    $sqlAuditoria = "SELECT zona, mes, pendiente, proceso, finalizado, vencido
-                 FROM vdashaud
-                 WHERE anio = '$anio'";
-    $queryAuditoria = mysqli_query($con, $sqlAuditoria);
-
-    while ($fila = mysqli_fetch_assoc($queryAuditoria)) {
-        $region = $mapaZona[$fila['zona']] ?? null;
-        $indice = (int)$fila['mes'] - 1;
-
-        if (!$region || $indice < 0 || $indice > 11) continue;
-
-        $data[$region]['auditoria']['pendiente'][$indice] = (int)$fila['pendiente'];
-        $data[$region]['auditoria']['proceso'][$indice] = (int)$fila['proceso'];
-        $data[$region]['auditoria']['finalizado'][$indice] = (int)$fila['finalizado'];
-        $data[$region]['auditoria']['vencido'][$indice] = (int)$fila['vencido'];
-    }
-
-
-    return $data;
-}
-
-
-//* Estructura base 
-//* 12 ceros, uno por mes
-function estructuraEstados()
-{
-    $ceros = array_fill(0, 12, 0);
-    return [
-        'pendiente'  => $ceros,
-        'proceso'    => $ceros,
-        'finalizado' => $ceros,
-        'vencido'    => $ceros
-    ];
-} */
-
+//*Función que consulta la información por año de mantenimiento/auditoria
 function consultar_datos($valores)
 {
     include("../conexion.php");
 
     $anio = $valores->anio;
 
-    // ── PASO 1: Obtener regiones dinámicamente ──
+    //* Obtener regiones dinámicamente
     $sqlRegiones = "SELECT DISTINCT zona FROM vdashmant WHERE anio = '$anio' 
                     UNION 
                     SELECT DISTINCT zona FROM vdashaud WHERE anio = '$anio'
@@ -110,14 +34,14 @@ function consultar_datos($valores)
 
     while ($fila = mysqli_fetch_assoc($queryRegiones)) {
         $zona = $fila['zona'];
-        // Convertir "Región Norte" → "norte"
+        //* Convertir "Región Norte" → "norte"
         $clave = strtolower(str_replace('Región ', '', $zona));
         $regiones[] = $clave;
         $mapaZona[$zona] = $clave;
     }
 
-    // ── PASO 2: Construir estructura dinámica ──
-    $data = ['regiones' => $regiones]; // Lista de regiones disponibles
+    //* Construir estructura dinámica
+    $data = ['regiones' => $regiones]; //* Lista de regiones disponibles
 
     foreach ($regiones as $region) {
         $data[$region] = [
@@ -126,7 +50,7 @@ function consultar_datos($valores)
         ];
     }
 
-    // ── PASO 3: Procesar Mantenimiento ──
+    //*Procesar Mantenimiento
     $sqlMantenimiento = "SELECT zona, mes, pendiente, proceso, finalizado, vencido
                          FROM vdashmant
                          WHERE anio = '$anio'";
@@ -144,7 +68,7 @@ function consultar_datos($valores)
         $data[$region]['mantenimiento']['vencido'][$indice]    = (int)$fila['vencido'];
     }
 
-    // ── PASO 4: Procesar Auditoría ──
+    //* Procesar Auditoría
     $sqlAuditoria = "SELECT zona, mes, pendiente, proceso, finalizado, vencido
                      FROM vdashaud
                      WHERE anio = '$anio'";
@@ -164,9 +88,10 @@ function consultar_datos($valores)
 
     return $data;
 }
-
+//*Función para estructurar el arreglo de datos
 function estructuraEstados()
 {
+    //*Estructurar las regiones disponibles con la siguiente estructura
     $ceros = array_fill(0, 12, 0);
     return [
         'pendiente'  => $ceros,
@@ -175,7 +100,7 @@ function estructuraEstados()
         'vencido'    => $ceros
     ];
 }
-
+//*Función para consultar el último año de mantenimiento/auditoría
 function consultar_año_mantenimiento_mayor()
 {
     include("../conexion.php");
