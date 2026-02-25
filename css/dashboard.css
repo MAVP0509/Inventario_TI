@@ -74,7 +74,7 @@
 }
 
 /* Tabs de región estilo pills */
-.region-pills .nav-link {
+/* .region-pills .nav-link {
     border-radius: 20px !important;
     font-size: 12px;
     padding: 4px 14px;
@@ -108,7 +108,7 @@
 .region-pills .nav-link[data-region="tampico"].active,
 .region-pills .nav-link[data-region="tampico"]:hover {
     background: #fd7e14;
-}
+} */
 
 /* Botones tipo – reusar btn-group de Bootstrap */
 .tipo-group .btn {
@@ -196,3 +196,13 @@
     flex-wrap: wrap;
     gap: 8px;
 }
+
+/* Select región personalizado */
+/* #select-region {
+    font-size: 13px;
+} 
+
+/* Opcional: Agregar icono al select */
+/* .select2-container--default .select2-selection--single .select2-selection__rendered {
+    padding-left: 8px;
+} */

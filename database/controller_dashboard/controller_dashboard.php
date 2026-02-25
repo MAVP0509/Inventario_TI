@@ -15,51 +15,63 @@ if ($clientejson->accion == 0) {
 
 print(json_encode($respuesta_servidor));
 
+//*Función que consulta la información por año de mantenimiento/auditoria
 function consultar_datos($valores)
 {
     include("../conexion.php");
 
-    $anio = $valores->anio;//date('Y');
+    $anio = $valores->anio;
 
+    //* Obtener regiones dinámicamente
+    $sqlRegiones = "SELECT DISTINCT zona FROM vdashmant WHERE anio = '$anio' 
+                    UNION 
+                    SELECT DISTINCT zona FROM vdashaud WHERE anio = '$anio'
+                    ORDER BY zona";
+    $queryRegiones = mysqli_query($con, $sqlRegiones);
 
-    // Mapa de zona BD → clave del array
-    $mapaZona = [
-        'Región Norte'  => 'norte',
-        'Región Sur'    => 'sur',
-        'Región Tampico' => 'tampico'
-    ];
+    $regiones = [];
+    $mapaZona = [];
 
-    $data = [
-        'norte'   => ['mantenimiento' => estructuraEstados(), 'auditoria' => estructuraEstados()],
-        'sur'     => ['mantenimiento' => estructuraEstados(), 'auditoria' => estructuraEstados()],
-        'tampico' => ['mantenimiento' => estructuraEstados(), 'auditoria' => estructuraEstados()]
-    ];
+    while ($fila = mysqli_fetch_assoc($queryRegiones)) {
+        $zona = $fila['zona'];
+        //* Convertir "Región Norte" → "norte"
+        $clave = strtolower(str_replace('Región ', '', $zona));
+        $regiones[] = $clave;
+        $mapaZona[$zona] = $clave;
+    }
 
+    //* Construir estructura dinámica
+    $data = ['regiones' => $regiones]; //* Lista de regiones disponibles
 
+    foreach ($regiones as $region) {
+        $data[$region] = [
+            'mantenimiento' => estructuraEstados(),
+            'auditoria'     => estructuraEstados()
+        ];
+    }
 
-    //*  Procesar Mantenimiento 
+    //*Procesar Mantenimiento
     $sqlMantenimiento = "SELECT zona, mes, pendiente, proceso, finalizado, vencido
-                     FROM vdashmant
-                     WHERE anio = '$anio'";
+                         FROM vdashmant
+                         WHERE anio = '$anio'";
     $queryMantenimiento = mysqli_query($con, $sqlMantenimiento);
 
     while ($fila = mysqli_fetch_assoc($queryMantenimiento)) {
         $region = $mapaZona[$fila['zona']] ?? null;
-        $indice = (int)$fila['mes'] - 1; // mes 1 → índice 0, mes 12 → índice 11
+        $indice = (int)$fila['mes'] - 1;
 
         if (!$region || $indice < 0 || $indice > 11) continue;
 
-        $data[$region]['mantenimiento']['pendiente'][$indice] = (int)$fila['pendiente'];
-        $data[$region]['mantenimiento']['proceso'][$indice] = (int)$fila['proceso'];
+        $data[$region]['mantenimiento']['pendiente'][$indice]  = (int)$fila['pendiente'];
+        $data[$region]['mantenimiento']['proceso'][$indice]    = (int)$fila['proceso'];
         $data[$region]['mantenimiento']['finalizado'][$indice] = (int)$fila['finalizado'];
-        $data[$region]['mantenimiento']['vencido'][$indice] = (int)$fila['vencido'];
+        $data[$region]['mantenimiento']['vencido'][$indice]    = (int)$fila['vencido'];
     }
 
-
-    //* Procesar Auditoría 
+    //* Procesar Auditoría
     $sqlAuditoria = "SELECT zona, mes, pendiente, proceso, finalizado, vencido
-                 FROM vdashaud
-                 WHERE anio = '$anio'";
+                     FROM vdashaud
+                     WHERE anio = '$anio'";
     $queryAuditoria = mysqli_query($con, $sqlAuditoria);
 
     while ($fila = mysqli_fetch_assoc($queryAuditoria)) {
@@ -68,21 +80,18 @@ function consultar_datos($valores)
 
         if (!$region || $indice < 0 || $indice > 11) continue;
 
-        $data[$region]['auditoria']['pendiente'][$indice] = (int)$fila['pendiente'];
-        $data[$region]['auditoria']['proceso'][$indice] = (int)$fila['proceso'];
+        $data[$region]['auditoria']['pendiente'][$indice]  = (int)$fila['pendiente'];
+        $data[$region]['auditoria']['proceso'][$indice]    = (int)$fila['proceso'];
         $data[$region]['auditoria']['finalizado'][$indice] = (int)$fila['finalizado'];
-        $data[$region]['auditoria']['vencido'][$indice] = (int)$fila['vencido'];
+        $data[$region]['auditoria']['vencido'][$indice]    = (int)$fila['vencido'];
     }
-
 
     return $data;
 }
-
-
-//* Estructura base 
-//* 12 ceros, uno por mes
+//*Función para estructurar el arreglo de datos
 function estructuraEstados()
 {
+    //*Estructurar las regiones disponibles con la siguiente estructura
     $ceros = array_fill(0, 12, 0);
     return [
         'pendiente'  => $ceros,
@@ -91,14 +100,15 @@ function estructuraEstados()
         'vencido'    => $ceros
     ];
 }
-
-function consultar_año_mantenimiento_mayor(){
+//*Función para consultar el último año de mantenimiento/auditoría
+function consultar_año_mantenimiento_mayor()
+{
     include("../conexion.php");
 
-    $sql="SELECT MAX(anio) AS anio FROM mantenimiento";
+    $sql = "SELECT MAX(anio) AS anio FROM mantenimiento";
 
-    if(!$query=mysqli_query($con,$sql)){
-    return (['error'=> 'Fallo del servdor']);
+    if (!$query = mysqli_query($con, $sql)) {
+        return (['error' => 'Fallo del servdor']);
     }
 
     $anio = mysqli_fetch_object($query);
