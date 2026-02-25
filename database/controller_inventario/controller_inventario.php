@@ -93,12 +93,14 @@ function insertar_datos($valores)
         "' . $val_tag . '","' . $usuario . '", "' . $registro . '", "' . $val_imei . '", "' . $val_linea . '", "' . $val_estatus . '")';
     // Ejecuta la consulta de inserción
     $query = mysqli_query($con, $sql);
+    // Obtener el ID del registro insertado
+    $id_insertado = mysqli_insert_id($con);
     // Consulta el registro insertado para devolverlo como respuesta
     $sql_select = "SELECT num_serie, fk_usuario, zona, ubicacion, af, fk_rubro, fk_tipo, fk_marca, 
                         modelo, tag, imei, linea,  fecha_entrega 
                     FROM inventario_ti_sur 
                     WHERE 
-                        num_serie = '$val_num_serie'";
+                        id = '$id_insertado'";
 
     $query_select = mysqli_query($con, $sql_select);    // Ejecuta la consulta de selección
     $resultado = mysqli_fetch_assoc($query_select);     // Obtiene los datos del registro insertado
