@@ -48,21 +48,21 @@ function server_excel(model) {
     });
 }
 
-let datos = [];
-let elemento
-let table
-
-let equipo_seleccionado = [];
-
+let datos = []; // Arreglo que almacenará los datos del inventario
+let elemento;    // Variable que almacenará temporalmente el registro seleccionado para edición
+let table;   // Instancia de la tabla Tabulator
+let equipo_seleccionado = [];   // Arreglo que almacena los IDs de los equipos seleccionados por el usuario
+//* Función principal para consultar y mostrar la información del inventario
 async function consultar_informacion() {
+    // Se construye el modelo que se enviará al servidor
     let model = {
         accion: 2
     };
-
+    // Envía la petición al servidor y se espera la respuesta
     let response = await server_inventario(model);
-
+    // Guarda los datos devueltos por el servidor en el arreglo datos
     datos = response.resultado
-
+    // Se configura el idioma español para los textos de Tabulator
     Tabulator.extendModule("localize", "langs", {
         "es": {
             "pagination": {
@@ -95,38 +95,39 @@ async function consultar_informacion() {
             }
         }
     });
-
-    datos.forEach(d => d.seleccionado = false); // Antes de construir la tabla, cada registro recibido del servidor se inicializa con la propiedad seleccionado (controla el estado visual d cada fila)
-
+    // Antes de construir la tabla, cada registro recibido del servidor se inicializa con la propiedad seleccionado (controla el estado visual d cada fila)
+    datos.forEach(d => d.seleccionado = false); 
+    // Función que define el ícono de selección (checkbox visual)
     let squareIcon = function (cell, formatterParams, onRendered) {
-        const seleccionado = cell.getRow().getData().seleccionado;
-        const iconClass = seleccionado ? "fa-solid fa-square-check" : "fa-regular fa-square";
+        const seleccionado = cell.getRow().getData().seleccionado;  // Obtiene el estado de selección
+        const iconClass = seleccionado ? "fa-solid fa-square-check" : "fa-regular fa-square";   // Define el icono
         return `<button type='button' class='btn icon toggle-select'>
                     <i class='${iconClass} fa-lg'></i>
                 </button>`;
     }
-
+    // Función que define el ícono de edición
     let editIcon = function (cell, formatterParams, onRendered) {
         return `<button type='button' class='btn btn-warning icon' onclick=''><i class='fa-solid fa-pen-to-square fa-lg'></i></button>`;
     }
 
     try {
+        // Se inicializa la tabla Tabulator
         table = new Tabulator("#tbl01", {
-            //layout: "fitData",
-            locale: "es",
-            data: datos,
-            pagination: true,
-            maxHeight: "750px",
-            paginationSize: 10,
+            locale: "es",   // Idioma
+            data: datos,    // Datos a mostrar
+            pagination: true,   // Activa paginación
+            maxHeight: "750px", // Altura máxima
+            paginationSize: 10, // Registros por página
             paginationSizeSelector: [10, 25, 35, true],
-            movableColumns: true,              //allow column order to be changed
-            // printAsHtml: true,
+            movableColumns: true,   // Permite mover columnas
+            // Personaliza el contador de registros
             paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
                 const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
                 const end = Math.min(currentRowStart + pageSize - 1, totalRows);
                 return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
             },
-            rowFormatter: function (row) {  // Aplica estilos visuales según el estado de selección
+            // Aplica estilos visuales según el estado de selección
+            rowFormatter: function (row) {  
                 data = row.getData()
                 if (data.seleccionado === true) {
                     row.getElement().classList.add("bg-primary")
@@ -134,6 +135,7 @@ async function consultar_informacion() {
                     row.getElement().classList.remove("bg-primary")
                 }
             },
+            // Definición de columnas
             columns: [
                 {
                     formatter: squareIcon, width: 70, hozAlign: "center", // Se muestra un ícono dinámico según el estado de selección (fa-square -> no seleccionado, fa-square-check -> seleccionado)
@@ -293,11 +295,11 @@ async function consultar_informacion() {
                         }
                     }, headerSort: false
                 },
-                {
+                {   // Botón de edición
                     formatter: editIcon, width: 60, hozAlign: "center",
                     cellClick: function (e, cell) {
-                        elemento = cell.getRow().getData();
-                        mdl_editar(elemento);
+                        elemento = cell.getRow().getData(); // Guarda el regsitro seleccionado
+                        mdl_editar(elemento);   // Abre el modal de edición
                     },
                     headerSort: false, frozen: true
                 },
@@ -308,21 +310,22 @@ async function consultar_informacion() {
         });
 
     } catch (error) {
-        console.log(error)
+        console.log(error)  // Muestra errores en consola
     }
-
+    // Se desactiva el autocompletado en los filtros
     table.on("tableBuilt", () => {
         Array.from(document.getElementsByName("tbtor-filter")).forEach(input => {
             input.setAttribute("autocomplete", "off");
             input.setAttribute("type", "text");
         });
     });
-
+    // Obtiene el input de búsqueda general
     let searchInput = document.getElementById("buscador-tabla-inventario")
-
+    // Evento para filtrar la tabla al escribir
     searchInput.addEventListener("keyup", function () {
+        // Texto ingresado por el usuario
         let query = searchInput.value.toLowerCase();
-        // Función de filtro personalizada
+        // Filtro personalizado: busca coincidencias en cualquier campo
         table.setFilter(function (data) {
             // Recorre todas las propiedades de la fila
             for (var key in data) {
@@ -817,7 +820,7 @@ async function mostrar_traspaso() {
             dropdownParent: '#mdl-traspaso',
             tags: false,
         })
-        
+
         selected = false    // Desactiva la opción de generación de resguardo
         // Cambia el icono del checkbox visual a estado "no seleccionado"
         $("#check-resguardo-icon").removeClass("fa-solid fa-square-check")
@@ -880,7 +883,7 @@ async function mdl_imprimir() {
         // Se agrega un evento click al contenedor de columnas
         check_columnas.addEventListener("click", function (e) {
             // Se identifica si el clic fue sobre un botón con la clase toggle-select
-            const button = e.target.closest(".toggle-select");  
+            const button = e.target.closest(".toggle-select");
             if (!button) return;    // se detiene la ejecución
             // Se obtiene el estado actual del botón (true = seleccionado)
             const checked = button.dataset.checked === "true";
@@ -912,7 +915,7 @@ async function imprimir_pdf() {
     // Si se seleccionan 14 o más columna, se asigna ancho fijo de 40 a cada una
     if (campos_selecionados.length >= 14) {
         campos = Array(campos_selecionados.length).fill(40)
-    // Si se seleccionan menos de 14 columnas, se asigna ancho automático a cada una    
+        // Si se seleccionan menos de 14 columnas, se asigna ancho automático a cada una    
     } else {
         campos = Array(campos_selecionados.length).fill('auto')
     }
@@ -1386,7 +1389,7 @@ async function resguardo(userSelect) {
         inputs[i].classList.remove('is-invalid')    // Elimina la clase de error visual (is-invalid)
         inputs[i].value = "";   // Limpia el valor de cada campo
     }
-    
+
     $('#select-usu').val(null).trigger('change');   // Limpia la selección del usuario en el select2
     $('#select-usu').prop('disabled', false)    // Habilita el select de usuario
     $('#select-region').val(null).trigger('change');    // Limpia la selección del campo región
@@ -1434,10 +1437,10 @@ async function resguardo(userSelect) {
     }
     // Oculta la columna específica de PEMEX
     document.getElementById('col-pemex').style.display = 'none'
-    
+
     selected = false    // Reinicia el estado del check de resguardo general
     celSelected = false // Reinicia el estado del check de resguardo de celular
-    
+
     // Cambia el icono del check de resguardo PEMEX a no seleccionado
     $("#check-resguardo-pemex-icon").removeClass("fa-solid fa-square-check")
     $("#check-resguardo-pemex-icon").addClass("fa-regular fa-square ")
@@ -1504,7 +1507,7 @@ async function crear_resguardo() {
     if (server.resultado.error) {
         // Muestra mensaje de advertencia con el error devuelto
         mostrar_toast('warning', 'Aviso', server.resultado.error)
-        
+
     } else if (server.resultado) {  // Si la respuesta del servido es válida
         // Abre el documento de resguardo generado
         abrir_resguardo(server.resultado.result)
@@ -1519,7 +1522,7 @@ async function crear_resguardo() {
 
 function abrir_resguardo(datos) {
     dominio = window.location.hostname, // Obtiene el nombre del dominio actual
-    puerto = location.port  // Obtiene el puerto actual del servidor
+        puerto = location.port  // Obtiene el puerto actual del servidor
 
     let ruta = datos.resultado  // Extrae la ruta del archivo devuelta por el servidor
     // Elimina comillas dobles al inicio y al final de la cadena, si existen
@@ -1567,40 +1570,39 @@ $(document).ready(function () {
 
 function myCallback(start, end) {
     $("#rango-fecha span").html(start.format("MMMM D, YYYY") + " - " + end.format("MMMM D, YYYY"))
-
 }
 
 function button_checked(button) {
-     // Verifica si el botón presionado corresponde al check de resguardo Pemex
+    // Verifica si el botón presionado corresponde al check de resguardo Pemex
     if (button[0].id == "check-resguardo-pemex") {
         selected = !selected;   // Invierte el valor de la variable selected (true <>> false)
         let icon = button.find('i') // Obtiene el ícono (<i>) que está dentro del botón
         // Si selected es verdadero, muestra el icono como seleccionado
         if (selected) {
             icon.removeClass("fa-regular fa-square").addClass("fa-solid fa-square-check");
-        // Si selected es falso, muestra el icono como no seleccionado
-        } else {    
+            // Si selected es falso, muestra el icono como no seleccionado
+        } else {
             icon.removeClass("fa-solid fa-square-check").addClass("fa-regular fa-square");
         }
-    // Verifica si el botón presionado corresponde al check de resguardo de celular
+        // Verifica si el botón presionado corresponde al check de resguardo de celular
     } else if (button[0].id == "check-resguardo-cel") {
         celSelected = !celSelected; // Invierte el valor de la variable celSelected (true <-> false)
         let icon = button.find('i') // Obtiene el ícono (<i>) que está dentro del botón
         // Si celSelected es verdadero, muestra el icono como seleccionado
         if (celSelected) {
             icon.removeClass("fa-regular fa-square").addClass("fa-solid fa-square-check");
-        // Si celSelected es falso, muestra el icono como no seleccionado
+            // Si celSelected es falso, muestra el icono como no seleccionado
         } else {
             icon.removeClass("fa-solid fa-square-check").addClass("fa-regular fa-square");
         }
-    // Caso general: cualquier otro botón tipo check
+        // Caso general: cualquier otro botón tipo check
     } else {
         selected = !selected;   // Invierte el valor de la variable selected
         let icon = button.find('i') // Obtiene el ícono (<i>) que está dentro del botón
         // Si selected es verdadero, muestra el icono como seleccionado
         if (selected) {
             icon.removeClass("fa-regular fa-square").addClass("fa-solid fa-square-check");
-        // Si selected es falso, muestra el icono como no seleccionado
+            // Si selected es falso, muestra el icono como no seleccionado
         } else {
             icon.removeClass("fa-solid fa-square-check").addClass("fa-regular fa-square");
         }
@@ -1623,71 +1625,67 @@ FilePond.registerPlugin(FilePondPluginFileValidateType);
 // Obtiene el input file donde se cargará el PDF del resguardo
 let fileResguardo = document.getElementById('up-resguardo-file')
 
-// Create a FilePond instance
+// Create una instanacia de Filepond sobre el input file
 const pond = FilePond.create(fileResguardo, {
-    maxFiles: 1,
-    labelIdle: 'Arrastra y suelta tu archivo .pdf o <span class="filepond--label-action"> Examina </span>',
-    allowMultiple: false,
-    dropOnPage: true,
-    dropValidation: true,
-    instantUpload: false,
-    acceptedFileTypes: ['application/pdf'],
-    labelFileTypeNotAllowed: 'Archivo no válido. Solo se permiten archivos .pdf',
-    disabled: true,
+    maxFiles: 1,    // Limita la carga a un solo archivo
+    labelIdle: 'Arrastra y suelta tu archivo .pdf o <span class="filepond--label-action"> Examina </span>', // Texto que se muestra cuando no hay seleccionado
+    allowMultiple: false,   //Desactiva la selección de múltiples archivos
+    dropOnPage: true,   // Permite soltar el archivo en cualquier parte de la página
+    dropValidation: true,   // Activa la validación al arrastrar archivos
+    instantUpload: false,   // Desactiva la subida automática
+    acceptedFileTypes: ['application/pdf'], // Define los tipos de archivo permitido (solo PDF)
+    labelFileTypeNotAllowed: 'Archivo no válido. Solo se permiten archivos .pdf',   // Mensaje mostrado si el archivo no es válido
+    disabled: true, // Inicialmente deshabilita el componente
+    // Configuración del servidor para subir el archivo
     server: {
         process: {
-            url: "database/controller_inventario/controller_inventario.php",
-            method: 'POST',
-            name: 'resguardo',
-            withCredentials: false,
-            ondata: (formData) => {
-                const trama = {
+            url: "database/controller_inventario/controller_inventario.php",    // URL del controlador que recibirá el archivo
+            method: 'POST', // Método HTTP utilizado para el envío
+            name: 'resguardo',  // Nombre del campo del archivo en el servidor
+            withCredentials: false, // No se envían credenciales
+            ondata: (formData) => {     // Función que permite agregar datos adicionales al FormData
+                const trama = { // Contrucción del objeto
                     accion: 7,
                     usuario: $('#select-usu-file').val()
                 };
-                formData.append('trama', JSON.stringify(trama));
-                return formData;
+                formData.append('trama', JSON.stringify(trama));    // Se agrega la trama como JSON al FormData
+                return formData;    // Se retorna el FormData modificado
             },
-            onload: (response) => {
+            onload: (response) => {  // Función que se ejecuta cuando el servidor responde correctamente
                 try {
-                    const data = JSON.parse(response); // <- convierte string en objeto
+                    const data = JSON.parse(response); // Convierte la respuesta (string) a objeto JSON
                     if (data.resultado.error) {
-                        //console.error("Error del servidor:", data.resultado.error);
-                        alert("Error: " + data.resultado.error);
-                    } else {
+                        alert("Error: " + data.resultado.error);    // Si el servidor devuelve un error
+                    } else {    // Si la subida fue exitosa
                         mostrar_toast("success", "Subido", data.resultado.mensaje)
-
-                        pond.removeFile();
+                        pond.removeFile();  // Elimina el archivo cargado del componente
                     }
-
                 } catch (e) {
+                    // Captura errores al convertir la respuesta en JSON
                     console.error("Error al parsear respuesta:", e);
                 }
             },
-            onerror: (error) => {
+            onerror: (error) => {   // Función que se ejecuta si ocurre un error durante la subida
                 console.error('Error al subir:', error);
                 alert("Error al subir archivo.");
             }
         },
     }
-
-
 });
 
-let fileToOpen;
-
+let fileToOpen; // Variable para almacenar la URL temporal del PDF
+// Evento que se ejecuta cuando se agrega un archivo a FilePond
 pond.on('addfile', (error, fileItem) => {
+    // Si ocurre un error al cargar el archivo
     if (error) {
         console.error('Error al cargar PDF:', error);
         return;
     }
-
-    // Generar URL temporal para el archivo PDF
+    // Generar URL temporal para visualizar el PDF cargado
     fileToOpen = URL.createObjectURL(fileItem.file);
-
+    // Obtiene el iframe o visor donde se mostrará el PDF
     const viewer = document.getElementById('pdf-viewer');
-    viewer.src = fileToOpen;
-
+    viewer.src = fileToOpen;    // Asigna la URL del PDF al visor
 });
 
 //* Función para abrir el sidebar para la subida y visualización de resguardos
@@ -1755,7 +1753,6 @@ document.addEventListener('FilePond:removefile', (e) => {
 function ver_pdf(ruta) {
     if (ruta) {
         //*Si el modal se abre desde descargar archivos
-
         const viewer = document.getElementById('pdf-viewer');
         viewer.src = ruta;
 
@@ -1790,35 +1787,36 @@ function col_subir_resguardos_firmados() {
     $('#col-subir').show()
 }
 
-//* consultar los documentos de ese usuario
+//* Evento que se ejecuta cuando cambia el valor del select de usuarios
 $('#select-ver-usu-file').on('change', async function () {
-
+    // Si el valor seleccionado está vacío, no se ejecuta nada
     if ($(this).val() === "") {
         return
     }
 
-    dominio = window.location.hostname
-    puerto = location.port
+    dominio = window.location.hostname  // Obtiene el dominio actual
+    puerto = location.port  // Obtiene el puerto del servidor
 
+    // Construye el modelo que se enviará al servidor
     let model = {
         accion: 8,
         usuario: $("#select-ver-usu-file").val()
     }
-
+    // Envía el modelo al servidor y espera la respuesta
     server = await server_inventario(model)
-
+    // Verifica si el servidor devolvió una lista de documentos
     if (server.resultado.documentos) {
-
+        // Invierte el orden para mostrar primero los documentos más recientes
         let rutas = server.resultado.documentos.reverse()
-
+        // Procesa cada ruta para separar fecha, hora y nombre del archivo
         let documentos = rutas.map(rutaCompleta => {
-            // Extraer solo el nombre del archivo
+            // Obtiene solo el nombre del archivo (sin ruta)
             let nombreArchivoCompleto = rutaCompleta.split('/').pop();
-
             // Dividir nombre del archivo en partes (fecha, hora, resto)
             let [fecha, hora] = nombreArchivoCompleto.split('_');
+            // Obtiene el nombre real del archivo eliminando fecha y hora
             let nombreArchivo = nombreArchivoCompleto.split('_').slice(2).join('_');
-
+            // Retorna un objeto con los datos procesados
             return {
                 fecha,
                 hora,
@@ -1826,26 +1824,23 @@ $('#select-ver-usu-file').on('change', async function () {
                 ruta: rutaCompleta
             };
         });
-
-
-
+        // Obtiene el contenedor donde se listarán los documentos
         let contenedor = document.getElementById('lista-documentos');
-        contenedor.innerHTML = '';
-
+        contenedor.innerHTML = '';  // Limpia el contenido previo
+        // Recorre cada documento procesado
         documentos.forEach(doc => {
-            // doc.ruta es la ruta completa para href/download
-            // doc.fecha, doc.hora, doc.nombreArchivo son las partes separadas
+            // Construye la ruta completa del archivo con dominio y puerto
             let ruta = dominio + ':' + puerto + doc.ruta
-
+            // Obtiene la fecha en formato AAAAMMDD
             fecha = doc.fecha
             // Extraemos partes de la fecha
             const anio = fecha.substring(0, 4);
             const mes = fecha.substring(4, 6);
             const dia = fecha.substring(6, 8);
 
-            const fechaFormateada = `${dia}-${mes}-${anio}`; // "14-07-2025"
+            const fechaFormateada = `${dia}-${mes}-${anio}`; // Formatea la fecha a DD-MM-AAAA "14-07-2025"
 
-
+            // Construye el elemento HTML para mostrar cada documento
             const item = `
             <div class="list-group-item">
                 <div class="container-fluid">
@@ -1860,20 +1855,18 @@ $('#select-ver-usu-file').on('change', async function () {
                             <button  type="button" class="btn btn-lock btn-outline-dark icon" onclick="ver_pdf('http://${ruta}')"><i class="fa-solid fa-eye"></i> Ver</button>
                         </div>
                     </div>
-                </div>
-                                
+                </div>             
             </div>`;
-
+            // Inserta el elemento en el contenedor
             contenedor.innerHTML += item;
         });
-
-
+        // Si el servidor indica que no hay documentos para el usuario
     } else if (server.resultado.mensaje) {
-        let mensaje = server.resultado.mensaje
-
+        // Obtiene el contenedor de documentos
         let contenedor = document.getElementById('lista-documentos');
+        // Limpia el contenido previo
         contenedor.innerHTML = '';
-
+        // Construye el mensaje visual de que no hay documentos
         const item = `
             <div class="list-group-item">
                 <div class="container-fluid">
@@ -1885,11 +1878,9 @@ $('#select-ver-usu-file').on('change', async function () {
                 </div>
                                 
             </div>`;
-
+        // Inserta el mensaje en el contenedor
         contenedor.innerHTML += item;
-
-
-
+        // Si ocurre un error inesperado del servidor
     } else {
         mostrar_toast("error", "Error", 'Hubo un problema con el servidor')
     }
