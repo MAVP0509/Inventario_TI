@@ -89,6 +89,7 @@ async function consultar_informacion() {
             { title: "Modelo", field: "modelo", hozAlign: "center", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
             { title: "Num_serie", field: "num_serie", hozAlign: "center", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
             { title: "IMEI", field: "imei", hozAlign: "center", width: 120, headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
+            { title: "Linea", field: "linea", hozAlign: "center", width: 120, headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
             { title: "TAG", field: "tag", hozAlign: "center", width: 170, headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
             { title: "Fecha de baja", field: "fecha_entrega", hozAlign: "center", headerSort: false, headerHozAlign: "center", frozen: true, sorter: "date", /* headerFilter: "input" */ },
 

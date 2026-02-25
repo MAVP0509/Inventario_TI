@@ -177,6 +177,8 @@ async function consultar_historico() {
             { title: "Tipo de dispositivo", field: "tipo", headerSort: false, headerHozAlign: "center", headerFilter: "input" },
             { title: "Modelo del dispositivo", field: "modelo", headerSort: false, headerHozAlign: "center", headerFilter: "input" },
             { title: "Marca del dispositivo", field: "marca", headerSort: false, headerHozAlign: "center", headerFilter: "input" },
+            { title: "IMEI", field: "imei", headerSort: false, headerHozAlign: "center", headerFilter: "input" },
+            { title: "Linea", field: "linea", headerSort: false, headerHozAlign: "center", headerFilter: "input" },
             { title: "Activo fijo", field: "af", headerHozAlign: "center", headerSort: false,headerFilter: "input" },
             { title: "TAG", field: "tag", headerHozAlign: "center", headerSort: false,headerFilter: "input" },
             { title: "Fecha de asignación", field: "fecha_registro", headerSort: false, headerHozAlign: "center", headerFilter: "input" },
