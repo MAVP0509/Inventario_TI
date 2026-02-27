@@ -19,13 +19,15 @@ function server_bajas(model) {
     });
 }
 
-let datos = []
-let table
+let datos_bajas = [];   // Arrelogo que almacenará los datos de bajas
+let tabla_bajas;    // Instancia de la tabla Tabulator
+//* Función principal para consultar y mostrar la información de los activos de baja
 async function consultar_informacion() {
+    // Modelo que se enviará al servidor
     let server = await server_bajas({ accion: 0 })
-    datos = server.resultado
-
-    //* Idioma Español
+    // Guarda los datos devueltos por el servidot en el arreglo datos_bajas
+    datos_bajas = server.resultado
+    // Configuración al idioma español para los textos de la tabla
     Tabulator.extendModule("localize", "langs", {
         "es": {
             "pagination": {
@@ -58,51 +60,52 @@ async function consultar_informacion() {
             }
         }
     });
-
-
-    table = new Tabulator('#tbl', {
-        layout: "fitData",
-        locale: "es",
-        data: datos,
-        pagination: true,               //paginate the data
-        maxHeight: "750px",
-        paginationSize: 10,                //allow 10 rows per page of data
-        paginationSizeSelector: [10, 15, 20],
+    // Se inicializa la tabla Tabulator
+    tabla_bajas = new Tabulator('#tbl', {
+        layout: "fitData",  // Ajuste de columnas por dato
+        locale: "es",   // Idioma
+        data: datos_bajas,  // Datos a mostrar
+        pagination: true,   // Habilita paginación
+        maxHeight: "750px", // Altura máxima
+        paginationSize: 10, // REgistro de paginación
+        paginationSizeSelector: [10, 15, 20],   // Opciones de tamaño de pagina
+        movableColumns: true,   // Permite mover columnas
+        paginationButtonCount: 3,   // Botones de paginación
+        // Función personalizada para mostrar el contador de registros
         paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
-            const totalRows = table.getDataCount(); // Asegúrate que 'table' esté accesible
+            const totalRows = tabla_bajas.getDataCount(); // Asegúrate que 'tabla_bajas' esté accesible
             const end = Math.min(currentRowStart + pageSize - 1, totalRows);
             return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
         },
-        movableColumns: true,              //allow column order to be changed
-        paginationButtonCount: 3,
+        // Definición de columnas
         columns: [
             {
-                title: "Zona", field: "zona", hozAlign: "center", headerSort: false, headerHozAlign: "center", /* headerFilter: "list", */
+                title: "Zona", field: "zona", hozAlign: "center", headerSort: false, headerHozAlign: "center", headerFilter: "list",
                 headerFilterParams: {
                     valuesLookup: true, clearable: true // se auto genera a partir de los valores únicos de la columna
                 },
             },
-            { title: "Rubro", field: "rubro", hozAlign: "center", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
-            { title: "Activo Fijo", field: "af", hozAlign: "center", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
-            { title: "Tipo", field: "tipo", hozAlign: "center", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
-            { title: "Marca", field: "marca", hozAlign: "center", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
-            { title: "Modelo", field: "modelo", hozAlign: "center", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
-            { title: "Num_serie", field: "num_serie", hozAlign: "center", headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
-            { title: "IMEI", field: "imei", hozAlign: "center", width: 120, headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
-            { title: "Linea", field: "linea", hozAlign: "center", width: 120, headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
-            { title: "TAG", field: "tag", hozAlign: "center", width: 170, headerSort: false, headerHozAlign: "center", /* headerFilter: "input" */ },
-            { title: "Fecha de baja", field: "fecha_entrega", hozAlign: "center", headerSort: false, headerHozAlign: "center", frozen: true, sorter: "date", /* headerFilter: "input" */ },
+            { title: "Rubro", field: "rubro", hozAlign: "center", headerSort: false, headerHozAlign: "center", headerFilter: "input" },
+            { title: "Activo Fijo", field: "af", hozAlign: "center", headerSort: false, headerHozAlign: "center", headerFilter: "input" },
+            { title: "Tipo", field: "tipo", hozAlign: "center", headerSort: false, headerHozAlign: "center", headerFilter: "input" },
+            { title: "Marca", field: "marca", hozAlign: "center", headerSort: false, headerHozAlign: "center", headerFilter: "input" },
+            { title: "Modelo", field: "modelo", hozAlign: "center", headerSort: false, headerHozAlign: "center", headerFilter: "input" },
+            { title: "Num_serie", field: "num_serie", hozAlign: "center", headerSort: false, headerHozAlign: "center", headerFilter: "input" },
+            { title: "IMEI", field: "imei", hozAlign: "center", width: 120, headerSort: false, headerHozAlign: "center", headerFilter: "input" },
+            { title: "Linea", field: "linea", hozAlign: "center", width: 120, headerSort: false, headerHozAlign: "center", headerFilter: "input" },
+            { title: "TAG", field: "tag", hozAlign: "center", width: 170, headerSort: false, headerHozAlign: "center", headerFilter: "input" },
+            { title: "Fecha de baja", field: "fecha_entrega", hozAlign: "center", headerSort: false, headerHozAlign: "center", frozen: true, sorter: "date", headerFilter: "input" },
 
         ],
     })
-
+    // Obtiene el input del buscador
     let searchInput = document.getElementById("buscador-tabla-bajas")
-
+    // Evento que se ejecuta cada vez que el usuario escribe
     searchInput.addEventListener("keyup", function () {
+        // Texto que el usuario escribe en el buscador
         let query = searchInput.value.toLowerCase();
-
         // Función de filtro personalizada
-        table.setFilter(function (data) {
+        tabla_bajas.setFilter(function (data) {
             // Recorre todas las propiedades de la fila
             for (var key in data) {
                 if (data[key] && data[key].toString().toLowerCase().includes(query)) {
@@ -113,4 +116,3 @@ async function consultar_informacion() {
         });
     });
 }
-

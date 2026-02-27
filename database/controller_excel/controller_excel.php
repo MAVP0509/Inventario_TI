@@ -739,7 +739,7 @@ function reporte_mantenimiento($valores)
             INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
             LEFT JOIN mantenimiento AS man
                 ON man.id_equipo = inv.id AND man.anio = '$anio'
-            WHERE cu.nombre = '$usuario'";
+            WHERE cu.nombre = '$usuario' AND ct.tipo NOT LIKE '%Teléfono celular%'";
 
     $query = mysqli_query($con, $sql);
 

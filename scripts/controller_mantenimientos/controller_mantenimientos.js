@@ -58,8 +58,9 @@ function server_correo(model) {
         })
     })
 }
-
+//* Función que se ejecuta al cargar la pagina
 async function load() {
+    // Inicializa el selector de año
     await general_select2({
         selectId: 'select-anio-mantenimiento',
         tabla: 'mantenimiento',
@@ -67,97 +68,105 @@ async function load() {
         placeholder: 'Seleccione un año',
         dropdownParent: '#card-mantenimientos',
         tags: false,
-        // popoverTitle: "Descripción",
-        // popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
     })
-
+    // Obtiene el año más reciente o actual desde el servidor
     let server = await server_mantenimiento({ accion: 4 })
+    // Si no hay resultado del servidor, termina la función
     if (!server.resultado) {
         return
     } else {
+        // Crea un objeto con el año obtenido del servidor
         let fecha = {}
         fecha.value = server.resultado.anio
+        // Estable el valor en el selector y dispara el evento 'change'
+        // para cargar automáticamente los datos de ese año
         $('#select-anio-mantenimiento').val(fecha.value).trigger('change')
-
     }
 }
-
-//* Limpiar el input del buscador si cambia el año de la tabla
+//* Evento listener que se ejecuta cuando cambia el año seleccionado
 $('#select-anio-mantenimiento').on('change', () => {
-    // Limpiar cualquier input de búsqueda de tablas de mantenimientos
-    $("[id^='buscador-tabla-']").each(function() { $(this).val(''); });
+    // Limpiar todos los inputs de búsqueda que empeicen con 'buscador-tabla-'
+    // Esto incluye el buscador generarl y los de cas tab de región
+    $("[id^='buscador-tabla-']").each(function () {
+        $(this).val('');    // Limpia el valor del input
+    });
 })
 
-let datos_mantenimiento = []
-let elemento_mnt
-let table
-let mantenimientosPendientes
+//* Variables globales
+let datos_mantenimiento = [];    // Array que contiene todos los datos de mantenimiento cargados
+let elemento_mnt;    // Objeto que almacena el elemento seleccionado actualmente en la tabla
+let table;  // Referencia a la tabla Tabulator activa
+let mantenimientosPendientes;   // Objeto que contiene los mantenimientos pendientes organizados por año y mes
 
-let tablas_mant_region = {};
-let datos_globales = [];
-let tab_actual = 'todas';
+let tablas_mant_region = {};    // Objeto que almacena todas las tablas creadas por región (para lazy loading)
+let datos_globales = [];    // Copia de seguridad de todos los datos para uso en filtros por región
+let tab_actual = 'todas';   // String que indica qué tab está actualmente activo ('todas', 'sur', 'norte', etc.)
 
-const usuDatos = JSON.parse(sessionStorage.getItem('user'));
-const rolUsuario = usuDatos.resultado[3];
-const regionUsu = usuDatos.resultado[2];
-
+const usuDatos = JSON.parse(sessionStorage.getItem('user'));    // Obtiene los datos del usuario desde sessionStorage
+const rolUsuario = usuDatos.resultado[3];   // Extrae el rol del usuario (admin o user)
+const regionUsu = usuDatos.resultado[2];    // Extrae la región a la que pertenece el usuario
+// Array de colores para los badges de las regionesa
 const colores_region = [
     'primary', 'success', 'warning', 'danger', 'info',
     'purple', 'indigo', 'teal', 'orange', 'pink'
 ];
-
-
+//* Función principal, se ejecuta cuando cambia el año en el selector
 async function consultar_mantenimiento(anio) {
-    const fecha = anio.value;
-    if (!fecha) return;
+    const fecha = anio.value;   // Obtiene el valor del año seleccionado
+    if (!fecha) return; // Si no hay año sellecionado, termina la ejecuación
 
-    tablas_mant_region = {}; // Reiniciar tablas por región
-
+    tablas_mant_region = {}; // Reiniciar el objeto de tablas por región
+    
+    // Decide qué función ejecutar según el rol del usuario
     if (rolUsuario === 'admin') {
-        await mantDatosAdmin(fecha, regionUsu);
+        await mantDatosAdmin(fecha, regionUsu); // Admin ve todas las regiones con tabs
     } else {
-        await mantDatosUser(fecha, regionUsu);
+        await mantDatosUser(fecha, regionUsu);  // Usuario normal solo ve su región
     }
 }
-
+//* Función para cargar dato de administrador
 async function mantDatosAdmin(fecha, region) {
+    // muestra el card de admin y oculta el card de usuario
     document.getElementById('card-mant-admin').style.display = 'block';
     document.getElementById('card-mant-user').style.display = 'none';
-
+    // Consulta al servidor
     let server = await server_mantenimiento({ accion: 0, anio: fecha, region: '' });
 
-    datos_mantenimiento = server.resultado;
-    datos_globales = server.resultado;
+    datos_mantenimiento = server.resultado; // Guarda los resultados en la variable global
+    datos_globales = server.resultado;  // Guarda una copia de seguridad de todos los datos
 
+    // Extrae las regiones únicas de los datos, filtra valores vacíos y ordena alfabéticamente
     const regiones = [...new Set(datos_mantenimiento.map(m => m.zona))].filter(Boolean).sort();
-
+    // Contruye los tabs dinámicamente para cada región
     Tabs(regiones, datos_mantenimiento);
-
+    // Crea la tabla principal "Todas" y la guarda como tabla activa
     table = crear_tabla_mantenimiento('todas', datos_mantenimiento, fecha, true);
-    tab_actual = 'todas';
+    tab_actual = 'todas';   // Estable 'todas' como el tab activo
 }
-
+//* Función para cargar datos de usuario normal
 async function mantDatosUser(fecha, region) {
     // Mostrar card de user, ocultar card de admin
     document.getElementById('card-mant-admin').style.display = 'none';
     document.getElementById('card-mant-user').style.display = 'block';
+    // Muestra un badge con la región del usuario en el header
     document.getElementById('badge-region-mant').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${regionUsu}`;
-
+    // Consulta al servidor filtrando por región
     let server = await server_mantenimiento({
         accion: 0,
         anio: fecha,
         region: region
     });
 
-    datos_mantenimiento = server.resultado;
+    datos_mantenimiento = server.resultado; // Guarda los resultados filtrados
 
-    // Crear tabla y guardar como tabla_aud principal
-    // En el HTML el contenedor para usuarios se llama "tbl-user-mant", por eso usamos 'user-mant' como tabId
+    // Crear una única tabla con los datos filtrados por región
+    // 'user-mant' es el ID del contenedor en el HTML para usuarios
     table = crear_tabla_mantenimiento('user-mant', datos_mantenimiento, fecha, false);
-    tab_actual = 'user-mant';
+    tab_actual = 'user-mant';   // Establece 'user-mant' como el tab activo
 }
-
+//* Función para construir los tabs dinámicamente (solo admin)
 function Tabs(regiones, datos) {
+    // Obtiene las referencias a los elementos del DOM donde se construirán los tabs
     const navTabs = document.getElementById('custom-tabs-mant');
     const tabContent = document.getElementById('custom-tabs-content-mant');
 
@@ -165,10 +174,10 @@ function Tabs(regiones, datos) {
     navTabs.innerHTML = '';
     tabContent.innerHTML = '';
 
-    // Calcular pendientes totales
+    // Calcular cuantos mantenimientos están pendientes
     const totalPendientes = datos.filter(d => d.estado !== 'Realizado').length;
 
-    // Tab "Todas las Regiones"
+    // HTML del botón del tab con badges de conteo
     const tabTodas = `
         <li class="nav-item">
             <a class="nav-link active" id="tab-todas" data-toggle="pill" href="#todas" role="tab">
@@ -178,7 +187,7 @@ function Tabs(regiones, datos) {
             </a>
         </li>
     `;
-
+    // HTML del contenido del tab con buscador y contenedor de la tabla
     const contentTodas = `
         <div class="tab-pane fade show active" id="todas" role="tabpanel">
             <div class="input-group mb-3">
@@ -190,16 +199,18 @@ function Tabs(regiones, datos) {
             <div id="tbl-todas" style="overflow-x: auto; width: 100%;"></div>
         </div>
     `;
-
+    //  Inserta el tab "Todas" en el DOM
     navTabs.insertAdjacentHTML('beforeend', tabTodas);
     tabContent.insertAdjacentHTML('beforeend', contentTodas);
 
-    // Crear tabs para cada región
+    // Crea tabs para cada región
     regiones.forEach((region, index) => {
-        const datosFiltrados = datos.filter(d => (d.zona) === region);
-        const count = datosFiltrados.length;
-        const pendientes = datosFiltrados.filter(d => d.estado !== 'Realizado').length;
-        const color = colores_region[index % colores_region.length];
+        const datosFiltrados = datos.filter(d => (d.zona) === region);  // Filtra los datos para obtener solo los de esta región
+        const count = datosFiltrados.length;    // Cuenta total de registros en esta región
+        const pendientes = datosFiltrados.filter(d => d.estado !== 'Realizado').length; // Cuenta los pendientes de esta región
+        const color = colores_region[index % colores_region.length];    // Asigna un color del array de colores (cicla si hay más regiones que colores)
+        // Crea un ID único para el tab basado en el nombre de la región
+        // Convierte a minúsculas, reemplaza espacios por guines y elimina caracteres especiales
         const regionId = region.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 
         const tab = `
@@ -339,11 +350,11 @@ function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
     // Definir columnas base
     let columnas = [
         {
-            title: "Fecha", field: "fecha", width: 115, headerHozAlign: "center", headerSort: false, hozAlign: "center", sorter: "date",
+            title: "Fecha", field: "fecha", width: 115, headerHozAlign: "center", headerFilter: "input", headerSort: false, hozAlign: "center", sorter: "date",
         },
         {
             title: "Tipo",
-            field: "tipo", width: 130, headerHozAlign: "center", headerSort: false, hozAlign: "center",
+            field: "tipo", width: 130, headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input",
             formatter: function (cell, formatterParams, onRendered) {
                 let data = cell.getData();
                 return `${data.tipo}<br><small>${data.marca}</small><br><small>${data.modelo}</small>`;
@@ -351,11 +362,11 @@ function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
         },
         {
             title: "Número de serie",
-            field: "num_serie", headerHozAlign: "center", headerSort: false, hozAlign: "center",
+            field: "num_serie", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input",
         },
         {
             title: "Usuario",
-            field: "usuario", headerHozAlign: "center", headerSort: false, hozAlign: "center",
+            field: "usuario", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "input",
             formatter: function (cell, formatterParams, onRendered) {
                 let data = cell.getData();
                 return `${data.usuario}<br><small>${data.cargo}</small>`;
@@ -363,7 +374,7 @@ function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
         },
         {
             title: "Ubicación",
-            field: "ubicacion", headerHozAlign: "center", headerSort: false, hozAlign: "center",
+            field: "ubicacion", headerHozAlign: "center", headerSort: false, hozAlign: "center", headerFilter: "list",
             headerFilterParams: {
                 valuesLookup: true, clearable: true,
             }
@@ -433,19 +444,26 @@ function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
         const regiones = [...new Set(datos_globales.map(item => item.region || item.zona))].filter(Boolean).sort();
         columnas.splice(4, 0, {
             title: "Región",
-            field: "region",
+            field: "zona",
             width: 120,
             headerHozAlign: "center",
             hozAlign: "center",
+            headerFilter: "list",
             headerSort: false,
             formatter: function (cell) {
-                const region = cell.getValue() || cell.getData().zona;
-                const index = regiones.indexOf(region);
+                const zona = cell.getValue();
+
+                let regionNormalizada = zona;
+                if (zona && zona.toLowerCase().startsWith('región')) {
+                    regionNormalizada = zona.replace(/^región\s*/i, '').trim();
+                }
+
+                const index = regiones.indexOf(zona);
                 const color = colores_region[index % colores_region.length];
 
                 return `<span class="badge badge-${color}">
-                            <i class="fas fa-map-marker-alt mr-1"></i>${region}
-                        </span>`;
+                        <i class="fas fa-map-marker-alt mr-1"></i>${regionNormalizada}
+                    </span>`;
             }
         });
     }
@@ -506,15 +524,15 @@ function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
 
     // Calcular mantenimientos pendientes
     mantenimientosPendientes = Object.values(datos.reduce((objeto, item) => {
-            if (item.estado == "Realizado") return objeto
-            let anio = item.anio
-            let mes = item.fecha.split('-')[1]
-            if (!objeto[anio]) {
-                objeto[anio] = { anio: anio, meses: {} };
-            }
-            objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
-            return objeto
-        }, {}));
+        if (item.estado == "Realizado") return objeto
+        let anio = item.anio
+        let mes = item.fecha.split('-')[1]
+        if (!objeto[anio]) {
+            objeto[anio] = { anio: anio, meses: {} };
+        }
+        objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
+        return objeto
+    }, {}));
 
     return tabla;
 }
@@ -829,7 +847,7 @@ async function mdl_programar_mantenimiento() {
 
     await Promise.all([
         // Si es admin, cargamos la lista de regiones
-        (async function(){
+        (async function () {
             if (rolUsuario === 'admin') {
                 await general_select2({
                     selectId: 'select-region-prog',

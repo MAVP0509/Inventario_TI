@@ -40,7 +40,6 @@ if ($clientejson->accion == 0) {
 
 print(json_encode($respuesta_servidor));
 
-
 function consultar_datos($valores)
 {
     include("../conexion.php");
@@ -72,21 +71,6 @@ function consultar_datos($valores)
     $datos = [];
     while ($fila = mysqli_fetch_object($query)) {
         $datos[] = $fila;
-    }
-
-    return $datos;
-}
-
-function consultar_orden()
-{
-    include("../conexion.php");
-
-    $sql = "SELECT * FROM vorden_tipos ORDER BY FIELD(tipo_id, 40, 41, 58, 55, 22, 23, 25, 1, 2, 78, 79, 80, 81, 82, 73, 74, 75, 76, 46, 51)";
-    $query = mysqli_query($con, $sql);
-
-    $datos = array();
-    while ($fila = mysqli_fetch_object($query)) {
-        array_push($datos, $fila);
     }
 
     return $datos;
