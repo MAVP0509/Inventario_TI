@@ -105,7 +105,7 @@ function consultar_supervisor()
     }
     return $array;
 }
-
+//*Función para habilitar/deshabilitar supervisores
 function habilitar_supervisor($valores)
 {
     include("../conexion.php");

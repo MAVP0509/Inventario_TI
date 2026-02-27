@@ -1,5 +1,4 @@
-let respuesta
-
+//* Función para envío de peticiones http al servidor
 function server_supervisor(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -9,11 +8,8 @@ function server_supervisor(model) {
                 trama: JSON.stringify(model)
             },
             success: function (response) {
-                //console.log(response);
                 try {
                     resolve(JSON.parse(response))
-                    //console.log(resolve(JSON.parse(response)))
-                    respuesta = response
                 } catch (error) {
                     reject(error)
                 }
@@ -26,7 +22,7 @@ let datos = []
 let elemento
 let table
 let supervisor_seleccionado = []
-
+//*Función para consulta de la base de datos y dibujado de tabla
 async function consultar_informacion(params) {
     let model = {
         accion: 2
@@ -212,15 +208,7 @@ async function consultar_informacion(params) {
                         });
 
                         const editBtn = cell.getRow().getElement().querySelector("button.btn-warning");
-                        /* if (editBtn) {
-                            editBtn.disabled = true;
-                            editBtn.setAttribute("data-toggle", "popover");
-                            editBtn.setAttribute("data-trigger", "hover");
-                            editBtn.setAttribute("data-html", "true");
-                            editBtn.setAttribute("data-placement", "top");
-                            editBtn.setAttribute("data-content", '<div class="bg-warning text-dark p-1 rounded">Deshabilite para editar</div>');
-                            $(editBtn).popover();
-                        } */
+                        
 
                     } else {
                         // Intentamos desactivar
@@ -345,9 +333,8 @@ async function insertar_supervisor() {
 
     let server = await server_supervisor(model)
 
-    let resultado = JSON.parse(respuesta)
 
-    if (resultado.resultado === true) {
+    if (server.resultado === true) {
         mostrar_toast("success", "Supervisor registrado", "El supervisor ha sido registrado exitosamente")
         consultar_informacion()
         $("#modalInsertar").modal('hide');
@@ -425,7 +412,6 @@ async function editar_supervisor() {
         }
 
         let server = await server_supervisor(model)
-        //let resultado = JSON.parse(respuesta)
 
         if (server.resultado.resultado) {
             mostrar_toast("success", "Éxito", server.resultado.resultado)
