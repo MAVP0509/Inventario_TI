@@ -29,7 +29,7 @@ if ($clientejson->accion == 0) {
 }
 print(json_encode($respuesta_servidor));
 
-
+//*Funciones para correo de recuperación de contraseña
 function verificar_email($valores)
 { //Verifica que el correo existe y genera el token
     include("../conexion.php");
@@ -60,7 +60,7 @@ function token_expirados($correo)
     $sql = "UPDATE usuario SET token = NULL, token_expiracion = NULL WHERE token_expiracion < NOW() AND correo='$correo'";
     mysqli_query($con, $sql);
 }
-
+//* Función que envía el correo de recuperación
 function email_recuperacion($destino, $token)
 {
 

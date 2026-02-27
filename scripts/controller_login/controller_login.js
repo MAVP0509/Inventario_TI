@@ -1,7 +1,7 @@
 //TODO En cuanto se recargue la página, limpiar la sessionStorage
 sessionStorage.clear()
 
-
+//*Al cargar la página se generará el select del formulario de registro
 async function load(){
     await general_select2({
         selectId: 'select-region',
@@ -14,6 +14,8 @@ async function load(){
 }
 
 let respuesta = ""
+
+//* Función para peticiones http al servidor
 function server_usuario(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -35,6 +37,7 @@ function server_usuario(model) {
     })
 }
 
+//* Función para peticiones http al servidor
 function server_email(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -55,15 +58,6 @@ function server_email(model) {
         })
     })
 }
-
-//TODO funciones para animar los iconos de los botones
-$(".icon").on('mouseover', function () {
-    $(this).find('i').addClass("fa-bounce");
-})
-$(".icon").on('mouseout', function (e) {
-    $(this).find('i').removeClass("fa-bounce");
-})
-
 
 
 //TODO Función para el formulario de registro y sus funciones derivadas
