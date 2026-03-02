@@ -697,16 +697,6 @@ function programa_mantenimiento($valores)
             }
         }
     }
-
-    // Si el cliente solicitó ambos programas, generar el de auditoría también
-    // if ((int)$descargar_ambos === 1) {
-    //     // Reutilizamos la función que genera el programa de auditoría
-    //     $aud_result = programa_auditoria($valores);
-    //     if (!empty($aud_result['url'])) {
-    //         $urls[] = $aud_result['url'];
-    //     }
-    // }
-
     // Retorna el resultado y las URLs generadas (uno o varios archivos)
     return [
         'result' => true,
