@@ -1,5 +1,4 @@
-let respuesta
-
+//*Función para enviar peticiones http al servidor
 function server_marca(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -9,11 +8,8 @@ function server_marca(model) {
                 trama: JSON.stringify(model)
             },
             success: function (response) {
-                //console.log(response);
                 try {
                     resolve(JSON.parse(response))
-                    //console.log(resolve(JSON.parse(response)))
-                    respuesta = response
                 } catch (error) {
                     reject(error)
                 }
@@ -27,6 +23,7 @@ let elemento
 let table
 let marca_seleccionada = []
 
+//*Función para consultar la información al servidor y mostrarla en una tabla
 async function consultar_informacion() {
     let server = await server_marca({ accion: 2 })
     datos = server.resultado
@@ -136,7 +133,7 @@ async function consultar_informacion() {
     })
 }
 
-
+//*Función para mostrar el modal para edición de marcas
 let datoSelected = ""
 selected = false
 function mdl_editar_marcas(params) {
@@ -161,6 +158,7 @@ function mdl_editar_marcas(params) {
     $("#mdl-marca").modal('show');
 }
 
+//*Función para gestionar el estado del check-box del modal
 $("#check-editar").on('click', function () {
     selected = !selected;
 
@@ -178,6 +176,7 @@ $("#check-editar").on('click', function () {
     document.getElementById('mdl-btn-conf').disabled = !selected;
 });
 
+//*Función para enviar la información de la marca editada al servidor
 async function editar_marca() {
     let model = {
         accion: 1,
@@ -197,6 +196,7 @@ async function editar_marca() {
     table.updateData([{ id: elemento.id, marca: model.marca }]);
     $("#mdl-marca").modal('hide')
 }
+
 //*Cada que se cierre el modal se reseteará el checkbox
 $('#mdl-marca').on('hidden.bs.modal', function () {
     // Limpiar y restaurar el ícono
@@ -205,6 +205,7 @@ $('#mdl-marca').on('hidden.bs.modal', function () {
     selected = false
 });
 
+//*Función para mostrar el modal de registro de marcas
 function mdl_nuevo_marca() {
 
     const serie = document.getElementById('marca');
@@ -219,6 +220,7 @@ function mdl_nuevo_marca() {
     $("#mdl-marca").modal('show');
 }
 
+//*Función  para enviar la información de la nueva marca al servidor
 async function nuevo_marca() {
     let validados = ["marca"]
 
@@ -246,6 +248,7 @@ async function nuevo_marca() {
     $('#mdl-marca').modal('hide')
 }
 
+//*Función para mostrar mensaje de confirmación al querer eliminar una o más marcas
 async function mensaje_eliminar() {
 
     if (marca_seleccionada.length === 0) {
@@ -256,6 +259,7 @@ async function mensaje_eliminar() {
     }
 }
 
+//*Función para enviar al servidor la o lás marcas a eliminar
 async function eliminar_marca() {
     let model = {
         accion: 3,
@@ -275,6 +279,7 @@ async function eliminar_marca() {
     deseleccionar_todos()
 }
 
+//*Función para deseleccionar las macas seleccionadas y resetear la variable marca_seleccionada
 function deseleccionar_todos() {
     //  Resetear propiedad "seleccionado"
     datos.forEach(d => d.seleccionado = false);
@@ -285,41 +290,3 @@ function deseleccionar_todos() {
     //  Forzar re-renderizado de todas las filas para reflejar los íconos
     table.getRows().forEach(row => row.reformat());
 }
-
-/* $(document).ready(function () {
-    const modal = $('#mdl-marca');
-    const dialog = modal.find('.modal-dialog');
-
-    let isClosing = false;
-
-    // Animación de entrada
-    modal.on('show.bs.modal', function () {
-        isClosing = false;
-        dialog
-            .removeClass('animate__fadeOutUp')
-            .addClass('animate__animated animate__fadeInDown');
-    });
-
-    // Animación de salida controlada
-    modal.on('hide.bs.modal', function (e) {
-        if (!isClosing) {
-            e.preventDefault(); // Pausa el cierre normal
-            isClosing = true;
-
-            dialog
-                .removeClass('animate__fadeInDown')
-                .addClass('animate__fadeOutUp');
-
-            // Espera que termine la animación antes de cerrar
-            setTimeout(() => {
-                modal.modal('hide'); // Ahora sí se cierra, se ejecuta hidden.bs.modal
-            }, 500); // Coincide con duración de la animación
-        }
-    });
-
-    // Limpieza después del cierre
-    modal.on('hidden.bs.modal', function () {
-        dialog.removeClass('animate__animated animate__fadeOutUp');
-    });
-}); */
-

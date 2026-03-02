@@ -85,10 +85,10 @@ async function consultar_usuarios() {
         }
     });
 
-    // Inicializar cada fila con "seleccionado: false"
+    //* Inicializar cada fila con "seleccionado: false"
     datos.forEach(d => d.seleccionado = false);
 
-    // Formatter del ícono tipo checkbox
+    //* Formatter del ícono tipo checkbox
     let squareIcon = function (cell, formatterParams, onRendered) {
         const seleccionado = cell.getRow().getData().seleccionado;
         const iconClass = seleccionado ? "fa-solid fa-square-check" : "fa-regular fa-square";
@@ -194,7 +194,7 @@ async function consultar_usuarios() {
     });
 }
 
-
+//*Función para abrir el modal de edición
 let usuSelect = ""
 async function mdl_editar_usuario(params) {
     usuSelect = params
@@ -232,6 +232,7 @@ async function mdl_editar_usuario(params) {
     $("#modalEditar").modal('show')
 }
 
+//*Función para enviar los datos de edición al servidor
 async function editar_usuario() {
 
     const validacion = [
@@ -267,7 +268,7 @@ async function editar_usuario() {
     $("#modalEditar").modal('hide')
 }
 
-
+//*Función para mostrar mensaje de advertencia antes de eliminar un usuario
 async function mensaje_eliminar() {
 
     if (usuario_seleccionado.length === 0) {
@@ -278,6 +279,7 @@ async function mensaje_eliminar() {
     }
 }
 
+//*Función para enviar al servidor los usuarios a ser eliminados
 async function eliminar_usuario() {
     let model = {
         accion: 3,
@@ -297,6 +299,7 @@ async function eliminar_usuario() {
 
 }
 
+//*Función para deseleccionar usuarios
 function deseleccionar_todos() {
     //  Resetear propiedad "seleccionado"
     datos.forEach(d => d.seleccionado = false);
@@ -308,7 +311,7 @@ function deseleccionar_todos() {
     table.getRows().forEach(row => row.reformat());
 }
 
-
+//*Función para abrir el modal de registro de un usuario
 async function mdl_nuevo_usuario() {
     let inputs = document.getElementsByName('insertMdl')
     for (let i = 0; i < inputs.length; i++) {
@@ -343,6 +346,7 @@ async function mdl_nuevo_usuario() {
     $("#modalInsertar").modal('show')
 }
 
+//*Función para enviar los datos del nuevo usuario al servidor
 async function insertar_usuario() {
 
 
@@ -391,7 +395,7 @@ async function insertar_usuario() {
     $("#modalInsertar").modal('hide')
 }
 
-
+//*Función para ver las contraseñas al registrar el nuevo usuario
 function ver_contraseña() {
     let regPasswordInput = document.getElementById('contraseniaReg')
     let regPasswordInputConf = document.getElementById('confContraseniaReg')
@@ -442,7 +446,7 @@ function validar_contraseña(inp1, inp2) {
 
 }
 
-
+//*Mensaje de advertencia y confirmación para continuar con la eliminación de usuarios
 let usuDes
 async function desactivar_usuariomsg(params) {
     for (let i = 0; i < datos.length; i++) {
@@ -457,6 +461,7 @@ async function desactivar_usuariomsg(params) {
     mostrar_alert('warning', '¿Está seguro de eliminar este usuario?', false, desactivar_usuario)
 }
 
+//*Función para enviar al servidor los usuaios a eliminar
 async function desactivar_usuario(params) {
     let model = {
         accion: 3,
@@ -476,9 +481,7 @@ async function desactivar_usuario(params) {
     }
 }
 
-
-
-
+//*Función para envío de correo de recuperación de contraseña
 async function recuperar_contraseña() {
     let model = {
         accion: 0,
@@ -497,8 +500,6 @@ async function recuperar_contraseña() {
     }
 
 }
-
-
 
 
 $(document).ready(function () {
