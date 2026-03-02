@@ -633,6 +633,7 @@ async function mdl_nvo_registro() {
     ])
     // Establece el título del moda
     $('#title-mdl-inventario').text('Registro de Activo');
+    $("#btn-mdl-inventario").prop('disabled', false);
     //  Asigna la función crear_registro al botón del modal
     $('#btn-mdl-inventario').off('click').on('click', function () { crear_registro(); })
     // Muestra el modal al usuario
