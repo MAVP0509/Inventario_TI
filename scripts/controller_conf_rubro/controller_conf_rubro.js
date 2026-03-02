@@ -1,5 +1,4 @@
-let respuesta
-
+//*Función para realizar peticiones http al servidor
 function server_rubro(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -9,11 +8,8 @@ function server_rubro(model) {
                 trama: JSON.stringify(model)
             },
             success: function (response) {
-                //console.log(response);
                 try {
                     resolve(JSON.parse(response))
-                    //console.log(resolve(JSON.parse(response)))
-                    respuesta = response
                 } catch (error) {
                     reject(error)
                 }
@@ -25,13 +21,13 @@ function server_rubro(model) {
 let datos = []
 let elemento
 let table
-
-
 let rubro_seleccionado = []
+
+//*Función para pedir la información rubros al servidor
 async function consultar_informacion() {
     let server = await server_rubro({ accion: 2 })
 
-    datos = JSON.parse(respuesta).resultado
+    datos = server.resultado
     //* Idioma Español
     Tabulator.extendModule("localize", "langs", {
         "es": {
@@ -139,6 +135,7 @@ async function consultar_informacion() {
 
 let datoSelected = ""
 selected = false
+//*Función para abrir el modal editar rubro
 function mdl_editar_rubro(params) {
     for (let i = 0; i < datos.length; i++) {
         let element = datos[i]
@@ -160,11 +157,11 @@ function mdl_editar_rubro(params) {
 
     $("#mdl-rubro").modal('show');
 }
-
+//*Función para gestionar el check-box del modal
 $("#check-editar").on('click', function () {
     selected = !selected;
 
-    // Cambiar el ícono del checkbox
+    //* Cambiar el ícono del checkbox
     let check = $("#check-editar-icon");
     if (selected) {
         check.removeClass("fa-regular fa-square");
@@ -178,6 +175,7 @@ $("#check-editar").on('click', function () {
     document.getElementById('mdl-btn-conf').disabled = !selected;
 });
 
+//*Función para enviar los datos editados al servidor
 async function editar_rubro() {
     let model = {
         accion: 1,
@@ -187,7 +185,7 @@ async function editar_rubro() {
 
     let server = await server_rubro(model)
 
-    if (JSON.parse(respuesta).resultado) {
+    if (server.resultado) {
         mostrar_toast('success', 'Rubro editado', 'El rubro ha sido editado exitosamente')
     } else {
         mostrar_toast('error', 'Inventario TI', 'Error en la consulta')
@@ -197,7 +195,7 @@ async function editar_rubro() {
     table.updateData([{ id: elemento.id, rubro: model.rubro }]);
     $("#mdl-rubro").modal('hide')
 }
-//*Cada que se cierre el modal se reseteará el checkbox
+//*Función para que cada que se cierre el modal se resetee el checkbox
 $('#mdl-rubro').on('hidden.bs.modal', function () {
     // Limpiar y restaurar el ícono
     $("#check-editar-icon").removeClass();
@@ -205,6 +203,7 @@ $('#mdl-rubro').on('hidden.bs.modal', function () {
     selected = false
 });
 
+//*Función para abrir el modal de nuevo rubro
 function mdl_nuevo_rubro() {
 
     const serie = document.getElementById('rubro');
@@ -219,6 +218,7 @@ function mdl_nuevo_rubro() {
     $("#mdl-rubro").modal('show');
 }
 
+//*Función para enviar los datos del nuevo rubro al servidor
 async function nuevo_rubro() {
     let validados = ["rubro"]
 
@@ -246,6 +246,7 @@ async function nuevo_rubro() {
     $('#mdl-rubro').modal('hide')
 }
 
+//*Función para mostrar mensaje de advertencia al querer eliminar un rubro
 async function mensaje_eliminar() {
 
     if (rubro_seleccionado.length === 0) {
@@ -256,17 +257,18 @@ async function mensaje_eliminar() {
     }
 }
 
+//*Función para enviar los rubros a eliminar al servidor
 async function eliminar_rubro() {
     let model = {
         accion: 3,
         id: rubro_seleccionado
     }
 
-    let response = await server_rubro(model);
+    let server = await server_rubro(model);
 
-    if (typeof JSON.parse(respuesta).resultado === "string") {
-        mostrar_toast('error', 'Error', JSON.parse(respuesta).resultado, 4000)
-    } else if (JSON.parse(respuesta).resultado) {
+    if (typeof server.resultado === "string") {
+        mostrar_toast('error', 'Error', server.resultado, 4000)
+    } else if (server.resultado) {
         mostrar_toast('success', '¡Éxito!', 'Rubro(s) eliminado(s) correctamente')
         consultar_informacion();
     } else {
@@ -275,7 +277,7 @@ async function eliminar_rubro() {
     deseleccionar_todos()
 }
 
-
+//*Función para deseleccionar los rubros y resetear el arreglo rubro_seleccionado
 function deseleccionar_todos() {
     //  Resetear propiedad "seleccionado"
     datos.forEach(d => d.seleccionado = false);
