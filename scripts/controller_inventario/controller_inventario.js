@@ -641,6 +641,7 @@ async function mdl_nvo_registro() {
 }
 
 async function crear_registro() {
+
     const check_num = $('#check-num').is(':checked');
     // Campos requeridos para validación
     let validacion = [
@@ -697,7 +698,8 @@ async function crear_registro() {
         linea: $("#inp-linea").val().trim(),
         usuario: $("#inp-usuario").val().trim(),
         cargo: $("#inp-cargo").select2('data')[0].text,
-        fecha_entrega: $("#inp-fecha-entrega").val()
+        fecha_entrega: $("#inp-fecha-entrega").val(),
+        region: JSON.parse(sessionStorage.getItem('user')).resultado[2]
     };
 
     // Enviar datos al servidor

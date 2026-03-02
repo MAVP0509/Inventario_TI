@@ -1,5 +1,4 @@
-let respuesta
-
+//*Función para realizar peticiones http al servidor
 function server_usuarios(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -9,11 +8,8 @@ function server_usuarios(model) {
                 trama: JSON.stringify(model)
             },
             success: function (response) {
-                //console.log(response);
                 try {
                     resolve(JSON.parse(response))
-                    //console.log(resolve(JSON.parse(response)))
-                    respuesta = response
                 } catch (error) {
                     reject(error)
                 }
@@ -26,6 +22,7 @@ let datos = []
 let elemento
 let table
 let usuarios_seleccionados = []
+//*Función para consultar la información de los usuarios de la empresa y mostrar una tabla con ella.
 async function consultar_informacion() {
     let server = await server_usuarios({ accion: 2 })
     datos = server.resultado
@@ -179,6 +176,8 @@ async function consultar_informacion() {
 
 let datoSelected = ""
 selected = false
+
+//*Función para abir el modal de edición de usuario
 async function mdl_editar_usuarios(params) {
 
     document.querySelectorAll('[name="conf-usuario"]').forEach(function (el) {
@@ -230,6 +229,7 @@ async function mdl_editar_usuarios(params) {
     $("#mdl-usu").modal('show');
 }
 
+//*Función para gestionar el check-box del modal
 $("#check-editar").on('click', function () {
     selected = !selected;
 
@@ -247,6 +247,7 @@ $("#check-editar").on('click', function () {
     document.getElementById('mdl-btn-conf').disabled = !selected;
 });
 
+//*Función para enviar al servior la información actualizada del usuatio editado
 async function editar_usuario() {
     let model = {
         accion: 1,
@@ -269,6 +270,7 @@ async function editar_usuario() {
     table.updateData([{ id: elemento.id, nombre: model.nombre, cargo: model.cargo, region: model.region, correo_usuario: model.correo }]);
     $("#mdl-usu").modal('hide')
 }
+
 //*Cada que se cierre el modal se reseteará el checkbox
 $('#mdl-usu').on('hidden.bs.modal', function () {
     // Limpiar y restaurar el ícono
@@ -277,6 +279,7 @@ $('#mdl-usu').on('hidden.bs.modal', function () {
     selected = false
 });
 
+//*Función para abrir el modal para ingresar un nuevo usuario
 async function mdl_nuevo_usuario() {
     document.querySelectorAll('[name="conf-usuario"]').forEach(function (el) {
         el.classList.remove('is-invalid', 'is-valid')
@@ -316,6 +319,7 @@ async function mdl_nuevo_usuario() {
     $("#mdl-usu").modal('show');
 }
 
+//*Función para enviar al 
 async function nuevo_usuario() {
     let validados = ["usu", "select-cargo"]
 
