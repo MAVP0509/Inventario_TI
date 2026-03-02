@@ -1,5 +1,4 @@
-let respuesta
-
+//*Función para realizar peticiones http al servidor
 function server_tipo(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -9,11 +8,9 @@ function server_tipo(model) {
                 trama: JSON.stringify(model)
             },
             success: function(response) {
-                //console.log(response);
                 try {
                     resolve(JSON.parse(response))
-                    //console.log(resolve(JSON.parse(response)))
-                    respuesta = response
+
                 } catch (error) {
                     reject(error)
                 }
@@ -27,6 +24,7 @@ let elemento
 let table
 let tipo_selecionado = []
 
+//*Función para consultar la información de tipos y mostrarla en una tabla
 async function consultar_informacion(){
     let server = await server_tipo({accion : 2})
 
@@ -136,6 +134,7 @@ async function consultar_informacion(){
 
 let datoSelected = ""
 selected = false
+//*Función para abrir el modal para editar tipos
 function mdl_editar_tipo(params) {
     for (let i = 0; i < datos_tipo.length; i++) {
         let element = datos_tipo[i]
@@ -183,6 +182,7 @@ $('#mdl-tipo').on('hidden.bs.modal', function () {
     selected = false
 });
 
+//*Función para enviar al servidor la información del tipo editado
 async function editar_tipo() {
     let model = {
         accion: 1,
@@ -203,6 +203,7 @@ async function editar_tipo() {
     $("#mdl-tipo").modal('hide')
 }
 
+//*Función para abrir el modal de registro de tipos
 function mdl_nuevo_tipo() {
     const serie = document.getElementById('tipo');
     serie.classList.remove('is-invalid'); // Remover clase de error si existía
@@ -216,6 +217,7 @@ function mdl_nuevo_tipo() {
     $("#mdl-tipo").modal('show');
 }
 
+//*Función para enviar al servidor la información del nuevo tipo
 async function nuevo_tipo() {
     let validados = ["tipo"]
 
@@ -243,6 +245,7 @@ async function nuevo_tipo() {
     $('#mdl-tipo').modal('hide')
 }
 
+//*Función para mostrar un aviso al seleccionar el botón eliminar
 async function mensaje_eliminar() {
 
     if (tipo_selecionado.length === 0) {
@@ -253,6 +256,7 @@ async function mensaje_eliminar() {
     }
 }
 
+//*Función para enviar al servidor los tipos a eliminar
 async function eliminar_tipo() {
     let model = {
         accion: 3,
@@ -262,7 +266,7 @@ async function eliminar_tipo() {
     let server = await server_tipo(model);
 
     if (typeof server.resultado === "string") {
-        mostrar_toast('error', 'Error', JSON.parse(respuesta).resultado, 4000)
+        mostrar_toast('error', 'Error', server.resultado, 4000)
     } else if (server.resultado) {
         mostrar_toast('success', '¡Éxito!', 'Tipo(s) eliminado(s) correctamente')
         consultar_informacion();
@@ -272,6 +276,7 @@ async function eliminar_tipo() {
     deseleccionar_todos()
 }
 
+//*Función para deseleccionar tipos 
 function deseleccionar_todos() {
     //  Resetear propiedad "seleccionado"
     datos_tipos.forEach(d => d.seleccionado = false);
