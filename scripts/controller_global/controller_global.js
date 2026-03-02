@@ -85,11 +85,34 @@ function mostrar_toast_cargando(texto) {
             <div style="display: flex; align-items: center;">
                 <!--<i class="fas fa-spinner fa-spin fa-lg" style="margin-right: 10px; color: #007bff;"></i>-->
                 <img src="images/circles.svg" alt="Icono" height="30" width="30">
-                <span style="font-weight: 500; margin-left: 8px;">${texto}</span>
+                <span id="toast-message-text" style="font-weight: 500; margin-left: 8px;">${texto}</span>
             </div>
         `,
         // Evento que se ejecuta al abrir el toast
         didOpen: () => {
+            // Obtener referencia al elemento del mensaje para actualizarlo
+            const mensajeElemento = document.getElementById('toast-message-text');
+            // Programar actualizaciones del mensaje en diferentes tiempos
+            const timeouts = [
+                // Despues de 3 segundos, actualiza el mensaje
+                setTimeout(() => {
+                    if (mensajeElemento && Swal.isVisible()) {
+                        mensajeElemento.textContent = 'Esto puede tomar un momento...';
+                    }
+                }, 3000),
+                // Despues de 6 segundos, actualiza el mensaje
+                setTimeout(() => {
+
+                    if (mensajeElemento && Swal.isVisible()) {
+                        mensajeElemento.textContent = 'Gracias por su paciencia...';
+                    }
+                }, 6000)
+            ];
+            // Limpiar todos los timeouts cuando se cierre el toast
+            // Esto previene que los mensajes se actualicen después de cerrar el toast
+            Swal.getPopup().addEventListener('destroyed', () => {
+                timeouts.forEach(timeout => clearTimeout(timeout));
+            });
             //Swal.showLoading(); Esto muestra el spinner por default de SweetAlert, pero ya no es necesario, ya que se usa uno de fontAwesome
         }
     });
@@ -441,24 +464,24 @@ async function consultar_mantenimientos_vencidos() {
     const alert = sessionStorage.getItem('alert-mnto')
     let server = await server_global({ accion: 1 })
 
-    if (server.resultado.total_vencidos  >= 1) {
+    if (server.resultado.total_vencidos >= 1) {
         $('[name=notificacion-numero-mantenimientos]').remove()
 
         $('#aviso-badge-pestaña-mantenimiento').text(server.resultado.total_vencidos)
         $('[name="aviso-badge-campana"]').text(server.resultado.total_vencidos)
-        $('[name="header-campana-notificacion"]').text('Tienes '+server.resultado.total_vencidos + (server.resultado.total_vencidos == 1 ? ' notificación' : ' notificaciones'))
+        $('[name="header-campana-notificacion"]').text('Tienes ' + server.resultado.total_vencidos + (server.resultado.total_vencidos == 1 ? ' notificación' : ' notificaciones'))
         $('[name="header-divider-campana-notificacion"]').after(`
                                                             <a href="mantenimientos.html" class="dropdown-item" name="notificacion-numero-mantenimientos">
                                                             <i class="fa-solid fa-screwdriver-wrench"></i>
                                                             <span class="float-right text-muted text-sm">${server.resultado.total_vencidos + (server.resultado.total_vencidos == 1 ? ' Mantenimiento vencido' : ' Mantenimientos vencidos')}</span>
                                                             <div class="dropdown-divider"></div></a>`)
 
-/*         if(alert){
-            sessionStorage.removeItem('alert-mnto')
-            mostrar_alert('warning',`Hay ${server.resultado.total_vencidos + (server.resultado.total_vencidos == 1 ? ' Mantenimiento vencido' : ' Mantenimientos vencidos')} `)
-            
-        } */
-        
+        /*         if(alert){
+                    sessionStorage.removeItem('alert-mnto')
+                    mostrar_alert('warning',`Hay ${server.resultado.total_vencidos + (server.resultado.total_vencidos == 1 ? ' Mantenimiento vencido' : ' Mantenimientos vencidos')} `)
+                    
+                } */
+
     } else {
         return
     }
@@ -468,18 +491,18 @@ async function consultar_auditorias_vencidos() {
     const alert = sessionStorage.getItem('alert-mnto')
     let server = await server_global({ accion: 1 })
 
-    if (server.resultado.total_vencidos  >= 1) {
+    if (server.resultado.total_vencidos >= 1) {
         $('[name=notificacion-numero-auditorias]').remove()
 
         $('#aviso-badge-pestaña-mantenimiento').text(server.resultado.total_vencidos)
         $('[name="aviso-badge-campana"]').text(server.resultado.total_vencidos)
-        $('[name="header-campana-notificacion"]').text('Tienes '+server.resultado.total_vencidos + (server.resultado.total_vencidos == 1 ? ' notificación' : ' notificaciones'))
+        $('[name="header-campana-notificacion"]').text('Tienes ' + server.resultado.total_vencidos + (server.resultado.total_vencidos == 1 ? ' notificación' : ' notificaciones'))
         $('[name="header-divider-campana-notificacion"]').after(`
                                                             <a href="auditorias.html" class="dropdown-item" name="notificacion-numero-auditoria">
                                                             <i class="fa-solid fa-screwdriver-wrench"></i>
                                                             <span class="float-right text-muted text-sm">${server.resultado.total_vencidos + (server.resultado.total_vencidos == 1 ? ' Auditoria vencido' : ' Auditorias vencidos')}</span>
                                                             <div class="dropdown-divider"></div></a>`)
-        
+
     } else {
         return
     }
