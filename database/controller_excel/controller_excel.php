@@ -697,16 +697,6 @@ function programa_mantenimiento($valores)
             }
         }
     }
-
-    // Si el cliente solicitó ambos programas, generar el de auditoría también
-    // if ((int)$descargar_ambos === 1) {
-    //     // Reutilizamos la función que genera el programa de auditoría
-    //     $aud_result = programa_auditoria($valores);
-    //     if (!empty($aud_result['url'])) {
-    //         $urls[] = $aud_result['url'];
-    //     }
-    // }
-
     // Retorna el resultado y las URLs generadas (uno o varios archivos)
     return [
         'result' => true,
@@ -739,7 +729,7 @@ function reporte_mantenimiento($valores)
             INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
             LEFT JOIN mantenimiento AS man
                 ON man.id_equipo = inv.id AND man.anio = '$anio'
-            WHERE cu.nombre = '$usuario'";
+            WHERE cu.nombre = '$usuario' AND ct.tipo NOT LIKE '%Teléfono celular%'";
 
     $query = mysqli_query($con, $sql);
 

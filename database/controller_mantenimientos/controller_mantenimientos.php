@@ -40,26 +40,25 @@ if ($clientejson->accion == 0) {
 
 print(json_encode($respuesta_servidor));
 
-
 function consultar_datos($valores)
 {
     include("../conexion.php");
-
+    // Obtiene la región y año; si no existe, se asigna null
     $region = $valores->region ?? null;
     $anio   = $valores->anio ?? null;
-
+    // Si no se recibe el año, no se puede realizar la consulta
     if (!$anio) {
-        return [];
+        return [];  // retorna un arrglo vacío
     }
-
+    // Verifica si la región está vacía
     if (empty($region)) {
-        // Si no viene región → es admin
+        // Si no viene región -> es admin
         $sql = "SELECT * 
                 FROM vmantenimiento
                 WHERE anio = '$anio' 
                 ORDER BY fecha ASC";
     } else {
-        // Si viene región → es usuario normal
+        // Si viene región -> es usuario normal
         $sql = "SELECT * 
                 FROM vmantenimiento
                 WHERE anio = '$anio' 
@@ -69,27 +68,13 @@ function consultar_datos($valores)
 
     $query = mysqli_query($con, $sql);
 
-    $datos = [];
+    $datos = [];    // Inicializa el arreglo para almacenar los resultados
+    // Recorre cada fila obtenida en la consulta
     while ($fila = mysqli_fetch_object($query)) {
-        $datos[] = $fila;
+        $datos[] = $fila;   // Agrega cada registro como objeto al arreglo de resultados
     }
 
-    return $datos;
-}
-
-function consultar_orden()
-{
-    include("../conexion.php");
-
-    $sql = "SELECT * FROM vorden_tipos ORDER BY FIELD(tipo_id, 40, 41, 58, 55, 22, 23, 25, 1, 2, 78, 79, 80, 81, 82, 73, 74, 75, 76, 46, 51)";
-    $query = mysqli_query($con, $sql);
-
-    $datos = array();
-    while ($fila = mysqli_fetch_object($query)) {
-        array_push($datos, $fila);
-    }
-
-    return $datos;
+    return $datos;  // Retorna el arreglo con todos los registros obtenidos
 }
 
 function guardar_reportes($valores)

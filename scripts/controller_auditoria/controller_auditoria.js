@@ -61,8 +61,9 @@ function server_correo(model) {
         })
     })
 }
-
+//* Función que se ejecuta al cargar la página
 async function load_auditoria() {
+    // Inicializa el selector de año (select2) con configuraciones específicas
     await general_select2({
         selectId: 'select-anio-auditoria',
         tabla: 'auditoria',
@@ -70,16 +71,18 @@ async function load_auditoria() {
         placeholder: 'Seleccione un año',
         dropdownParent: '#card-auditoria',
         tags: false,
-        // popoverTitle: "Descripción",
-        // popoverContent: "Especificación técnica o funcional del equipo. Depende del rubro seleccionado."
     })
-
-    let server = await server_auditoria({ accion: 1 })
+    // Obtienen el año más recientes o actual desde el servidor
+    let server = await server_auditoria({ accion: 1 });
+    // Si no hay resultado del servidor, termina la función
     if (!server.resultado) {
         return
     } else {
+        // Crea un objeto con el año obtenido del servidor
         let fecha = {}
         fecha.value = server.resultado.anio
+        // Establece el valor en el selector y dispara el evento 'change'
+        // para cargar automáticamente los datos de ese año
         $('#select-anio-auditoria').val(fecha.value).trigger('change')
 
     }
@@ -449,22 +452,29 @@ function crear_tabla_auditoria(tabId, datos, fecha, mostrarRegion = false) {
 
     // Agregar columna de región si mostrarRegion es true
     if (mostrarRegion && datosGlobales) {
-        const regiones = [...new Set(datosGlobales.map(item => item.region || item.zona))].filter(Boolean).sort();
+        const regiones = [...new Set(datosGlobales.map(item => item.zona))].filter(Boolean).sort();
         columnas.splice(4, 0, {
             title: "Región",
-            field: "region",
+            field: "zona",
             width: 120,
             headerHozAlign: "center",
             hozAlign: "center",
+            headerFilter: "list",
             headerSort: false,
             formatter: function (cell) {
-                const region = cell.getValue() || cell.getData().zona;
-                const index = regiones.indexOf(region);
+                const zona = cell.getValue();
+
+                let regionNormalizada = zona;
+                if (zona && zona.toLowerCase().startsWith('región')) {
+                    regionNormalizada = zona.replace(/^región\s*/i, '').trim();
+                }
+
+                const index = regiones.indexOf(zona);
                 const color = coloresRegion[index % coloresRegion.length];
 
                 return `<span class="badge badge-${color}">
-                            <i class="fas fa-map-marker-alt mr-1"></i>${region}
-                        </span>`;
+                        <i class="fas fa-map-marker-alt mr-1"></i>${regionNormalizada}
+                    </span>`;
             }
         });
     }
