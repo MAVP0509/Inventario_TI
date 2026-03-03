@@ -1599,23 +1599,25 @@ async function descargarMes(mes) {
 }
 
 async function consultar_programa_firmado() {
-
+    // Obtener el año del primer mantenimiento pendiente
     let año_programa = mantenimientosPendientes[0].anio;
-
+    // Construir el modelo de datos para la petición
     let model = {
         accion: 7,
         anio: año_programa
     }
-
+    // Enviar petición al servidor
     let server = await server_mantenimiento(model);
-
+    // Obtener referencia al contenedor donde se mostrará el PDF
     const PDF = document.getElementById('lista-pdfs');
-
+    // Si existe un programa firmado para este año
     if (server.resultado.existe === true) {
+        // Mostrar alerta informativa
         document.getElementById('alert-programa').style.display = 'block';
-
-        const ruta = server.resultado.url;
-        const nombreArchivo = server.resultado.archivo;
+        // Obtener información del archivo
+        const ruta = server.resultado.url;  // URL para acceder al PDF
+        const nombreArchivo = server.resultado.archivo; // Nombre del archivo
+        // Construir la tarjeta HTML que muestra el PDF
         const item = `
             <div class="card mb-2 shadow-sm" style="width: 100%;">
                 <div class="card-body d-flex align-items-center p-2">
@@ -1632,62 +1634,71 @@ async function consultar_programa_firmado() {
                 </div>
             </div>
         `;
-
+        // Insertar la tarjeta en el contenedor
         PDF.innerHTML = item;
     } else {
+        // Si no existe programa firmado, ocultar alerta y limpiar contenedor
         document.getElementById('alert-programa').style.display = 'none';
         PDF.innerHTML = '';
     }
-
+    // Simular clic en el botón que abre el modal
+    // Esto permite abrir el modal programáticamente
     document.getElementById('btn-open-programa').click();
-
+    // Inicializar el sistema de carga de archivos
     programa_firmado();
 }
-
-let estanque = null;
-let estanqueInicializado = false;
+// Variables globales para controlar la instancia de FilePond
+let estanque = null;    // Instancia de FilePond
+let estanqueInicializado = false;   // Flag para saber si ya se inicializó
+//  * Función que permite subir un nuevo programa de mantenimiento firmado (solo PDF)
 async function programa_firmado() {
-
+    // Si es la primera vez que se ejecuta, inicializar FilePond
     if (!estanqueInicializado) {
-
+        // Obtener referencia al input file
         const input = document.getElementById("subir-programa");
-
+        // Crear instancia de FilePond con configuración personalizada
         estanque = FilePond.create(input, {
-            maxFiles: 1,
-            acceptedFileTypes: ['application/pdf'],
+            maxFiles: 1,  // Solo permitir un archivo a la vez
+            acceptedFileTypes: ['application/pdf'], // Solo aceptar PDFs
             labelIdle: 'Arrastre y suelta un archivo .pdf o <span class="filepond--label-action"> Examina </span>',
-            allowMultiple: false,
-            dropOnPage: false,
-            instantUpload: false,
+            allowMultiple: false,     // No permitir múltiples archivos
+            dropOnPage: false,        // No permitir drop en toda la página
+            instantUpload: false,     // No subir automáticamente
             labelFileTypeNotAllowed: 'Archivo no válido solo .pdf',
+            // Configuración del servidor para la carga
             server: {
                 process: {
                     url: "database/controller_mantenimientos/controller_mantenimientos.php",
                     method: "POST",
-                    name: 'reporte_programa',
+                    name: 'reporte_programa',   // Nombre del campo en $_FILES
                     withCredentials: false,
+                    // Modificar el FormData antes de enviar
                     ondata: (formData) => {
+                        // Agregar el año del programa como parte de la petición
                         formData.append('trama', JSON.stringify({ accion: 6, anio: mantenimientosPendientes[0].anio }));
                         return formData;
                     },
+                    // Manejar respuesta exitosa del servidor
                     onload: (response) => {
                         let data = JSON.parse(response);
-                        if (data.resultado.error) {
+                        if (data.resultado.error) { // Mostrar error si algo salió mal
                             mostrar_toast('error', '¡Error!', data.resultado.error);
-                        } else {
+                        } else {    // Mostrar éxito y limpiar el widget
                             mostrar_toast('success', '¡Carga exitosa!', data.resultado.mensaje);
-                            estanque.removeFiles();
+                            estanque.removeFiles(); // Limpiar archivos del widget
                         }
                     },
+                    // Manejar errores de red o servidor
                     onerror: (err) => {
                         console.error('Error al subir: ', err);
                     }
                 }
             }
         });
-
+        // Marcar como inicializado para no volver a crear la instancia
         estanqueInicializado = true;
     } else {
+        // Si ya estaba inicializado, solo limpiar archivos anteriores
         estanque.removeFiles();
     }
 }

@@ -185,39 +185,44 @@ function validar_reporte_mismo_año($valores)
 function consultar_reporte($valores)
 {
     $respuesta = new stdClass();
-
+    // Separar la fecha en año y mes
+    // Ejemplo: "2027-03-15" -> ['2027', '03', '15']
     $fecha = explode('-', $valores->fecha_mnto);
-    $año = $fecha[0];
-    $mes = $fecha[1];
-
+    $año = $fecha[0];   // Primer elemento: año
+    $mes = $fecha[1];   // Segundo elemento: mes
+    // Construir la ruta física de la carpeta donde se almacenan los reportes
     $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $año . '/' . $mes;
+    // Construir la URL relativa para acceder al archivo desde el navegador
     $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/' . $año . '/' . $mes;
-
+    // Verificar si la carpeta existe
     if (is_dir($carpeta)) {
+        // Obtener todos los archivos de la carpeta, excluyendo '.' y '..'
         $archivos = array_diff(scandir($carpeta), ['.', '..']);
-
+        // Recorrer cada archivo buscando el que corresponde al equipo
         foreach ($archivos as $archivo) {
+            // Los archivos tienen formato: {id_equipo}-{resto_del_nombre}.pdf
+            // Separar por '-' para extraer el ID del equipo
             $partes = explode('-', $archivo);
-            $idEquipo = $partes[0];
-
+            $idEquipo = $partes[0]; // Primer parte es el ID del equipo
+            // Si el ID del archivo coincide con el ID buscado
             if ($idEquipo === $valores->id_equipo) {
+                // Construir la URL completa del documento
                 $respuesta->documento = $carpetaUrl . '/' . $archivo;
-                //var_dump($archivo);
+                // Retornar inmediatamente al encontrar el archivo
                 return $respuesta;
             }
         }
     } else {
+        // Si la carpeta no existe, significa que no hay reportes para ese mes/año
         $respuesta->aviso = "El activo no tiene reporte subido";
     }
-
     return $respuesta;
 }
 
 function guardar_programa($valores)
 {
     $respuesta = new stdClass();
-
-    // Validar archivo
+    // Validar que se recibió un archivo válido
     if (
         !isset($_FILES['reporte_programa']) ||
         $_FILES['reporte_programa']['error'] !== UPLOAD_ERR_OK
@@ -225,53 +230,53 @@ function guardar_programa($valores)
         $respuesta->error = "No se recibió ningún archivo válido.";
         return $respuesta;
     }
-
+    // Obtener información del archivo subido
     $archivo = $_FILES['reporte_programa'];
-
+    // Extraer nombre sin extensión y la extensión por separado
     $nombreOriginal = pathinfo($archivo['name'], PATHINFO_FILENAME);
     $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
-    $tmpPath = $archivo['tmp_name'];
-
+    $tmpPath = $archivo['tmp_name'];    // Ruta temporal del archivo
+    // Validar que sea un archivo PDF
     if ($extension !== 'pdf') {
         $respuesta->error = "Tipo de archivo no permitido. Solo PDF.";
         return $respuesta;
     }
 
-    // Limpiar nombre (mantiene el nombre original)
+    // Limpiar el nombre del archivo, reemplazando caracteres especiales por '_'
+    // Permite solo letras, números, puntos, guiones y guiones bajos
     $nombreLimpio = preg_replace('/[^A-Za-z0-9._-]/', '_', $nombreOriginal);
-
-    // Ruta base
+    // Obtener la ruta base absoluta de la carpeta de programas
     $base = realpath(__DIR__ . '/../../documentos/mantenimiento/programa');
     if ($base === false) {
         $respuesta->error = "No se encontró la ruta base.";
         return $respuesta;
     }
-
-    // Carpeta por año
+    // Crear carpeta específica para el año si no existe
+    // Estructura: /documentos/mantenimiento/programa/{año}
     $carpeta_anual = $base . DIRECTORY_SEPARATOR . $valores->anio;
 
     if (!is_dir($carpeta_anual)) {
+        // Crear carpeta con permisos 0755 (lectura/escritura/ejecución para owner, lectura/ejecución para grupo y otros)
         if (!mkdir($carpeta_anual, 0755, true)) {
             $respuesta->error = "No se pudo crear la carpeta del año.";
             return $respuesta;
         }
     }
-
-    // Eliminar PDF existente
+    // Eliminar cualquier PDF existente en la carpeta del año
+    // Esto asegura que solo exista una versión del programa firmado por año
     foreach (glob($carpeta_anual . DIRECTORY_SEPARATOR . '*.pdf') as $pdfExistente) {
         unlink($pdfExistente);
     }
-
-    // Nombre siempre con fecha actual
+    // Construir el nombre final del archivo con la fecha actual
+    // Formato: {nombre_original}_{YYYYMMDD}.pdf
     $fecha = date('Ymd');
     $archivo_final = $carpeta_anual
         . DIRECTORY_SEPARATOR
         . $nombreLimpio . '_' . $fecha . '.pdf';
-
-    // Guardar archivo
+    // Mover el archivo desde la ubicación temporal a la ubicación final
     if (move_uploaded_file($tmpPath, $archivo_final)) {
         $respuesta->mensaje = "Archivo guardado correctamente.";
-        $respuesta->ruta_guardada = basename($archivo_final);
+        $respuesta->ruta_guardada = basename($archivo_final);   // Solo el nombre del archivo
         $respuesta->fecha_subida = $fecha;
     } else {
         $respuesta->error = "No se pudo guardar el archivo.";
@@ -282,40 +287,48 @@ function guardar_programa($valores)
 
 function consultar_programa_firmado($valores)
 {
+    // Obtener la ruta absoluta de la carpeta base donde se almacenan los programas firmados
+    // realpath() convierte rutas relativas a absolutas y valida que la ruta exista
     $base = realpath(__DIR__ . '/../../documentos/mantenimiento/programa');
-
+    // Si la ruta base no existe o no es accesible
     if ($base === false) {
         return [
-            "existe" => false
+            "existe" => false   // Indica que no existe programa
         ];
     }
-
+    // Construir la ruta de la carpeta específica del año
     $carpeta = $base . DIRECTORY_SEPARATOR . $valores->anio;
-
+    // Verificar si la carpeta del año existe
+    // Si no existe la carpeta, significa que nunca se subió un programa para ese año
     if (!is_dir($carpeta)) {
         return [
             "existe" => false
         ];
     }
-
+    // Buscar todos los archivos PDF en la carpeta del año
+    // glob() retorna un array con las rutas completas de los archivos que coinciden con el patrón
+    // El patrón '*.pdf' encuentra todos los archivos con extensión .pdf
     $archivos = glob($carpeta . DIRECTORY_SEPARATOR . '*.pdf');
-
+    // Si se encontró al menos un archivo PDF
     if (!empty($archivos)) {
-
+        // Obtener solo el nombre del archivo (sin la ruta completa)
+        // Se usa el primer archivo encontrado ([0]) ya que solo debe existir uno por año
         $archivo = basename($archivos[0]);
-
+        // Obtener el nombre del host del servidor
         $host = $_SERVER['HTTP_HOST'];
+        // Determinar el protocolo (http o https)
+        // Verifica si la conexión es segura (HTTPS) o normal (HTTP)
         $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-
+        // Construir la URL completa para acceder al archivo desde el navegador
         $url = "{$protocolo}://{$host}/Inventario_TI/documentos/mantenimiento/programa/{$valores->anio}/{$archivo}";
-
+        // Retornar información completa del archivo encontrado
         return [
-            "existe" => true,
-            "archivo" => $archivo,
-            "url" => $url
+            "existe" => true,   // Indicar que existe un programa
+            "archivo" => $archivo,  // Nombre del archivo (para mostrar en interfaz)
+            "url" => $url          // URL completa para descargar/visualizar
         ];
     }
-
+    // Si la carpeta existe pero no contiene archivos PDF
     return [
         "existe" => false
     ];
