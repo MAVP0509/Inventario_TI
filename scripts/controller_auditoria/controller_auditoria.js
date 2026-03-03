@@ -1,5 +1,3 @@
-// const { use } = require("react");
-
 auditoria_loading = false;
 function server_auditoria(model) {
     return new Promise((resolve, reject) => {

@@ -1221,7 +1221,6 @@ async function reporte_mantenimiento(elemento_mnt) {
         $('#btn-reporte-mant').prop('disabled', false);
     }
 }
-
 //? Inicializar popover
 $(function () {
     $('[data-toggle="popover"]').tooltip()
@@ -1238,10 +1237,8 @@ function rellenar_select(texto, select) {
     $select.trigger('change');
 }
 
-
 //todo Subida de reportes de mantenimiento
 FilePond.registerPlugin(FilePondPluginFileValidateType);
-
 
 let pond
 //* Variable utilizada para guardar temporalmente el archivo y asi poder ser eliminado desde otra función
@@ -1402,7 +1399,6 @@ async function ver_pdf_reporte(elemento_mnt) {
     }
 }
 
-
 //todo Funciones para el envío de correo de reporte
 async function mdl_correo_reporte_mantenimiento(equipo) {
     let fecha = equipo.fecha.split('-')
@@ -1481,18 +1477,13 @@ async function enviar_correo_reporte(datos_equipo) {
     let server = await server_correo(model)
 
     if (server.resultado) {
-        //table.updateData([{ id: datos_equipo.id, correo_enviado: 1 }])
-
-        //consultar_informacion()
         mostrar_toast('success', '¡Realizado!', "Correo enviado al usuario")
-
         //* Actualizando la fila sin dibujar de nuevo la tabla
         const row = table.getRow(datos_equipo.id);
         if (row) {
             row.update({ correo_enviado: 1 }); //*Agregar await al principio si se requiere forzar renderizado de un boton de habilitado a deshabilitado
             table.redraw(true);
         }
-
         return
     } else if (server.resultado == false) {
         mostrar_toast('error', '¡Error!', "Hubo un problema con el servidor")

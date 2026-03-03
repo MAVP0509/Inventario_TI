@@ -894,7 +894,7 @@ function reporte_mantenimiento($valores)
         'ids' => $id_equipo
     );
 }
-
+// * Genera el programa anual de auditoría en formato Excel
 function programa_auditoria($valores)
 {
     include('../conexion.php');
