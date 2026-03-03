@@ -875,19 +875,6 @@ function reporte_mantenimiento($valores)
         return false;
     }
 
-    /* if (!empty($ids_equipo)) {
-        $ids = implode(',', $ids_equipo);
-        $sql = "UPDATE mantenimiento
-                SET reporte_descargado = 1,
-                    estado = 'En proceso'
-                WHERE id_equipo IN ($ids)
-                AND  anio = '$anio'";
-
-        if (!mysqli_query($con, $sql)) {
-            return false;
-        }
-    } */
-
     return array(
         'result' => true,
         'url' => $url_descarga,
