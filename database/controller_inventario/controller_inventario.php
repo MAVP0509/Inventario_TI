@@ -398,9 +398,9 @@ function traspaso($valores)
 
     // Datos generales por defecto
     $fecha = date('Y-m-d');
-    $zona = "Región Sur";
-    $ubicacion = "Bodega";
-    $usuario = '5'; // Usuario por defecto para activos en Bodega
+    $zona = $valores->region;
+    $ubicacion = 'Bodega';
+    $usuario = $valores->nombre . ' (Bodega)'; // Usuario por defecto para activos en Bodega
 
     $datos = [];    // Para almacenar el estado anterior de los activos
     $nuevo = [];    // Para almacenar el estado nuevo después del traspaso
@@ -424,8 +424,19 @@ function traspaso($valores)
 
         // Actualización de los activos segpus el estatus
         if ($valores->estatus == 'Bodega') {
+            // Se busca la región del usuario encargado
+            $sql_zona = "SELECT zona FROM inventario_ti_sur WHERE zona LIKE '%$zona%' LIMIT 1";
+            $query_zona = mysqli_query($con, $sql_zona);
+            $fila_zona = mysqli_fetch_assoc($query_zona);
+            $zona_bodega = $fila_zona['zona'];
+            // Se busca el ID del usuario en el catálogo
+            $sql_usuario = "SELECT id FROM cat_usuarios WHERE nombre LIKE '%$usuario%' LIMIT 1";
+            $query_usuario = mysqli_query($con, $sql_usuario);
+            $fila_usuario = mysqli_fetch_assoc($query_usuario);
+            $id_usuario = $fila_usuario['id'];
+
             // Si el estatus es Bodega, asignar valores por defecto
-            $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$usuario', zona = '$zona', ubicacion = '$ubicacion', fecha_entrega = '$fecha' WHERE id IN ($ids)";
+            $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$id_usuario', zona = '$zona_bodega', ubicacion = '$ubicacion', fecha_entrega = '$fecha' WHERE id IN ($ids)";
         } else {
             // Si es otro estatus, usar los valores seleccionados para el usuario
             $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$valores->usuario', zona = '$valores->zona', ubicacion = '$valores->ubicacion', fecha_entrega = '$fecha' WHERE id IN ($ids)";

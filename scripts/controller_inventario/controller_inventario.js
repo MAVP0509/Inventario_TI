@@ -732,6 +732,9 @@ async function crear_registro() {
 }
 
 async function traspasos() {
+    const usuario = JSON.parse(sessionStorage.getItem('user')); // Obtiene los datos del usuario
+    const nombre = usuario.resultado[0];    // Extrae el nombre del usuario
+    const region = usuario.resultado[2];    // Extrae la región a la que pertenece el usuario
     // Campos requeridos para la validación
     const validacion = ['mdl-estado']
 
@@ -758,6 +761,8 @@ async function traspasos() {
         usuario: $('#mdl-usuario').val(),
         zona: $('#mdl-zona').val(),
         ubicacion: $('#mdl-ubicacion').val(),
+        nombre: nombre,
+        region: region,
     }
 
     // Envia los datos al servidor

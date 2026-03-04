@@ -355,16 +355,6 @@ function unir_reportes_mantenimiento($valores)
     $archivoFinal = $carpeta_reporte . '/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
     $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/' . $valores->anio . '/reportes_unidos/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
 
-    //$carpetaArchivoUnido = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->anio . '/reportes_unidos/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
-
-    /* if (file_exists($archivoFinal)) {
-        $respuesta->mensaje = "Archivos unidos correctamente";
-        $respuesta->ruta = $carpetaUrl;
-
-        return $respuesta;
-    } */
-    //var_dump("hola");
-
     try {
         $ilovepdf = new Ilovepdf(
             'project_public_ecd8df30001f3773a605a14a2c0416c9_I--AV17bdca45d44f5b70e44a9960a810a1ab',
@@ -377,10 +367,8 @@ function unir_reportes_mantenimiento($valores)
         // Create a new task
         $myTaskMerge = $ilovepdf->newTask('merge');
         // Add files to task for upload
-
         $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->anio . '/' . $valores->mes;
 
-        //var_dump($carpeta);
         if (!is_dir($carpeta)) {
             $respuesta->error = "No se pudo encontrar la ruta";
             return $respuesta;
@@ -398,18 +386,15 @@ function unir_reportes_mantenimiento($valores)
                 $ruta[] = $rutaCompleta;
             }
         }
-        //var_dump($ruta);
 
         if (empty($ruta)) {
             $respuesta->error = "No se pudo encontrar los archivos";
             return $respuesta;
         }
 
-
         foreach ($ruta as $archivo) {
             $myTaskMerge->addFile($archivo);
         }
-
 
         // Crear carpeta antes de descargar
         if (!is_dir($carpeta_reporte)) {
@@ -418,10 +403,6 @@ function unir_reportes_mantenimiento($valores)
 
         // Execute the task
         $myTaskMerge->execute();
-
-        //$myTaskMerge->setOutputFileName('Reporte_' . $valores->anio . '_' . $valores->mes);
-
-        // Download the package files
         $myTaskMerge->download($carpeta_reporte);
 
         //*Renombrando el pdf generado
@@ -441,8 +422,6 @@ function unir_reportes_mantenimiento($valores)
             $respuesta->error =  "El archivo original no existe";
             return $respuesta;
         }
-
-        //$respuesta->mensaje = "Archivos unidos correctamente";
 
         $respuesta->ruta = $carpetaUrl;
     } catch (\Ilovepdf\Exceptions\AuthException $e) {

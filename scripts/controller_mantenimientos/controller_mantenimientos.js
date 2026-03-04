@@ -1097,11 +1097,8 @@ async function ver_pdf_reporte(elemento_mnt) {
 
 //todo Funciones para el envío de correo de reporte
 async function mdl_correo_reporte_mantenimiento(equipo) {
-    let fecha = equipo.fecha.split('-')
-    let mes = fecha[1]
-
-    //let valido = mesesPendientes.find
-    //console.log(mesesPendientes)
+    let fecha = equipo.fecha.split('-');
+    let mes = fecha[1];
 
     await Promise.all([
         general_select2({
@@ -1122,6 +1119,7 @@ async function mdl_correo_reporte_mantenimiento(equipo) {
             sincronizarCon: 'select-usuario'
         })
     ])
+
     rellenar_select(equipo.usuario, "select-usuario-correo");
     rellenar_select(equipo.cargo, 'select-cargo-correo')
     $('#inp-correo').val(equipo.correo_usuario)
@@ -1131,13 +1129,7 @@ async function mdl_correo_reporte_mantenimiento(equipo) {
 
     let scrollAnterior = window.scrollY; // guarda scroll actual
 
-    /* $('#mdl-correo-reporte').off('shown.bs.modal').on('shown.bs.modal', function () {
-        window.scrollTo(0, scrollAnterior); // restaura scroll al terminar de abrir
-    }); */
-
     $('#mdl-correo-reporte').modal('show')
-
-
 }
 
 async function enviar_correo_reporte(datos_equipo) {
@@ -1202,7 +1194,7 @@ function validar_dos_input_text(texto1, texto2) {
         return false
     }
 }
-
+// TODO: Funciones para unir reportes por mes
 async function mdl_descargar_reportes_mensuales() {
     const cont = document.getElementById("mesesContainer");
     cont.innerHTML = "";
@@ -1220,15 +1212,11 @@ $(document).ready(function () {
 })
 
 function consultar_reportes_mensuales() {
-    //console.log(mantenimientosPendientes[0])
 
     let meses = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
     let mesesConMantenimientos = Object.keys(mantenimientosPendientes[0].meses)
-    //console.log(meses)
-    //console.log(mesesConMantenimientos)
 
     let mesesCompletados = meses.filter(elemento => !mesesConMantenimientos.includes(elemento)).map(Number)
-    //console.log(mesesCompletados)
 
     cargarMeses(mesesCompletados)
 }
@@ -1266,7 +1254,7 @@ function cargarMeses(mesesDisponibles = []) {
 async function descargarMes(mes) {
     dominio = window.location.hostname
     puerto = location.port
-    console.log("Descargando mes:", mes);
+    // console.log("Descargando mes:", mes);
     mantenimiento_loading = true
     alert_cargando('Uniendo los reportes, esto tardará, por favor espere...')
     let server = await server_mantenimiento({ accion: 5, anio: mantenimientosPendientes[0].anio, mes: mes })
@@ -1284,7 +1272,7 @@ async function descargarMes(mes) {
         mostrar_toast('error', '¡Error!', 'Hubo un problema')
     }
 }
-
+// TODO: Funciones para consultar y cargar programa de mant.
 async function consultar_programa_firmado() {
     // Obtener el año del primer mantenimiento pendiente
     let año_programa = mantenimientosPendientes[0].anio;
