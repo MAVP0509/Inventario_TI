@@ -203,7 +203,7 @@ async function mdl_editar_usuarios(params) {
     await general_select2({
         selectId: 'select-cargo',
         tabla: 'cat_usuarios',
-        campo: 'cargo',
+        campo: 'cargo_sin_sincronizar',
         placeholder: 'Seleccione un cargo',
         dropdownParent: '#mdl-usu',
         tags: true,

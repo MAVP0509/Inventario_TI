@@ -52,7 +52,7 @@ function consultar_distintos($valores)
                 break;
             //*Opción para el select de cargo que no tenga que sincronizarse con su usuario
             case "cargo_sin_sincronizar":
-                $sql = "SELECT DISTINCT cargo AS cargo_sin_sincronizar FROM `$tabla` WHERE  cargo <> 'NA' ";
+                $sql = "SELECT DISTINCT cargo AS cargo_sin_sincronizar FROM `$tabla` WHERE  cargo <> 'NA' ORDER BY cargo ASC ";
                 break;
 
             case "zona":
@@ -62,7 +62,7 @@ function consultar_distintos($valores)
             case "rol":
             case "region":
                 // case "cargo":
-                $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE  `$campo` <> 'NA'";
+                $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE  `$campo` <> 'NA' ORDER BY `$campo` ASC";
                 break;
             case 'nombre':
                 if (isset($valores->filtro) && $valores->filtro == 'bodega') {
@@ -73,7 +73,7 @@ function consultar_distintos($valores)
                 }
                 break;
             default:
-                $sql = "SELECT DISTINCT `$campo`,id FROM `$tabla` WHERE  `$campo` <> 'NA' AND habilitado <> 0;";
+                $sql = "SELECT DISTINCT `$campo`,id FROM `$tabla` WHERE  `$campo` <> 'NA' AND habilitado <> 0 ORDER BY `$campo` ASC;";
                 break;
         }
     }
