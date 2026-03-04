@@ -305,13 +305,13 @@ async function mdl_nuevo_usuario() {
     await general_select2({
         selectId: 'select-cargo',
         tabla: 'cat_usuarios',
-        campo: 'cargo',
+        campo: 'cargo_sin_sincronizar',
         placeholder: 'Seleccione un cargo',
         dropdownParent: '#mdl-usu',
         tags: true,
     })
 
-    document.getElementById("inp-correo").value='@diavaz.com'
+    document.getElementById("inp-correo").value = '@diavaz.com'
     document.getElementById('mdl-title').textContent = "Nuevo Usuario"
     document.getElementById('mdl-btn-conf').onclick = function () { nuevo_usuario() }
     document.getElementById('mdl-btn-conf').disabled = false
