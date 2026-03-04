@@ -1016,8 +1016,6 @@ async function abrir_subir_reporte(elemento_mnt) {
 
 
     });
-
-
     //* Mostrando pdf cuando se suba
     let fileToOpen;
 
