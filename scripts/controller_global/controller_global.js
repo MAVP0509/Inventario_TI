@@ -249,7 +249,7 @@ function seleccionar_registro(id, lista) {
 }
 
 //* Función para inicializar componentes Select2
-async function general_select2({ selectId, tabla, campo, data, placeholder, dropdownParent, tags, popoverTitle, popoverContent, placement, sincronizarCon, sincronizarCampo, multiple = false }) {
+async function general_select2({ selectId, tabla, campo, data, placeholder, dropdownParent, tags, popoverTitle, popoverContent, placement, sincronizarCon, sincronizarCampo, multiple = false, filtro = null }) {
 
     let opciones = [];
 
@@ -265,7 +265,8 @@ async function general_select2({ selectId, tabla, campo, data, placeholder, drop
         let response = await server_global({
             accion: 0,
             tabla: tabla,
-            campo: campo
+            campo: campo,
+            ...(filtro && { filtro: filtro })
         });
         //console.log('Respuesta del servidor para select2:', response);
         opciones = response.resultado.map(item => ({

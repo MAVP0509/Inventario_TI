@@ -96,7 +96,7 @@ async function consultar_informacion() {
         }
     });
     // Antes de construir la tabla, cada registro recibido del servidor se inicializa con la propiedad seleccionado (controla el estado visual d cada fila)
-    datos.forEach(d => d.seleccionado = false); 
+    datos.forEach(d => d.seleccionado = false);
     // Función que define el ícono de selección (checkbox visual)
     let squareIcon = function (cell, formatterParams, onRendered) {
         const seleccionado = cell.getRow().getData().seleccionado;  // Obtiene el estado de selección
@@ -127,7 +127,7 @@ async function consultar_informacion() {
                 return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
             },
             // Aplica estilos visuales según el estado de selección
-            rowFormatter: function (row) {  
+            rowFormatter: function (row) {
                 data = row.getData()
                 if (data.seleccionado === true) {
                     row.getElement().classList.add("bg-primary")
@@ -793,6 +793,8 @@ async function mostrar_traspaso() {
     if (equipo_seleccionado.length == 0) {
         mostrar_toast('warning', 'Alerta', 'Selecione al menos un activo. Inténtalo nuevamente.')
     } else {
+        const usuario = JSON.parse(sessionStorage.getItem('user'));
+        const rol = usuario.resultado[3];
         // Inicialización de selects
         await general_select2({
             selectId: 'mdl-estado',
@@ -802,6 +804,7 @@ async function mostrar_traspaso() {
             dropdownParent: '#mdl-traspaso',
             tags: false,
         })
+
         await general_select2({
             selectId: 'mdl-usuario',
             tabla: 'cat_usuarios',
@@ -809,6 +812,7 @@ async function mostrar_traspaso() {
             placeholder: 'Seleccione un usuario',
             dropdownParent: '#mdl-traspaso',
             tags: false,
+            filtro: 'bodega'
         })
 
         await general_select2({
@@ -837,6 +841,26 @@ async function mostrar_traspaso() {
         $("#mdl-traspaso").modal("show");
     }
 }
+
+$(document).ready(function () {
+    $('#mdl-estado').on('change', function () {
+        const seleccionado = $(this).val();
+        const usuario = JSON.parse(sessionStorage.getItem('user'));
+        const rol = usuario.resultado[3];
+
+        if (seleccionado === 'Asignado') {
+            $('#mdl-usuario, #mdl-zona, #mdl-ubicacion').prop('disabled', false).addClass('is-requerid');
+            document.getElementById('alert-traspaso').style.display = 'block'
+        } else if (seleccionado === 'Bodega') {
+            $('#mdl-zona, #mdl-ubicacion').prop('disabled', true).removeClass('is-requerid').val('')
+            $('#mdl-usuario').prop('disabled', false).addClass('is-requerid'); // 👈 solo usuario habilitado
+            document.getElementById('alert-traspaso').setAttribute('style', 'display:none !important; background-color:#e7f3fe; border-color:#b8daff; color:#004085; padding-right: 4rem;');
+        } else {
+            $('#mdl-usuario, #mdl-zona, #mdl-ubicacion').prop('disabled', true).removeClass('is-requerid').val('')
+            document.getElementById('alert-traspaso').setAttribute('style', 'display:none !important; background-color:#e7f3fe; border-color:#b8daff; color:#004085; padding-right: 4rem;');
+        }
+    })
+})
 
 async function desactivar_registro() {
     // Se contruye el objeto model de datos necesarios
@@ -1365,20 +1389,6 @@ $(document).ready(function () {
     });
 
 });
-
-$(document).ready(function () {
-    $('#mdl-estado').on('change', function () {
-        const seleccionado = $(this).val();
-
-        if (seleccionado === 'Asignado') {
-            $('#mdl-usuario, #mdl-zona, #mdl-ubicacion').prop('disabled', false).addClass('is-requerid');
-            document.getElementById('alert-traspaso').style.display = 'block'
-        } else {
-            $('#mdl-usuario, #mdl-zona, #mdl-ubicacion').prop('disabled', true).removeClass('is-requerid').val('')
-            document.getElementById('alert-traspaso').setAttribute('style', 'display:none !important; background-color:#e7f3fe; border-color:#b8daff; color:#004085; padding-right: 4rem;');
-        }
-    })
-})
 
 let selected = false    // Variable que indica si el resguardo general esta seleccionado
 let celSelected = false // Variable que indica si el resguardo de celular está seleccionado

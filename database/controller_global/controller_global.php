@@ -50,7 +50,7 @@ function consultar_distintos($valores)
                         SELECT YEAR(CURDATE()) + 1;       
                         ";
                 break;
-                //*Opción para el select de cargo que no tenga que sincronizarse con su usuario
+            //*Opción para el select de cargo que no tenga que sincronizarse con su usuario
             case "cargo_sin_sincronizar":
                 $sql = "SELECT DISTINCT cargo AS cargo_sin_sincronizar FROM `$tabla` WHERE  cargo <> 'NA' ";
                 break;
@@ -63,6 +63,14 @@ function consultar_distintos($valores)
             case "region":
                 // case "cargo":
                 $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE  `$campo` <> 'NA'";
+                break;
+            case 'nombre':
+                if (isset($valores->filtro) && $valores->filtro == 'bodega') {
+                    // Solo usuarios que tengan "(Bodega)" en el nombre
+                    $sql = "SELECT DISTINCT nombre, id FROM `$tabla` WHERE nombre LIKE '%(Bodega)%' AND habilitado <> 0";
+                } else {
+                    $sql = "SELECT DISTINCT `$campo`, id FROM `$tabla` WHERE `$campo` <> 'NA' AND habilitado <> 0";
+                }
                 break;
             default:
                 $sql = "SELECT DISTINCT `$campo`,id FROM `$tabla` WHERE  `$campo` <> 'NA' AND habilitado <> 0;";
