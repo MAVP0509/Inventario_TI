@@ -422,30 +422,14 @@ function traspaso($valores)
 
         // Actualización de los activos segpus el estatus
         if ($valores->estatus == 'Bodega') {
-            // Si el admin seleccionó un usuario de bodega manualmente, usar ese ID
-            // de lo contrario, buscarlo por nombre + "(Bodega)"
-            if (!empty($valores->usuario)) {
-                $id_usuario_bodega = $valores->usuario; // ID seleccionado por el admin
-            } else {
-                $nombre_bodega = $valores->nombre . ' (Bodega)';
-                $sql_usuario = "SELECT id FROM cat_usuarios 
-                        WHERE nombre = '$nombre_bodega' 
-                        LIMIT 1";
-                $query_usuario = mysqli_query($con, $sql_usuario);
-                $fila_usuario = mysqli_fetch_assoc($query_usuario);
-                $id_usuario_bodega = $fila_usuario['id'];
-            }
-
             // Buscar zona con LIKE
-            $sql_zona = "SELECT zona FROM inventario_ti_sur 
-                 WHERE zona LIKE '%$valores->region%' 
-                 LIMIT 1";
+            $sql_zona = "SELECT zona FROM inventario_ti_sur WHERE zona LIKE '%$valores->region%' LIMIT 1";
             $query_zona = mysqli_query($con, $sql_zona);
             $fila_zona = mysqli_fetch_assoc($query_zona);
             $zona_bodega = $fila_zona['zona'];
 
             // Si el estatus es Bodega, asignar valores por defecto
-            $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$id_usuario_bodega', zona = '$zona_bodega', ubicacion = '$ubicacion', fecha_entrega = '$fecha' WHERE id IN ($ids)";
+            $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$valores->usuario', zona = '$zona_bodega', ubicacion = '$ubicacion', fecha_entrega = '$fecha' WHERE id IN ($ids)";
         } else {
             // Si es otro estatus, usar los valores seleccionados para el usuario
             $sql_datos = "UPDATE inventario_ti_sur SET estatus = '$valores->estatus', fk_usuario = '$valores->usuario', zona = '$valores->zona', ubicacion = '$valores->ubicacion', fecha_entrega = '$fecha' WHERE id IN ($ids)";
