@@ -743,7 +743,11 @@ async function traspasos() {
     // Si el estado seleccionado es "Asignado",
     // se agregan campos de zona y ubicación como obligatorios
     if (tipo_seleccionado === 'Asignado') {
-        validacion.push("mdl-zona", "mdl-ubicacion");
+        validacion.push("mdl-zona", "mdl-ubicacion", "mdl-usuario");
+    }
+
+    if (tipo_seleccionado === "Bodega") {
+        validacion.push("mdl-usuario");
     }
 
     // Valida los campos definidos en el arrglo validacion; si algún campo es vació o inválido
