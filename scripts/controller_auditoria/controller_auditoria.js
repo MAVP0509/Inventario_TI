@@ -1,4 +1,7 @@
+//*Variable para cerrar toast cargando cuando se realiza una petición que puede tardar más de lo normal
 auditoria_loading = false;
+
+//*Función para peticiones http al servidor
 function server_auditoria(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -22,6 +25,7 @@ function server_auditoria(model) {
     })
 }
 
+//*Función para peticiones http de generación de documentos al servidor
 function server_excel(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -41,6 +45,7 @@ function server_excel(model) {
     })
 }
 
+//*Función para realizar peticiones hhtp al servidor para envío de correos lectrónicos
 function server_correo(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -59,7 +64,8 @@ function server_correo(model) {
         })
     })
 }
-//* Función que se ejecuta al cargar la página
+
+//* Función que se ejecuta al cargar la página, genera el select de año y carga el último año de auditoría
 async function load_auditoria() {
     // Inicializa el selector de año (select2) con configuraciones específicas
     await general_select2({
@@ -85,6 +91,7 @@ async function load_auditoria() {
 
     }
 }
+
 //* Limpiar el input del buscador si cambia el año de la tabla
 $('#select-anio-auditoria').on('change', () => {
     $('#buscador-tabla-auditoria').val('')
@@ -96,23 +103,23 @@ let tabla_aud;
 let elemento_aud;
 let auditorias_pendientes;
 
-// NUEVAS VARIABLES
+
 let tablas_por_region = {};
 let datosGlobales = null;
 let tabActual = 'todas'; // Para saber qué tab está activo
 
-// Obtener datos del usuario
+//* Obtener datos del usuario
 const userData = JSON.parse(sessionStorage.getItem('user'));
 const rol = userData.resultado[3];
 const regionUsuario = userData.resultado[2];
 
-// Colores para las regiones
+//* Colores para las regiones
 const coloresRegion = [
     'primary', 'success', 'info', 'warning', 'danger',
     'purple', 'indigo', 'pink', 'teal', 'orange'
 ];
 
-// Función principal ORIGINAL
+//* Función para cargar la tabla en base a los permisos y la región
 async function consultar_auditoria(anio) {
     const fecha = anio.value;
     if (!fecha) return;
@@ -120,7 +127,7 @@ async function consultar_auditoria(anio) {
     const usuRegion = JSON.parse(sessionStorage.getItem('user'));
     const region = usuRegion.resultado[2];
 
-    // Limpiar tablas anteriores
+    //* Limpiar tablas anteriores
     tablas_por_region = {};
 
     if (rol === 'admin') {
@@ -130,35 +137,35 @@ async function consultar_auditoria(anio) {
     }
 }
 
-// Cargar datos para administrador
+//* Cargar datos para administrador
 async function cargarDatosAdmin(fecha, region) {
-    // Mostrar card de admin, ocultar card de user
+    //* Mostrar card de admin, ocultar card de user
     document.getElementById('card-admin').style.display = 'block';
     document.getElementById('card-user').style.display = 'none';
 
     let server = await server_auditoria({
         accion: 0,
         anio: fecha,
-        region: '' // Admin ve todas las regiones
+        region: '' //* Admin ve todas las regiones
     });
 
     datos_auditoria = server.resultado;
     datosGlobales = server.resultado; // Copia para tabs
 
-    // Obtener regiones únicas
+    //* Obtener regiones únicas
     const regionesUnicas = [...new Set(datos_auditoria.map(item => item.zona))].filter(Boolean).sort();
 
-    // Construir tabs dinámicamente
+    //* Construir tabs dinámicamente
     construirTabs(regionesUnicas, datos_auditoria);
 
-    // Crear tabla "Todas" y guardar como tabla_aud principal
+    //* Crear tabla "Todas" y guardar como tabla_aud principal
     tabla_aud = crear_tabla_auditoria('todas', datos_auditoria, fecha, true);
     tabActual = 'todas';
 }
 
-// Cargar datos para usuario normal
+//* Cargar datos para usuario normal
 async function cargarDatosUser(fecha, region) {
-    // Mostrar card de user, ocultar card de admin
+    //* Mostrar card de user, ocultar card de admin
     document.getElementById('card-admin').style.display = 'none';
     document.getElementById('card-user').style.display = 'block';
     document.getElementById('badge-region').innerHTML = `<i class="fas fa-map-marker-alt"></i> ${regionUsuario}`;
@@ -171,23 +178,23 @@ async function cargarDatosUser(fecha, region) {
 
     datos_auditoria = server.resultado;
 
-    // Crear tabla y guardar como tabla_aud principal
+    //* Crear tabla y guardar como tabla_aud principal
     tabla_aud = crear_tabla_auditoria('user', datos_auditoria, fecha, false);
 }
 
-// Construir tabs dinámicamente
+//* Construir tabs dinámicamente
 function construirTabs(regiones, datos) {
     const navTabs = document.getElementById('custom-tabs');
     const tabContent = document.getElementById('custom-tabs-content');
 
-    // Limpiar tabs existentes
+    //* Limpiar tabs existentes
     navTabs.innerHTML = '';
     tabContent.innerHTML = '';
 
-    // Calcular pendientes totales
+    //* Calcular pendientes totales
     const totalPendientes = datos.filter(d => d.estado !== 'Realizado').length;
 
-    // Tab "Todas las Regiones"
+    //* Tab "Todas las Regiones"
     const tabTodas = `
         <li class="nav-item">
             <a class="nav-link active" id="tab-todas" data-toggle="pill" href="#todas" role="tab">
@@ -213,7 +220,7 @@ function construirTabs(regiones, datos) {
     navTabs.insertAdjacentHTML('beforeend', tabTodas);
     tabContent.insertAdjacentHTML('beforeend', contentTodas);
 
-    // Crear tabs para cada región
+    //* Crear tabs para cada región
     regiones.forEach((region, index) => {
         const datosFiltrados = datos.filter(d => (d.zona) === region);
         const count = datosFiltrados.length;
@@ -247,22 +254,22 @@ function construirTabs(regiones, datos) {
         tabContent.insertAdjacentHTML('beforeend', content);
     });
 
-    // Event listeners para tabs (lazy loading)
+    //* Event listeners para tabs (lazy loading)
     $('a[data-toggle="pill"]').off('shown.bs.tab').on('shown.bs.tab', function (e) {
         const tabId = $(e.target).attr('href').substring(1);
         const region = $(e.target).data('region');
 
-        // Actualizar tabActual
+        //* Actualizar tabActual
         tabActual = tabId;
 
-        // Actualizar tabla_aud con la tabla del tab activo
+        //* Actualizar tabla_aud con la tabla del tab activo
         if (tablas_por_region[tabId]) {
             tabla_aud = tablas_por_region[tabId];
-            // Actualizar datos_auditoria con los datos filtrados del tab actual
+            //* Actualizar datos_auditoria con los datos filtrados del tab actual
             datos_auditoria = tabla_aud.getData();
         }
 
-        // Si la tabla no ha sido creada, crearla
+        //* Si la tabla no ha sido creada, crearla
         if (!tablas_por_region[tabId]) {
             let datosFiltrados;
             let mostrarRegion = false;
@@ -275,14 +282,14 @@ function construirTabs(regiones, datos) {
             }
 
             const nuevaTabla = crear_tabla_auditoria(tabId, datosFiltrados, null, mostrarRegion);
-            // Actualizar tabla_aud y datos_auditoria
+            //* Actualizar tabla_aud y datos_auditoria
             tabla_aud = nuevaTabla;
             datos_auditoria = datosFiltrados;
         }
     });
 }
 
-// Función para crear tabla
+//* Función para crear tabla
 function crear_tabla_auditoria(tabId, datos, fecha, mostrarRegion = false) {
     Tabulator.extendModule("localize", "langs", {
         "es": {
@@ -356,7 +363,7 @@ function crear_tabla_auditoria(tabId, datos, fecha, mostrarRegion = false) {
         { label: `<i class="fa-solid fa-circle fa-beat-fade" style="color: #dc3545;"></i> Vencido` },
     ]
 
-    // Definir columnas base
+    //* Definir columnas base
     let columnas = [
         {
             title: "Fecha", field: "fecha", width: 115, headerHozAlign: "center", headerSort: false, hozAlign: "center", sorter: "date",
@@ -448,7 +455,7 @@ function crear_tabla_auditoria(tabId, datos, fecha, mostrarRegion = false) {
         },
     ];
 
-    // Agregar columna de región si mostrarRegion es true
+    //* Agregar columna de región si mostrarRegion es true
     if (mostrarRegion && datosGlobales) {
         const regiones = [...new Set(datosGlobales.map(item => item.zona))].filter(Boolean).sort();
         columnas.splice(4, 0, {
@@ -477,7 +484,7 @@ function crear_tabla_auditoria(tabId, datos, fecha, mostrarRegion = false) {
         });
     }
 
-    // Crear tabla
+    //* Crear tabla
     const tabla = new Tabulator(`#tbl-${tabId}`, {
         locale: "es",
         data: datos,
@@ -512,10 +519,10 @@ function crear_tabla_auditoria(tabId, datos, fecha, mostrarRegion = false) {
         columns: columnas,
     });
 
-    // Guardar referencia a la tabla
+    //* Guardar referencia a la tabla
     tablas_por_region[tabId] = tabla;
 
-    // Configurar buscador
+    //* Configurar buscador
     let searchInput = document.getElementById(`buscador-tabla-${tabId}`);
     if (searchInput) {
         searchInput.addEventListener("keyup", function () {
@@ -531,10 +538,8 @@ function crear_tabla_auditoria(tabId, datos, fecha, mostrarRegion = false) {
         });
     }
 
-    // Calcular auditorías pendientes
-    // if (tabId === 'todas' || tabId === 'user') {
+    //* Calcular auditorías pendientes
 
-    // }
     auditorias_pendientes = Object.values(datos.reduce((objeto, item) => {
         if (item.estado == "Realizado") return objeto
         let anio = item.anio
@@ -549,296 +554,7 @@ function crear_tabla_auditoria(tabId, datos, fecha, mostrarRegion = false) {
     return tabla;
 }
 
-// let datos_auditoria = [];
-// let tabla_aud;
-// let elemento_aud;
-// let auditorias_pendientes
-
-// async function consultar_auditoria(anio) {
-//     const fecha = anio.value;
-//     // console.log(fecha);
-//     const usuDatos = JSON.parse(sessionStorage.getItem('user'));
-//     const rol = usuDatos.resultado[3];
-//     const region = usuDatos.resultado[2];
-
-//     let server = await server_auditoria({ accion: 0, anio: fecha, region: region });
-
-//     if (!fecha) return;
-
-//     datos_auditoria = server.resultado
-//     Tabulator.extendModule("localize", "langs", {
-//         "es": {
-//             "pagination": {
-//                 "first": '<i class="fa-solid fa-angles-right fa-flip-horizontal"></i>',
-//                 "first_title": "Primera página",
-//                 "last": '<i class="fa-solid fa-angles-right"></i>',
-//                 "last_title": "Última página",
-//                 "prev": '<i class="fa-solid fa-angle-right fa-flip-horizontal"></i>',
-//                 "prev_title": "Página anterior",
-//                 "next": '<i class="fa-solid fa-angle-right"></i>',
-//                 "next_title": "Página siguiente",
-//                 "page_size": "Tamaño",
-//             },
-//             "headerFilters": {
-//                 "default": "Filtrar columna...",
-//                 "columns": {}
-//             },
-//             "groups": {
-//                 "item": "ítem",
-//                 "items": "ítems"
-//             },
-//         }
-//     });
-
-//     let editarIcon = function (cell, formatterParams, onRendered) {
-//         onRendered(function () {
-//             $(cell.getElement()).find('[data-toggle="popover"]').popover()
-//         })
-//         return `<button type='button' class='btn btn-warning icon' data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Información' onclick=''><i class='fa-solid fa-circle-info fa-lg'></i></button>`;
-//     }
-
-//     let subirIcon = function (cell, formatterParams, onRendered) {
-//         onRendered(function () {
-//             $(cell.getElement()).find('[data-toggle="popover"]').popover()
-//         })
-//         const data = cell.getRow().getData()
-//         const disabled = data.reporte_descargado == 0 ? "disabled" : ""
-
-//         return `<button type='button' class='btn btn-info icon' ${disabled} data-animation="true" data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Subir reporte firmado' data-widget="control-sidebar" data-slide="true" data-target="#sidebar-rauditoria"><i class='fa-solid fa-upload fa-lg'></i></button>`;
-//     }
-
-//     let archivoIcon = function (cell, formatterParams, onRendered) { //plain text value
-//         onRendered(function () {
-//             $(cell.getElement()).find('[data-toggle="popover"]').popover()
-//         })
-//         const data = cell.getRow().getData()
-//         const disabled = data.correo_enviado == 0 ? "disabled" : ""
-
-//         return `<button type='button' class='btn btn-success icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Reporte de auditoría' onclick=''><i class='fa-solid fa-file-excel fa-lg'></i></button>`;
-//     }
-
-//     let verIcon = function (cell, formatterParams, onRendered) { //plain text value
-//         onRendered(function () {
-//             $(cell.getElement()).find('[data-toggle="popover"]').popover()
-//         })
-//         const data = cell.getRow().getData()
-//         const disabled = data.reporte_subido == 0 ? "disabled" : ""
-
-//         return `<button type='button' class='btn btn-lock btn-outline-dark icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Ver pdf'><i class='fa-solid fa-eye '></i></button>`;
-//     }
-
-//     let correoIcon = function (cell, formatterParams, onRendered) { //plain text value
-//         onRendered(function () {
-//             $(cell.getElement()).find('[data-toggle="popover"]').popover()
-//         })
-//         // const data = cell.getRow().getData()
-//         // const disabled = data.correo_enviado == 1 ? "disabled" : ""
-//         return `<button type='button' class='btn btn-lock btn-danger envelope'  data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Enviar correo'><i class='fa-solid fa-envelope '></i></button>`;
-//     }
-
-//     let menuEstatus = [
-//         {
-//             label: `<i class="fa-solid fa-circle" style="color: #28a745;"></i> Realizado`
-//         },
-//         { label: `<i class="fa-solid fa-circle" style="color: #0385ffff;"></i> En proceso` },
-//         {
-//             label: `<i class="fa-solid fa-circle" style="color: #ff7300;"></i> Pendiente`
-//         },
-//         {
-//             label: `<i class="fa-solid fa-circle fa-beat-fade" style="color: #dc3545;"></i> Vencido`
-//         },
-//     ]
-
-//     tabla_aud = new Tabulator("#tbl-aud", {
-//         locale: "es",
-//         data: datos_auditoria,
-//         layout: "fitColumns",
-//         maxHeight: window.innerHeight,
-//         movableColumns: true,
-//         pagination: true,
-//         paginationSize: 15,
-//         paginationSizeSelector: [15, 25, 35, true],
-//         paginationCounter: function (pageSize, currentRowStart, currentRowEnd, currentPage) {
-//             const totalRows = tabla_aud.getDataCount(); // Asegúrate que 'table' esté accesible
-//             const end = Math.min(currentRowStart + pageSize - 1, totalRows);
-//             return `Mostrando del ${currentRowStart} al ${end} de ${totalRows} registros`;
-//         },
-//         groupBy: function (data) {
-//             // Asegura que tenga formato YYYY-MM
-//             const [año, mes] = data.fecha.split("-");
-//             // Creamos una fecha con día explícito
-//             const fecha = new Date(`${año}-${mes}-01T00:00:00`);
-//             const opciones = { year: 'numeric', month: 'long' };
-
-//             //let excluir = ['Realizado']
-//             //const datos = table.getData().filter(d=> d.estado && !excluir.includes(d.estado)).length
-
-
-//             return `${fecha.toLocaleDateString('es-ES', opciones)}`
-//         },
-//         groupHeader: function (value, count, data) {
-//             const fila = data[0];  // Primera fila del grupo
-
-//             const [año, mes] = fila.fecha.split("-");
-//             const fecha = new Date(`${año}-${mes}-01T00:00:00`);
-//             const opciones = { year: 'numeric', month: 'long' };
-
-//             // Excluir estatus
-//             const excluir = ['Realizado'];
-
-//             // Contar pendiente SOLO dentro del grupo actual
-//             const pendientes = data.filter(d =>
-//                 d.estado &&
-//                 !excluir.includes(d.estado)
-//             ).length;
-
-//             return `${fecha.toLocaleDateString('es-ES', opciones)} (${pendientes} auditorías pendientes)`;
-
-//         },
-//         groupStartOpen: false,
-//         groupToggleElement: "header",
-//         columns: [
-//             {
-//                 title: "Fecha", field: "fecha", width: 115, headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */ sorter: "date",
-//             },
-//             {
-//                 title: "Tipo",
-//                 field: "tipo", width: 130, headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */
-//                 formatter: function (cell, formatterParams, onRendered) {
-//                     let data = cell.getData();
-//                     return `${data.tipo}<br><small>${data.marca}<br><small>${data.modelo}`;
-//                 }
-//             },
-//             {
-//                 title: "Número de serie",
-//                 field: "num_serie", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input" */
-
-//             },
-//             {
-//                 title: "Usuario",
-//                 field: "usuario", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "input", */
-//                 formatter: function (cell, formatterParams, onRendered) {
-//                     let data = cell.getData(); // Obtiene toda la fila
-//                     return `${data.usuario}<br><small>${data.cargo}</small>`;
-//                 }
-
-//             },
-//             {
-//                 title: "Ubicación",
-//                 field: "ubicacion", headerHozAlign: "center", headerSort: false, hozAlign: "center", /* headerFilter: "list", */
-//                 headerFilterParams: {
-//                     valuesLookup: true, clearable: true,
-//                 }
-
-//             },
-//             {
-//                 title: "Estatus",
-//                 field: "estado", hozAlign: "center", formatter: "lookup", headerHozAlign: "center", formatter: "lookup", width: 150,
-//                 headerFilterParams: {
-//                     valuesLookup: true, clearable: true,
-//                 },
-//                 headerMenu: menuEstatus,
-//                 headerMenuIcon: '<i class="fa-solid fa-circle-question"></i>',
-//                 formatterParams: {
-//                     "Pendiente": `<i class="fa-solid fa-circle" style="color: #ff7300;"></i> Pendiente`,
-//                     "En proceso": `<i class="fa-solid fa-circle" style="color: #0385ffff;"></i> En proceso`,
-//                     "Realizado": `<i class="fa-solid fa-circle" style="color: #28a745;"></i> Realizado`,
-//                     "Vencido": `<i class="fa-solid fa-circle fa-beat-fade" style="color: #dc3545;"></i> Vencido`,
-//                 },
-//                 /* headerFilter: "list",
-//                 headerFilterParams: {
-//                     valuesLookup: true, clearable: true,
-//                 }, */ headerSort: false,
-
-//             },
-//             {
-//                 formatter: correoIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "correo_enviado",
-//                 cellClick: function (e, cell) {
-//                     elemento_aud = cell.getRow().getData();
-//                     mdl_correo_reporte_auditoria(elemento_aud)
-//                 },
-//             },
-//             {
-//                 formatter: archivoIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "correo_enviado",
-//                 cellClick: function (e, cell) {
-//                     const button = cell.getElement().querySelector('button');
-//                     if (button && !button.disabled) {
-//                         // Deshabilita el botón
-//                         button.disabled = true;
-
-//                         // Acción que quieres ejecutar al hacer clic
-//                         const elemento_aud = cell.getRow().getData();
-//                         mdl_descargar_reporte_auditoria(elemento_aud);
-
-//                         // Rehabilita el botón después de 3 segundos
-//                         setTimeout(() => {
-//                             button.disabled = false;
-//                         }, 3000);
-//                     }
-//                 }
-//             },
-//             {
-//                 formatter: subirIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_descargado",
-//                 cellClick: function (e, cell) {
-//                     elemento_aud = cell.getRow().getData();
-//                     reporte_auditoria_firmado(elemento_aud)
-//                     // abrir_subir_reporte(elemento_aud.id, elemento_aud.fecha)
-//                 }
-//             },
-
-//             {
-//                 formatter: verIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false, field: "reporte_subido",
-//                 cellClick: function (e, cell) {
-//                     elemento_aud = cell.getRow().getData();
-//                     consultar_reporte_firmado(elemento_aud);
-//                 }
-//             },
-//             {
-//                 formatter: editarIcon, width: 70, hozAlign: "center", frozen: true, headerSort: false,
-//                 cellClick: function (e, cell) {
-//                     elemento_aud = cell.getRow().getData();
-//                     mdl_auditoria_info(elemento_aud);
-//                 }
-//             },
-//         ],
-//     });
-
-//     auditorias_pendientes = Object.values(datos_auditoria.reduce((objeto, item) => {
-//         if (item.estado == "Realizado") return objeto
-
-//         let anio = item.anio
-//         let mes = item.fecha.split('-')[1]
-
-//         // Si aún no existe el año, inicializamos su propiedad meses
-//         if (!objeto[anio]) {
-//             objeto[anio] = { anio: anio, meses: {} };
-//         }
-
-//         //si ya existe este mes, incrementa su valor, sino lo inicia en 0 y suma 1
-//         objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
-
-//         return objeto
-//     }, {}))
-//     // console.log(auditorias_pendientes);
-
-//     let searchInput = document.getElementById("buscador-tabla-auditoria")
-
-//     searchInput.addEventListener("keyup", function () {
-//         let query = searchInput.value.toLowerCase();
-
-//         // Función de filtro personalizada
-//         tabla_aud.setFilter(function (data) {
-//             // Recorre todas las propiedades de la fila
-//             for (var key in data) {
-//                 if (data[key] && data[key].toString().toLowerCase().includes(query)) {
-//                     return true; // Coincidencia encontrada
-//                 }
-//             }
-//             return false; // No hay coincidencia
-//         });
-//     });
-// }
-
+//*Función para mostrar el modal para descargar programa de auditoría
 async function mdl_programar_auditoria() {
 
     await Promise.all([
@@ -930,6 +646,7 @@ async function mdl_programar_auditoria() {
     $('#mdl-prog-aud').modal("show")
 }
 
+//*Función para enviar al servidor la información para la generación del programa de auditoría
 async function programar_auditoria() {
 
     const validar = (rol === 'admin')
@@ -951,7 +668,7 @@ async function programar_auditoria() {
 
     }
 
-    // Agregar rol y región según el usuario
+    //* Agregar rol y región según el usuario
     model.rol = rol;
     if (rol === 'admin') {
         const sel = $('#select-region-prog-aud').select2('data');
@@ -982,6 +699,7 @@ async function programar_auditoria() {
     }
 }
 
+//*Función para mostrar el sidebar para subir programa de auditoríafirmado
 async function consultar_pauditoria_firmado() {
 
     let año_pauditoria = auditorias_pendientes[0].anio;
@@ -1031,6 +749,7 @@ async function consultar_pauditoria_firmado() {
 let charco = null;
 let charcoInicializado = false;
 
+//*Función para la generación de la instancia filepond para subir el programa de auditoría
 async function auditoria_firmado() {
     if (!charcoInicializado) {
 
@@ -1080,7 +799,9 @@ async function auditoria_firmado() {
 
 //TODO: Funciones para el proceso de auditoria (notificación, descarga de reporte, carga de reporte, vista de reporte, información del activo)
 
-//* Funciones para notificación de auditoría (mdl_correo_reporte_auditoria, corre_reporte_auditoria, validar_correo 1 y 2)
+//? Funciones para notificación de auditoría (mdl_correo_reporte_auditoria, corre_reporte_auditoria, validar_correo 1 y 2)
+
+//*Función para abrir el modal de envío de correo
 async function mdl_correo_reporte_auditoria(equipo) {
 
     await Promise.all([
@@ -1112,6 +833,7 @@ async function mdl_correo_reporte_auditoria(equipo) {
     $('#mdl-correo-rauditoria').modal('show');
 }
 
+//*Función para enviar datos al servidor para el envío de correos electrónicos
 async function correo_reporte_auditoria(datos_equipo) {
     const validar = ['inp-aud-correo', 'inp-aud-correo-validar'];
 
@@ -1164,11 +886,13 @@ async function correo_reporte_auditoria(datos_equipo) {
     }
 }
 
+//*Función para validar estructura de un correo
 function validar_correo1(correo) {
     const correo_valido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     return correo_valido.test(correo)
 }
 
+//*Función para validar coincidencia de ambos correos
 function validar_correo2(texto1, texto2) {
     if (texto1 === texto2) {
         return true
@@ -1177,7 +901,9 @@ function validar_correo2(texto1, texto2) {
     }
 }
 
-//* Funciones para descarga de reporte de auditoria
+//? Funciones para descarga de reporte de auditoria
+
+//*Función para mostrar modal de descarga de reporte de auditoría
 async function mdl_descargar_reporte_auditoria(equipo) {
     $("#btn-reporte-aud").prop("disabled", false);
     // document.getElementById("btn-reporte-aud").disabled = false;
@@ -1207,6 +933,7 @@ async function mdl_descargar_reporte_auditoria(equipo) {
     $("#mdl-reporte-aud").modal("show");
 }
 
+//*Función para enviar al servidor la petición de descarga del reporte
 async function reporte_auditoria(equipo) {
     const validar = ["ubicacion-aud", "aud-area", "saud-encargado", "saud-cargo"];
 
@@ -1244,13 +971,14 @@ async function reporte_auditoria(equipo) {
     }
 }
 
-//* Funciones para subir reporte de auditoria
+//? Funciones para subir reporte de auditoria
 
 FilePond.registerPlugin(FilePondPluginFileValidateType);
 
 let charco2;
 let charcoInicializado2;
 
+//*Función para abrir el sidebar para subida de reporte de mantenimiento firmado
 async function reporte_auditoria_firmado(elemento_aud) {
     //?Escondiendo el alert
     document.getElementById('alert-aud-reporte').setAttribute('style', 'display: none !important;  background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;');
@@ -1324,23 +1052,6 @@ async function reporte_auditoria_firmado(elemento_aud) {
     //* Mostrando pdf cuando se suba
     let abrirArchivo;
 
-    /* charco2.on('addfile', (error, fileItem) => {
-        if (error) {
-            mostrar_toast('error', 'Error', 'Error al cargar PDF:' + error);
-            return;
-        }
-
-        charcoInicializado2 = fileItem; // <-- guardar archivo
-
-        // Generar URL temporal para el archivo PDF
-        abrirArchivo = URL.createObjectURL(fileItem.file);
-
-        const viewer = document.getElementById('pdf-ver-aud');
-        viewer.src = abrirArchivo;
-
-        $('#pdf-aud').show()
-
-    }); */
 
     let server = await server_auditoria({ accion: 5, id_equipo: elemento_aud.id, fecha_aud: elemento_aud.fecha })
 
@@ -1349,6 +1060,7 @@ async function reporte_auditoria_firmado(elemento_aud) {
     }
 }
 
+//*Función para eliminar el archivo de la isntancia del filepond
 function eliminar_archivo() {
     if (charco2 && charcoInicializado2) {
         charco2.removeFile(charcoInicializado2);
@@ -1356,13 +1068,15 @@ function eliminar_archivo() {
     }
 }
 
-// ? Cerrando filepond al finalizar la carga del reporte
+//* Cerrando filepond al finalizar la carga del reporte
 document.addEventListener('FilePond:removefile', (e) => {
     // $('#pdf-aud').hide()
     $('[data-widget="sidebar-rauditoria"]').ControlSidebar('toggle')
 })
 
-//* Funciones para visualizar el reporte firmado
+//? Funciones para visualizar el reporte firmado
+
+//*Función para mostrar el reporte subido al sistema
 async function consultar_reporte_firmado(elemento_aud) {
     let model = {
         accion: 6,
@@ -1509,10 +1223,14 @@ async function mdl_reportes_mensuales() {
     $('#mdl-raud-mens').modal('show');
 }
 
+//*Habilitando el popover
 $(document).ready(function () {
     $('[data-toggle="popover"]').popover();
 })
 
+//? Funciones para descargar reportes de auditoría por mes
+
+//*Función para validar los meses completados y mostrar el modal 
 function consulta_reportes_mensuales() {
     let meses = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
     let meses_auditados = Object.keys(auditorias_pendientes[0].meses);
@@ -1527,6 +1245,7 @@ const nombre_meses = [
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
 
+//*Generando los botones de descarga de cada mes en el modal
 function carga_meses(meses = []) {
     const contenedor = document.getElementById("contenedor-mes");
     contenedor.innerHTML = "";
@@ -1552,6 +1271,7 @@ function carga_meses(meses = []) {
     });
 }
 
+//*Función para pedir al servidor los reportes unidos de un mes
 async function unir_reportes_mes(mes) {
     auditoria_loading = true;
 

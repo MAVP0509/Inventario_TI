@@ -1,3 +1,4 @@
+//*Función para realizar peticiones http al servidor
 function server_tipo_mantenimiento(model) {
     return new Promise((resolve, reject) => {
         $.ajax({
@@ -22,6 +23,7 @@ let table_orden
 let orden_seleccionado = []
 // let orden_actual = []
 
+//*Función para consultar la información y mostrarla en una tabla
 async function consultar_orden_tipo(params) {
 
     orden_seleccionado = []
@@ -128,6 +130,7 @@ async function consultar_orden_tipo(params) {
     })
 }
 
+//*Función para preparara el formulario de nuevo tipo y mostrarlo
 async function mdl_nuevo_orden_tipo() {
     $('[name="nv-tipo-mant"]').each(function () {
         $(this).removeClass('is-invalid');
@@ -146,6 +149,7 @@ async function mdl_nuevo_orden_tipo() {
     $("#mdl-tipo-mant").modal("show");
 }
 
+//*Función para enviar al servidor el nuevo tipo ingresado
 async function nuevo_orden_tipo() {
 
     let validar = ["slc-orden-tp"]
@@ -169,6 +173,7 @@ async function nuevo_orden_tipo() {
     }
 }
 
+//*Función para mostrar mensaje de confirmación al querer eliminarun tipo
 async function msj_eliminar_orden_tipo() {
 
     if (orden_seleccionado.length === 0) {
@@ -179,6 +184,7 @@ async function msj_eliminar_orden_tipo() {
     }
 }
 
+//*Función para enviar al servidor el tipo a eliminar
 async function eliminar_orden_tipo() {
 
     let model = { accion: 3, activo: orden_seleccionado };
@@ -193,6 +199,7 @@ async function eliminar_orden_tipo() {
     }
 }
 
+//*Función para actualizar el orden de los tipos
 async function orden_tipos_mantenimiento(orden_actual) {
     let model = {
         accion: 2,

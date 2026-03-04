@@ -18,6 +18,7 @@ if ($clientejson->accion == 0) {
 
 print(json_encode($respuesta_servidor));
 
+//*Función para consultar la información de la base de datos
 function consultar_orden_tipos($valores)
 {
     include("../conexion.php");
@@ -34,6 +35,7 @@ function consultar_orden_tipos($valores)
     return $datos;
 }
 
+//*Función para registrar un nuevo tipo 
 function nuevo_orden_tipo($valores)
 {
     include("../conexion.php");
@@ -55,6 +57,7 @@ function nuevo_orden_tipo($valores)
     }
 }
 
+//*Función para actualizar el orden de prioridad
 function actualizar_orden_tipos($valores) {
     include("../conexion.php");
 
@@ -85,7 +88,7 @@ function actualizar_orden_tipos($valores) {
     );
 }
 
-
+//*Función para eliminar tipos
 function eliminar_orden_tipo($valores)
 {
     include("../conexion.php");

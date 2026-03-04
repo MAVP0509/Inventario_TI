@@ -305,13 +305,13 @@ async function mdl_nuevo_usuario() {
     await general_select2({
         selectId: 'select-cargo',
         tabla: 'cat_usuarios',
-        campo: 'cargo',
+        campo: 'cargo_sin_sincronizar',
         placeholder: 'Seleccione un cargo',
         dropdownParent: '#mdl-usu',
         tags: true,
     })
 
-    document.getElementById("inp-correo").value='@diavaz.com'
+    document.getElementById("inp-correo").value = '@diavaz.com'
     document.getElementById('mdl-title').textContent = "Nuevo Usuario"
     document.getElementById('mdl-btn-conf').onclick = function () { nuevo_usuario() }
     document.getElementById('mdl-btn-conf').disabled = false
@@ -350,6 +350,7 @@ async function nuevo_usuario() {
     $('#mdl-usu').modal('hide')
 }
 
+//*Función para que aparezca un aviso de confirmación al querer eliminar uno o mas usuarios
 async function mensaje_eliminar() {
 
     if (usuarios_seleccionados.length === 0) {
@@ -360,6 +361,7 @@ async function mensaje_eliminar() {
     }
 }
 
+//*Función para enviar los usuarios a eliminar al servidor
 async function eliminar_usuario() {
     let model = {
         accion: 3,
@@ -379,6 +381,7 @@ async function eliminar_usuario() {
     deseleccionar_todos()
 }
 
+//*Función para deseleccionar los usuarios seleccionados y vaciar la variable usuarios_seleccionados
 function deseleccionar_todos() {
     //  Resetear propiedad "seleccionado"
     datos.forEach(d => d.seleccionado = false);

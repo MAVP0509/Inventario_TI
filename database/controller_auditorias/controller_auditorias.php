@@ -34,6 +34,7 @@ if ($clientejson->accion == 0) {
 
 print(json_encode($respuesta_servidor));
 
+//*Función para consultar las auditorías
 function consultar_auditoria($valores)
 {
     include("../conexion.php");
@@ -70,6 +71,7 @@ function consultar_auditoria($valores)
     return $datos;
 }
 
+//*Función para consultar el último año de auditoría programado
 function consultar_anio_auditoria()
 {
     include("../conexion.php");
@@ -83,6 +85,7 @@ function consultar_anio_auditoria()
     return $fila;
 }
 
+//*Función para guardar el programa de auditoría firmado
 function guardar_programa_auditoria($valores)
 {
     $respuesta = new stdClass();
@@ -150,6 +153,7 @@ function guardar_programa_auditoria($valores)
     return $respuesta;
 }
 
+//*Función para consultar el programa de auditoría subido
 function consultar_auditoria_firmada($valores)
 {
     $base = realpath(__DIR__ . '/../../documentos/auditoria/programa');
@@ -191,6 +195,7 @@ function consultar_auditoria_firmada($valores)
     ];
 }
 
+//*Función para guardar reportes de auditoría
 function guardar_reportes_auditoria($valores)
 {
     include("../conexion.php");
@@ -266,6 +271,7 @@ function guardar_reportes_auditoria($valores)
     return $respuesta;
 }
 
+//*Función para validar reporte subido de un equipo 
 function validar_reporte_año($valores)
 {
     $respuesta = new stdClass();
@@ -298,6 +304,7 @@ function validar_reporte_año($valores)
     return false;
 }
 
+//*Función para consultar reporte de auditoria
 function consultar_reporte_auditoria($valores)
 {
     $respuesta = new stdClass();
@@ -329,6 +336,7 @@ function consultar_reporte_auditoria($valores)
     return $respuesta;
 }
 
+//*Función para unir reportes de auditoría de un mes
 function unir_reportes_auditoria($valores)
 {
     $respuesta = new stdClass();

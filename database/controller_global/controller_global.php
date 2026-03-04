@@ -9,7 +9,7 @@ $respuesta_servidor = new stdClass();
 
 if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = consultar_distintos($clientejson);
-}else if($clientejson-> accion == 1){
+} else if ($clientejson->accion == 1) {
     $respuesta_servidor->resultado = consultar_mantenimientos_vencidos($clientejson);
 } elseif ($clientejson->accion == 2) {
     $respuesta_servidor->resultado = consultar_auditorias_vencidos($clientejson);
@@ -50,6 +50,11 @@ function consultar_distintos($valores)
                         SELECT YEAR(CURDATE()) + 1;       
                         ";
                 break;
+                //*Opción para el select de cargo que no tenga que sincronizarse con su usuario
+            case "cargo_sin_sincronizar":
+                $sql = "SELECT DISTINCT cargo AS cargo_sin_sincronizar FROM `$tabla` WHERE  cargo <> 'NA' ";
+                break;
+
             case "zona":
             case "ubicacion":
             case "evento":
@@ -66,7 +71,7 @@ function consultar_distintos($valores)
     }
 
     $query = mysqli_query($con, $sql);
-    
+
     /* if (!$query) {
         throw new Exception("Error en la consulta: " . mysqli_error($con));
     } */
@@ -84,29 +89,30 @@ function consultar_distintos($valores)
     return $datos;
 }
 
-function consultar_mantenimientos_vencidos(){
+function consultar_mantenimientos_vencidos()
+{
     include("../conexion.php");
 
     $sql = "SELECT COUNT(*) AS total_vencidos FROM mantenimiento WHERE estado = 'Vencido'";
-    $query = mysqli_query($con,$sql);
-    if($query){
+    $query = mysqli_query($con, $sql);
+    if ($query) {
         $result = mysqli_fetch_assoc($query);
         return $result;
-    }else{
+    } else {
         return false;
     }
 }
 
-function consultar_auditorias_vencidos(){
+function consultar_auditorias_vencidos()
+{
     include("../conexion.php");
 
     $sql = "SELECT COUNT(*) AS total_vencidos FROM auditoria WHERE estado = 'Vencido'";
-    $query = mysqli_query($con,$sql);
-    if($query){
+    $query = mysqli_query($con, $sql);
+    if ($query) {
         $result = mysqli_fetch_assoc($query);
         return $result;
-    }else{
+    } else {
         return false;
     }
 }
-?>
