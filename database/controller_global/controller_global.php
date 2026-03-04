@@ -65,7 +65,7 @@ function consultar_distintos($valores)
                 $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE  `$campo` <> 'NA' ORDER BY `$campo` ASC";
                 break;
             case 'nombre':
-                if (isset($valores->filtro) && $valores->filtro == 'bodega') {
+                if (isset($valores->filtro) && $valores->filtro == 'Bodega') {
                     // Solo usuarios que tengan "(Bodega)" en el nombre
                     $sql = "SELECT DISTINCT nombre, id FROM `$tabla` WHERE nombre LIKE '%(Bodega)%' AND habilitado <> 0";
                 } else {

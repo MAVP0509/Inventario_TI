@@ -814,7 +814,7 @@ async function mostrar_traspaso() {
             placeholder: 'Seleccione un usuario',
             dropdownParent: '#mdl-traspaso',
             tags: false,
-            filtro: 'bodega'
+            // filtro: 'Bodega'
         })
 
         await general_select2({
@@ -845,17 +845,26 @@ async function mostrar_traspaso() {
 }
 
 $(document).ready(function () {
-    $('#mdl-estado').on('change', function () {
+    $('#mdl-estado').on('change', async function () {
         const seleccionado = $(this).val();
-        const usuario = JSON.parse(sessionStorage.getItem('user'));
-        const rol = usuario.resultado[3];
+        const filtro = seleccionado === 'Bodega'
 
         if (seleccionado === 'Asignado') {
             $('#mdl-usuario, #mdl-zona, #mdl-ubicacion').prop('disabled', false).addClass('is-requerid');
             document.getElementById('alert-traspaso').style.display = 'block'
+
         } else if (seleccionado === 'Bodega') {
+            await general_select2({
+                selectId: 'mdl-usuario',
+                tabla: 'cat_usuarios',
+                campo: 'nombre',
+                placeholder: 'Seleccione un usuario',
+                dropdownParent: '#mdl-traspaso',
+                tags: false,
+                filtro: filtro
+            })
             $('#mdl-zona, #mdl-ubicacion').prop('disabled', true).removeClass('is-requerid').val('')
-            $('#mdl-usuario').prop('disabled', false).addClass('is-requerid'); // 👈 solo usuario habilitado
+            $('#mdl-usuario').prop('disabled', false).addClass('is-requerid');
             document.getElementById('alert-traspaso').setAttribute('style', 'display:none !important; background-color:#e7f3fe; border-color:#b8daff; color:#004085; padding-right: 4rem;');
         } else {
             $('#mdl-usuario, #mdl-zona, #mdl-ubicacion').prop('disabled', true).removeClass('is-requerid').val('')
