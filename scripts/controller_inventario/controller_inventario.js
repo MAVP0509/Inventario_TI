@@ -798,42 +798,44 @@ async function mostrar_traspaso() {
         const usuario = JSON.parse(sessionStorage.getItem('user'));
         const rol = usuario.resultado[3];
         // Inicialización de selects
-        await general_select2({
-            selectId: 'mdl-estado',
-            tabla: 'inventario_ti_sur',
-            campo: 'estatus',
-            placeholder: 'Seleccione un estatus',
-            dropdownParent: '#mdl-traspaso',
-            tags: false,
-        })
+        await Promise.all([
+            await general_select2({
+                selectId: 'mdl-estado',
+                tabla: 'inventario_ti_sur',
+                campo: 'estatus',
+                placeholder: 'Seleccione un estatus',
+                dropdownParent: '#mdl-traspaso',
+                tags: false,
+            }),
 
         await general_select2({
-            selectId: 'mdl-usuario',
-            tabla: 'cat_usuarios',
-            campo: 'nombre',
-            placeholder: 'Seleccione un usuario',
-            dropdownParent: '#mdl-traspaso',
-            tags: false,
-            // filtro: 'Bodega'
-        })
+                selectId: 'mdl-usuario',
+                tabla: 'cat_usuarios',
+                campo: 'nombre',
+                placeholder: 'Seleccione un usuario',
+                dropdownParent: '#mdl-traspaso',
+                tags: false,
+                // filtro: 'Bodega'
+            }),
 
         await general_select2({
-            selectId: 'mdl-zona',
-            tabla: 'inventario_ti_sur',
-            campo: 'zona',
-            placeholder: 'Seleccione una zona',
-            dropdownParent: '#mdl-traspaso',
-            tags: false,
-        })
+                selectId: 'mdl-zona',
+                tabla: 'inventario_ti_sur',
+                campo: 'zona',
+                placeholder: 'Seleccione una zona',
+                dropdownParent: '#mdl-traspaso',
+                tags: false,
+            }),
 
         await general_select2({
-            selectId: 'mdl-ubicacion',
-            tabla: 'inventario_ti_sur',
-            campo: 'ubicacion',
-            placeholder: 'Seleccione una ubicación',
-            dropdownParent: '#mdl-traspaso',
-            tags: false,
-        })
+                selectId: 'mdl-ubicacion',
+                tabla: 'inventario_ti_sur',
+                campo: 'ubicacion',
+                placeholder: 'Seleccione una ubicación',
+                dropdownParent: '#mdl-traspaso',
+                tags: false,
+            })
+        ]);
 
         selected = false    // Desactiva la opción de generación de resguardo
         // Cambia el icono del checkbox visual a estado "no seleccionado"
@@ -850,6 +852,15 @@ $(document).ready(function () {
         const filtro = seleccionado === 'Bodega'
 
         if (seleccionado === 'Asignado') {
+            await general_select2({
+                selectId: 'mdl-usuario',
+                tabla: 'cat_usuarios',
+                campo: 'nombre',
+                placeholder: 'Seleccione un usuario',
+                dropdownParent: '#mdl-traspaso',
+                tags: false,
+                // filtro: 'Bodega'
+            })
             $('#mdl-usuario, #mdl-zona, #mdl-ubicacion').prop('disabled', false).addClass('is-requerid');
             document.getElementById('alert-traspaso').style.display = 'block'
 
