@@ -731,6 +731,67 @@ async function crear_registro() {
 
 }
 
+async function mostrar_traspaso() {
+    let inputs = document.getElementsByName('traspasos');
+
+    for (let i = 0; i < inputs.length; i++) {
+        inputs[i].value = ""; // Limpia el valor del input
+        inputs[i].classList.remove('is-invalid'); // Elimina la clase de validación
+    }
+    // Verifica si no hay equipos seleccionados
+    if (equipo_seleccionado.length == 0) {
+        mostrar_toast('warning', 'Alerta', 'Selecione al menos un activo. Inténtalo nuevamente.')
+    } else {
+        const usuario = JSON.parse(sessionStorage.getItem('user'));
+        const rol = usuario.resultado[3];
+        // Inicialización de selects
+        await Promise.all([
+            await general_select2({
+                selectId: 'mdl-estado',
+                tabla: 'inventario_ti_sur',
+                campo: 'estatus',
+                placeholder: 'Seleccione un estatus',
+                dropdownParent: '#mdl-traspaso',
+                tags: false,
+            }),
+
+            await general_select2({
+                selectId: 'mdl-usuario',
+                tabla: 'cat_usuarios',
+                campo: 'nombre',
+                placeholder: 'Seleccione un usuario',
+                dropdownParent: '#mdl-traspaso',
+                tags: false,
+            }),
+
+            await general_select2({
+                selectId: 'mdl-zona',
+                tabla: 'inventario_ti_sur',
+                campo: 'zona',
+                placeholder: 'Seleccione una zona',
+                dropdownParent: '#mdl-traspaso',
+                tags: false,
+            }),
+
+            await general_select2({
+                selectId: 'mdl-ubicacion',
+                tabla: 'inventario_ti_sur',
+                campo: 'ubicacion',
+                placeholder: 'Seleccione una ubicación',
+                dropdownParent: '#mdl-traspaso',
+                tags: false,
+            })
+        ]);
+
+        selected = false    // Desactiva la opción de generación de resguardo
+        // Cambia el icono del checkbox visual a estado "no seleccionado"
+        $("#check-resguardo-icon").removeClass("fa-solid fa-square-check")
+        $("#check-resguardo-icon").addClass("fa-regular fa-square ")
+        // Muentra el modal de trapaso
+        $("#mdl-traspaso").modal("show");
+    }
+}
+
 async function traspasos() {
     const usuario = JSON.parse(sessionStorage.getItem('user')); // Obtiene los datos del usuario
     const region = usuario.resultado[2];    // Extrae la región a la que pertenece el usuario
@@ -789,82 +850,15 @@ async function traspasos() {
         mostrar_toast('error', 'Error', 'No se pudo realizar el traspaso. Inténtalo nuevamente.');
     }
 }
-
-async function mostrar_traspaso() {
-    // Verifica si no hay equipos seleccionados
-    if (equipo_seleccionado.length == 0) {
-        mostrar_toast('warning', 'Alerta', 'Selecione al menos un activo. Inténtalo nuevamente.')
-    } else {
-        const usuario = JSON.parse(sessionStorage.getItem('user'));
-        const rol = usuario.resultado[3];
-        // Inicialización de selects
-        await Promise.all([
-            await general_select2({
-                selectId: 'mdl-estado',
-                tabla: 'inventario_ti_sur',
-                campo: 'estatus',
-                placeholder: 'Seleccione un estatus',
-                dropdownParent: '#mdl-traspaso',
-                tags: false,
-            }),
-
-        await general_select2({
-                selectId: 'mdl-usuario',
-                tabla: 'cat_usuarios',
-                campo: 'nombre',
-                placeholder: 'Seleccione un usuario',
-                dropdownParent: '#mdl-traspaso',
-                tags: false,
-                // filtro: 'Bodega'
-            }),
-
-        await general_select2({
-                selectId: 'mdl-zona',
-                tabla: 'inventario_ti_sur',
-                campo: 'zona',
-                placeholder: 'Seleccione una zona',
-                dropdownParent: '#mdl-traspaso',
-                tags: false,
-            }),
-
-        await general_select2({
-                selectId: 'mdl-ubicacion',
-                tabla: 'inventario_ti_sur',
-                campo: 'ubicacion',
-                placeholder: 'Seleccione una ubicación',
-                dropdownParent: '#mdl-traspaso',
-                tags: false,
-            })
-        ]);
-
-        selected = false    // Desactiva la opción de generación de resguardo
-        // Cambia el icono del checkbox visual a estado "no seleccionado"
-        $("#check-resguardo-icon").removeClass("fa-solid fa-square-check")
-        $("#check-resguardo-icon").addClass("fa-regular fa-square ")
-        // Muentra el modal de trapaso
-        $("#mdl-traspaso").modal("show");
-    }
-}
-
+// Cuando el DOM esté completamente cargado en traspasos
 $(document).ready(function () {
+    // Escucha cambios en el select de estado del activo
     $('#mdl-estado').on('change', async function () {
-        const seleccionado = $(this).val();
-        const filtro = seleccionado === 'Bodega'
-
+        const seleccionado = $(this).val(); // Obtiene el valor del estado selecccionado
+        const filtro = seleccionado === 'Bodega'    // true si el estado es bodega, falso en caso contrario
+        // si el estado seleccionado es "Asignado"
         if (seleccionado === 'Asignado') {
-            await general_select2({
-                selectId: 'mdl-usuario',
-                tabla: 'cat_usuarios',
-                campo: 'nombre',
-                placeholder: 'Seleccione un usuario',
-                dropdownParent: '#mdl-traspaso',
-                tags: false,
-                // filtro: 'Bodega'
-            })
-            $('#mdl-usuario, #mdl-zona, #mdl-ubicacion').prop('disabled', false).addClass('is-requerid');
-            document.getElementById('alert-traspaso').style.display = 'block'
-
-        } else if (seleccionado === 'Bodega') {
+            // Carga todos los usuarios en el select (sin filtro)
             await general_select2({
                 selectId: 'mdl-usuario',
                 tabla: 'cat_usuarios',
@@ -874,15 +868,37 @@ $(document).ready(function () {
                 tags: false,
                 filtro: filtro
             })
-            $('#mdl-zona, #mdl-ubicacion').prop('disabled', true).removeClass('is-requerid').val('')
-            $('#mdl-usuario').prop('disabled', false).addClass('is-requerid');
+            // Habilita los campos de usuario, zona y ubicación
+            $('#mdl-usuario, #mdl-zona, #mdl-ubicacion').prop('disabled', false);
+            // Muestra la alerta informativa del traspaso
+            document.getElementById('alert-traspaso').style.display = 'block'
+            // Si el estado seleccionado es "Bodega"
+        } else if (seleccionado === 'Bodega') {
+            // Carga solo los usuarios que tengan "Bodega" en su nombre
+            await general_select2({
+                selectId: 'mdl-usuario',
+                tabla: 'cat_usuarios',
+                campo: 'nombre',
+                placeholder: 'Seleccione un usuario',
+                dropdownParent: '#mdl-traspaso',
+                tags: false,
+                filtro: filtro  // true: filtra solo usuarios de bodega
+            })
+            // Deshabilita y limpia los campos de zona y ubicación (no aplican para bodega)
+            $('#mdl-zona, #mdl-ubicacion').prop('disabled', true).removeClass('is-requerid').val('');
+            // Habilita y marca como requerido solo el campo de usuario
+            $('#mdl-usuario').prop('disabled', false);
+            // Oculta la alerta informativa
             document.getElementById('alert-traspaso').setAttribute('style', 'display:none !important; background-color:#e7f3fe; border-color:#b8daff; color:#004085; padding-right: 4rem;');
+            // Si no se ha seleccionado ningún estado válido
         } else {
-            $('#mdl-usuario, #mdl-zona, #mdl-ubicacion').prop('disabled', true).removeClass('is-requerid').val('')
+            // Deshabilita y limpia todos los campos del formulario
+            $('#mdl-usuario, #mdl-zona, #mdl-ubicacion').prop('disabled', true).val('')
+            // Oculta la alerta informativa
             document.getElementById('alert-traspaso').setAttribute('style', 'display:none !important; background-color:#e7f3fe; border-color:#b8daff; color:#004085; padding-right: 4rem;');
         }
-    })
-})
+    });
+});
 
 async function desactivar_registro() {
     // Se contruye el objeto model de datos necesarios
