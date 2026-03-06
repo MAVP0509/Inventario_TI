@@ -349,71 +349,85 @@ function consultar_anio_mantenimiento()
 
 function unir_reportes_mantenimiento($valores)
 {
-    $respuesta = new stdClass();
+    $respuesta = new stdClass();  // Objeto de respuesta que se retornará al final
 
+    // Rutas del directorio y archivo final donde se guardará el PDF unido
     $carpeta_reporte =  __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->anio . '/reportes_unidos';
     $archivoFinal = $carpeta_reporte . '/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
     $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/' . $valores->anio . '/reportes_unidos/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
 
     try {
+        // Inicializa la librería ilovepdf con las credenciales de la API
         $ilovepdf = new Ilovepdf(
             'project_public_ecd8df30001f3773a605a14a2c0416c9_I--AV17bdca45d44f5b70e44a9960a810a1ab',
             'secret_key_181ece80f4c57be30267facf2f3890af_TcklQ6a753e75d95f5b32aef79aac42c0d33c',
             [
-                'timeout' => 300,
-                'connect_timeout' => 60
+                'timeout' => 300,       // Tiempo máximo de espera para la tarea
+                'connect_timeout' => 60 // Tiempo máximo de espera para la conexión
             ]
         );
-        // Create a new task
+
+        // Crea una nueva tarea de tipo "merge" (unir PDFs)
         $myTaskMerge = $ilovepdf->newTask('merge');
-        // Add files to task for upload
+
+        // Ruta de la carpeta que contiene los PDFs del mes y año indicados
         $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->anio . '/' . $valores->mes;
 
+        // Verifica que la carpeta exista, si no retorna un error
         if (!is_dir($carpeta)) {
             $respuesta->error = "No se pudo encontrar la ruta";
             return $respuesta;
         }
 
+        // Obtiene todos los archivos de la carpeta, excluyendo "." y ".."
         $archivos = array_diff(scandir($carpeta), ['.', '..']);
 
-        $ruta = [];
+        $ruta = [];  // Arreglo para almacenar las rutas de los PDFs encontrados
 
         foreach ($archivos as $archivo) {
 
             $rutaCompleta = $carpeta . '/' . $archivo;
 
-            if (is_file($rutaCompleta) && strtolower(pathinfo($archivo, PATHINFO_EXTENSION)) === 'pdf') {  //  ignora carpetas
+            // Solo agrega al arreglo los archivos con extensión PDF, ignora carpetas y otros tipos
+            if (is_file($rutaCompleta) && strtolower(pathinfo($archivo, PATHINFO_EXTENSION)) === 'pdf') {
                 $ruta[] = $rutaCompleta;
             }
         }
 
+        // Si no se encontraron PDFs en la carpeta, retorna un error
         if (empty($ruta)) {
             $respuesta->error = "No se pudo encontrar los archivos";
             return $respuesta;
         }
 
+        // Agrega cada PDF encontrado a la tarea de merge
         foreach ($ruta as $archivo) {
             $myTaskMerge->addFile($archivo);
         }
 
-        // Crear carpeta antes de descargar
+        // Crea la carpeta de destino si no existe
         if (!is_dir($carpeta_reporte)) {
             mkdir($carpeta_reporte, 0777, true);
         }
 
-        // Execute the task
+        // Ejecuta la tarea de unión en la API de ilovepdf
         $myTaskMerge->execute();
+
+        // Descarga el PDF resultante en la carpeta de destino
         $myTaskMerge->download($carpeta_reporte);
 
-        //*Renombrando el pdf generado
+        // Ruta del archivo descargado por defecto (ilovepdf lo llama "merged.pdf")
         $archivoDescargado = $carpeta_reporte . '/merged.pdf';
 
+        // Nuevo nombre que se le asignará al archivo descargado
         $nuevoNombre = $archivoFinal;
 
+        // Verifica que el archivo descargado exista antes de renombrarlo
         if (file_exists($archivoDescargado)) {
+
+            // Intenta renombrar el archivo con el nombre definido
             if (rename($archivoDescargado, $nuevoNombre)) {
                 $respuesta->mensaje = "Archivos unidos correctamente";
-                //$respuesta->error = "Archivo renombrado correctamente a $nuevoNombre";
             } else {
                 $respuesta->error =  "Error al renombrar el archivo";
                 return $respuesta;
@@ -423,14 +437,18 @@ function unir_reportes_mantenimiento($valores)
             return $respuesta;
         }
 
+        // Guarda la URL pública del archivo generado en la respuesta
         $respuesta->ruta = $carpetaUrl;
     } catch (\Ilovepdf\Exceptions\AuthException $e) {
+        // Error de autenticación con la API de ilovepdf
         $respuesta->error = "Error de autenticación Ilovepdf: " . $e->getMessage();
     } catch (\Ilovepdf\Exceptions\TaskException $e) {
+        // Error durante la ejecución de la tarea en ilovepdf
         $respuesta->error = "Error en la tarea Ilovepdf: " . $e->getMessage();
     } catch (\Exception $e) {
+        // Cualquier otro error no contemplado
         $respuesta->error = "Error general: " . $e->getMessage();
     }
 
-    return $respuesta;
+    return $respuesta;  // Retorna la respuesta con el mensaje, ruta o error según corresponda
 }

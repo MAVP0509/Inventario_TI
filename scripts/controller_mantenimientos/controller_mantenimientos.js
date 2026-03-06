@@ -539,34 +539,19 @@ function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
     }
     // Calcular mantenimientos pendientes
     // Crea un objeto organizado por año y mes con la cantidad de mantenimientos pendientes
-    // mantenimientosPendientes = Object.values(datos.reduce((objeto, item) => {
-    //     // Si está realizado, no lo cuenta como pendiente
-    //     if (item.estado == "Realizado") return objeto
-    //     let anio = item.anio
-    //     let mes = item.fecha.split('-')[1]
-    //     // Si el año no existe en el objeto, lo inicializa
-    //     if (!objeto[anio]) {
-    //         objeto[anio] = { anio: anio, meses: {} };
-    //     }
-    //     // Incrementa el contador de ese mes (o lo inicializa en 1)
-    //     objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
-    //     return objeto
-    // }, {}));
-
-    mantenimientosPendientes = Object.values(
-        (datos_globales && datos_globales.length > 0 ? datos_globales : datos)
-            .reduce((objeto, item) => {
-                if (item.estado == "Realizado") return objeto
-                let anio = item.anio
-                let mes = item.fecha.split('-')[1]
-                if (!objeto[anio]) {
-                    objeto[anio] = { anio: anio, meses: {} };
-                }
-                objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
-                return objeto
-            }, {})
-    );
-
+    mantenimientosPendientes = Object.values(datos.reduce((objeto, item) => {
+        // Si está realizado, no lo cuenta como pendiente
+        if (item.estado == "Realizado") return objeto
+        let anio = item.anio
+        let mes = item.fecha.split('-')[1]
+        // Si el año no existe en el objeto, lo inicializa
+        if (!objeto[anio]) {
+            objeto[anio] = { anio: anio, meses: {} };
+        }
+        // Incrementa el contador de ese mes (o lo inicializa en 1)
+        objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
+        return objeto
+    }, {}));
 
     return tabla;   // Retorna la tabla
 }
@@ -904,32 +889,33 @@ async function mdl_reporte_mantenimiento(elemento_mnt) {
 }
 
 async function reporte_mantenimiento(elemento_mnt) {
-
+    // Se define los elementos a validar
     const validacion = ["slc-encargado"];
-
+    // Validar que todos los campos requeridos estén llenos
     if (!validar_campos(validacion)) {
         mostrar_toast('error', 'Error', 'Rellena los campos. Inténtelo nuevamente.');
         return; // Termina función si no es válido
     }
-
+    // Construcción de modelo de datos que se envía al servidor
     let model = {
         accion: 4,
         elementos: elemento_mnt,
         encargado: $("#slc-encargado").select2('data')[0].text
     }
-
+    // Mostrar notificación de carga
     mostrar_toast_cargando("Generando reporte de mantenimiento...")
-    // document.getElementById("btn-reporte-mant").disabled = true;
+    // Deshabilita el botón de envio de datos
     $("#btn-reporte-mant").prop("disabled", true);
-
+    // Envia solicitud al servidor
     let server = await server_excel(model);
-
+    // Procesa la respuesta del servidor
     if (server.resultado.result === true && server.resultado.url) {
-        window.location = server.resultado.url;
-        $('#mdl-reporte-mant').modal("hide");
-        table.updateData([{ id: elemento_mnt.id, reporte_descargado: 1, estado: "En proceso" }])
-        mostrar_toast('success', '¡Generación de reporte exitoso!', 'La generación de reporte de mantenimiento se ha realizado correctamente.');
+        window.location = server.resultado.url; // Descargar un archivo redirigiendo a la URL
+        $('#mdl-reporte-mant').modal("hide");   // Cierra en modal
+        table.updateData([{ id: elemento_mnt.id, reporte_descargado: 1, estado: "En proceso" }])    // Actualiza la información de una sola fila
+        mostrar_toast('success', '¡Generación de reporte exitoso!', 'La generación de reporte de mantenimiento se ha realizado correctamente.'); // Muestra mensaje de éxito
     } else {
+        // Mensaje de error
         mostrar_toast('error', '¡Error!', 'No se pudo generar el reporte de mantenimiento. Inténtelo nuevamente.');
         $('#btn-reporte-mant').prop('disabled', false);
     }
@@ -953,47 +939,44 @@ function rellenar_select(texto, select) {
 //todo Subida de reportes de mantenimiento
 FilePond.registerPlugin(FilePondPluginFileValidateType);
 
-let pond
+let pond // Instancia de FilePond
 //* Variable utilizada para guardar temporalmente el archivo y asi poder ser eliminado desde otra función
 let fileItemCargado
 async function abrir_subir_reporte(elemento_mnt) {
     //*Escondiendo el alert
     document.getElementById('alert-reporte').setAttribute('style', 'display: none !important;  background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;');
-
     //*Escondiendo el visor de pdf
     $('#ver-pdf-reporte').hide()
-
+    // Si la instancia está creada
     if (pond) {
         pond.destroy();   //* <- Esto destruye la instancia anterior, lo cual es necesario
     }
-
     //* Al destruir la instancia es necesario colocarle de nuevo el name al input, sino, no aceptará el archivo el php
     $('#subir-reporte').attr('name', 'reporte_mantenimiento');
-
+    // Obtener la referencia al input file
     let fileReporte = document.getElementById('subir-reporte')
 
-    //datos_documento = [id,fechaMnto]
     let fecha = elemento_mnt.fecha.split('-')
     let anio = {}
     anio.value = fecha[0]
-    // console.log(anio);
-    // Create a FilePond instance
+    // Crear instancia de FilePond con configuración personalizada
     pond = FilePond.create(fileReporte, {
-        maxFiles: 1,
+        maxFiles: 1,    // Solo permitir un archivo a la vez
         labelIdle: 'Arrastra y suelta tu archivo .pdf o <span class="filepond--label-action"> Examina </span>',
-        allowMultiple: false,
-        dropOnPage: true,
-        dropValidation: true,
-        instantUpload: false,
-        acceptedFileTypes: ['application/pdf'],
+        allowMultiple: false,   // No permitir múltiples archivos
+        dropOnPage: true,   // No permitir drop en toda la página
+        dropValidation: true,   // Habilitar la validación al soltar
+        instantUpload: false,   // No subir automáticamente
+        acceptedFileTypes: ['application/pdf'], // Solo aceptar PDFs
         labelFileTypeNotAllowed: 'Archivo no válido solo .pdf',
+        // Configuración del servidor para la carga
         server: {
             process: {
                 url: "database/controller_mantenimientos/controller_mantenimientos.php",
                 method: 'POST',
-                name: 'reporte_mantenimiento',
+                name: 'reporte_mantenimiento',  // Nombre del campo en $_FILES
                 withCredentials: false,
-                ondata: (formData) => {
+                ondata: (formData) => { // Modificar el FormData antes de enviar
                     const trama = {
                         accion: 1,
                         id_equipo: elemento_mnt.id,
@@ -1002,7 +985,7 @@ async function abrir_subir_reporte(elemento_mnt) {
                     formData.append('trama', JSON.stringify(trama));
                     return formData;
                 },
-                onload: (response) => {
+                onload: (response) => { // Manejar respuesta exitosa del servidor
                     try {
                         const data = JSON.parse(response); // <- convierte string en objeto
                         if (data.resultado.error) {
@@ -1022,7 +1005,7 @@ async function abrir_subir_reporte(elemento_mnt) {
                         console.error("Error al parsear respuesta:", e);
                     }
                 },
-                onerror: (error) => {
+                onerror: (error) => {   // Manejar errores de red o servidor
                     console.error('Error al subir:', error);
                     alert("Error al subir archivo.");
                 }
@@ -1041,7 +1024,6 @@ async function abrir_subir_reporte(elemento_mnt) {
         }
 
         fileItemCargado = fileItem; // <-- guardar archivo
-
         // Generar URL temporal para el archivo PDF
         fileToOpen = URL.createObjectURL(fileItem.file);
 
@@ -1051,7 +1033,7 @@ async function abrir_subir_reporte(elemento_mnt) {
         $('#ver-pdf-reporte').show()
 
     });
-
+    // Valida la existencia de un reporte en ese formato de fecha
     let server = await server_mantenimiento({ accion: 2, id_equipo: elemento_mnt.id, fecha_mnto: elemento_mnt.fecha })
 
     if (server.resultado) {
@@ -1225,66 +1207,64 @@ async function mdl_descargar_reportes_mensuales() {
 $(document).ready(function () {
     $('[data-toggle="popover"]').popover();
 })
-
+//* Consulta y determina qué meses tienen todos sus mantenimientos completados
 function consultar_reportes_mensuales() {
 
-    let meses = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
-    let mesesConMantenimientos = Object.keys(mantenimientosPendientes[0].meses)
-
+    let meses = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']    // Lista de todos los meses del año
+    let mesesConMantenimientos = Object.keys(mantenimientosPendientes[0].meses)  // Meses que aún tienen mantenimientos pendientes
+    // Filtra los meses que NO tienen pendientes (completados) y los convierte a número
     let mesesCompletados = meses.filter(elemento => !mesesConMantenimientos.includes(elemento)).map(Number)
 
-    cargarMeses(mesesCompletados)
+    cargarMeses(mesesCompletados)   // Carga las tarjetas visuales con los meses disponibles
 }
-
+// Nombres de los meses para mostrar en las tarjetas
 const mesesNombres = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
-
+// * Genera y renderiza las tarjetas de cada mes indicando si están disponibles o no
 function cargarMeses(mesesDisponibles = []) {
     const cont = document.getElementById("mesesContainer");
-    cont.innerHTML = "";
+    cont.innerHTML = "";    // Limpia el contenedor antes de renderizar
 
     mesesNombres.forEach((mes, i) => {
-        const numMes = i + 1;
-        let disponible = mesesDisponibles.includes(numMes);
-
+        const numMes = i + 1;   // Número del mes (1-12)
+        let disponible = mesesDisponibles.includes(numMes); // Verifica si el mes está en la lista de disponibles
+        // Crea el elemento de la tarjeta y le asigna la clase según disponibilidad
         const card = document.createElement("div");
         card.className = "mes-card " + (disponible ? "disponible" : "no-disponible");
-
+        // Inserta el contenido visual de la tarjeta con nombre y estatus
         card.innerHTML = `
             <div class="mes-nombre">${mes}</div>
             <div class="mes-status">${disponible ? "Disponible" : "No disponible"}</div>
         `;
-
+        // Solo los meses disponibles tienen acción de clic para descargar
         if (disponible) {
             let numeroMes = numMes.toString().padStart(2, '0') //Si es un digito, se añade un cero a la izquierda
-            card.onclick = () => descargarMes(numeroMes);
+            card.onclick = () => descargarMes(numeroMes);   // Asigna el evento de descarga al hacer clic
         }
-
-        cont.appendChild(card);
+        cont.appendChild(card); // Agrega la tarjeta al contenedor
     });
 }
-
+//* Une y descarga el reporte PDF del mes seleccionado
 async function descargarMes(mes) {
-    dominio = window.location.hostname
-    puerto = location.port
+    dominio = window.location.hostname  // Obtiene el dominio actual
+    puerto = location.port              // Obtiene el puerto actual
     // console.log("Descargando mes:", mes);
-    mantenimiento_loading = true
+    mantenimiento_loading = true    // Activa el estado de carga
+    // Muestra alerta de espera al usuario
     alert_cargando('Uniendo los reportes, esto tardará, por favor espere...')
+    // Envía la solicitud al servidor para unir los reportes del mes y año indicados
     let server = await server_mantenimiento({ accion: 5, anio: mantenimientosPendientes[0].anio, mes: mes })
 
     if (server.resultado.mensaje) {
-        mostrar_toast('success', '¡Éxito!', server.resultado.mensaje)
-
-        let ruta = `${location.origin}${server.resultado.ruta}`;
-
-        window.open(ruta, '_blank');
-
+        mostrar_toast('success', '¡Éxito!', server.resultado.mensaje)   // Muestra mensaje de éxito
+        let ruta = `${location.origin}${server.resultado.ruta}`;    // Construye la URL completa del PDF generado
+        window.open(ruta, '_blank');    // Abre el PDF en una nueva pestaña
     } else if (server.resultado.error) {
-        mostrar_toast('error', '¡Error!', server.resultado.mensaje)
+        mostrar_toast('error', '¡Error!', server.resultado.mensaje) // Muestra mensaje de error del servidor
     } else {
-        mostrar_toast('error', '¡Error!', 'Hubo un problema')
+        mostrar_toast('error', '¡Error!', 'Hubo un problema')     // Muestra mensaje de error genérico
     }
 }
 // TODO: Funciones para consultar y cargar programa de mant.

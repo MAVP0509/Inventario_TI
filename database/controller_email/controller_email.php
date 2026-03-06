@@ -9,20 +9,9 @@ $clientejson = json_decode($_POST['trama']);
 
 $respuesta_servidor = new stdClass();
 
-
-/* $persona= new stdClass();
-    $persona->Nombre = "oswaldo";
-    $persona->fechanac = date("Y-m-d H:i:s");
-    print("Hola soy".$persona->Nombre ."hoy es". $persona->fechanac  );
- */
-
-// print($persona->Nombre);
-//var_dump($persona);
-//print($clientejson->nombre);
-
 if ($clientejson->accion == 0) {
     $respuesta_servidor->resultado = verificar_email($clientejson);
-}else if ($clientejson->accion == 1) {
+} else if ($clientejson->accion == 1) {
     $respuesta_servidor->resultado = email_reporte_mantenimiento($clientejson);
 } else if ($clientejson->accion == 2) {
     $respuesta_servidor->resultado = correo_reporte_auditoria($clientejson);
@@ -151,11 +140,6 @@ function email_recuperacion($destino, $token)
 
         // Enviar el correo
         $mail->send();
-        /* if ($mail->send()) {
-                return "correo enviado correctamente.";
-            } else {
-                return "Error al enviar el correo";
-            } */
         return true;
     } catch (Exception $e) {
         return false;
@@ -164,6 +148,7 @@ function email_recuperacion($destino, $token)
 
 function email_reporte_mantenimiento($valores)
 {
+    // Incluye las librerías necesarias para el envío de correos y la conexión a BD
     include("../email/Exception.php");
     include("../email/PHPMailer.php");
     include("../email/SMTP.php");
@@ -171,13 +156,12 @@ function email_reporte_mantenimiento($valores)
 
     $mail = new PHPMailer();
 
-    $datos_equipo = $valores->datos;
-    $anio = $datos_equipo->anio;
-    $id_equipo = $datos_equipo->id;
-    $region_val = $datos_equipo->zona ?? '';
+    $datos_equipo = $valores->datos;        // Datos del equipo a mantener
+    $anio = $datos_equipo->anio;            // Año del mantenimiento
+    $id_equipo = $datos_equipo->id;         // ID del equipo
+    $region_val = $datos_equipo->zona ?? ''; // Zona/región del equipo
 
-    // Generar número de reporte basado en región + secuencia de mantenimiento
-    // Prefijos por región
+    // Define el prefijo del folio según la región del equipo
     $prefijo = 'MTO';
     $r_lower = mb_strtolower($region_val);
     if (strpos($r_lower, 'sur') !== false) {
@@ -188,32 +172,33 @@ function email_reporte_mantenimiento($valores)
         $prefijo = 'MTO-PR-';
     }
 
-    //Verificar su ya tiene folio asignado
+    // Verifica si el equipo ya tiene un folio de reporte asignado
     $check_sql = "SELECT num_reporte FROM mantenimiento WHERE id_equipo = '$id_equipo' AND anio = '$anio'";
     $check_q = mysqli_query($con, $check_sql);
     $check_row = mysqli_fetch_assoc($check_q);
 
     if (!empty($check_row['num_reporte'])) {
-        // Si ya tiene folio, reutilizarlo
+        // Si ya tiene folio, lo reutiliza para no generar duplicados
         $report_code = $check_row['num_reporte'];
     } else {
-        // Generar nuevo folio
+        // Cuenta cuántos reportes existen en la misma región para generar el siguiente número de secuencia
         $seq_sql = "SELECT COUNT(*) AS cnt FROM mantenimiento m
                 INNER JOIN inventario_ti_sur inv ON inv.id = m.id_equipo
                 WHERE m.num_reporte IS NOT NULL
                 AND inv.zona LIKE '%$region_val%'";
-                // Agregar condición : AND m.anio = '$anio' para que el folio reinicie por año
+        // Nota: agregar AND m.anio = '$anio' si se desea reiniciar la secuencia por año
         $seq_q = mysqli_query($con, $seq_sql);
         $seq_num = 0;
         if ($seq_q) {
             $seq_row = mysqli_fetch_assoc($seq_q);
             $seq_num = (int)$seq_row['cnt'];
         }
-        // siguiente número en la secuencia
-        $seq_num++;
-        $seq_formatted = str_pad($seq_num, 3, '0', STR_PAD_LEFT);
-        $report_code = $prefijo . $seq_formatted;
-        // Guardar el folio en la bd
+
+        $seq_num++;     // Incrementa la secuencia para el nuevo folio
+        $seq_formatted = str_pad($seq_num, 3, '0', STR_PAD_LEFT);  // Formatea con ceros a la izquierda (ej. 001)
+        $report_code = $prefijo . $seq_formatted;                   // Construye el folio completo (ej. MTO-VHA-001)
+
+        // Guarda el nuevo folio en la base de datos
         mysqli_query($con, "UPDATE mantenimiento SET num_reporte = '$report_code' WHERE id_equipo = '$id_equipo' AND anio = '$anio'");
     }
 
@@ -233,15 +218,11 @@ function email_reporte_mantenimiento($valores)
         // Configuración del remitente y destinatario
         $mail->setFrom('diavazdsp@diavaz.com', 'Inventario TI');
         $mail->addAddress($valores->correo, 'Destinatario');
-        //$IP = exec("curl https://checkip.amazonaws.com");
-        //$Puerto = $_SERVER['SERVER_PORT'];
-
-        //$reset_link = "http://$destino->dominio:$destino->puerto/Inventario_TI/recuperacion.html?ftygui=$token";
-        // $mail->addReplyTo('otra-direccion@dominio.com', 'Responder a'); // Opcional: dirección de respuesta
 
         // Contenido del correo
         $mail->isHTML(true); // Usar HTML en el correo
-        $mail->Subject = 'Mantenimiento de equipo: ' . $valores->datos->tipo . ' Folio '. $report_code;
+        $mail->Subject = 'Mantenimiento de equipo: ' . $valores->datos->tipo . ' Folio ' . $report_code;
+        // Cuerpo del correo en HTML con la información del equipo y tabla de detalles
         $mail->Body =
             '<html>
                 <body style="font-family: Arial, sans-serif; background-color: #f9fafc; color: #333; margin: 0; padding: 0;">
@@ -290,37 +271,33 @@ function email_reporte_mantenimiento($valores)
                     </div>
                 </body>
             </html>';
-        $mail->AltBody = 'Mantenimiento de equipos';
+        $mail->AltBody = 'Mantenimiento de equipos';    // Versión de texto plano como alternativa
 
         // Enviar el correo
         $mail->send();
-        /* if ($mail->send()) {
-                return "correo enviado correctamente.";
-            } else {
-                return "Error al enviar el correo";
-            } */
-
+        // Marca el correo como enviado en la tabla de mantenimiento
         $sql = "UPDATE mantenimiento SET correo_enviado = 1 WHERE id_equipo = '$datos_equipo->id' AND  anio = '$datos_equipo->anio'";
-        if(!mysqli_query($con,$sql)){
+        if (!mysqli_query($con, $sql)) {
             return "No se pudo actualizar la BD";
         }
-
-        if($valores->datos->usuario !== 'NA'){
+        // Si el usuario no es 'NA', guarda o actualiza su correo en el catálogo de usuarios
+        if ($valores->datos->usuario !== 'NA') {
             $user = $valores->datos->usuario;
             $sql_correo_usuario = "UPDATE cat_usuarios SET correo_usuario = '$valores->correo' WHERE nombre = '$user'";
-            if(!mysqli_query($con,$sql_correo_usuario)){
+            if (!mysqli_query($con, $sql_correo_usuario)) {
                 return "No se pudo guardar el correo";
             }
         }
-        
-        return true;
+
+        return true;    // Retorna true si todo fue exitoso
     } catch (Exception $e) {
-        return false;
+        return false;   // Retorna false si ocurre algún error durante el envío
     }
 }
 
 function correo_reporte_auditoria($valores)
 {
+    // Incluye las librerías necesarias para el envío de correos y la conexión a BD
     include("../email/Exception.php");
     include("../email/PHPMailer.php");
     include("../email/SMTP.php");
@@ -328,7 +305,7 @@ function correo_reporte_auditoria($valores)
 
     $mail = new PHPMailer();
 
-    $datos_equipo = $valores->datos;
+    $datos_equipo = $valores->datos;    // Datos del equipo a auditar
 
     try {
         // Configuración del servidor SMTP
@@ -346,15 +323,11 @@ function correo_reporte_auditoria($valores)
         // Configuración del remitente y destinatario
         $mail->setFrom('diavazdsp@diavaz.com', 'Inventario TI');
         $mail->addAddress($valores->correo, 'Destinatario');
-        //$IP = exec("curl https://checkip.amazonaws.com");
-        //$Puerto = $_SERVER['SERVER_PORT'];
-
-        //$reset_link = "http://$destino->dominio:$destino->puerto/Inventario_TI/recuperacion.html?ftygui=$token";
-        // $mail->addReplyTo('otra-direccion@dominio.com', 'Responder a'); // Opcional: dirección de respuesta
 
         // Contenido del correo
         $mail->isHTML(true); // Usar HTML en el correo
-        $mail->Subject = 'Notificación de Auditoría TI: '.$valores->datos->tipo. ' Folio '.$valores->datos->id;
+        $mail->Subject = 'Notificación de Auditoría TI: ' . $valores->datos->tipo . ' Folio ' . $valores->datos->id;
+        // Cuerpo del correo en HTML con la información del equipo y tabla de detalles
         $mail->Body =
             '<html>
                 <body style="font-family: Arial, sans-serif; background-color: #f9fafc; color: #333; margin: 0; padding: 0;">
@@ -403,32 +376,29 @@ function correo_reporte_auditoria($valores)
                     </div>
                 </body>
             </html>';
-        $mail->AltBody = 'Auditoría de equipos';
+
+        $mail->AltBody = 'Auditoría de equipos';    // Versión de texto plano como alternativa
 
         // Enviar el correo
         $mail->send();
-        /* if ($mail->send()) {
-                return "correo enviado correctamente.";
-            } else {
-                return "Error al enviar el correo";
-            } */
 
+        // Marca el correo como enviado en la tabla de auditoría
         $sql = "UPDATE auditoria SET correo_enviado = 1 WHERE id_equipo = '$datos_equipo->id' AND  anio = '$datos_equipo->anio'";
         // var_dump($sql);
-        if(!mysqli_query($con,$sql)){
+        if (!mysqli_query($con, $sql)) {
             return "No se pudo actualizar la BD";
         }
-
-        if($valores->datos->usuario !== 'NA'){
+        // Si el usuario no es 'NA', guarda o actualiza su correo en el catálogo de usuarios
+        if ($valores->datos->usuario !== 'NA') {
             $user = $valores->datos->usuario;
             $sql_correo_usuario = "UPDATE cat_usuarios SET correo_usuario = '$valores->correo' WHERE nombre = '$user'";
-            if(!mysqli_query($con,$sql_correo_usuario)){
+            if (!mysqli_query($con, $sql_correo_usuario)) {
                 return "No se pudo guardar el correo";
             }
         }
-        
-        return true;
+
+        return true;    // Retorna true si todo fue exitoso
     } catch (Exception $e) {
-        return false;
+        return false;   // Retorna false si ocurre algún error durante el envío
     }
 }
