@@ -570,7 +570,6 @@ function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
         return objeto
     }, {}));
 
-    console.log(mantenimientosPendientes)
     return tabla;   // Retorna la tabla
 
 }

@@ -267,6 +267,16 @@ function construirTabs(regiones, datos) {
             tabla_aud = tablas_por_region[tabId];
             //* Actualizar datos_auditoria con los datos filtrados del tab actual
             datos_auditoria = tabla_aud.getData();
+            auditorias_pendientes = Object.values(datos_auditoria.reduce((objeto, item) => {
+                if (item.estado == "Realizado") return objeto
+                let anio = item.anio
+                let mes = item.fecha.split('-')[1]
+                if (!objeto[anio]) {
+                    objeto[anio] = { anio: anio, meses: {} };
+                }
+                objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
+                return objeto
+            }, {}));
         }
 
         //* Si la tabla no ha sido creada, crearla
@@ -990,6 +1000,28 @@ async function reporte_auditoria_firmado(elemento_aud) {
         charco2.destroy();   //? <- Esto destruye la instancia anterior, lo cual es necesario
     }
 
+    let rolUsuario = JSON.parse(sessionStorage.getItem('user')).resultado[3]
+    let regionUsuario = JSON.parse(sessionStorage.getItem('user')).resultado[2]
+    let region = ''
+    switch (tabActual) {
+        case 'regin-norte':
+            region = 'norte'
+            break;
+        case 'regin-sur':
+            region = 'sur'
+            break;
+        case 'regin-tampico':
+            region = 'tampico'
+            break;
+
+        default:
+            break;
+    }
+
+    if (rolUsuario === 'user') {
+        region = regionUsuario
+    }
+
     //? Al destruir la instancia es necesario colocarle de nuevo el name al input, sino, no aceptará el archivo el php
     $('#subir-reporte-aud').attr('name', 'reporte_aud');
 
@@ -1019,7 +1051,8 @@ async function reporte_auditoria_firmado(elemento_aud) {
                     const trama = {
                         accion: 4,
                         id_equipo: elemento_aud.id,
-                        fecha_aud: elemento_aud.fecha
+                        fecha_aud: elemento_aud.fecha,
+                        region: region
                     };
                     formData.append('trama', JSON.stringify(trama));
                     return formData;
@@ -1053,7 +1086,7 @@ async function reporte_auditoria_firmado(elemento_aud) {
     let abrirArchivo;
 
 
-    let server = await server_auditoria({ accion: 5, id_equipo: elemento_aud.id, fecha_aud: elemento_aud.fecha })
+    let server = await server_auditoria({ accion: 5, id_equipo: elemento_aud.id, fecha_aud: elemento_aud.fecha, region: region })
 
     if (server.resultado) {
         document.getElementById('alert-aud-reporte').style.display = 'block'
@@ -1078,10 +1111,32 @@ document.addEventListener('FilePond:removefile', (e) => {
 
 //*Función para mostrar el reporte subido al sistema
 async function consultar_reporte_firmado(elemento_aud) {
+    let rolUsuario = JSON.parse(sessionStorage.getItem('user')).resultado[3]
+    let regionUsuario = JSON.parse(sessionStorage.getItem('user')).resultado[2]
+    let region = ''
+    switch (tabActual) {
+        case 'regin-norte':
+            region = 'norte'
+            break;
+        case 'regin-sur':
+            region = 'sur'
+            break;
+        case 'regin-tampico':
+            region = 'tampico'
+            break;
+
+        default:
+            break;
+    }
+
+    if (rolUsuario === 'user') {
+        region = regionUsuario
+    }
     let model = {
         accion: 6,
         id_equipo: elemento_aud.id,
-        fecha_aud: elemento_aud.fecha
+        fecha_aud: elemento_aud.fecha,
+        region: region
     }
 
     let server = await server_auditoria(model);
@@ -1211,12 +1266,30 @@ async function mdl_auditoria_info(elemento_aud) {
 
 //* Funciones para la descargar mensual de reportes
 async function mdl_reportes_mensuales() {
+    if (tabActual === 'todas') {
+        mostrar_toast('warning', 'Advertencia', 'Porfavor escoja la vista de una región')
+        return
+    }
+    let region = ''
+    switch (tabActual) {
+        case 'regin-norte':
+            region = 'región norte'
+            break;
+        case 'regin-sur':
+            region = 'región sur'
+            break;
+        case 'regin-tampico':
+            region = 'región tampico'
+            break;
+
+        default:
+            break;
+    }
     const cont = document.getElementById("contenedor-mes");
     cont.innerHTML = "";
 
     let año = auditorias_pendientes[0].anio
-    console.log(auditorias_pendientes[0].anio);
-    $('#descargar-text-aud').text(`Descargar reportes mensuales del año ${año}`)
+    $('#descargar-text-aud').text(`Descargar reportes mensuales ${region} del año ${año}`)
 
 
     consulta_reportes_mensuales()
@@ -1273,11 +1346,33 @@ function carga_meses(meses = []) {
 
 //*Función para pedir al servidor los reportes unidos de un mes
 async function unir_reportes_mes(mes) {
+    let rolUsuario = JSON.parse(sessionStorage.getItem('user')).resultado[3]
+    let regionUsuario = JSON.parse(sessionStorage.getItem('user')).resultado[2]
+
+    let region = ''
+    switch (tabActual) {
+        case 'regin-norte':
+            region = 'norte'
+            break;
+        case 'regin-sur':
+            region = 'sur'
+            break;
+        case 'regin-tampico':
+            region = 'tampico'
+            break;
+
+        default:
+            break;
+    }
+
+    if (rolUsuario === 'user') {
+        region = regionUsuario
+    }
     auditoria_loading = true;
 
     alert_cargando('Uniendo reportes, esto tomará un tiempo, por favor espere...');
 
-    let server = await server_auditoria({ accion: 7, anio: auditorias_pendientes[0].anio, mes: mes });
+    let server = await server_auditoria({ accion: 7, anio: auditorias_pendientes[0].anio, mes: mes,region:region });
 
     if (server.resultado.mensaje) {
         mostrar_toast('success', '¡Éxito!', server.resultado.mensaje);
