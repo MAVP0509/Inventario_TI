@@ -58,7 +58,7 @@ function insertar_datos($valores)
             $cargo = mysqli_real_escape_string($con, $valores->cargo);
             $region = mysqli_real_escape_string($con, $valores->region);
             // Inserta el nuevo usuario en el catálogo de usuarios
-            $sql_insert = "INSERT INTO cat_usuarios(nombre, cargo,region,correo,habilitado) VALUES ('$nombre', '$cargo','$region','@diavaz.com',1);";
+            $sql_insert = "INSERT INTO cat_usuarios(nombre, cargo,region,correo_usuario,habilitado) VALUES ('$nombre', '$cargo','$region','@diavaz.com',1);";
             mysqli_query($con, $sql_insert);
             // Consulta el ID del usuario recién insertado
             $sql_get_id = "SELECT id FROM cat_usuarios WHERE nombre = '$nombre' AND cargo = '$cargo';";

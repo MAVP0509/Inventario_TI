@@ -620,3 +620,4 @@ Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_J
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Rednar_García_Harcía.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Rednar_García_Harcía.pdf using filter : calc_pdf_Export
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Hernan_Castro_Cantarell.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Hernan_Castro_Cantarell.pdf using filter : calc_pdf_Export
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Gabriela_Morales_Gallegos.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Gabriela_Morales_Gallegos.pdf using filter : calc_pdf_Export
+El sistema no puede encontrar la ruta especificada.
