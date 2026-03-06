@@ -1273,10 +1273,15 @@ async function mdl_auditoria_info(elemento_aud) {
 
 //* Funciones para la descargar mensual de reportes
 async function mdl_reportes_mensuales() {
-    if (tabActual === 'todas') {
-        mostrar_toast('warning', 'Advertencia', 'Porfavor escoja la vista de una región')
-        return
+    let rolUsuario = JSON.parse(sessionStorage.getItem('user')).resultado[3]
+    if (rolUsuario === 'admin') {
+        if (tabActual === 'todas') {
+            console.log(tabActual)
+            mostrar_toast('warning', 'Advertencia', 'Porfavor escoja la vista de una región')
+            return
+        }
     }
+
     let region = ''
     switch (tabActual) {
         case 'regin-norte':
@@ -1295,6 +1300,10 @@ async function mdl_reportes_mensuales() {
     const cont = document.getElementById("contenedor-mes");
     cont.innerHTML = "";
 
+    if (datos_auditoria.length == 0 ) {
+        mostrar_toast('warning', 'Advertencia', `Porfavor escoja un año con auditorías programadas`)
+        return
+    }
     let año = auditorias_pendientes[0].anio
     $('#descargar-text-aud').text(`Descargar reportes mensuales ${region} del año ${año}`)
 
@@ -1379,7 +1388,7 @@ async function unir_reportes_mes(mes) {
 
     alert_cargando('Uniendo reportes, esto tomará un tiempo, por favor espere...');
 
-    let server = await server_auditoria({ accion: 7, anio: auditorias_pendientes[0].anio, mes: mes,region:region });
+    let server = await server_auditoria({ accion: 7, anio: auditorias_pendientes[0].anio, mes: mes, region: region });
 
     if (server.resultado.mensaje) {
         mostrar_toast('success', '¡Éxito!', server.resultado.mensaje);
