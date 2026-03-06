@@ -539,19 +539,34 @@ function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
     }
     // Calcular mantenimientos pendientes
     // Crea un objeto organizado por año y mes con la cantidad de mantenimientos pendientes
-    mantenimientosPendientes = Object.values(datos.reduce((objeto, item) => {
-        // Si está realizado, no lo cuenta como pendiente
-        if (item.estado == "Realizado") return objeto
-        let anio = item.anio
-        let mes = item.fecha.split('-')[1]
-        // Si el año no existe en el objeto, lo inicializa
-        if (!objeto[anio]) {
-            objeto[anio] = { anio: anio, meses: {} };
-        }
-        // Incrementa el contador de ese mes (o lo inicializa en 1)
-        objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
-        return objeto
-    }, {}));
+    // mantenimientosPendientes = Object.values(datos.reduce((objeto, item) => {
+    //     // Si está realizado, no lo cuenta como pendiente
+    //     if (item.estado == "Realizado") return objeto
+    //     let anio = item.anio
+    //     let mes = item.fecha.split('-')[1]
+    //     // Si el año no existe en el objeto, lo inicializa
+    //     if (!objeto[anio]) {
+    //         objeto[anio] = { anio: anio, meses: {} };
+    //     }
+    //     // Incrementa el contador de ese mes (o lo inicializa en 1)
+    //     objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
+    //     return objeto
+    // }, {}));
+
+    mantenimientosPendientes = Object.values(
+        (datos_globales && datos_globales.length > 0 ? datos_globales : datos)
+            .reduce((objeto, item) => {
+                if (item.estado == "Realizado") return objeto
+                let anio = item.anio
+                let mes = item.fecha.split('-')[1]
+                if (!objeto[anio]) {
+                    objeto[anio] = { anio: anio, meses: {} };
+                }
+                objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
+                return objeto
+            }, {})
+    );
+
 
     return tabla;   // Retorna la tabla
 }
