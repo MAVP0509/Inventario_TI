@@ -350,7 +350,7 @@ function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
         })
 
         const data = cell.getRow().getData()
-        const disabled = data.reporte_subido == 0 || tab_actual === 'todas'? "disabled" : "" // Deshabilita si no se ha subido el reporte
+        const disabled = data.reporte_subido == 0 || tab_actual === 'todas' ? "disabled" : "" // Deshabilita si no se ha subido el reporte
         return `<button type='button' class='btn btn-lock btn-outline-dark icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Ver pdf'><i class='fa-solid fa-eye'></i></button>`;
     }
     // Ícono de enviar correo
@@ -1358,7 +1358,6 @@ async function descargarMes(mes) {
         region = regionUsuario
     }
 
-
     mantenimiento_loading = true
     alert_cargando('Uniendo los reportes, esto tardará, por favor espere...')
     let server = await server_mantenimiento({ accion: 5, anio: mantenimientosPendientes[0].anio, mes: mes, region: region })
@@ -1380,7 +1379,8 @@ async function consultar_programa_firmado() {
     // Construir el modelo de datos para la petición
     let model = {
         accion: 7,
-        anio: año_programa
+        anio: año_programa,
+        region: regionUsu
     }
     // Enviar petición al servidor
     let server = await server_mantenimiento(model);
@@ -1451,7 +1451,7 @@ async function programa_firmado() {
                     // Modificar el FormData antes de enviar
                     ondata: (formData) => {
                         // Agregar el año del programa como parte de la petición
-                        formData.append('trama', JSON.stringify({ accion: 6, anio: mantenimientosPendientes[0].anio }));
+                        formData.append('trama', JSON.stringify({ accion: 6, anio: mantenimientosPendientes[0].anio, region: regionUsu }));
                         return formData;
                     },
                     // Manejar respuesta exitosa del servidor
