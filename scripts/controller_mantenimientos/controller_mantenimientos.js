@@ -254,6 +254,20 @@ function Tabs(regiones, datos) {
         if (tablas_mant_region[tabId]) {
             table = tablas_mant_region[tabId];  // Actualiza referencia a la tabla activa
             datos_mantenimiento = table.getData();  // Actualiza datos con los del tab actual
+            mantenimientosPendientes = Object.values(datos_mantenimiento.reduce((objeto, item) => {
+                // Si está realizado, no lo cuenta como pendiente
+                if (item.estado == "Realizado") return objeto
+                let anio = item.anio
+                let mes = item.fecha.split('-')[1]
+                // Si el año no existe en el objeto, lo inicializa
+                if (!objeto[anio]) {
+                    objeto[anio] = { anio: anio, meses: {} };
+                }
+                // Incrementa el contador de ese mes (o lo inicializa en 1)
+                objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
+                return objeto
+            }, {}))
+            console.log(mantenimientosPendientes)
         }
 
         // Si la tabla no ha sido creada, se crea
@@ -273,6 +287,7 @@ function Tabs(regiones, datos) {
             // Actualizar las varibles globales con la nueva tabla y datos
             table = nuevaTabla;
             datos_mantenimiento = datosFiltrados;
+
         }
     });
 }
@@ -553,7 +568,9 @@ function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
         return objeto
     }, {}));
 
+    console.log(mantenimientosPendientes)
     return tabla;   // Retorna la tabla
+
 }
 
 async function mdl_programar_mantenimiento() {
@@ -1211,13 +1228,27 @@ $(document).ready(function () {
     $('[data-toggle="popover"]').popover();
 })
 
-function consultar_reportes_mensuales() {
+async function consultar_reportes_mensuales() {
 
     let meses = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
     let mesesConMantenimientos = Object.keys(mantenimientosPendientes[0].meses)
 
     let mesesCompletados = meses.filter(elemento => !mesesConMantenimientos.includes(elemento)).map(Number)
 
+    let rolUsuario = JSON.parse(sessionStorage.getItem('user')).resultado[3]
+    let regionUsuario = JSON.parse(sessionStorage.getItem('user')).resultado[2]
+
+    if (rolUsuario === 'admin') {
+        await general_select2({
+            selectId: 'select-region-reportes',
+            tabla: 'supervisor',
+            campo: 'region',
+            placeholder: 'Seleccione una región',
+            dropdownParent: '#mdl-descargar-reportes-mes',
+            tags: false,
+        })
+
+    }
     cargarMeses(mesesCompletados)
 }
 
