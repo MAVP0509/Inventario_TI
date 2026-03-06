@@ -716,7 +716,8 @@ async function consultar_pauditoria_firmado() {
 
     let model = {
         accion: 3,
-        anio: año_pauditoria
+        anio: año_pauditoria,
+        region: regionUsuario
     }
 
     let server = await server_auditoria(model);
@@ -751,7 +752,8 @@ async function consultar_pauditoria_firmado() {
         PDF.innerHTML = '';
     }
 
-    document.getElementById('btn-open-pauditoria').click();
+    $('body').addClass('control-sidebar-slide-open');
+    $('#control-sidebar-pauditoria').addClass('control-sidebar-slide-open');
 
     auditoria_firmado();
 }
@@ -780,7 +782,7 @@ async function auditoria_firmado() {
                     consulta_reportes_mesuales: 'reporte_pauditoria',
                     withCredentials: false,
                     ondata: (formData) => {
-                        formData.append('trama', JSON.stringify({ accion: 2, anio: auditorias_pendientes[0].anio }));
+                        formData.append('trama', JSON.stringify({ accion: 2, anio: auditorias_pendientes[0].anio, region: regionUsuario }));
                         return formData;
                     },
                     onload: (response) => {
@@ -1300,7 +1302,7 @@ async function mdl_reportes_mensuales() {
     const cont = document.getElementById("contenedor-mes");
     cont.innerHTML = "";
 
-    if (datos_auditoria.length == 0 ) {
+    if (datos_auditoria.length == 0) {
         mostrar_toast('warning', 'Advertencia', `Porfavor escoja un año con auditorías programadas`)
         return
     }

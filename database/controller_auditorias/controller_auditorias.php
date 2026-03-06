@@ -120,8 +120,16 @@ function guardar_programa_auditoria($valores)
         return $respuesta;
     }
 
+    $carpeta_region = $base . DIRECTORY_SEPARATOR . $valores->region;
+
+    if (!is_dir($carpeta_region)) {
+        if (!mkdir($carpeta_region, 0755, true)) {
+            $respuesta->error = "No se pudo crear la carpeta del año.";
+            return $respuesta;
+        }
+    }
     // Carpeta por año
-    $carpeta_anual = $base . DIRECTORY_SEPARATOR . $valores->anio;
+    $carpeta_anual = $carpeta_region . DIRECTORY_SEPARATOR . $valores->anio;
 
     if (!is_dir($carpeta_anual)) {
         if (!mkdir($carpeta_anual, 0755, true)) {
@@ -164,6 +172,14 @@ function consultar_auditoria_firmada($valores)
         ];
     }
 
+    $carpeta_region = $base . DIRECTORY_SEPARATOR . $valores->region;
+
+    if (!is_dir($carpeta_region)) {
+        return [
+            "existe" => false
+        ];
+    }
+
     $carpeta = $base . DIRECTORY_SEPARATOR . $valores->anio;
 
     if (!is_dir($carpeta)) {
@@ -181,7 +197,7 @@ function consultar_auditoria_firmada($valores)
         $host = $_SERVER['HTTP_HOST'];
         $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 
-        $url = "{$protocolo}://{$host}/Inventario_TI/documentos/auditoria/programa/{$valores->anio}/{$archivo}";
+        $url = "{$protocolo}://{$host}/Inventario_TI/documentos/auditoria/programa/{$valores->region}/{$valores->anio}/{$archivo}";
 
         return [
             "existe" => true,
@@ -229,8 +245,8 @@ function guardar_reportes_auditoria($valores)
 
 
         //* Ruta de la carpeta
-        $rutaAnio =  __DIR__ . '/../../Documentos/auditoria/reporte/'.$valores->region.'/' . $fechaAuditoria[0];
-        $rutaMes =  __DIR__ . '/../../Documentos/auditoria/reporte/'.$valores->region.'/' . $fechaAuditoria[0] . '/' . $fechaAuditoria[1];
+        $rutaAnio =  __DIR__ . '/../../Documentos/auditoria/reporte/' . $valores->region . '/' . $fechaAuditoria[0];
+        $rutaMes =  __DIR__ . '/../../Documentos/auditoria/reporte/' . $valores->region . '/' . $fechaAuditoria[0] . '/' . $fechaAuditoria[1];
         //$ruta = __DIR__ . '/../../Documentos/Auditoria/reporte/'. $fechaAuditoria[0].'/'. $fechaAuditoria[1].'/'. $valores->id_equipo;
 
         //* Validando si el año de Auditoria ya tiene su carpeta o no
@@ -281,7 +297,7 @@ function validar_reporte_año($valores)
     $mes = $fecha[1];
 
     //*ruta física del servidor
-    $carpeta = __DIR__ . '/../../documentos/auditoria/reporte/'.$valores->region.'/' . $año . '/' . $mes;
+    $carpeta = __DIR__ . '/../../documentos/auditoria/reporte/' . $valores->region . '/' . $año . '/' . $mes;
 
     //* Verifica si existe la carpeta
     if (is_dir($carpeta)) {
@@ -313,8 +329,8 @@ function consultar_reporte_auditoria($valores)
     $año = $fecha[0];
     $mes = $fecha[1];
 
-    $carpeta = __DIR__ . '/../../documentos/auditoria/reporte/'.$valores->region.'/' . $año . '/' . $mes;
-    $carpetaUrl = '/Inventario_TI/documentos/auditoria/reporte/'.$valores->region.'/' . $año . '/' . $mes;
+    $carpeta = __DIR__ . '/../../documentos/auditoria/reporte/' . $valores->region . '/' . $año . '/' . $mes;
+    $carpetaUrl = '/Inventario_TI/documentos/auditoria/reporte/' . $valores->region . '/' . $año . '/' . $mes;
 
     if (is_dir($carpeta)) {
         $archivos = array_diff(scandir($carpeta), ['.', '..']);
@@ -343,9 +359,9 @@ function unir_reportes_auditoria($valores)
 
     // $base = realpath(__DIR__ . );
 
-    $carpeta_reporte = __DIR__ . '/../../documentos/auditoria/reporte/'.$valores->region.'/' . $valores->anio . '/reportes_unidos';
+    $carpeta_reporte = __DIR__ . '/../../documentos/auditoria/reporte/' . $valores->region . '/' . $valores->anio . '/reportes_unidos';
     $archivo_final = $carpeta_reporte . '/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
-    $url_descarga = '/Inventario_TI/documentos/auditoria/reporte/'.$valores->region.'/' . $valores->anio . '/reportes_unidos/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
+    $url_descarga = '/Inventario_TI/documentos/auditoria/reporte/' . $valores->region . '/' . $valores->anio . '/reportes_unidos/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
 
     try {
         $ilovepdf = new Ilovepdf(
@@ -359,7 +375,7 @@ function unir_reportes_auditoria($valores)
 
         $myTaksMerge = $ilovepdf->newTask('merge');
 
-        $carpeta = __DIR__ . '/../../documentos/auditoria/reporte/'.$valores->region.'/' . $valores->anio . '/' . $valores->mes;
+        $carpeta = __DIR__ . '/../../documentos/auditoria/reporte/' . $valores->region . '/' . $valores->anio . '/' . $valores->mes;
 
         if (!is_dir($carpeta)) {
             $respuesta->error = "No se encontró la ruta";
