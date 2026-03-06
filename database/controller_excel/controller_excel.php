@@ -739,9 +739,9 @@ function reporte_mantenimiento($valores)
 {
     include('../conexion.php');
 
-    $usuario = $valores->elementos->usuario;
-    $anio = $valores->elementos->anio;
-
+    $usuario = $valores->elementos->usuario;    // Nombre del usuario al que pertenece el reporte
+    $anio = $valores->elementos->anio;  // Año del mantenimiento
+    // Consulta los equipos del usuario (excluyendo celulares) junto con su estado de mantenimiento
     $sql = "SELECT
                 inv.id AS id,
                 man.anio,
@@ -759,29 +759,25 @@ function reporte_mantenimiento($valores)
             INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
             LEFT JOIN mantenimiento AS man
                 ON man.id_equipo = inv.id AND man.anio = '$anio'
-            WHERE cu.nombre = '$usuario' AND ct.tipo NOT LIKE '%Teléfono celular%'";
+            WHERE cu.nombre = '$usuario' AND ct.tipo NOT LIKE '%Teléfono celular%' AND inv.estatus <> 'Baja'";
 
     $query = mysqli_query($con, $sql);
 
     $datos = [];
 
     while ($fila = mysqli_fetch_object($query)) {
-        $datos[] = $fila;
+        $datos[] = $fila;   // Almacena cada equipo encontrado
     }
-
+    // Carga la plantilla Excel de mantenimiento
     $spreadsheet = IOFactory::load('FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.01.xlsx'); //*Cargando la plantilla del Excel
     $worksheet = $spreadsheet->getActiveSheet();
-
-    /*
-    TODO Configuración de impresión
-    * Es necesario para dar un formato, delimitar márgenes para cuando se exporte a pdf, el pdf no este descuadrado
-    */
+    // Configuración de impresión para exportación correcta a PDF
     $pageSetup = $worksheet->getPageSetup();
-    $pageSetup->setOrientation(PageSetup::ORIENTATION_PORTRAIT);
-    $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LETTER);
-    $pageSetup->setFitToPage(true);
-    $pageSetup->setFitToWidth(1);
-    $pageSetup->setFitToHeight(0);
+    $pageSetup->setOrientation(PageSetup::ORIENTATION_PORTRAIT);    // Orientación vertical
+    $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LETTER);  // Tamaño carta
+    $pageSetup->setFitToPage(true); // Ajusta el contenido a la página
+    $pageSetup->setFitToWidth(1);   // Ajusta al ancho de una página
+    $pageSetup->setFitToHeight(0);  // Sin límite de alto
 
     //* ajustando márgenes
     $pageMargins = $worksheet->getPageMargins();
@@ -789,13 +785,13 @@ function reporte_mantenimiento($valores)
     $pageMargins->setBottom(0.5);
     $pageMargins->setLeft(0.5);
     $pageMargins->setRight(0.5);
-
+    // Llena los datos del encabezado del reporte
     $worksheet->setCellValue("G11", !empty($valores->elementos->usuario) ? $valores->elementos->usuario : 'NA');
     $worksheet->setCellValue("G12", !empty($valores->elementos->cargo) ? $valores->elementos->cargo : 'NA');
     $worksheet->setCellValue("G13", !empty($valores->elementos->region) ? $valores->elementos->region : 'NA');
     $worksheet->setCellValue("G14", !empty($valores->elementos->folio) ? $valores->elementos->folio : 'MTO');
 
-    // Mapeo de tipo -> fila
+    // Mapa que relaciona cada tipo de equipo con su fila correspondiente en la plantilla
     $mapa_filas = [
         'Laptop' => 20,
         'Desktop' => 20,
@@ -807,47 +803,42 @@ function reporte_mantenimiento($valores)
         'Docking Station' => 25,
     ];
 
-    // Inicializar filas con 'NA'
+    // Inicializa todas las filas de equipos con 'NA' antes de llenarlas
     for ($fila = 20; $fila <= 27; $fila++) {
         $worksheet->getStyle("G{$fila}:W{$fila}")->getAlignment()->setWrapText(true);
-        // $worksheet->getRowDimension($fila)->setRowHeight(-1);
         $worksheet->setCellValue("G{$fila}", 'NA'); // Marca
         $worksheet->setCellValue("L{$fila}", 'NA'); // Modelo
         $worksheet->setCellValue("Q{$fila}", 'NA'); // Serie
         $worksheet->setCellValue("W{$fila}", 'NA'); // Observaciones
     }
 
-    $otros_fila = 26;
+    $otros_fila = 26;   // Fila de inicio para equipos que no están en el mapa
     $ids_equipo = [];
-
+    // Recorre cada equipo y lo coloca en su fila correspondiente del Excel
     foreach ($datos as $equipo) {
         $tipo = trim($equipo->tipo);
 
         if (isset($mapa_filas[$tipo])) {
-            $fila = $mapa_filas[$tipo];
+            $fila = $mapa_filas[$tipo]; // Usa la fila definida en el mapa
         } else {
             if ($otros_fila > 27) {
-                continue;
+                continue;   // Si ya no hay filas disponibles para "otros", lo omite
             }
-
-            $fila = $otros_fila;
+            $fila = $otros_fila;    // Asigna la siguiente fila disponible para tipos no mapeados
             $otros_fila++;
         }
-
+        // Inserta los datos del equipo en las celdas correspondientes
         $worksheet->setCellValue("G{$fila}", $equipo->marca ?? 'NA');
         $worksheet->setCellValue("L{$fila}", $equipo->modelo ?? 'NA');
         $worksheet->setCellValue("Q{$fila}", $equipo->num_serie ?? 'NA');
-        $worksheet->setCellValue("W{$fila}", '');
+        $worksheet->setCellValue("W{$fila}", '');   // Observaciones vacías por defecto
 
-        $ids_equipo[] = $equipo->id;
+        $ids_equipo[] = $equipo->id;    // Guarda el ID del equipo procesado
     }
-
+    // Inserta los nombres de firma al final del reporte
     $worksheet->setCellValue("D69", !empty($valores->encargado) ? $valores->encargado : '');
     $worksheet->setCellValue("U69", !empty($valores->elementos->usuario) ? $valores->elementos->usuario : '');
-
-    // $workskheet->setCellValue("W{$fila}", $observaciones);
-
-
+    // Define el nombre del archivo con región, ID de usuario y fecha para hacerlo único
     $fecha_doc = date('Ymd_His');
     $nombre_doc = "FO-DSP-TI-06 Reporte de mantenimiento preventivo a equipo de computo Rev.{$valores->elementos->region}_{$valores->elementos->id_usuario}_{$fecha_doc}.xlsx";
 
@@ -856,15 +847,17 @@ function reporte_mantenimiento($valores)
     $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 
     if ($base !== false) {
+        // Construye la ruta absoluta donde se guardará el archivo
         $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'controller_excel' . DIRECTORY_SEPARATOR . 'documentos_descarga' . DIRECTORY_SEPARATOR . 'mantenimiento' . DIRECTORY_SEPARATOR . 'reporte' . DIRECTORY_SEPARATOR . $nombre_doc;
+        // Construye la URL pública para descargar el archivo
         $url_descarga = "{$protocolo}://{$host}/Inventario_TI/database/controller_excel/documentos_descarga/mantenimiento/reporte/{$nombre_doc}";
     }
-
+    // Guarda el archivo Excel en la ruta definida
     $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
     $writer->save($ruta_guardar);
 
     $id_equipo = $valores->elementos->id;
-
+    // Actualiza el registro de mantenimiento marcándolo como descargado y en proceso
     $sql = "UPDATE mantenimiento
         SET reporte_descargado = 1,
             estado = 'En proceso'
@@ -872,9 +865,9 @@ function reporte_mantenimiento($valores)
         AND anio = '$anio'";
 
     if (!mysqli_query($con, $sql)) {
-        return false;
+        return false;   // Retorna false si la actualización falla
     }
-
+    // Retorna el resultado con la URL de descarga y el ID del equipo
     return array(
         'result' => true,
         'url' => $url_descarga,
@@ -976,7 +969,7 @@ function programa_auditoria($valores)
     $filas = count($aud); // Cuenta cuántos dispositivos hay
     // Insertar datos de equipos
     foreach ($aud as $index => $item) { // Recorre cada dispositivo
-            if ($index >= 3) { // A partir del cuarto dispositivo, inserta una nueva fila
+        if ($index >= 3) { // A partir del cuarto dispositivo, inserta una nueva fila
             $worksheet->insertNewRowBefore($fila_inicio, 1); // Inserta nueva fila antes de la actual
             $worksheet->duplicateStyle($worksheet->getStyle("B14:S14"), "B{$fila_inicio}:S{$fila_inicio}");
         }
@@ -1053,10 +1046,10 @@ function programa_auditoria($valores)
 function reporte_auditoria($valores)
 {
     include('../conexion.php');
-
+    // Convierte el tipo a minúsculas y reemplaza caracteres especiales para normalizar la comparación
     $tipo = mb_strtolower($valores->elementos->tipo);
     $tipo = str_replace('é', 'e', $tipo);
-
+    // Define el filtro SQL según el tipo de dispositivo
     if ($tipo === 'telefono celular') {
         // SOLO celular
         $filtro_tipo = "AND ct.tipo LIKE 'telefono celular'";
@@ -1065,17 +1058,9 @@ function reporte_auditoria($valores)
         $filtro_tipo = "AND ct.tipo NOT LIKE 'telefono celular'";
     }
 
-    $usuario = $valores->elementos->usuario;
-    $anio = $valores->elementos->anio;
-
-    /*  $sql = "SELECT aud.id_equipo AS id, aud.anio, cu.nombre, cu.cargo, cu.region,
-                   ct.tipo, ca.marca, inv.modelo, inv.num_serie
-            FROM auditoria AS aud
-            INNER JOIN inventario_ti_sur AS inv ON inv.id = aud.id_equipo
-            INNER JOIN cat_usuarios AS cu ON cu.id = inv.fk_usuario
-            INNER JOIN cat_tipo AS ct ON ct.id = inv.fk_tipo
-            INNER JOIN cat_marca AS ca ON ca.id = inv.fk_marca
-            WHERE cu.nombre = '$usuario' AND aud.anio = '$anio'"; */
+    $usuario = $valores->elementos->usuario;    // Nombre del usuario a auditar
+    $anio = $valores->elementos->anio;  // Año de la auditoría
+    // Consulta los equipos del usuario junto con su estado de auditoría para el año indicado
     $sql = "SELECT
                 inv.id AS id,
                 aud.anio,
@@ -1098,30 +1083,24 @@ function reporte_auditoria($valores)
     $query = mysqli_query($con, $sql);
     $datos = [];
     while ($fila = mysqli_fetch_object($query)) {
-        $datos[] = $fila;
+        $datos[] = $fila;   // Almacena cada equipo encontrado
     }
-
-    /* $telefonos = [];
-    $otros = [];
-    $tipo = mb_strtolower(trim($equipo->tipo)); */
-
+    // Carga la plantilla Excel de auditoría
     $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load('FO-DSP-TI-02 Reporte de auditoria a herramientas TI Rev.00.xlsx');
     $worksheet = $spreadsheet->getActiveSheet();
-
-    // Encabezados
+    // Llena los encabezados del reporte con los datos del usuario    
     $worksheet->setCellValue("C8", !empty($usuario) ? $usuario : 'NA');
     $worksheet->setCellValue("G10", !empty($valores->elementos->region) ? $valores->elementos->region : 'NA');
     $worksheet->setCellValue("C10", !empty($valores->area) ? $valores->area : 'NA');
     $worksheet->setCellValue("K10", !empty($valores->ubicacion) ? $valores->ubicacion : 'NA');
 
-    $fila_inicio = 14;
+    $fila_inicio = 14;  // Fila donde comienza el listado de equipos en la plantilla
     $total_equipos = count($datos);
     $ids_equipo = [];
 
     // Proceos de filas y estilos
     foreach ($datos as $index => $equipo) {
         $fila_actual = $fila_inicio + $index;
-        // $ids_equipo[] = $equipo->id;
 
         // Si es el segundo equipo o más, preparamos la fila
         if ($index > 0) {
@@ -1153,21 +1132,21 @@ function reporte_auditoria($valores)
     $desplazamiento = ($total_equipos > 1) ? ($total_equipos - 1) : 0;
     $fila_nombres = 26 + $desplazamiento;
     $fila_cargos = 27 + $desplazamiento;
-
+    // Inserta los datos de firma del encargado y del usuario auditado
     $worksheet->setCellValue("C{$fila_nombres}", !empty($valores->encargado) ? $valores->encargado : '');
     $worksheet->setCellValue("C{$fila_cargos}", !empty($valores->cargo) ? $valores->cargo : '');
     $worksheet->setCellValue("H{$fila_nombres}", $usuario);
     $worksheet->setCellValue("H" . ($fila_nombres + 1), !empty($valores->elementos->cargo) ? $valores->elementos->cargo : '');
-
+    // Define el nombre y ruta donde se guardará el archivo generado
     $nombre_doc = "FO-DSP-TI-06 Reporte de auditoria a herramientas TI Rev.00_{$valores->elementos->region}" . date('Ymd_His') . ".xlsx";
     $base = realpath(__DIR__ . '/../../../');
     $ruta_guardar = $base . DIRECTORY_SEPARATOR . 'Inventario_TI/database/controller_excel/documentos_descarga/auditoria/reporte/' . $nombre_doc;
-
+    // Guarda el archivo Excel en la ruta definida
     $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
     $writer->save($ruta_guardar);
 
     $id_equipo = $valores->elementos->id;
-
+    // Actualiza el registro de auditoría marcándolo como descargado y en proceso
     $sql = "UPDATE auditoria
         SET reporte_descargado = 1,
             estado = 'En proceso'
@@ -1175,13 +1154,9 @@ function reporte_auditoria($valores)
         AND anio = '$anio'";
 
     if (!mysqli_query($con, $sql)) {
-        return false;
+        return false;   // Retorna false si la actualización falla
     }
-    /* if (!empty($ids_equipo)) {
-        $ids = implode(',', $ids_equipo);
-        mysqli_query($con, "UPDATE auditoria SET reporte_descargado = 1, estado = 'En proceso' WHERE id_equipo IN ($ids) AND anio = '$anio'");
-    } */
-
+    // Retorna el resultado con la URL de descarga y el ID del equipo
     return [
         'result' => true,
         'url' => "http://" . $_SERVER['HTTP_HOST'] . "/Inventario_TI/database/controller_excel/documentos_descarga/auditoria/reporte/" . $nombre_doc,

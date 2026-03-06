@@ -109,8 +109,8 @@ function guardar_reportes($valores)
 
 
         //* Ruta de la carpeta
-        $rutaAnio =  __DIR__ . '/../../Documentos/mantenimiento/reporte/'.$valores->region.'/' . $fechaMantenimiento[0];
-        $rutaMes =  __DIR__ . '/../../Documentos/mantenimiento/reporte/'.$valores->region.'/' . $fechaMantenimiento[0] . '/' . $fechaMantenimiento[1];
+        $rutaAnio =  __DIR__ . '/../../Documentos/mantenimiento/reporte/' . $valores->region . '/' . $fechaMantenimiento[0];
+        $rutaMes =  __DIR__ . '/../../Documentos/mantenimiento/reporte/' . $valores->region . '/' . $fechaMantenimiento[0] . '/' . $fechaMantenimiento[1];
         //$ruta = __DIR__ . '/../../Documentos/mantenimiento/reporte/'. $fechaMantenimiento[0].'/'. $fechaMantenimiento[1].'/'. $valores->id_equipo;
 
         //* Validando si el año de mantenimiento ya tiene su carpeta o no
@@ -159,7 +159,7 @@ function validar_reporte_mismo_año($valores)
     $mes = $fecha[1];
 
     //*ruta física del servidor
-    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/'.$valores->region.'/' . $año . '/' . $mes;
+    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->region . '/' . $año . '/' . $mes;
 
     //* Verifica si existe la carpeta
     if (is_dir($carpeta)) {
@@ -191,9 +191,9 @@ function consultar_reporte($valores)
     $año = $fecha[0];   // Primer elemento: año
     $mes = $fecha[1];   // Segundo elemento: mes
     // Construir la ruta física de la carpeta donde se almacenan los reportes
-    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/'.$valores->region.'/' . $año . '/' . $mes;
+    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->region . '/' . $año . '/' . $mes;
     // Construir la URL relativa para acceder al archivo desde el navegador
-    $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/'.$valores->region.'/' . $año . '/' . $mes;
+    $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/' . $valores->region . '/' . $año . '/' . $mes;
     // Verificar si la carpeta existe
     if (is_dir($carpeta)) {
         // Obtener todos los archivos de la carpeta, excluyendo '.' y '..'
@@ -253,7 +253,18 @@ function guardar_programa($valores)
     }
     // Crear carpeta específica para el año si no existe
     // Estructura: /documentos/mantenimiento/programa/{año}
-    $carpeta_anual = $base . DIRECTORY_SEPARATOR . $valores->anio;
+    $carpeta_region = $base . DIRECTORY_SEPARATOR . $valores->region;
+
+    if (!is_dir($carpeta_region)) {
+        // Crear carpeta con permisos 0755 (lectura/escritura/ejecución para owner, lectura/ejecución para grupo y otros)
+        if (!mkdir($carpeta_region, 0755, true)) {
+            $respuesta->error = "No se pudo crear la carpeta de la región.";
+            return $respuesta;
+        }
+    }
+    // Crear carpeta específica para el año si no existe
+    // Estructura: /documentos/mantenimiento/programa/{año}
+    $carpeta_anual = $carpeta_region . DIRECTORY_SEPARATOR . $valores->anio;
 
     if (!is_dir($carpeta_anual)) {
         // Crear carpeta con permisos 0755 (lectura/escritura/ejecución para owner, lectura/ejecución para grupo y otros)
@@ -297,7 +308,16 @@ function consultar_programa_firmado($valores)
         ];
     }
     // Construir la ruta de la carpeta específica del año
-    $carpeta = $base . DIRECTORY_SEPARATOR . $valores->anio;
+    $carpeta_region = $base . DIRECTORY_SEPARATOR . $valores->region;
+    // Verificar si la carpeta del año existe
+    // Si no existe la carpeta, significa que nunca se subió un programa para ese año
+    if (!is_dir($carpeta_region)) {
+        return [
+            "existe" => false
+        ];
+    }
+    // Construir la ruta de la carpeta específica del año
+    $carpeta = $carpeta_region . DIRECTORY_SEPARATOR . $valores->anio;
     // Verificar si la carpeta del año existe
     // Si no existe la carpeta, significa que nunca se subió un programa para ese año
     if (!is_dir($carpeta)) {
@@ -305,6 +325,8 @@ function consultar_programa_firmado($valores)
             "existe" => false
         ];
     }
+    // var_dump($carpeta);
+
     // Buscar todos los archivos PDF en la carpeta del año
     // glob() retorna un array con las rutas completas de los archivos que coinciden con el patrón
     // El patrón '*.pdf' encuentra todos los archivos con extensión .pdf
@@ -320,7 +342,7 @@ function consultar_programa_firmado($valores)
         // Verifica si la conexión es segura (HTTPS) o normal (HTTP)
         $protocolo = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
         // Construir la URL completa para acceder al archivo desde el navegador
-        $url = "{$protocolo}://{$host}/Inventario_TI/documentos/mantenimiento/programa/{$valores->anio}/{$archivo}";
+        $url = "{$protocolo}://{$host}/Inventario_TI/documentos/mantenimiento/programa/{$valores->region}/{$valores->anio}/{$archivo}";
         // Retornar información completa del archivo encontrado
         return [
             "existe" => true,   // Indicar que existe un programa
@@ -349,71 +371,83 @@ function consultar_anio_mantenimiento()
 
 function unir_reportes_mantenimiento($valores)
 {
-    $respuesta = new stdClass();
+    $respuesta = new stdClass();  // Objeto de respuesta que se retornará al final
 
-    $carpeta_reporte =  __DIR__ . '/../../documentos/mantenimiento/reporte/'.$valores->region.'/' . $valores->anio . '/reportes_unidos';
+    $carpeta_reporte =  __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->region . '/' . $valores->anio . '/reportes_unidos';
     $archivoFinal = $carpeta_reporte . '/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
-    $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/'.$valores->region.'/' . $valores->anio . '/reportes_unidos/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
+    $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/' . $valores->region . '/' . $valores->anio . '/reportes_unidos/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
 
     try {
+        // Inicializa la librería ilovepdf con las credenciales de la API
         $ilovepdf = new Ilovepdf(
             'project_public_ecd8df30001f3773a605a14a2c0416c9_I--AV17bdca45d44f5b70e44a9960a810a1ab',
             'secret_key_181ece80f4c57be30267facf2f3890af_TcklQ6a753e75d95f5b32aef79aac42c0d33c',
             [
-                'timeout' => 300,
-                'connect_timeout' => 60
+                'timeout' => 300,       // Tiempo máximo de espera para la tarea
+                'connect_timeout' => 60 // Tiempo máximo de espera para la conexión
             ]
         );
-        // Create a new task
+
+        // Crea una nueva tarea de tipo "merge" (unir PDFs)
         $myTaskMerge = $ilovepdf->newTask('merge');
         // Add files to task for upload
-        $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/'.$valores->region.'/' . $valores->anio . '/' . $valores->mes;
+        $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->region . '/' . $valores->anio . '/' . $valores->mes;
 
+        // Verifica que la carpeta exista, si no retorna un error
         if (!is_dir($carpeta)) {
             $respuesta->error = "No se pudo encontrar la ruta";
             return $respuesta;
         }
 
+        // Obtiene todos los archivos de la carpeta, excluyendo "." y ".."
         $archivos = array_diff(scandir($carpeta), ['.', '..']);
 
-        $ruta = [];
+        $ruta = [];  // Arreglo para almacenar las rutas de los PDFs encontrados
 
         foreach ($archivos as $archivo) {
 
             $rutaCompleta = $carpeta . '/' . $archivo;
 
-            if (is_file($rutaCompleta) && strtolower(pathinfo($archivo, PATHINFO_EXTENSION)) === 'pdf') {  //  ignora carpetas
+            // Solo agrega al arreglo los archivos con extensión PDF, ignora carpetas y otros tipos
+            if (is_file($rutaCompleta) && strtolower(pathinfo($archivo, PATHINFO_EXTENSION)) === 'pdf') {
                 $ruta[] = $rutaCompleta;
             }
         }
 
+        // Si no se encontraron PDFs en la carpeta, retorna un error
         if (empty($ruta)) {
             $respuesta->error = "No se pudo encontrar los archivos";
             return $respuesta;
         }
 
+        // Agrega cada PDF encontrado a la tarea de merge
         foreach ($ruta as $archivo) {
             $myTaskMerge->addFile($archivo);
         }
 
-        // Crear carpeta antes de descargar
+        // Crea la carpeta de destino si no existe
         if (!is_dir($carpeta_reporte)) {
             mkdir($carpeta_reporte, 0777, true);
         }
 
-        // Execute the task
+        // Ejecuta la tarea de unión en la API de ilovepdf
         $myTaskMerge->execute();
+
+        // Descarga el PDF resultante en la carpeta de destino
         $myTaskMerge->download($carpeta_reporte);
 
-        //*Renombrando el pdf generado
+        // Ruta del archivo descargado por defecto (ilovepdf lo llama "merged.pdf")
         $archivoDescargado = $carpeta_reporte . '/merged.pdf';
 
+        // Nuevo nombre que se le asignará al archivo descargado
         $nuevoNombre = $archivoFinal;
 
+        // Verifica que el archivo descargado exista antes de renombrarlo
         if (file_exists($archivoDescargado)) {
+
+            // Intenta renombrar el archivo con el nombre definido
             if (rename($archivoDescargado, $nuevoNombre)) {
                 $respuesta->mensaje = "Archivos unidos correctamente";
-                //$respuesta->error = "Archivo renombrado correctamente a $nuevoNombre";
             } else {
                 $respuesta->error =  "Error al renombrar el archivo";
                 return $respuesta;
@@ -423,14 +457,18 @@ function unir_reportes_mantenimiento($valores)
             return $respuesta;
         }
 
+        // Guarda la URL pública del archivo generado en la respuesta
         $respuesta->ruta = $carpetaUrl;
     } catch (\Ilovepdf\Exceptions\AuthException $e) {
+        // Error de autenticación con la API de ilovepdf
         $respuesta->error = "Error de autenticación Ilovepdf: " . $e->getMessage();
     } catch (\Ilovepdf\Exceptions\TaskException $e) {
+        // Error durante la ejecución de la tarea en ilovepdf
         $respuesta->error = "Error en la tarea Ilovepdf: " . $e->getMessage();
     } catch (\Exception $e) {
+        // Cualquier otro error no contemplado
         $respuesta->error = "Error general: " . $e->getMessage();
     }
 
-    return $respuesta;
+    return $respuesta;  // Retorna la respuesta con el mensaje, ruta o error según corresponda
 }

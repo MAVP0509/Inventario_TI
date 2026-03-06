@@ -684,8 +684,8 @@
                                             <span class="input-group-text"><i
                                                     class="fa-solid fa-clipboard-question"></i></span>
                                         </div>
-                                        <input type="text" class="form-control" id="inp-observaciones" name="lmp-baja"
-                                            placeholder="Observaciones de activos" autocomplete="off">
+                                        <textarea class="form-control" id="inp-observaciones" name="lmp-baja"
+                                            placeholder="Observaciones de activos" autocomplete="off"></textarea>
                                         <div class="invalid-feedback">Por favor, ingrese algunas observaciones</div>
                                     </div>
                                 </div>
@@ -788,14 +788,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- <div class="modal-footer">
-                    <button type="button" class="btn btn-danger icon" data-dismiss="modal" id="modal-btn-his">Cancelar
-                        <i class="fa-solid fa-arrow-right-from-bracket fa-lg"></i>
-                    </button>
-                    <button type="button" class="btn btn-success icon" id="conf-baja" onclick="generar_baja()">Confirmar
-                        <i class="fa-solid fa-circle-check fa-lg"></i>
-                    </button>
-                </div> -->
             </div>
         </div>
     </div>
@@ -887,13 +879,13 @@
                                 <div class="input-group">
                                     <div class="input-group-prepend"><span class="input-group-text"><i
                                                 class="fa-solid fa-circle-info"></i></span></div>
-                                    <select class="form-control" id="mdl-estado"></select>
+                                    <select class="form-control" name="traspasos" id="mdl-estado"></select>
                                 </div>
                                 <label for="mdl-usuario">Usuario a traspasar</label>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend"><span class="input-group-text"><i
                                                 class="fa-solid fa-user"></i></span></div>
-                                    <select class="form-control" id="mdl-usuario"></select>
+                                    <select class="form-control" name="traspasos" id="mdl-usuario"></select>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6">
@@ -901,7 +893,7 @@
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend"><span class="input-group-text"><i
                                                         class="fa-solid fa-user"></i></span></div><select
-                                                class="form-control" id="mdl-zona"></select>
+                                                class="form-control" name="traspasos" id="mdl-zona"></select>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -909,7 +901,7 @@
                                         <div class="input-group mb-3">
                                             <div class="input-group-prepend"><span class="input-group-text"><i
                                                         class="fa-solid fa-user"></i></span></div>
-                                            <select class="form-control" id="mdl-ubicacion"></select>
+                                            <select class="form-control" name="traspasos" id="mdl-ubicacion"></select>
                                         </div>
                                     </div>
                                 </div>

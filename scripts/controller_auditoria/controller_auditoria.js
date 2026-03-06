@@ -915,6 +915,13 @@ function validar_correo2(texto1, texto2) {
 
 //*Función para mostrar modal de descarga de reporte de auditoría
 async function mdl_descargar_reporte_auditoria(equipo) {
+    // Selecciona todos los inputs con el nombre 'auditoria-rp'
+    let inputs = document.getElementsByName('auditoria-rp');
+    // Limpia los valores de todos los inputs y quita clases de error
+    for (let i = 0; i < inputs.length; i++) {
+        inputs[i].value = ""; // Limpia el valor del input
+        inputs[i].classList.remove('is-invalid'); // Elimina la clase de validación
+    }
     $("#btn-reporte-aud").prop("disabled", false);
     // document.getElementById("btn-reporte-aud").disabled = false;
 
