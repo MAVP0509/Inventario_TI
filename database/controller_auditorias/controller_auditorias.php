@@ -164,6 +164,7 @@ function guardar_programa_auditoria($valores)
 //*Función para consultar el programa de auditoría subido
 function consultar_auditoria_firmada($valores)
 {
+
     $base = realpath(__DIR__ . '/../../documentos/auditoria/programa');
 
     if ($base === false) {
@@ -180,7 +181,7 @@ function consultar_auditoria_firmada($valores)
         ];
     }
 
-    $carpeta = $base . DIRECTORY_SEPARATOR . $valores->anio;
+    $carpeta = $carpeta_region . DIRECTORY_SEPARATOR . $valores->anio;
 
     if (!is_dir($carpeta)) {
         return [
