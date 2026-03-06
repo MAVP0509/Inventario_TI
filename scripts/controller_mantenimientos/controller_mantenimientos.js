@@ -254,6 +254,7 @@ function Tabs(regiones, datos) {
         if (tablas_mant_region[tabId]) {
             table = tablas_mant_region[tabId];  // Actualiza referencia a la tabla activa
             datos_mantenimiento = table.getData();  // Actualiza datos con los del tab actual
+            //*Actualizando la variable mantenimientosPendientes
             mantenimientosPendientes = Object.values(datos_mantenimiento.reduce((objeto, item) => {
                 // Si está realizado, no lo cuenta como pendiente
                 if (item.estado == "Realizado") return objeto
@@ -267,7 +268,7 @@ function Tabs(regiones, datos) {
                 objeto[anio].meses[mes] = (objeto[anio].meses[mes] || 0) + 1
                 return objeto
             }, {}))
-            console.log(mantenimientosPendientes)
+
         }
 
         // Si la tabla no ha sido creada, se crea
@@ -347,8 +348,9 @@ function crear_tabla_mantenimiento(tabId, datos, fecha, mostrarRegion = false) {
         onRendered(function () {
             $(cell.getElement()).find('[data-toggle="popover"]').popover()
         })
+
         const data = cell.getRow().getData()
-        const disabled = data.reporte_subido == 0 ? "disabled" : "" // Deshabilita si no se ha subido el reporte
+        const disabled = data.reporte_subido == 0 || tab_actual === 'todas'? "disabled" : "" // Deshabilita si no se ha subido el reporte
         return `<button type='button' class='btn btn-lock btn-outline-dark icon' ${disabled} data-animation='true' data-toggle='popover' data-trigger='hover' data-html='true' data-placement='bottom' data-content='Ver pdf'><i class='fa-solid fa-eye'></i></button>`;
     }
     // Ícono de enviar correo
@@ -959,6 +961,8 @@ let pond
 //* Variable utilizada para guardar temporalmente el archivo y asi poder ser eliminado desde otra función
 let fileItemCargado
 async function abrir_subir_reporte(elemento_mnt) {
+
+
     //*Escondiendo el alert
     document.getElementById('alert-reporte').setAttribute('style', 'display: none !important;  background-color:#fceaea; border-color:#f5c6cb; color:#721c24; padding-right: 4rem;');
 
@@ -967,6 +971,27 @@ async function abrir_subir_reporte(elemento_mnt) {
 
     if (pond) {
         pond.destroy();   //* <- Esto destruye la instancia anterior, lo cual es necesario
+    }
+    let rolUsuario = JSON.parse(sessionStorage.getItem('user')).resultado[3]
+    let regionUsuario = JSON.parse(sessionStorage.getItem('user')).resultado[2]
+    let region = ''
+    switch (tab_actual) {
+        case 'regin-norte':
+            region = 'norte'
+            break;
+        case 'regin-sur':
+            region = 'sur'
+            break;
+        case 'regin-tampico':
+            region = 'tampico'
+            break;
+
+        default:
+            break;
+    }
+
+    if (rolUsuario === 'user') {
+        region = regionUsuario
     }
 
     //* Al destruir la instancia es necesario colocarle de nuevo el name al input, sino, no aceptará el archivo el php
@@ -999,7 +1024,8 @@ async function abrir_subir_reporte(elemento_mnt) {
                     const trama = {
                         accion: 1,
                         id_equipo: elemento_mnt.id,
-                        fecha_mnto: elemento_mnt.fecha
+                        fecha_mnto: elemento_mnt.fecha,
+                        region: region
                     };
                     formData.append('trama', JSON.stringify(trama));
                     return formData;
@@ -1054,7 +1080,8 @@ async function abrir_subir_reporte(elemento_mnt) {
 
     });
 
-    let server = await server_mantenimiento({ accion: 2, id_equipo: elemento_mnt.id, fecha_mnto: elemento_mnt.fecha })
+
+    let server = await server_mantenimiento({ accion: 2, id_equipo: elemento_mnt.id, fecha_mnto: elemento_mnt.fecha, region: region })
 
     if (server.resultado) {
         document.getElementById('alert-reporte').style.display = 'block'
@@ -1087,11 +1114,33 @@ document.addEventListener('FilePond:removefile', (e) => {
 async function ver_pdf_reporte(elemento_mnt) {
     dominio = window.location.hostname
     puerto = location.port
+    let rolUsuario = JSON.parse(sessionStorage.getItem('user')).resultado[3]
+    let regionUsuario = JSON.parse(sessionStorage.getItem('user')).resultado[2]
+    let region = ''
+    switch (tab_actual) {
+        case 'regin-norte':
+            region = 'norte'
+            break;
+        case 'regin-sur':
+            region = 'sur'
+            break;
+        case 'regin-tampico':
+            region = 'tampico'
+            break;
+
+        default:
+            break;
+    }
+
+    if (rolUsuario === 'user') {
+        region = regionUsuario
+    }
 
     let model = {
         accion: 3,
         id_equipo: elemento_mnt.id,
-        fecha_mnto: elemento_mnt.fecha
+        fecha_mnto: elemento_mnt.fecha,
+        region: region
     }
 
     let server = await server_mantenimiento(model)
@@ -1213,12 +1262,31 @@ function validar_dos_input_text(texto1, texto2) {
 }
 // TODO: Funciones para unir reportes por mes
 async function mdl_descargar_reportes_mensuales() {
+    if (tab_actual === 'todas') {
+        mostrar_toast('warning', 'Advertencia', 'Porfavor escoja la vista de una región')
+        return
+    }
+    let region = ''
+    switch (tab_actual) {
+        case 'regin-norte':
+            region = 'región norte'
+            break;
+        case 'regin-sur':
+            region = 'región sur'
+            break;
+        case 'regin-tampico':
+            region = 'región tampico'
+            break;
+
+        default:
+            break;
+    }
+
     const cont = document.getElementById("mesesContainer");
     cont.innerHTML = "";
 
     let año = mantenimientosPendientes[0].anio
-    $('#mdl-descargar-text').text(`Descargar reportes mensuales del año ${año}`)
-
+    $('#mdl-descargar-text').text(`Descargar reportes mensuales ${region} del año ${año}`)
 
     consultar_reportes_mensuales()
     $('#mdl-descargar-reportes-mes').modal('show')
@@ -1235,20 +1303,6 @@ async function consultar_reportes_mensuales() {
 
     let mesesCompletados = meses.filter(elemento => !mesesConMantenimientos.includes(elemento)).map(Number)
 
-    let rolUsuario = JSON.parse(sessionStorage.getItem('user')).resultado[3]
-    let regionUsuario = JSON.parse(sessionStorage.getItem('user')).resultado[2]
-
-    if (rolUsuario === 'admin') {
-        await general_select2({
-            selectId: 'select-region-reportes',
-            tabla: 'supervisor',
-            campo: 'region',
-            placeholder: 'Seleccione una región',
-            dropdownParent: '#mdl-descargar-reportes-mes',
-            tags: false,
-        })
-
-    }
     cargarMeses(mesesCompletados)
 }
 
@@ -1286,9 +1340,33 @@ async function descargarMes(mes) {
     dominio = window.location.hostname
     puerto = location.port
     // console.log("Descargando mes:", mes);
+    let rolUsuario = JSON.parse(sessionStorage.getItem('user')).resultado[3]
+    let regionUsuario = JSON.parse(sessionStorage.getItem('user')).resultado[2]
+
+    let region = ''
+    switch (tab_actual) {
+        case 'regin-norte':
+            region = 'norte'
+            break;
+        case 'regin-sur':
+            region = 'sur'
+            break;
+        case 'regin-tampico':
+            region = 'tampico'
+            break;
+
+        default:
+            break;
+    }
+
+    if (rolUsuario === 'user') {
+        region = regionUsuario
+    }
+
+
     mantenimiento_loading = true
     alert_cargando('Uniendo los reportes, esto tardará, por favor espere...')
-    let server = await server_mantenimiento({ accion: 5, anio: mantenimientosPendientes[0].anio, mes: mes })
+    let server = await server_mantenimiento({ accion: 5, anio: mantenimientosPendientes[0].anio, mes: mes, region: region })
 
     if (server.resultado.mensaje) {
         mostrar_toast('success', '¡Éxito!', server.resultado.mensaje)
