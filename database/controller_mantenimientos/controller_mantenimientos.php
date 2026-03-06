@@ -109,8 +109,8 @@ function guardar_reportes($valores)
 
 
         //* Ruta de la carpeta
-        $rutaAnio =  __DIR__ . '/../../Documentos/mantenimiento/reporte/' . $fechaMantenimiento[0];
-        $rutaMes =  __DIR__ . '/../../Documentos/mantenimiento/reporte/' . $fechaMantenimiento[0] . '/' . $fechaMantenimiento[1];
+        $rutaAnio =  __DIR__ . '/../../Documentos/mantenimiento/reporte/'.$valores->region.'/' . $fechaMantenimiento[0];
+        $rutaMes =  __DIR__ . '/../../Documentos/mantenimiento/reporte/'.$valores->region.'/' . $fechaMantenimiento[0] . '/' . $fechaMantenimiento[1];
         //$ruta = __DIR__ . '/../../Documentos/mantenimiento/reporte/'. $fechaMantenimiento[0].'/'. $fechaMantenimiento[1].'/'. $valores->id_equipo;
 
         //* Validando si el año de mantenimiento ya tiene su carpeta o no
@@ -159,7 +159,7 @@ function validar_reporte_mismo_año($valores)
     $mes = $fecha[1];
 
     //*ruta física del servidor
-    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $año . '/' . $mes;
+    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/'.$valores->region.'/' . $año . '/' . $mes;
 
     //* Verifica si existe la carpeta
     if (is_dir($carpeta)) {
@@ -191,9 +191,9 @@ function consultar_reporte($valores)
     $año = $fecha[0];   // Primer elemento: año
     $mes = $fecha[1];   // Segundo elemento: mes
     // Construir la ruta física de la carpeta donde se almacenan los reportes
-    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $año . '/' . $mes;
+    $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/'.$valores->region.'/' . $año . '/' . $mes;
     // Construir la URL relativa para acceder al archivo desde el navegador
-    $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/' . $año . '/' . $mes;
+    $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/'.$valores->region.'/' . $año . '/' . $mes;
     // Verificar si la carpeta existe
     if (is_dir($carpeta)) {
         // Obtener todos los archivos de la carpeta, excluyendo '.' y '..'
@@ -351,10 +351,9 @@ function unir_reportes_mantenimiento($valores)
 {
     $respuesta = new stdClass();  // Objeto de respuesta que se retornará al final
 
-    // Rutas del directorio y archivo final donde se guardará el PDF unido
-    $carpeta_reporte =  __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->anio . '/reportes_unidos';
+    $carpeta_reporte =  __DIR__ . '/../../documentos/mantenimiento/reporte/'.$valores->region.'/' . $valores->anio . '/reportes_unidos';
     $archivoFinal = $carpeta_reporte . '/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
-    $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/' . $valores->anio . '/reportes_unidos/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
+    $carpetaUrl = '/Inventario_TI/documentos/mantenimiento/reporte/'.$valores->region.'/' . $valores->anio . '/reportes_unidos/Reporte_' . $valores->anio . '_' . $valores->mes . '.pdf';
 
     try {
         // Inicializa la librería ilovepdf con las credenciales de la API
@@ -369,9 +368,8 @@ function unir_reportes_mantenimiento($valores)
 
         // Crea una nueva tarea de tipo "merge" (unir PDFs)
         $myTaskMerge = $ilovepdf->newTask('merge');
-
-        // Ruta de la carpeta que contiene los PDFs del mes y año indicados
-        $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/' . $valores->anio . '/' . $valores->mes;
+        // Add files to task for upload
+        $carpeta = __DIR__ . '/../../documentos/mantenimiento/reporte/'.$valores->region.'/' . $valores->anio . '/' . $valores->mes;
 
         // Verifica que la carpeta exista, si no retorna un error
         if (!is_dir($carpeta)) {
