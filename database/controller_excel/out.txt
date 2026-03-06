@@ -621,3 +621,5 @@ convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Rednar
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Hernan_Castro_Cantarell.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Hernan_Castro_Cantarell.pdf using filter : calc_pdf_Export
 convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Gabriela_Morales_Gallegos.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Gabriela_Morales_Gallegos.pdf using filter : calc_pdf_Export
 El sistema no puede encontrar la ruta especificada.
+convert C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Janny_Leticia_García_Mendoza.xlsx as a Calc document -> C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Janny_Leticia_García_Mendoza.pdf using filter : calc_pdf_Export
+Overwriting: C:\xampp\htdocs\Inventario_TI\database\controller_excel\Resguardo_Janny_Leticia_García_Mendoza.pdf

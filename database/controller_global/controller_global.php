@@ -61,7 +61,7 @@ function consultar_distintos($valores)
             case "anio":
             case "rol":
             case "region":
-                // case "cargo":
+            case "cargo":
                 $sql = "SELECT DISTINCT `$campo` FROM `$tabla` WHERE  `$campo` <> 'NA' ORDER BY `$campo` ASC";
                 break;
             case 'nombre':
