@@ -20,7 +20,7 @@
     function validar_log($valores) {
         include("../conexion.php");
 
-        $sql="SELECT * FROM usuario WHERE correo= '$valores->correo'";
+        $sql="SELECT * FROM usuario WHERE correo= '$valores->correo' AND habilitado = 1";
         $query = mysqli_query($con,$sql); //*Consultamos si el correo existe
         
         if ($query->num_rows > 0) {

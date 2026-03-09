@@ -738,12 +738,21 @@ async function mostrar_traspaso() {
         inputs[i].value = ""; // Limpia el valor del input
         inputs[i].classList.remove('is-invalid'); // Elimina la clase de validación
     }
+
     // Verifica si no hay equipos seleccionados
     if (equipo_seleccionado.length == 0) {
         mostrar_toast('warning', 'Alerta', 'Selecione al menos un activo. Inténtalo nuevamente.')
     } else {
         const usuario = JSON.parse(sessionStorage.getItem('user'));
         const rol = usuario.resultado[3];
+        const region = usuario.resultado[2]
+
+        //*Comparando las regiones de los equipos seleccionados sean de la region del usuario
+        let equipos_misma_region = datos.filter(equipo =>
+            equipo_seleccionado.includes(equipo.id_equipo) &&
+            equipo.zona.toLowerCase().includes(region.toLowerCase())
+        );
+        let equipos_no_permitidos = equipo_seleccionado.length - equipos_misma_region.length
         // Inicialización de selects
         await Promise.all([
             await general_select2({
@@ -788,7 +797,17 @@ async function mostrar_traspaso() {
         $("#check-resguardo-icon").removeClass("fa-solid fa-square-check")
         $("#check-resguardo-icon").addClass("fa-regular fa-square ")
         // Muentra el modal de trapaso
-        $("#mdl-traspaso").modal("show");
+
+        //*Si no todos los equipos son de la misma region no procede el traspaso
+        if (equipos_misma_region.length !== equipo_seleccionado.length) {
+            mostrar_toast('warning', ' Advertencia', `${equipos_no_permitidos} equipo(s) son de otra región, no puede traspasarlos`)
+            //*Quitando la selección a todos los equipos
+            deseleccionar_todos()
+
+        } else {
+            $("#mdl-traspaso").modal("show");
+        }
+
     }
 }
 
@@ -856,6 +875,11 @@ $(document).ready(function () {
     $('#mdl-estado').on('change', async function () {
         const seleccionado = $(this).val(); // Obtiene el valor del estado selecccionado
         const filtro = seleccionado === 'Bodega'    // true si el estado es bodega, falso en caso contrario
+
+        const usuario = JSON.parse(sessionStorage.getItem('user'));
+        const rol = usuario.resultado[3];
+        const region = usuario.resultado[2]
+
         // si el estado seleccionado es "Asignado"
         if (seleccionado === 'Asignado') {
             // Carga todos los usuarios en el select (sin filtro)
@@ -884,6 +908,7 @@ $(document).ready(function () {
                 tags: false,
                 filtro: filtro  // true: filtra solo usuarios de bodega
             })
+
             // Deshabilita y limpia los campos de zona y ubicación (no aplican para bodega)
             $('#mdl-zona, #mdl-ubicacion').prop('disabled', true).removeClass('is-requerid').val('');
             // Habilita y marca como requerido solo el campo de usuario
@@ -1941,3 +1966,15 @@ $('#select-ver-usu-file').on('change', async function () {
         mostrar_toast("error", "Error", 'Hubo un problema con el servidor')
     }
 })
+
+function deseleccionar_todos() {
+    //  Resetear propiedad "seleccionado"
+    datos.forEach(d => d.seleccionado = false);
+
+    //  Limpiar el array de usuarios_seleccionados
+    equipo_seleccionado = [];
+
+
+    //  Forzar re-renderizado de todas las filas para reflejar los íconos
+    table.getRows().forEach(row => row.reformat());
+}
